@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from '../../styles/layout/layout.module.scss';
-import { Header } from './index';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import Loading from '../Loading';
@@ -13,7 +12,6 @@ import { LeftNav } from './LeftNav';
 import { HeaderWms } from './HeaderWms';
 import Head from 'next/head';
 import { useCommonStore } from '../../stores';
-import { HeaderDesignMobile } from './HeaderDesignMobile';
 
 interface Props {
   children: React.ReactNode;
@@ -43,25 +41,23 @@ export const Layout = ({ children }: Props) => {
     histParamList: [{ paramNm: '', paramValue: '' }],
   });
   /** 공통 스토어 - State */
-  const [setHistoryList, isOrderOn, setIsOrderOn] = useCommonStore((s) => [s.setHistoryList, s.isOrderOn, s.setIsOrderOn]);
+  const { setHistoryList, isOrderOn } = useCommonStore();
   const isMatch = useRef(false);
 
   const {
     data: menuAuthList,
     isLoading,
     isSuccess: isMenuCheckSuccess,
-  } = useQuery(
-    ['/auth/check/menu', router.pathname],
-    () =>
-      authApi.get<ApiResponseAuthResponseMenuAuth>('/auth/check/menu', {
-        params: {
-          menuUri: router.pathname,
-        },
-      }),
-    {
-      enabled: !!storeSession?.user,
-    },
-  );
+  } = useQuery({
+    queryKey: ['/auth/check/menu', router.pathname],
+    queryFn: () =>
+        authApi.get<ApiResponseAuthResponseMenuAuth>('/auth/check/menu', {
+          params: {
+            menuUri: router.pathname,
+          },
+        }),
+    enabled: !!storeSession?.user,
+  });
 
   /**
    * 히스토리탭에서 사용되는 uri 목록 생성
@@ -128,70 +124,20 @@ export const Layout = ({ children }: Props) => {
     }
   }, [authGroupCd]);
 
-  if (authGroupCd === '3' && !isMobile) {
-    // oms 사용자
     return (
-      <>
-        {session.status === 'authenticated' && !isLoading && (
-          <div className={`omsLayout ${styles.layout} ${isOrderOn ? 'isOrderOn' : ''}`}>
-            <Head>
-              <title>GGUANGGU</title>
-            </Head>
-            <Header
-              closed={closed}
-              toggle={() => setClosed(!closed)}
-              onClick={() => {
-                localStorage.setItem('OMS_AREA', 'OTHER');
-              }}
-            />
-            <div className={`container ${styles.container} ${closed ? styles.on : ''}`}>
-              <div
-                className={`content ${styles.content}`}
-                onClick={() => {
-                  localStorage.setItem('OMS_AREA', 'OTHER');
-                }}
-              >
-                {children}
+        <>
+          {session.status === 'authenticated' && !isLoading && (
+              <div className={`wmsLayout ${styles.layout}`}>
+                <Head>
+                  <title>BINBLUR WMS</title>
+                </Head>
+                <HeaderWms closed={closed} toggle={() => setClosed(!closed)} />
+                <div className={`container ${styles.container} ${closed ? styles.on : ''}`}>
+                  <LeftNav />
+                  <div className={`content ${styles.content}`}>{children}</div>
+                </div>
               </div>
-            </div>
-          </div>
-        )}
-      </>
+          )}
+        </>
     );
-  } else if (authGroupCd === '3' && isMobile) {
-    // admin wms 사용자
-    return (
-      <>
-        {session.status === 'authenticated' && !isLoading && (
-          <div>
-            <Head>
-              <title>GGUANGGU MOBILE</title>
-            </Head>
-            <HeaderDesignMobile closed={closed} toggle={() => setClosed(!closed)} />
-            <div>
-              <div>{children}</div>
-            </div>
-          </div>
-        )}
-      </>
-    );
-  } else {
-    // admin wms 사용자
-    return (
-      <>
-        {session.status === 'authenticated' && !isLoading && (
-          <div className={`wmsLayout ${styles.layout}`}>
-            <Head>
-              <title>GGUANGGU ADMIN</title>
-            </Head>
-            <HeaderWms closed={closed} toggle={() => setClosed(!closed)} />
-            <div className={`container ${styles.container} ${closed ? styles.on : ''}`}>
-              <LeftNav />
-              <div className={`content ${styles.content}`}>{children}</div>
-            </div>
-          </div>
-        )}
-      </>
-    );
-  }
 };

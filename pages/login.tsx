@@ -169,7 +169,7 @@ const Login = () => {
           histMenuUri: menu.menuUri,
           histParamList: [],
         }));
-        const landingPage = authGroupCd === '3' ? (session.data.user.isMobileLogin === 'Y' ? '/mobile/asn/MobileAsn' : '/oms/orderInfo/today') : '/';
+        const landingPage = '/';
         if (favHistoryList && favHistoryList.length > 0) {
           localStorage.setItem(myLocalStorage, JSON.stringify(favHistoryList));
         }

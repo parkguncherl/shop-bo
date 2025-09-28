@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { signOut } from 'next-auth/react';
 import styles from '../../styles/layout/header.module.scss';
-import { Button } from '../Button';
 import Link from 'next/link';
 import useAppStore, { appStoreContext } from '../../stores/useAppStore';
 import { useAuthStore, useCommonStore, useMypageStore } from '../../stores';
@@ -11,7 +10,6 @@ import { toastError } from '../ToastMessage';
 import { ApiResponseAuthResponseMenuAuth, ApiResponseListSelectFavorites } from '../../generated';
 import { useQuery } from '@tanstack/react-query';
 import { TabMenu } from './TabMenu';
-import { TabMenu2 } from './TabMenu2';
 import { ConfirmModal } from '../ConfirmModal';
 
 interface Props {
@@ -53,7 +51,7 @@ export const HeaderWms = ({ closed = false, toggle }: Props) => {
     }
   };
 
-  const { data: favoriteData, isSuccess: isFavSuccess } = useQuery([], () => authApi.get<ApiResponseListSelectFavorites>('/mypage/favorites', {}));
+  const { data: favoriteData, isSuccess: isFavSuccess } = useQuery({queryKey: [], queryFn: () => authApi.get<ApiResponseListSelectFavorites>('/mypage/favorites')});
 
   // 즐겨찾기 데이터가 변경될 때 상태 업데이트
   useEffect(() => {

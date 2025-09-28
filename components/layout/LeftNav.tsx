@@ -3,16 +3,13 @@ import { useRouter } from 'next/router';
 import { authApi } from '../../libs';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { ApiResponseListCodeDropDown, ApiResponseListLeftMenu, ApiResponseListLogisCodeDropDown, LogisCodeDropDown } from '../../generated';
+import { ApiResponseListLeftMenu } from '../../generated';
 import Loading from '../Loading';
 import { useSession } from 'next-auth/react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { DEFAULT_ADD_HOURE } from '../../libs/const';
-import useAppStore from '../../stores/useAppStore';
-import { Utils } from '../../libs/utils';
 import { toastError } from '../ToastMessage';
-import data from '@react-google-maps/api/src/components/drawing/Data';
 
 interface IMenu {
   menuNm?: string;
@@ -65,15 +62,15 @@ const SingleLevel = ({ item }: { item: IMenu }) => {
 const MultiLevel = ({ item }: { item: IMenu }) => {
   const { items: children } = item;
   const router = useRouter();
-  const isSelected = false;
+  let isSelected = false;
 
   const bigUri = !item.menuUri ? '' : item.menuUri;
 
-  /*if (router.pathname) {
+  if (router.pathname) {
     if (bigUri == router.pathname.split('/')[1]) {
       isSelected = true;
     }
-  }*/
+  }
   // url 직접 들어왔을때 대메뉴 활성화 끝
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -191,24 +188,7 @@ export const LeftNav = ({ closed = false }: Props) => {
   const { data: session, update: updateSession } = useSession();
   // 센터관련
   const initialCenters = [''];
-  const [selectedCenter, setSelectedCenter] = useState(initialCenters[0]);
-  const [centers, setCenters] = useState(initialCenters.slice(1));
-  const [centerOn, setCenterOn] = useState(false);
   const centerRef = useRef<HTMLLIElement | null>(null);
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (centerRef.current && !centerRef.current.contains(event.target as Node)) {
-        // 클릭한 요소가 centerRef 내부가 아닐 경우
-        setCenterOn(false); // 영역 외 클릭 시 centerOn을 false로 설정
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [centerRef]);
-
   useEffect(() => {
     const timer = setInterval(() => {
       const now = new Date();
@@ -223,43 +203,9 @@ export const LeftNav = ({ closed = false }: Props) => {
     enabled: sessions.status === 'authenticated',
   });
 
-  const { data: logisDropDown, isSuccess } = useQuery(['/logis/dropdown'], () => authApi.get<ApiResponseListLogisCodeDropDown>('/logis/dropdown'), {
-    enabled: sessions.status === 'authenticated',
-  });
-
-  useEffect(() => {
-    console.log(logisDropDown);
-  }, [isSuccess]);
-
   if (isFetching) {
     return <Loading />;
   }
-
-  // 센터 관련
-  const handleCenterBtn = () => {
-    setCenterOn(!centerOn);
-  };
-  const handleDdClick = async (logisId: string, logisNm: string) => {
-    // 이전 선택을 dd 목록에 다시 추가
-    setCenters((prevCenters) => [...prevCenters, selectedCenter].sort());
-    // 선택된 항목을 dt로 이동시키고 dd 목록에서 제거
-    setSelectedCenter(logisId);
-    setCenters((prevCenters) => prevCenters.filter((c) => c !== logisId));
-    handleCenterBtn();
-    const response = await authApi.get<ApiResponseListCodeDropDown>('/auth/changeLogisId/' + logisId);
-    if (response.data.resultCode === 200) {
-      await updateSession({
-        ...session,
-        user: {
-          ...session?.user,
-          workLogisId: logisId,
-          workLogisNm: logisNm,
-        },
-      });
-    } else {
-      toastError('시간 업데이트에 실패했습니다.');
-    }
-  };
 
   return (
     <aside className={`${closed ? 'on' : ''}`}>
@@ -273,22 +219,6 @@ export const LeftNav = ({ closed = false }: Props) => {
           }}
         >
           {session?.user?.userNm || ''}
-        </li>
-        <li className={`ico_mulyu ${centerOn ? 'on' : ''}`} ref={centerRef}>
-          <dl>
-            <dt onClick={handleCenterBtn}>{session?.user.workLogisNm}</dt>
-            {logisDropDown?.data.body &&
-              logisDropDown.data.body
-                .filter((data) => data?.codeCd !== session?.user.workLogisId)
-                .map((data, index) => (
-                  <dd key={index} onClick={() => handleDdClick(data?.codeCd || '', data?.codeNm || '')} aria-selected={true}>
-                    {data.codeNm}
-                  </dd>
-                ))}
-          </dl>
-          <button onClick={handleCenterBtn}>
-            <span></span>
-          </button>
         </li>
         <li className="ico_date">
           <div>

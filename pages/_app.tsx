@@ -23,9 +23,7 @@ import Error from 'next/error';
 import 'ag-grid-community/styles/ag-grid.css'; // Mandatory CSS required by the Data Grid
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import 'react-datepicker/dist/react-datepicker.css';
-import 'ag-grid-enterprise';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
-import { AllEnterpriseModule } from 'ag-grid-enterprise'; // Enterprise 사용 시
 
 // dayjs 플러그인 설정
 dayjs.extend(utc);
@@ -35,7 +33,6 @@ dayjs.tz.setDefault('Asia/Seoul');
 
 ModuleRegistry.registerModules([
   AllCommunityModule,
-  AllEnterpriseModule, // Enterprise 라이선스가 있는 경우만
 ]);
 
 const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
