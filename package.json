@@ -12,9 +12,9 @@
     "start:prod": "env-cmd -f .env.production next start",
     "lint": "next lint",
     "openapi:local": "openapi-generator-cli generate --reserved-words-mappings delete=delete -g typescript-axios -i http://localhost:8080/shop-ap/v3/api-docs/smart -o ./generated -c ./openapi.json --skip-validate-spec",
-    "openapi:dev": "openapi-generator-cli generate --reserved-words-mappings delete=delete -g typescript-axios -i http://172.31.10.108:8080/shop-ap/v3/api-docs/smart -o ./generated -c ./openapi.json --skip-validate-spec",
-    "openapi:prod": "openapi-generator-cli generate --reserved-words-mappings delete=delete -g typescript-axios -i http://172.31.10.108:8080/shop-ap/v3/api-docs/smart -o ./generated -c ./openapi.json --skip-validate-spec",
-    "release": "yarn install; yarn openapi:dev; yarn build:wdev; yarn dev"
+    "openapi:dev": "openapi-generator-cli generate --reserved-words-mappings delete=delete -g typescript-axios -i http://localhost:8080/shop-ap/v3/api-docs/smart -o ./generated -c ./openapi.json --skip-validate-spec",
+    "openapi:prod": "openapi-generator-cli generate --reserved-words-mappings delete=delete -g typescript-axios -i http://localhost:8080/shop-ap/v3/api-docs/smart -o ./generated -c ./openapi.json --skip-validate-spec",
+    "release": "pnpm install; pnpm openapi:dev; pnpm build:wdev; pnpm dev"
   },
   "dependencies": {
     "@ant-design/cssinjs": "^1.7.1",
@@ -38,7 +38,6 @@
     "@types/react-datepicker": "^4.8.0",
     "@types/react-dom": "18.0.9",
     "ag-grid-community": "34.1.1",
-    "ag-grid-enterprise": "34.1.1",
     "ag-grid-react": "34.1.1",
     "antd": "^5.19.0",
     "axios": "^1.7.4",
@@ -115,5 +114,12 @@
   },
   "resolutions": {
     "@types/react": "18.0.26"
+  },
+  "overrides": {
+    "form-data": "^4.0.0",
+    "tough-cookie": "^4.1.3",
+    "get-pixels": {
+      "request": "^2.88.2"
+    }
   }
 }
