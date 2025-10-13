@@ -12,7 +12,7 @@ const nextConfig = {
     NEXT_PUBLIC_AWS_REGION: process.env.NEXT_AWS_REGION,
   },
   reactStrictMode: false,
-  swcMinify: true,
+  //swcMinify: true,
   compiler: {
     styledComponents: true,
   },
