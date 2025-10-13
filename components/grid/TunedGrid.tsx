@@ -34,7 +34,6 @@ import {
   SelectionChangedEvent,
   SortChangedEvent,
 } from 'ag-grid-community';
-import { AG_CHARTS_LOCALE_KO_KR } from 'ag-charts-locale';
 import { useRouter } from 'next/router';
 import { AG_GRID_LOCALE_KO, GridSetting, withCommonKeyboardSuppress } from '../../libs/ag-grid';
 import { useCommonStore } from '../../stores';
@@ -277,9 +276,44 @@ const InnerTunedGrid = <P,>(props: TunedGridProps<P>, ref: React.Ref<AgGridReact
     ];
   };
 
+  const localeText = {
+    // 일반 메시지
+    noRowsToShow: '표시할 행이 없습니다',
+    loadingOoo: '불러오는 중...',
+    // 필터
+    equals: '같음',
+    notEqual: '같지 않음',
+    lessThan: '보다 작음',
+    greaterThan: '보다 큼',
+    contains: '포함',
+    notContains: '포함하지 않음',
+    startsWith: '시작 문자',
+    endsWith: '끝 문자',
+    // 메뉴
+    pinColumn: '컬럼 고정',
+    autosizeThiscolumn: '이 컬럼 크기 자동조정',
+    autosizeAllColumns: '모든 컬럼 크기 자동조정',
+    resetColumns: '컬럼 초기화',
+    expandAll: '모두 펼치기',
+    collapseAll: '모두 접기',
+    // 페이징
+    page: '페이지',
+    more: '더보기',
+    to: '까지',
+    of: '의',
+    next: '다음',
+    last: '마지막',
+    first: '처음',
+    previous: '이전',
+    // 선택
+    selectAll: '전체 선택',
+    searchOoo: '검색...',
+    blanks: '빈 값',
+  };
+
   const defaultGridOption: GridOptions = {
     rowHeight: 28,
-    localeText: AG_CHARTS_LOCALE_KO_KR,
+    localeText: localeText,
     getContextMenuItems: getContextMenuItems,
   };
 
