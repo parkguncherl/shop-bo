@@ -8,7 +8,7 @@
     "build:local": "cross-env ANALYZE=true env-cmd -f .env.local next build",
     "build:dev": "env-cmd -f .env.development next build",
     "start:dev": "env-cmd -f .env.development next start",
-    "build:prod": "NODE_OPTIONS=--max-old-space-size=2048 env-cmd -f .env.production next build",
+    "build:prod": "env-cmd -f .env.production next build",
     "start:prod": "env-cmd -f .env.production next start",
     "lint": "next lint",
     "openapi:local": "openapi-generator-cli generate --reserved-words-mappings delete=delete -g typescript-axios -i http://localhost:8080/shop-ap/v3/api-docs/smart -o ./generated -c ./openapi.json --skip-validate-spec",
