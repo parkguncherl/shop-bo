@@ -86,17 +86,7 @@ const options: NextAuthOptions = {
     async jwt(params) {
       if (params.trigger === 'update') {
         params.token.user.partnerId = params.session.user.partnerId;
-        params.token.user.partnerNm = params.session.user.partnerNm;
-        params.token.user.workYmd = params.session.user.workYmd;
-        params.token.user.workLogisId = params.session.user.workLogisId;
-        params.token.user.workLogisNm = params.session.user.workLogisNm;
         params.token.user.isPageAuth = params.session.user.isPageAuth;
-        params.token.user.seller1 = params.session.user.seller1;
-        params.token.user.seller2 = params.session.user.seller2;
-        params.token.user.factory1 = params.session.user.factory1;
-        params.token.user.factory2 = params.session.user.factory2;
-        params.token.user.sku1 = params.session.user.sku1;
-        params.token.user.sku2 = params.session.user.sku2;
       }
 
       const currentUser = params.user || params.token.user;
