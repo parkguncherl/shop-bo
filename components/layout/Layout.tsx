@@ -174,9 +174,6 @@ export const Layout = ({ children }: Props) => {
     <>
       {session.status === 'authenticated' && !isLoading && (
         <div className={`wmsLayout ${styles.layout}`}>
-          {/*<Head>*/}
-          {/*  <title>BINBLUR WMS</title>*/}
-          {/*</Head>*/}
           <HeaderWms closed={closed} toggle={() => setClosed(!closed)} />
           <div className={`container ${styles.container} ${closed ? styles.on : ''}`}>
             <LeftNav />

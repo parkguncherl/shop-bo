@@ -75,6 +75,11 @@ const nextConfig = {
 
     return config;
   },
+  turbopack: {
+    resolveAlias: {
+      '@': path.resolve(__dirname),
+    },
+  },
   transpilePackages: [
     '@ant-design/icons',
     'antd',

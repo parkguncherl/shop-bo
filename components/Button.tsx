@@ -1,9 +1,9 @@
 import React, { ReactElement, ReactNode } from 'react';
 import { IComponentProps } from '../types/IComponentProps';
 import styles from '../styles/delete/button.module.scss';
-import classNames from 'classnames/bind';
+//import classNames from 'classnames/bind';
 
-const cx = classNames.bind(styles);
+//const cx = classNames.bind(styles);
 
 type ButtonStyle = IComponentProps;
 
@@ -16,7 +16,8 @@ export const Button = ({ className, children, ...props }: ButtonProps): ReactEle
   return (
     <button
       type={'button'}
-      className={cx(className)}
+      //className={cx(className)}
+      className={className}
       {...props}
       onClick={(e) => {
         if (props.onClick) {

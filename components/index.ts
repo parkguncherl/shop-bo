@@ -8,7 +8,7 @@ export * from './ErrorMessage';
 export * from './FileList';
 export * from './Input';
 export * from './Label';
-export { SimpleSouthKoreaMapChart } from './SimpleSouthKoreaMapChart';
+// export { SimpleSouthKoreaMapChart } from './SimpleSouthKoreaMapChart';
 export * from './TableHeader';
 export * from './Pagination';
 export * from './ToastMessage';
