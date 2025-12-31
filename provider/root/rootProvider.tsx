@@ -1,12 +1,13 @@
 'use client';
 
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import ko from 'antd/locale/ko_KR';
 import { ConfigProvider } from 'antd';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { SessionProvider, signOut } from 'next-auth/react';
 import { AppProvider } from '../../stores';
+import { ToastContainer } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
 import '../../libs/lang/i18n';
@@ -91,6 +92,7 @@ export default function RootProvider({ children }: { children: ReactNode }) {
         {/* 추후  !==  로 변경 todo */}
         {process.env.NODE_ENV === 'production' ? <ReactQueryDevtools initialIsOpen={false} /> : ''}
         <SessionProvider refetchOnWindowFocus={true} refetchInterval={60}>
+          <ToastContainer />
           <AppProvider>{children}</AppProvider>
         </SessionProvider>
       </QueryClientProvider>
