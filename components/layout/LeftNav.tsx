@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/router';
 import { authApi } from '../../libs';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
@@ -9,7 +8,7 @@ import { useSession } from 'next-auth/react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { DEFAULT_ADD_HOURE } from '../../libs/const';
-import { toastError } from '../ToastMessage';
+import { useRouter, usePathname } from 'next/navigation';
 
 interface IMenu {
   menuNm?: string;
@@ -62,15 +61,15 @@ const SingleLevel = ({ item }: { item: IMenu }) => {
 const MultiLevel = ({ item }: { item: IMenu }) => {
   const { items: children } = item;
   const router = useRouter();
-  let isSelected = false;
+  const isSelected = false;
 
   const bigUri = !item.menuUri ? '' : item.menuUri;
 
-  if (router.pathname) {
-    if (bigUri == router.pathname.split('/')[1]) {
-      isSelected = true;
-    }
-  }
+  // if (router.pathname) {
+  //   if (bigUri == router.pathname.split('/')[1]) {
+  //     isSelected = true;
+  //   }
+  // }
   // url 직접 들어왔을때 대메뉴 활성화 끝
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -126,16 +125,15 @@ const closeSideMenu = () => {
 /** 하위 메뉴 링크 */
 const ChildLevel = ({ item }: { item: IMenu }) => {
   const router = useRouter();
+  const pathname = usePathname();
+
   const lastUri = !item.menuUri ? '' : item.menuUri;
   let isSelected = false;
-  let routerPathname = router.pathname;
-  // _ 로 연결된 하위메뉴도 style 적용받게하기위해
-  if (routerPathname.indexOf('_') > -1) {
-    routerPathname = routerPathname.substring(0, routerPathname.indexOf('_'));
-  }
 
-  if (routerPathname === lastUri) {
-    isSelected = true;
+  if (pathname && pathname.indexOf('_') > -1) {
+    if (pathname.substring(0, pathname.indexOf('_')) == lastUri) {
+      isSelected = false;
+    }
   }
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -149,25 +147,24 @@ const ChildLevel = ({ item }: { item: IMenu }) => {
     closeSideMenu();
 
     if (typeof window !== 'undefined') {
-      const openHeader = document.getElementsByClassName(`${router.pathname.split('/')[2]}`);
+      const openHeader = document.getElementsByClassName(`${pathname.split('/')[2]}`);
 
       // 마이페이지는 제외
-      if (router.pathname !== '/mypageForWms') {
+      if (pathname !== '/mypageForWms') {
         for (let i = 0; i < openHeader.length; i++) {
           openHeader[i].parentNode?.parentNode?.parentElement?.classList.add('on');
         }
       }
     }
-  }, [router.pathname]);
+  }, [pathname]);
 
   return (
     <li>
       <Link
         className={`${isSelected ? 'on' : ''} ${lastUri.split('/')[2]}`}
-        href={router.pathname === lastUri ? '#' : lastUri}
+        href={pathname === lastUri ? '#' : lastUri}
         onClick={(e) => {
-          handleClick(e);
-          if (router.pathname === lastUri) {
+          if (pathname === lastUri) {
             router.push(item.menuUri || '');
           }
         }}

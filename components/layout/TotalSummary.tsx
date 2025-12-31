@@ -3,7 +3,7 @@ import React from 'react';
 import { MainVatList } from '../../generated';
 import { Utils } from '../../libs/utils';
 import { router } from 'next/client';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 export interface AlignedResult {
   key: string;

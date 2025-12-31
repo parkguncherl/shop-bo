@@ -1,9 +1,9 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { publicApi } from '../../../libs';
+import { publicApi } from '../../../../libs';
 import { ApiResponseLoginResponse } from '../../../generated';
-import { appStoreContext } from '../../../stores';
-import { ISessionUser } from '../../../types/next-auth';
+import { appStoreContext } from '../../../../stores';
+import { ISessionUser } from '../../../../types/next-auth';
 import dayjs from 'dayjs';
 import axios from 'axios';
 

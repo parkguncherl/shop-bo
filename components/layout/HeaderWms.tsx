@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { signOut } from 'next-auth/react';
 import styles from '../../styles/layout/header.module.scss';
+import { Button } from '../Button';
 import Link from 'next/link';
 import useAppStore, { appStoreContext } from '../../stores/useAppStore';
 import { useAuthStore, useCommonStore, useMypageStore } from '../../stores';
 import { authApi } from '../../libs';
-import { useRouter } from 'next/router';
 import { toastError } from '../ToastMessage';
 import { ApiResponseAuthResponseMenuAuth, ApiResponseListSelectFavorites } from '../../generated';
 import { useQuery } from '@tanstack/react-query';
 import { TabMenu } from './TabMenu';
 import { ConfirmModal } from '../ConfirmModal';
+import { usePathname } from 'next/navigation';
 
 interface Props {
   closed?: boolean;
@@ -18,18 +19,18 @@ interface Props {
 }
 
 export const HeaderWms = ({ closed = false, toggle }: Props) => {
-  const router = useRouter();
+  const pathname = usePathname();
   const { session } = useAppStore();
-  const [logout] = useAuthStore((s) => [s.logout]);
+  const { logout } = useAuthStore();
   /** 공통 스토어 - State */
   const [setUpMenuNm, setMenuNm, setMenuUpdYn, setMenuExcelYn] = useCommonStore((s) => [s.setUpMenuNm, s.setMenuNm, s.setMenuUpdYn, s.setMenuExcelYn]);
   const [setFavoriteList] = useMypageStore((s) => [s.setFavoriteList]);
   const [logoutConfirmModal, setLogoutConfirmModal] = useState(false);
 
-  const authCheck = async () => {
+  const authCheck = async (pathname: string | null) => {
     const result = await authApi.get<ApiResponseAuthResponseMenuAuth>('/auth/check/menu', {
       params: {
-        menuUri: router.pathname,
+        menuUri: pathname,
       },
     });
     const { body, resultCode, resultMessage } = result.data;
@@ -51,7 +52,7 @@ export const HeaderWms = ({ closed = false, toggle }: Props) => {
     }
   };
 
-  const { data: favoriteData, isSuccess: isFavSuccess } = useQuery({queryKey: [], queryFn: () => authApi.get<ApiResponseListSelectFavorites>('/mypage/favorites')});
+  const { data: favoriteData, isSuccess: isFavSuccess } = useQuery([], () => authApi.get<ApiResponseListSelectFavorites>('/mypage/favorites', {}));
 
   // 즐겨찾기 데이터가 변경될 때 상태 업데이트
   useEffect(() => {
@@ -59,8 +60,8 @@ export const HeaderWms = ({ closed = false, toggle }: Props) => {
   }, [favoriteData?.data?.body, isFavSuccess, setFavoriteList]);
 
   useEffect(() => {
-    authCheck();
-  }, [router.pathname]);
+    authCheck(pathname);
+  }, [pathname]);
 
   // 로그아웃 처리 함수
   const handleLogout = async () => {
@@ -78,7 +79,7 @@ export const HeaderWms = ({ closed = false, toggle }: Props) => {
           <Link href={'/wmsIndex'}>{'logo'}</Link>
         </h1>
       </div>
-      <TabMenu router={router} />
+      <TabMenu />
       <div className={styles.right}>
         <button title={'로그아웃'} onClick={handleLogout}>
           {'로그아웃'}

@@ -8,18 +8,31 @@ import { toastError, toastSuccess } from '../ToastMessage';
 import { ApiResponseListSelectFavorites, SelectFavorites } from '../../generated';
 import { authApi } from '../../libs';
 import { ReactSortable, SortableEvent } from 'react-sortablejs';
+import { redirect, RedirectType, usePathname } from 'next/navigation';
 
 interface Props {
-  router: any;
+  ref?: React.Ref<{ closeAllTabs: () => void }>;
 }
 
+// 이하 local type, interface
+interface ExtendedSortableEvent extends SortableEvent {
+  originalEvent: DragEvent;
+}
 type MenuHistory = {
   histMenuUri: string;
   histMenuNm: string;
   histParamList: [];
 };
-export const TabMenu = forwardRef<{ closeAllTabs: () => void }, Props>(({ router }, ref) => {
+
+/**
+ * 탭 메뉴 컴포넌트 정의
+ * */
+export const TabMenu = ({ ref }: Props) => {
+  /** context hook(provided by Root Provider) */
   const session = useSession();
+  const pathname = usePathname();
+
+  /** 지역(local) states */
   const [favoriteBtn, setFavoriteBtn] = useState(false); // 즐겨찾기 onoff
   const [historyList, setHistoryList] = useCommonStore((s) => [s.historyList, s.setHistoryList]);
   const [activeIndex, setActiveIndex] = useState<number | null>(0); // 활성화 탭
@@ -41,10 +54,6 @@ export const TabMenu = forwardRef<{ closeAllTabs: () => void }, Props>(({ router
     localStorage.setItem(localStorageHistory, JSON.stringify(updatedList));
   };
 
-  interface ExtendedSortableEvent extends SortableEvent {
-    originalEvent: DragEvent;
-  }
-
   const dragStart = (event: ExtendedSortableEvent) => {
     const idx = event.oldIndex ?? -1; // 드래그 시작 시의 인덱스
     if (idx >= 0) {
@@ -65,7 +74,8 @@ export const TabMenu = forwardRef<{ closeAllTabs: () => void }, Props>(({ router
       setList(updatedList); // 리스트 상태 업데이트
       updateHistoryListInStorage(updatedList);
       // 드래그 종료된 페이지로 이동
-      router.push(updatedList[endIndex].histMenuUri);
+      //router.push(updatedList[endIndex].histMenuUri);
+      redirect(updatedList[endIndex].histMenuUri, RedirectType.push);
     }
 
     // 최종 드래깅한 아이템에 on 클래스 추가
@@ -102,24 +112,25 @@ export const TabMenu = forwardRef<{ closeAllTabs: () => void }, Props>(({ router
   const handleActivateItem = (index: number, histMenuUri: string) => {
     //setActiveIndex(index); // 활성화된 div의 인덱스 업데이트
     updateButtonVisibility();
-    if (histMenuUri !== router.pathname) {
+    if (histMenuUri !== pathname) {
       setActiveIndex(index);
-      router.push(histMenuUri || '');
+      //router.push(histMenuUri || '');
+      redirect(histMenuUri || '', RedirectType.push);
     }
   };
 
   // 현재 URI와 같은 histMenuUri를 가진 탭을 찾아 활성화
   useEffect(() => {
-    const foundIndex = historyList.findIndex((item) => item.histMenuUri === router.pathname);
+    const foundIndex = historyList.findIndex((item) => item.histMenuUri === pathname);
     if (foundIndex !== -1) {
       setActiveIndex(foundIndex);
     } else {
       setActiveIndex(null); // 현재 URI와 일치하는 히스토리 탭이 없으면 activeIndex를 null로 설정
     }
-  }, [router.pathname, historyList]);
+  }, [pathname, historyList]);
 
   // 닫기
-  const closeHistory = (index: number) => {
+  const closeHistory = (index: number, historyList: HistoryType[]) => {
     updateButtonVisibility();
     // 리스트에서 선택된 히스토리를 삭제
     const updatedList = historyList.filter((_, idx) => idx !== index);
@@ -130,12 +141,14 @@ export const TabMenu = forwardRef<{ closeAllTabs: () => void }, Props>(({ router
 
     // 남은 히스토리가 없으면 홈 페이지로 이동
     if (updatedList.length === 0) {
-      router.push('/');
+      //router.push('/');
+      redirect('/', RedirectType.push);
     } else {
       // 다음 히스토리가 있을 경우 해당 히스토리의 uri로 이동
       const nextIndex = index < updatedList.length ? index : updatedList.length - 1;
       const nextHistMenuUri = updatedList[nextIndex].histMenuUri;
-      router.push(nextHistMenuUri);
+      //router.push(nextHistMenuUri);
+      redirect(nextHistMenuUri, RedirectType.push);
     }
   };
 
@@ -143,7 +156,8 @@ export const TabMenu = forwardRef<{ closeAllTabs: () => void }, Props>(({ router
   const handleFavoriteLink = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, menuUri: string | undefined) => {
     e.preventDefault();
     if (menuUri) {
-      router.push(menuUri);
+      //router.push(menuUri);
+      redirect(menuUri, RedirectType.push);
     }
   };
 
@@ -217,7 +231,8 @@ export const TabMenu = forwardRef<{ closeAllTabs: () => void }, Props>(({ router
     // 상태 초기화
     setHistoryList([]);
     setActiveIndex(null);
-    router.push('/', undefined, { shallow: true });
+    //router.push('/', undefined, { shallow: true });
+    redirect('/', RedirectType.push);
   };
 
   const {
@@ -314,13 +329,15 @@ export const TabMenu = forwardRef<{ closeAllTabs: () => void }, Props>(({ router
       closeContextMenu();
       if (updatedList.length === 0) {
         // 모든 탭이 닫혔다면 홈페이지로 이동
-        router.push('/');
+        //router.push('/');
+        redirect('/', RedirectType.push);
         setActiveIndex(null);
       } else {
         // 다음 탭으로 이동 (마지막 탭이었다면 이전 탭으로)
         const newActiveIndex = activeIndex >= updatedList.length ? updatedList.length - 1 : activeIndex;
         setActiveIndex(newActiveIndex);
-        router.push(updatedList[newActiveIndex].histMenuUri);
+        //router.push(updatedList[newActiveIndex].histMenuUri);
+        redirect(updatedList[newActiveIndex].histMenuUri, RedirectType.push);
       }
     }
   };
@@ -381,13 +398,13 @@ export const TabMenu = forwardRef<{ closeAllTabs: () => void }, Props>(({ router
                     <div
                       key={index}
                       className={`item-${index} ${isHover ? 'hover' : ''} ${isNotHover ? 'notHover' : ''} ${activePrev ? 'notHover' : ''} ${
-                        index === activeIndex && router.pathname !== '/' && router.pathname !== '' ? 'on' : ''
+                        index === activeIndex && pathname !== '/' && pathname !== '' ? 'on' : ''
                       }`}
                       onMouseEnter={() => setHoverIndex(index)} // 마우스가 들어오면 hover 상태 설정
                       onMouseLeave={() => setHoverIndex(null)} // 마우스가 나가면 hover 상태 초기화
                     >
                       <div onClick={() => handleActivateItem(index, item.histMenuUri)}>{item.histMenuNm}</div>
-                      <button onClick={() => closeHistory(index)}>
+                      <button onClick={() => closeHistory(index, historyList)}>
                         <span></span>
                         <span></span>
                       </button>
@@ -469,5 +486,5 @@ export const TabMenu = forwardRef<{ closeAllTabs: () => void }, Props>(({ router
       </div>
     </>
   );
-});
+};
 TabMenu.displayName = 'TabMenu';
