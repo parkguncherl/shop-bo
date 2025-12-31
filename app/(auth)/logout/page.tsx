@@ -1,10 +1,10 @@
 import LogoutClient from './LogoutClient';
 
 /**
- * (server side)Logout
+ * (server side)LogoutPage
  * */
-const Logout = () => {
+const LogoutPage = () => {
   return <LogoutClient />;
 };
 
-export default Logout;
+export default LogoutPage;

@@ -1,10 +1,10 @@
 import LoginClient from './LoginClient';
 
 /**
- * (server side)Login
+ * (server side)LoginPage
  * */
-const Login = () => {
+const LoginPage = () => {
   return <LoginClient />;
 };
 
-export default Login;
+export default LoginPage;
