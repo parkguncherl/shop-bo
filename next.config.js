@@ -39,42 +39,43 @@ const nextConfig = {
       },
     ];
   },
-  webpack: (config, { isServer, webpack }) => {
-    config.resolve.alias['@'] = path.resolve(__dirname);
+  // webpack: (config, { isServer, webpack }) => {
+  //   config.resolve.alias['@'] = path.resolve(__dirname);
+  //
+  //   if (!isServer) {
+  //     config.resolve.fallback = {
+  //       ...config.resolve.fallback,
+  //       fs: false,
+  //       net: false,
+  //       tls: false,
+  //       crypto: require.resolve('crypto-browserify'),
+  //     };
+  //   }
+  //
+  //   // webpack이 정의되어 있을 때만 ProgressPlugin을 추가
+  //   if (webpack && webpack.ProgressPlugin) {
+  //     config.plugins.push(new webpack.ProgressPlugin());
+  //   }
+  //
+  //   if (config.optimization && config.optimization.minimizer) {
+  //     config.optimization.minimizer = config.optimization.minimizer.map((minimizer) => {
+  //       if (minimizer.constructor.name === 'TerserPlugin') {
+  //         return new minimizer.constructor({
+  //           ...minimizer.options,
+  //           terserOptions: {
+  //             ...minimizer.options.terserOptions,
+  //             keep_classnames: true,
+  //             keep_fnames: true,
+  //           },
+  //         });
+  //       }
+  //       return minimizer;
+  //     });
+  //   }
+  //
+  //   return config;
+  // },
 
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-        crypto: require.resolve('crypto-browserify'),
-      };
-    }
-
-    // webpack이 정의되어 있을 때만 ProgressPlugin을 추가
-    if (webpack && webpack.ProgressPlugin) {
-      config.plugins.push(new webpack.ProgressPlugin());
-    }
-
-    if (config.optimization && config.optimization.minimizer) {
-      config.optimization.minimizer = config.optimization.minimizer.map((minimizer) => {
-        if (minimizer.constructor.name === 'TerserPlugin') {
-          return new minimizer.constructor({
-            ...minimizer.options,
-            terserOptions: {
-              ...minimizer.options.terserOptions,
-              keep_classnames: true,
-              keep_fnames: true,
-            },
-          });
-        }
-        return minimizer;
-      });
-    }
-
-    return config;
-  },
   turbopack: {
     resolveAlias: {
       '@': path.resolve(__dirname),

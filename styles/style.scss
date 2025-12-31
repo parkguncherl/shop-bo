@@ -1549,7 +1549,16 @@ button[class*="btn_"] {
     font-size: var(--s-size);
   }
 
-  & .ag-header-cell.ag-header-span-height .ag-header-cell-resize::after,
+  //& .ag-header-cell.ag-header-span-height .ag-header-cell-resize::after, 터보팩 파싱을 위하여 아래와 같이 변경
+  & .ag-header-cell.ag-header-span-height {
+    .ag-header-cell-resize::after {
+      top: 0;
+      left: calc(62% - var(--ag-header-column-resize-handle-width));;
+      width: 1px;
+      height: 100%;
+      background-color: #ddd;
+    }
+  }
   & .ag-ltr {
     & .ag-header-viewport {
       & .ag-header-cell-resize::after {

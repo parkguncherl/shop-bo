@@ -79,7 +79,7 @@ export default function ModalLayout({
     <Modal
       {...props}
       width={width}
-      destroyOnClose
+      destroyOnHidden
       closable={true}
       keyboard={false}
       maskClosable={false}
