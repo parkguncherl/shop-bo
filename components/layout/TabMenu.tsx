@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useEffect, useRef, useState, useImperativeHandle } from 'react';
 import Link from 'next/link';
 import { LOCAL_STORAGE_HISTORY, LOCAL_STORAGE_WMS_HISTORY } from '../../libs/const';
 import { useCommonStore, useMypageStore, HistoryType } from '../../stores';

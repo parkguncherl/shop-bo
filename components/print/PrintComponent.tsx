@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 
 interface Props {
@@ -8,10 +8,10 @@ interface Props {
   type?: string;
   children: React.ReactNode;
   sellerInfoData: any;
-  ref?: any;
+  ref?: React.Ref<HTMLDivElement>;
 }
 
-const PrintComponent = forwardRef<HTMLDivElement, Props>(({ selectedDetail, printData, fileUrl, type, children, sellerInfoData }, ref) => {
+const PrintComponent = ({ selectedDetail, printData, fileUrl, type, children, sellerInfoData, ref }: Props) => {
   console.log('PrintComponent Props printData [' + type + '] >>', selectedDetail, printData);
   const [amountAreaHide, setAmountAreaHide] = useState<boolean>(false);
   const [vatAreaHide, setVatAreaHide] = useState<boolean>(false);
@@ -1351,7 +1351,5 @@ const PrintComponent = forwardRef<HTMLDivElement, Props>(({ selectedDetail, prin
       </div>
     </div>
   );
-});
-
-PrintComponent.displayName = 'PrintComponent';
+};
 export default PrintComponent;

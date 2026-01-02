@@ -1,4 +1,4 @@
-import React, { forwardRef, RefAttributes, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { ApiResponse } from '../../generated';
 import { DataListOption } from '../../types/DataListOptions';
 import { toastError } from '../ToastMessage';
@@ -19,6 +19,7 @@ interface Props<T> {
   onTypingOccurred?: (name: string, value: string | number) => void;
   onError?: (result: AxiosResponse<ApiResponse, any>) => void;
   emptyMessage?: string;
+  ref: React.Ref<SearchBarRefInterface>;
 }
 
 export interface SearchBarRefInterface {
@@ -26,10 +27,20 @@ export interface SearchBarRefInterface {
   eraseInputValue: () => void;
 }
 
-export const InnerSearchBar = <T,>(
-  { title, placeholder, name, displayedObjKey, onDataSelected, onDataErased, onSearch, selectedData, onTypingOccurred, onError, emptyMessage }: Props<T>,
-  ref: React.Ref<SearchBarRefInterface>,
-) => {
+export const SearchBar = <T,>({
+  title,
+  placeholder,
+  name,
+  displayedObjKey,
+  onDataSelected,
+  onDataErased,
+  onSearch,
+  selectedData,
+  onTypingOccurred,
+  onError,
+  emptyMessage,
+  ref,
+}: Props<T>) => {
   const [InputValue, setInputValue] = useState<string>('');
   const [respondedDataList, setRespondedDataList] = useState<any[]>([]);
   const [selectedDataOnBar, setSelectedDataOnBar] = useState<T | undefined>(undefined);
@@ -218,12 +229,4 @@ export const InnerSearchBar = <T,>(
     </>
   );
 };
-
-function fixedForwardRef<P>(
-  render: (props: P, ref: React.Ref<SearchBarRefInterface> | null) => JSX.Element,
-): (props: P & React.RefAttributes<SearchBarRefInterface>) => JSX.Element {
-  return forwardRef(render) as (props: P & RefAttributes<SearchBarRefInterface>) => JSX.Element;
-}
-
-const SearchBar = fixedForwardRef(InnerSearchBar);
 export default SearchBar;
