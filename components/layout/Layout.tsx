@@ -51,11 +51,6 @@ export const Layout = ({ children }: Props) => {
   const { session: storeSession } = useAppStore();
 
   /** 참조 */
-  // const menuHistoryRef = useRef<MenuHistory>({
-  //   histMenuNm: '',
-  //   histMenuUri: '',
-  //   histParamList: [{ paramNm: '', paramValue: '' }],
-  // });
   const isMatch = useRef(false);
 
   /** 컴포넌트 상수 */
@@ -164,42 +159,22 @@ export const Layout = ({ children }: Props) => {
   //   }
   // }, [authGroupCd]);
 
+  // 반환 영역
   if (session.status === 'loading') {
     return <Loading />;
-  }
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  // useEffect(() => {
-  //   if (typeof window !== 'undefined') {
-  //     const bodyClassList = document.querySelector('body')?.classList;
-  //     if (authGroupCd === '3') {
-  //       bodyClassList?.remove('wms');
-  //       bodyClassList?.add('oms');
-  //     } else if (authGroupCd === '6') {
-  //       // 6은 모바일
-  //       bodyClassList?.remove('oms');
-  //       bodyClassList?.remove('wms');
-  //     } else if (authGroupCd === '7') {
-  //       bodyClassList?.remove('oms');
-  //       bodyClassList?.add('wms');
-  //     } else {
-  //       bodyClassList?.remove('oms');
-  //       bodyClassList?.add('wms');
-  //     }
-  //   }
-  // }, [authGroupCd]);
-
-  return (
-    <>
-      {session.status === 'authenticated' && !isLoading && (
-        <div className={`wmsLayout ${styles.layout}`}>
-          <HeaderWms closed={closed} toggle={() => setClosed(!closed)} />
-          <div className={`container ${styles.container} ${closed ? styles.on : ''}`}>
-            <LeftNav />
-            <div className={`content ${styles.content}`}>{children}</div>
+  } else {
+    return (
+      <>
+        {session.status === 'authenticated' && !isLoading && (
+          <div className={`wmsLayout ${styles.layout}`}>
+            <HeaderWms closed={closed} toggle={() => setClosed(!closed)} />
+            <div className={`container ${styles.container} ${closed ? styles.on : ''}`}>
+              <LeftNav />
+              <div className={`content ${styles.content}`}>{children}</div>
+            </div>
           </div>
-        </div>
-      )}
-    </>
-  );
+        )}
+      </>
+    );
+  }
 };

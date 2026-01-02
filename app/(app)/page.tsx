@@ -1,15 +1,11 @@
 import Index from './Index';
-import { Metadata } from 'next';
 
 /**
- * (server side)IndexPage
+ * (server side)Index page
  * */
 
-export const metadata: Metadata = {
-  title: 'Binblur',
-};
-const IndexPage = () => {
+const page = () => {
   return <Index />;
 };
 
-export default IndexPage;
+export default page;

@@ -1,10 +1,10 @@
 import NoAuthClient from './NoAuthClient';
 
 /**
- * (server side)NoAuth
+ * (server side)NoAuth page
  * */
-const NoAuth = () => {
+const page = () => {
   return <NoAuthClient />;
 };
 
-export default NoAuth;
+export default page;

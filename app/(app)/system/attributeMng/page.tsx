@@ -1,10 +1,10 @@
 import AttributeMng from './attributeMng';
 
 /**
- * (server side)AccessLog
+ * (server side)AccessLog page
  * */
-const AttributeMngPage = () => {
+const page = () => {
   return <AttributeMng />;
 };
 
-export default AttributeMngPage;
+export default page;

@@ -1,10 +1,10 @@
 import CodeMng from './codeMng';
 
 /**
- * (server side)AccessLog
+ * (server side)AccessLog page
  * */
-const CodeMngPage = () => {
+const page = () => {
   return <CodeMng />;
 };
 
-export default CodeMngPage;
+export default page;

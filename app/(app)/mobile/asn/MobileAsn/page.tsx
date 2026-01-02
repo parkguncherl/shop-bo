@@ -1,10 +1,10 @@
 import MobileAsn from './MobileAsn';
 
 /**
- * (server side)MobileAsnPage
+ * (server side)MobileAsn page
  * */
-const MobileAsnPage = () => {
+const page = () => {
   return <MobileAsn />;
 };
 
-export default MobileAsnPage;
+export default page;

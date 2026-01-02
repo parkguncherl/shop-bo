@@ -18,7 +18,7 @@ import 'swiper/css/pagination';
 export const metadata: Metadata = {
   title: 'BINBLUR',
 };
-const RootLayout = ({ children }: { children: React.ReactNode }) => {
+const layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en">
       <body className={'wms'}>
@@ -31,4 +31,4 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
     </html>
   );
 };
-export default RootLayout;
+export default layout;

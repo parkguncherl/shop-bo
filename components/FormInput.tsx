@@ -83,31 +83,56 @@ const FormInput = forwardRef(function FormInput<T extends FieldValues>(
   const {
     data: files,
     isLoading: filesIsLoading,
+    isSuccess: isFilesSuccess,
     refetch: filesRefetch,
   } = useQuery(
-    { queryKey: ['/common/file', fileId] },
-    () =>
-      authApi.get('/common/file', {
-        params: { id: fileId },
-      }),
     {
+      queryKey: ['/common/file', fileId],
+      queryFn: () =>
+        authApi.get('/common/file', {
+          params: { id: fileId },
+        }),
       enabled: !!fileId,
-      onSuccess: (e) => {
-        const { resultCode, body, resultMessage } = e.data;
-        if (resultCode === 200) {
-          if (isFileNm) {
-            // 알람 모델은 파일명이 보여야됨
-            setFileName(body?.fileNm);
-          } else {
-            // 일감#596 요청으로 초기에 첨부된 파일명이 안 보이도록 처리
-            setFileName('');
-          }
-        } else {
-          toastError(resultMessage);
-        }
-      },
     },
+    // () =>
+    //   authApi.get('/common/file', {
+    //     params: { id: fileId },
+    //   }),
+    // {
+    //   enabled: !!fileId,
+    //   onSuccess: (e) => {
+    //     const { resultCode, body, resultMessage } = e.data;
+    //     if (resultCode === 200) {
+    //       if (isFileNm) {
+    //         // 알람 모델은 파일명이 보여야됨
+    //         setFileName(body?.fileNm);
+    //       } else {
+    //         // 일감#596 요청으로 초기에 첨부된 파일명이 안 보이도록 처리
+    //         setFileName('');
+    //       }
+    //     } else {
+    //       toastError(resultMessage);
+    //     }
+    //   },
+    // },
   );
+
+  useEffect(() => {
+    if (isFilesSuccess) {
+      const { resultCode, body, resultMessage } = files.data;
+      if (resultCode === 200) {
+        if (isFileNm) {
+          // 알람 모델은 파일명이 보여야됨
+          setFileName(body?.fileNm);
+        } else {
+          // 일감#596 요청으로 초기에 첨부된 파일명이 안 보이도록 처리
+          setFileName('');
+        }
+      } else {
+        toastError(resultMessage);
+      }
+    }
+  }, [files, isFilesSuccess]);
 
   /** 파일 삭제 */
   const { mutate: deleteFileMutate, isLoading: deleteFileIsLoading } = useMutation(deleteFile, {

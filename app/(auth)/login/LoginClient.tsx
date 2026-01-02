@@ -150,22 +150,24 @@ const LoginClient = () => {
 
   useEffect(() => {
     if (session && session.status === 'authenticated' && session.data?.user) {
-      const authGroupCd = session.data?.user?.authCd ? session.data?.user.authCd?.substring(0, 1) : '';
-      const myLocalStorage = authGroupCd === '3' ? LOCAL_STORAGE_HISTORY : LOCAL_STORAGE_WMS_HISTORY;
-      const mygubunSetting = {
-        seller1: session.data.user.seller1 || '구분1',
-        seller2: session.data.user.seller2 || '구분2',
-        factory1: session.data.user.factory1 || '구분1',
-        factory2: session.data.user.factory2 || '구분2',
-        sku1: session.data.user.sku1 || '구분1',
-        sku2: session.data.user.sku2 || '구분2',
-      };
-      // oms 사용자인경우만 만들어준다.
-      if (authGroupCd === '3') {
-        localStorage.setItem(LOCAL_STORAGE_GUBUN, JSON.stringify(mygubunSetting));
-      } else {
-        localStorage.removeItem(LOCAL_STORAGE_GUBUN);
-      }
+      const myLocalStorage = LOCAL_STORAGE_WMS_HISTORY;
+
+      // const authGroupCd = session.data?.user?.authCd ? session.data?.user.authCd?.substring(0, 1) : '';
+      // const myLocalStorage = authGroupCd === '3' ? LOCAL_STORAGE_HISTORY : LOCAL_STORAGE_WMS_HISTORY;
+      // const mygubunSetting = {
+      //   seller1: session.data.user.seller1 || '구분1',
+      //   seller2: session.data.user.seller2 || '구분2',
+      //   factory1: session.data.user.factory1 || '구분1',
+      //   factory2: session.data.user.factory2 || '구분2',
+      //   sku1: session.data.user.sku1 || '구분1',
+      //   sku2: session.data.user.sku2 || '구분2',
+      // };
+      // // oms 사용자인경우만 만들어준다.
+      // if (authGroupCd === '3') {
+      //   localStorage.setItem(LOCAL_STORAGE_GUBUN, JSON.stringify(mygubunSetting));
+      // } else {
+      //   localStorage.removeItem(LOCAL_STORAGE_GUBUN);
+      // }
 
       const reFetch = async () => {
         const { data: favorites } = await favRefetch(); // 데이터가 로드될 때까지 기다림
@@ -174,27 +176,28 @@ const LoginClient = () => {
           histMenuUri: menu.menuUri,
           histParamList: [],
         }));
-        const landingPage =
-          authGroupCd === '3'
-            ? session.data.user.isMobileLogin === 'Y'
-              ? '/mobile/asn/MobileAsn'
-              : '/oms/orderInfo/today'
-            : authGroupCd === '4'
-            ? '/wms/live/OrderListForSeller'
-            : authGroupCd === '6'
-            ? '/mobile/live/AccountConfirm'
-            : authGroupCd === '7'
-            ? '/oms/product/ProductScmMng'
-            : '/';
+        // const landingPage =
+        //   authGroupCd === '3'
+        //     ? session.data.user.isMobileLogin === 'Y'
+        //       ? '/mobile/asn/MobileAsn'
+        //       : '/oms/orderInfo/today'
+        //     : authGroupCd === '4'
+        //     ? '/wms/live/OrderListForSeller'
+        //     : authGroupCd === '6'
+        //     ? '/mobile/live/AccountConfirm'
+        //     : authGroupCd === '7'
+        //     ? '/oms/product/ProductScmMng'
+        //     : '/';
+        const landingPage = '/';
 
         if (favHistoryList && favHistoryList.length > 0) {
           localStorage.setItem(myLocalStorage, JSON.stringify(favHistoryList));
         }
 
-        setTimeout(() => {
-          //router.push(landingPage, undefined, { shallow: true }); // todo 추후 마이그레이션
-          router.push(landingPage);
-        }, 1000);
+        // setTimeout(() => {
+        //   router.push(landingPage);
+        // }, 1000);
+        router.push(landingPage);
       };
 
       reFetch();
@@ -296,7 +299,7 @@ const LoginClient = () => {
     return <Loading />;
   } else {
     // 세션이 없을때만 로컬 스토리지를 삭제한다.
-    localStorage.removeItem(LOCAL_STORAGE_HISTORY);
+    //localStorage.removeItem(LOCAL_STORAGE_HISTORY);
     localStorage.removeItem(LOCAL_STORAGE_WMS_HISTORY);
     return (
       <div className={styles.login_box_group}>

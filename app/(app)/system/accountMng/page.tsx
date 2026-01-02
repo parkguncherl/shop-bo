@@ -1,10 +1,10 @@
 import AccountMng from './accountMng';
 
 /**
- * (server side)AccessLog
+ * (server side)AccessLog page
  * */
-const AccountMngPage = () => {
+const page = () => {
   return <AccountMng />;
 };
 
-export default AccountMngPage;
+export default page;

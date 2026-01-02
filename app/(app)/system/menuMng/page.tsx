@@ -1,10 +1,10 @@
 import MenuMng from './menuMng';
 
 /**
- * (server side)AccessLog
+ * (server side)MenuMng page
  * */
-const MenuMngPage = () => {
+const page = () => {
   return <MenuMng />;
 };
 
-export default MenuMngPage;
+export default page;

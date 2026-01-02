@@ -1,10 +1,10 @@
 import AccessLog from './accessLog';
 
 /**
- * (server side)AccessLog
+ * (server side)AccessLog page
  * */
-const AccessLogPage = () => {
+const page = () => {
   return <AccessLog />;
 };
 
-export default AccessLogPage;
+export default page;
