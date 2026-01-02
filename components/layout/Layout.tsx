@@ -12,7 +12,6 @@ import { LOCAL_STORAGE_HISTORY, LOCAL_STORAGE_WMS_HISTORY } from '../../libs/con
 import { LeftNav } from './LeftNav';
 import { HeaderWms } from './HeaderWms';
 import { useCommonStore } from '../../stores';
-import { HeaderDesignMobile } from './HeaderDesignMobile';
 import { usePathname, useRouter } from 'next/navigation';
 
 interface Props {
@@ -139,36 +138,56 @@ export const Layout = ({ children }: Props) => {
     }
   }, [menuAuthList]);
 
-  if (session.status === 'loading') {
-    return <Loading />;
-  }
-
   if (!session?.data || authGroupCd === '') {
     //router.push('/login', undefined, { shallow: true });
     router.push('/login');
   }
 
-  // body에 class 부여
+  // body에 class 부여 todo 단일 레이아웃을 사용하므로 해당 영역 주석
+  // useEffect(() => {
+  //   if (typeof window !== 'undefined') {
+  //     const bodyClassList = document.querySelector('body')?.classList;
+  //     if (authGroupCd === '3') {
+  //       bodyClassList?.remove('wms');
+  //       bodyClassList?.add('oms');
+  //     } else if (authGroupCd === '6') {
+  //       // 6은 모바일
+  //       bodyClassList?.remove('oms');
+  //       bodyClassList?.remove('wms');
+  //     } else if (authGroupCd === '7') {
+  //       bodyClassList?.remove('oms');
+  //       bodyClassList?.add('wms');
+  //     } else {
+  //       bodyClassList?.remove('oms');
+  //       bodyClassList?.add('wms');
+  //     }
+  //   }
+  // }, [authGroupCd]);
+
+  if (session.status === 'loading') {
+    return <Loading />;
+  }
+
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const bodyClassList = document.querySelector('body')?.classList;
-      if (authGroupCd === '3') {
-        bodyClassList?.remove('wms');
-        bodyClassList?.add('oms');
-      } else if (authGroupCd === '6') {
-        // 6은 모바일
-        bodyClassList?.remove('oms');
-        bodyClassList?.remove('wms');
-      } else if (authGroupCd === '7') {
-        bodyClassList?.remove('oms');
-        bodyClassList?.add('wms');
-      } else {
-        bodyClassList?.remove('oms');
-        bodyClassList?.add('wms');
-      }
-    }
-  }, [authGroupCd]);
+  // useEffect(() => {
+  //   if (typeof window !== 'undefined') {
+  //     const bodyClassList = document.querySelector('body')?.classList;
+  //     if (authGroupCd === '3') {
+  //       bodyClassList?.remove('wms');
+  //       bodyClassList?.add('oms');
+  //     } else if (authGroupCd === '6') {
+  //       // 6은 모바일
+  //       bodyClassList?.remove('oms');
+  //       bodyClassList?.remove('wms');
+  //     } else if (authGroupCd === '7') {
+  //       bodyClassList?.remove('oms');
+  //       bodyClassList?.add('wms');
+  //     } else {
+  //       bodyClassList?.remove('oms');
+  //       bodyClassList?.add('wms');
+  //     }
+  //   }
+  // }, [authGroupCd]);
 
   return (
     <>
@@ -183,57 +202,4 @@ export const Layout = ({ children }: Props) => {
       )}
     </>
   );
-
-  // if (authGroupCd === '3') {
-  //   // oms 사용자
-  //   return (
-  //     <>
-  //       {session.status === 'authenticated' && !isLoading && (
-  //         <div className={`omsLayout ${styles.layout} ${isOrderOn ? 'isOrderOn' : ''}`}>
-  //           <Header closed={closed} toggle={() => setClosed(!closed)} />
-  //           <div className={`container ${styles.container} ${closed ? styles.on : ''}`}>
-  //             <OrderReg />
-  //             <div className={`content ${styles.content}`}>{children}</div>
-  //             <RightNav />
-  //           </div>
-  //         </div>
-  //       )}
-  //     </>
-  //   );
-  // } else if (authGroupCd === '6') {
-  //   // admin wms 사용자
-  //   return (
-  //     <>
-  //       {session.status === 'authenticated' && !isLoading && (
-  //         <div>
-  //           {/*<Head>*/}
-  //           {/*  <title>BINBLUR MOBILE</title>*/}
-  //           {/*</Head>*/}
-  //           <HeaderDesignMobile closed={closed} toggle={() => setClosed(!closed)} />
-  //           <div>
-  //             <div>{children}</div>
-  //           </div>
-  //         </div>
-  //       )}
-  //     </>
-  //   );
-  // } else {
-  //   // admin wms 사용자
-  //   return (
-  //     <>
-  //       {session.status === 'authenticated' && !isLoading && (
-  //         <div className={`wmsLayout ${styles.layout}`}>
-  //           {/*<Head>*/}
-  //           {/*  <title>BINBLUR WMS</title>*/}
-  //           {/*</Head>*/}
-  //           <HeaderWms closed={closed} toggle={() => setClosed(!closed)} />
-  //           <div className={`container ${styles.container} ${closed ? styles.on : ''}`}>
-  //             <LeftNav />
-  //             <div className={`content ${styles.content}`}>{children}</div>
-  //           </div>
-  //         </div>
-  //       )}
-  //     </>
-  //   );
-  //}
 };
