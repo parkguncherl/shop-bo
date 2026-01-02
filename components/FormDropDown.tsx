@@ -29,12 +29,12 @@ type TProps<T extends FieldValues> = TControl<T> & {
   disabled?: boolean;
   gbCode?: string;
   className?: string;
-  refOfDropDown?: React.RefObject<BaseSelectRef>;
   onKeyDown?: (e: React.KeyboardEvent) => void;
   defaultValue?: string;
+  ref?: React.Ref<BaseSelectRef>;
 };
 
-const FormDropDownInner = <T extends FieldValues>(props: TProps<T>, ref: React.ForwardedRef<BaseSelectRef>) => {
+const FormDropDown = <T extends FieldValues>({ ref, ...props }: TProps<T>) => {
   const {
     field: { name, onChange: controlChange, value },
     fieldState: { error },
@@ -147,7 +147,7 @@ const FormDropDownInner = <T extends FieldValues>(props: TProps<T>, ref: React.F
                 defaultValues={props.defaultOptions || []}
                 readonly={props.readonly}
                 multiple={props.multiple}
-                ref={props.refOfDropDown}
+                ref={ref}
                 virtual={props.virtual}
                 onFocus={() => {
                   handleFocus(name);
@@ -184,7 +184,7 @@ const FormDropDownInner = <T extends FieldValues>(props: TProps<T>, ref: React.F
                     onChangeControl={controlChange}
                     readonly={props.readonly}
                     virtual={props.virtual}
-                    ref={props.refOfDropDown}
+                    ref={ref}
                     onFocus={() => {
                       handleFocus(name);
                     }}
@@ -216,7 +216,7 @@ const FormDropDownInner = <T extends FieldValues>(props: TProps<T>, ref: React.F
                 disabledOptionValues={props.disabledOptionValues}
                 virtual={props.virtual}
                 style={props.style}
-                ref={props.refOfDropDown}
+                ref={ref}
                 onFocus={() => {
                   handleFocus(name);
                 }}
@@ -239,7 +239,7 @@ const FormDropDownInner = <T extends FieldValues>(props: TProps<T>, ref: React.F
                 onChangeControl={controlChange}
                 readonly={props.readonly}
                 virtual={props.virtual}
-                ref={props.refOfDropDown}
+                ref={ref}
                 onFocus={() => {
                   handleFocus(name);
                 }}
@@ -261,11 +261,5 @@ const FormDropDownInner = <T extends FieldValues>(props: TProps<T>, ref: React.F
     </>
   );
 };
-
-/** 제네릭 사용을 위한 타입 캐스팅 */
-const FormDropDown = forwardRef(FormDropDownInner) as <T extends FieldValues>(
-  props: TProps<T>,
-  ref: React.ForwardedRef<BaseSelectRef>,
-) => ReturnType<typeof FormDropDownInner>;
 
 export default FormDropDown;

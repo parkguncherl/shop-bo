@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -21,6 +21,7 @@ import { LOCAL_STORAGE_GUBUN, LOCAL_STORAGE_HISTORY, LOCAL_STORAGE_WMS_HISTORY, 
 import { toast } from 'react-toastify';
 import Loading from '../../../components/Loading';
 import { UAParser } from 'ua-parser-js';
+import { InputRef } from 'antd';
 
 export interface LoginVerificationFields {
   loginId: string;

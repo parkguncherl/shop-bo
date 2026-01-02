@@ -1,12 +1,13 @@
-import React, { forwardRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FieldError, FieldValues, useController } from 'react-hook-form';
 import { BaseInputAtom } from './atom/BaseInputAtom';
 import { TControl } from '../types/Control';
-import { AutoComplete } from 'antd';
+import { AutoComplete, InputRef } from 'antd';
 import { useCommonStore } from '../stores';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { authApi } from '../libs';
 import { toastError, toastSuccess } from './ToastMessage';
+import mergeRefs from '../customFn/ref/mergeRefs';
 
 type IInputTextProps<T extends FieldValues> = TControl<T> & {
   type?: 'text' | 'number' | 'email' | 'password';
@@ -34,43 +35,41 @@ type IInputTextProps<T extends FieldValues> = TControl<T> & {
   allowClear?: boolean;
   onFieldErrorChanged?: (error: FieldError | undefined) => void; // 유효한 에러가 발생하거나 다른 에러가 발생하여 errorStatus 의 값이 변할 시 호출
   priceTxt?: string;
+  ref?: React.Ref<any>;
 };
 
-const FormInput = forwardRef(function FormInput<T extends FieldValues>(
-  {
-    control,
-    rules,
-    name,
-    label = '',
-    placeholder,
-    type = 'text',
-    required = false,
-    onKeyDown,
-    style,
-    inputType = 'label',
-    disable = false,
-    unit,
-    rows,
-    maxLength,
-    //inputRef,
-    dtWidth,
-    readOnly,
-    fileId,
-    isFileNm = false,
-    isAuthorized = false,
-    onClick,
-    fileInpHidden,
-    children,
-    price,
-    handleOnFocus,
-    handleOnBlur,
-    allowClear,
-    onFieldErrorChanged,
-    priceTxt,
-    ...props
-  }: IInputTextProps<T>,
-  ref?: React.ForwardedRef<any>, // input 요소 타입을 별도로 명시하지 않았으므로 타입 에러에 유의할 것
-) {
+const FormInput = function FormInput<T extends FieldValues>({
+  control,
+  rules,
+  name,
+  label = '',
+  placeholder,
+  type = 'text',
+  required = false,
+  onKeyDown,
+  style,
+  inputType = 'label',
+  disable = false,
+  unit,
+  rows,
+  maxLength,
+  dtWidth,
+  readOnly,
+  fileId,
+  isFileNm = false,
+  isAuthorized = false,
+  onClick,
+  fileInpHidden,
+  children,
+  price,
+  handleOnFocus,
+  handleOnBlur,
+  allowClear,
+  onFieldErrorChanged,
+  priceTxt,
+  ref,
+  ...props
+}: IInputTextProps<T>) {
   const {
     field: { value, onChange: controlChange, ref: refForUseController },
     fieldState: { isDirty, isTouched, error },
@@ -234,7 +233,7 @@ const FormInput = forwardRef(function FormInput<T extends FieldValues>(
                 disabled={disable}
                 maxLength={maxLength}
                 readOnly={readOnly ?? false}
-                ref={ref || refForUseController}
+                ref={mergeRefs<HTMLInputElement>(ref, refForUseController)}
                 onFocus={() => {
                   handleFocus(name);
                 }}
@@ -278,7 +277,7 @@ const FormInput = forwardRef(function FormInput<T extends FieldValues>(
                 style={style}
                 maxLength={maxLength}
                 readonly={readOnly ?? false}
-                ref={ref || refForUseController}
+                ref={mergeRefs<InputRef>(ref, refForUseController)}
                 onFocus={() => {
                   if (handleOnFocus) {
                     handleOnFocus();
@@ -321,7 +320,7 @@ const FormInput = forwardRef(function FormInput<T extends FieldValues>(
             style={style}
             maxLength={maxLength}
             readonly={readOnly ?? false}
-            ref={ref || refForUseController}
+            ref={mergeRefs<InputRef>(ref, refForUseController)}
             onFocus={() => {
               handleFocus(name);
             }}
@@ -353,7 +352,7 @@ const FormInput = forwardRef(function FormInput<T extends FieldValues>(
                   disabled={disable}
                   maxLength={maxLength}
                   readOnly={readOnly ?? false}
-                  ref={ref || refForUseController}
+                  ref={mergeRefs<HTMLTextAreaElement>(ref, refForUseController)}
                   onFocus={() => {
                     handleFocus(name);
                   }}
@@ -389,6 +388,7 @@ const FormInput = forwardRef(function FormInput<T extends FieldValues>(
                 onKeyDown={onKeyDown}
                 readonly={true}
                 allowClear={allowClear}
+                ref={mergeRefs<InputRef>(ref, refForUseController)}
               />
               {children}
               <button className={`btn`} onClick={onClick} disabled={disable}>
@@ -418,7 +418,7 @@ const FormInput = forwardRef(function FormInput<T extends FieldValues>(
               style={style}
               maxLength={maxLength}
               readonly={readOnly ?? false}
-              ref={ref || refForUseController}
+              ref={mergeRefs<InputRef>(ref, refForUseController)}
               onFocus={() => {
                 handleFocus(name);
               }}
@@ -439,6 +439,5 @@ const FormInput = forwardRef(function FormInput<T extends FieldValues>(
       )}
     </>
   );
-}) as <T extends FieldValues>(props: IInputTextProps<T> & { ref?: React.ForwardedRef<any> }) => React.ReactElement;
-
+};
 export default FormInput;

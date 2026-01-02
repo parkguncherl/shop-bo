@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect } from 'react';
-import { Input } from 'antd';
+import { Input, InputRef } from 'antd';
 
 export interface Props {
   name: string;
@@ -37,7 +37,7 @@ export const BaseInputAtom = forwardRef(function BaseInputAtom(
     inputType,
     allowClear,
   }: Props,
-  ref: React.ForwardedRef<any>,
+  ref: React.ForwardedRef<InputRef>,
 ) {
   return (
     <>

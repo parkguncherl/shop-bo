@@ -21,6 +21,7 @@ interface Props {
   handleBlur?: (name: string) => void;
   focusStates?: { [key: string]: boolean };
   className?: string;
+  ref?: React.Ref<React.ComponentRef<typeof DatePicker>>;
 }
 
 const DatePickerAtom = ({
@@ -39,6 +40,7 @@ const DatePickerAtom = ({
   style,
   className,
   allowClear = true,
+  ref,
 }: Props) => {
   return (
     <div className={`formBox border ${className}`}>
@@ -51,6 +53,7 @@ const DatePickerAtom = ({
         allowClear={allowClear}
         onChange={onChange}
         style={style}
+        ref={ref}
       />
     </div>
   );

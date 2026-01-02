@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react';
 import { Select } from 'antd';
 import { Controller, Control, Path, FieldValues } from 'react-hook-form';
+import { BaseSelectRef } from 'rc-select';
 
 interface Props<T extends FieldValues> {
   control: Control<T>; // react-hook-form의 control 타입 정의
@@ -12,12 +13,21 @@ interface Props<T extends FieldValues> {
   onChange?: (value: string[]) => void; // 선택값 변경 시 호출되는 함수
   className?: string;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  ref?: React.Ref<BaseSelectRef>;
 }
 
-const CustomInputSelect = forwardRef(function CustomInputSelect<T extends FieldValues>(
-  { control, name, type, title, required, defaultValue, onChange, className, ...props }: Props<T>,
-  ref?: React.ForwardedRef<any>,
-) {
+const CustomInputSelect = function CustomInputSelect<T extends FieldValues>({
+  control,
+  name,
+  type,
+  title,
+  required,
+  defaultValue,
+  onChange,
+  className,
+  ref,
+  ...props
+}: Props<T>) {
   return (
     <>
       {type === 'single' ? (
@@ -78,6 +88,5 @@ const CustomInputSelect = forwardRef(function CustomInputSelect<T extends FieldV
       ) : null}
     </>
   );
-}) as <T extends FieldValues>(props: Props<T> & { ref?: React.ForwardedRef<any> }) => React.ReactElement;
-
+};
 export default CustomInputSelect;

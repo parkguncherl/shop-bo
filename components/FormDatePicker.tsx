@@ -5,8 +5,6 @@ import { TControl } from '../types/Control';
 import DatePickerAtom from './atom/DatePickerAtom';
 import { DatePicker } from 'antd';
 import dayjs from 'dayjs';
-import { toast } from 'react-toastify';
-import onChange = toast.onChange;
 
 type TProps<T extends FieldValues> = TControl<T> & {
   title?: string;
@@ -23,10 +21,11 @@ type TProps<T extends FieldValues> = TControl<T> & {
   disabled?: boolean;
   format?: string;
   className?: string;
+  ref?: React.Ref<React.ComponentRef<typeof DatePicker>>;
 };
 
-function FormDatePicker<T extends FieldValues>(props: TProps<T>) {
-  const el = useRef<HTMLDListElement | null>(null);
+function FormDatePicker<T extends FieldValues>({ ref, ...props }: TProps<T>) {
+  //const el = useRef<HTMLDListElement | null>(null);
   const {
     field: { name, onChange: controlChange, value },
     fieldState: { error },
@@ -78,7 +77,8 @@ function FormDatePicker<T extends FieldValues>(props: TProps<T>) {
     <>
       {props.year ? (
         <>
-          <dl ref={el} className={props.className}>
+          {/*<dl ref={el} className={props.className}>*/}
+          <dl className={props.className}>
             <dt>
               <label>{props.title}</label>
               {props.required && <span className={'req'}>*</span>}
@@ -91,6 +91,7 @@ function FormDatePicker<T extends FieldValues>(props: TProps<T>) {
                   value={value ? dayjs(value) : ''}
                   disabledDate={disabledDate}
                   onOpenChange={hideUnavailableYears}
+                  ref={ref}
                 />
               </div>
               {error && (
@@ -109,29 +110,33 @@ function FormDatePicker<T extends FieldValues>(props: TProps<T>) {
       ) : (
         <>
           {props.title && (
-            <dl ref={el} className={props.className}>
-              <dt style={{ ...props.style }}>
-                <label>{props.title}</label>
-                {props.required && <span className={'req'}>*</span>}
-              </dt>
-              <dd>
-                <DatePickerAtom
-                  name={name}
-                  onChange={handleChange}
-                  value={value ? dayjs(value).format(props.format || 'YYYY-MM-DD') : ''}
-                  disable={props.disabled}
-                />
-                {error && (
-                  <span className={'error_txt'} style={{ marginTop: '5px' }}>
-                    {error?.message}
-                  </span>
-                )}
-              </dd>
-            </dl>
+            <>
+              {/*<dl ref={el} className={props.className}>*/}
+              <dl className={props.className}>
+                <dt style={{ ...props.style }}>
+                  <label>{props.title}</label>
+                  {props.required && <span className={'req'}>*</span>}
+                </dt>
+                <dd>
+                  <DatePickerAtom
+                    name={name}
+                    onChange={handleChange}
+                    value={value ? dayjs(value).format(props.format || 'YYYY-MM-DD') : ''}
+                    disable={props.disabled}
+                    ref={ref}
+                  />
+                  {error && (
+                    <span className={'error_txt'} style={{ marginTop: '5px' }}>
+                      {error?.message}
+                    </span>
+                  )}
+                </dd>
+              </dl>
+            </>
           )}
           {!props.title && (!props.type || props.type === 'single') && (
             <>
-              <DatePickerAtom name={name} onChange={handleChange} value={value} disable={props.disabled} className={props.className} />
+              <DatePickerAtom name={name} onChange={handleChange} value={value} disable={props.disabled} className={props.className} ref={ref} />
               {error && (
                 <span className={'error_txt'} style={{ marginTop: '5px' }}>
                   {error?.message}
@@ -141,7 +146,7 @@ function FormDatePicker<T extends FieldValues>(props: TProps<T>) {
           )}
           {!props.title && props.type === 'flex' && (
             <>
-              <DatePickerAtom name={name} onChange={handleChange} value={value} disable={props.disabled} className={props.className} />
+              <DatePickerAtom name={name} onChange={handleChange} value={value} disable={props.disabled} className={props.className} ref={ref} />
               {error && (
                 <span className={'error_txt'} style={{ marginTop: '5px' }}>
                   {error?.message}
