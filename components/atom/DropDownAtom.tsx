@@ -28,7 +28,7 @@ interface Props {
   onFocus?: (e: React.FocusEvent<HTMLElement, Element>) => void;
   onBlur?: () => void;
   disabled?: boolean;
-  ref: React.Ref<BaseSelectRef>;
+  ref?: React.Ref<BaseSelectRef>;
 }
 
 const DropDownAtom = function DropDownAtom({

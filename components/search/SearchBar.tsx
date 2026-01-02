@@ -19,7 +19,7 @@ interface Props<T> {
   onTypingOccurred?: (name: string, value: string | number) => void;
   onError?: (result: AxiosResponse<ApiResponse, any>) => void;
   emptyMessage?: string;
-  ref: React.Ref<SearchBarRefInterface>;
+  ref?: React.Ref<SearchBarRefInterface>;
 }
 
 export interface SearchBarRefInterface {

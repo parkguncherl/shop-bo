@@ -15,7 +15,7 @@ interface Props {
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   children?: string;
   clickPreventTime?: number; // 미정의시 이중클릭 억제 비활성화, 0 미만 값 정의할 시 enableClickBehavior 를 통한 수동 제어
-  ref: React.Ref<TunedButtonAtomRefInterface>;
+  ref?: React.Ref<TunedButtonAtomRefInterface>;
 }
 
 const TunedButtonAtom = ({ className, title, dataTooltipId, dataTooltipContent, dataTooltipPlace, onClick, children, clickPreventTime, ref }: Props) => {

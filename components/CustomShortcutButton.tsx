@@ -52,7 +52,7 @@ interface CustomShortcutButtonProps {
   tooltipPlace?: 'top' | 'bottom' | 'left' | 'right';
   dataCount?: number;
   isBlueRounded?: boolean;
-  ref: React.Ref<HTMLButtonElement>;
+  ref?: React.Ref<HTMLButtonElement>;
 }
 
 /**

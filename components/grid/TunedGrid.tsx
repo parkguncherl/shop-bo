@@ -1,5 +1,5 @@
 import { AgGridReact } from 'ag-grid-react';
-import React, { forwardRef, RefAttributes, RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import React, { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import {
   BodyScrollEvent,
   CellClickedEvent,
@@ -38,10 +38,6 @@ import { useRouter } from 'next/router';
 import { AG_GRID_LOCALE_KO, GridSetting, withCommonKeyboardSuppress } from '../../libs/ag-grid';
 import { useCommonStore } from '../../stores';
 import { GridResponse } from '../../generated';
-
-export interface statusInf {
-  prevEventKey?: string;
-}
 
 export interface selectedRowCopiedEvent<P> {
   copiedRowNodes: IRowNode<P>[];
@@ -125,26 +121,14 @@ export interface TunedGridProps<P> {
   onRowDataUpdated?: (event: RowDataUpdatedEvent) => void;
   onRowGroupOpened?: (event: RowGroupOpenedEvent) => void;
   suppressClickEdit?: boolean;
+  ref?: React.Ref<AgGridReact>;
 }
-
-// MultiChoiceFn 위에 추가
-const getSerializableColumnDefs = (columnDefs: any[]): any[] => {
-  return columnDefs.map((col) => ({
-    field: col.field,
-    headerName: col.headerName,
-    hide: col.hide,
-    minWidth: col.minWidth,
-    width: col.width,
-    flex: col.flex,
-    pinned: col.pinned,
-  }));
-};
 
 /**
  * keyForBeingPressed 인자로 들어온 키에 해당하는 키가 눌린 상태로 화살표 이동할 시 다중 행 선택이 이루어짐
  * ArrowDown, ArrowUp 키는 본 요소 내부에서 사용되므로 외부에서 이벤트 리스너를 던질 시 유의하여야 함
  * */
-const InnerTunedGrid = <P,>(props: TunedGridProps<P>, ref: React.Ref<AgGridReact> | null) => {
+const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
   const router = useRouter();
 
   const [selectGridColumnState, updateGridColumnState, initGridColumnState] = useCommonStore((s) => [
@@ -715,12 +699,4 @@ const InnerTunedGrid = <P,>(props: TunedGridProps<P>, ref: React.Ref<AgGridReact
     </div>
   );
 };
-
-function fixedForwardRef<P>(
-  render: (props: P, ref: React.Ref<AgGridReact> | null) => JSX.Element,
-): (props: P & React.RefAttributes<AgGridReact>) => JSX.Element {
-  return forwardRef(render) as (props: P & RefAttributes<AgGridReact>) => JSX.Element;
-}
-
-const TunedGrid = fixedForwardRef(InnerTunedGrid);
 export default TunedGrid;
