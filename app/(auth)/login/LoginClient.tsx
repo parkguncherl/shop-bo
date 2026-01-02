@@ -33,6 +33,7 @@ export interface LoginVerificationFields {
 /**
  * (client side)LoginClient
  * */
+// todo oms wms 구분 폐지한 관계로 상당 영역 주석처리, 추후 삭제
 const LoginClient = () => {
   const [onVerification, modalType, onSendOtp, openModal] = useAuthStore((s) => [s.onVerification, s.modalType, s.onSendOtp, s.openModal, s.closeModal]);
   const session = useSession();
@@ -144,7 +145,9 @@ const LoginClient = () => {
   }, [isWatingOtp]);
 
   // 세션이 생겼을때 즐겨찾기 목록 가져오기
-  const { refetch: favRefetch } = useQuery([], () => authApi.get<ApiResponseListSelectFavorites>('/mypage/favorites', {}), {
+  const { refetch: favRefetch } = useQuery({
+    queryKey: [],
+    queryFn: () => authApi.get<ApiResponseListSelectFavorites>('/mypage/favorites', {}),
     enabled: false, // 쿼리가 자동으로 실행되지 않도록 설정
   });
 
@@ -188,7 +191,7 @@ const LoginClient = () => {
         //     : authGroupCd === '7'
         //     ? '/oms/product/ProductScmMng'
         //     : '/';
-        const landingPage = '/';
+        const landingPage = '/'; // 리다이렉트 고정
 
         if (favHistoryList && favHistoryList.length > 0) {
           localStorage.setItem(myLocalStorage, JSON.stringify(favHistoryList));
@@ -256,8 +259,8 @@ const LoginClient = () => {
       redirect: false,
     });
 
-    console.log('result:==> ', result);
-    alert(result);
+    // console.log('result:==> ', result);
+    // alert(result);
 
     if (result?.error) {
       return toastError(result.error);

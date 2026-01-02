@@ -1,5 +1,4 @@
 import React from 'react';
-import PrintScripts from '../script/print-client';
 import RootProvider from '../provider/root/rootProvider';
 import GlobalErrorBoundary from './globalErrorBoundary';
 import { Metadata } from 'next';

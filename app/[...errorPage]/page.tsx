@@ -2,10 +2,10 @@ import ErrorPageClient from './ErrorPageClient';
 import styles from '../../styles/error.module.scss';
 
 /**
- * (server side)ErrorPage
+ * (server side)Error page
  * */
-const ErrorPage = () => {
+const page = () => {
   return <ErrorPageClient styles={styles} />;
 };
 
-export default ErrorPage;
+export default page;

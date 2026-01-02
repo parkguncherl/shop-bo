@@ -196,9 +196,15 @@ export const LeftNav = ({ closed = false }: Props) => {
   }, []);
 
   const sessions = useSession();
-  const { data: menus, isFetching } = useQuery(['/menu/leftMenu'], () => authApi.get<ApiResponseListLeftMenu>('/menu/leftMenu'), {
+  const { data: menus, isFetching } = useQuery({
+    queryKey: ['/menu/leftMenu'],
+    queryFn: () => authApi.get<ApiResponseListLeftMenu>('/menu/leftMenu'),
     enabled: sessions.status === 'authenticated',
   });
+
+  useEffect(() => {
+    console.log('menus: ', menus, 'sessions: ', sessions);
+  }, [menus, sessions]);
 
   if (isFetching) {
     return <Loading />;
