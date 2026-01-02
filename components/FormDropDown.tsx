@@ -1,6 +1,6 @@
 import { useController, FieldValues } from 'react-hook-form';
 import { DropDownOption } from '../types/DropDownOptions';
-import React, { forwardRef, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import DropDownAtom from './atom/DropDownAtom';
 import { authApi } from '../libs';
 import { ApiResponseListCodeDropDown } from '../generated';

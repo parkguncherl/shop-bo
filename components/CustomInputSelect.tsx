@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 import { Select } from 'antd';
 import { Controller, Control, Path, FieldValues } from 'react-hook-form';
 import { BaseSelectRef } from 'rc-select';

@@ -2,7 +2,7 @@ import { DropDownOption } from '../../types/DropDownOptions';
 import { Select, Space } from 'antd';
 import { SelectCommonPlacement } from 'antd/lib/_util/motion';
 import { BaseSelectRef } from 'rc-select';
-import React, { forwardRef } from 'react';
+import React from 'react';
 
 interface Props {
   value?: string | number;
@@ -28,35 +28,34 @@ interface Props {
   onFocus?: (e: React.FocusEvent<HTMLElement, Element>) => void;
   onBlur?: () => void;
   disabled?: boolean;
+  ref: React.Ref<BaseSelectRef>;
 }
 
-const DropDownAtom = forwardRef(function DropDownAtom(
-  {
-    value,
-    values,
-    options,
-    name,
-    placeholder,
-    onChangeOptions,
-    onChangeControl,
-    placement = 'bottomLeft',
-    readonly = false,
-    disabledOptionValues = [],
-    style,
-    defaultValue,
-    selectorShowAction,
-    multiple,
-    onKeyDown,
-    optionClass,
-    dropDownStyle,
-    virtual,
-    className,
-    onFocus,
-    onBlur,
-    disabled,
-  }: Props,
-  ref: React.ForwardedRef<BaseSelectRef>,
-) {
+const DropDownAtom = function DropDownAtom({
+  value,
+  values,
+  options,
+  name,
+  placeholder,
+  onChangeOptions,
+  onChangeControl,
+  placement = 'bottomLeft',
+  readonly = false,
+  disabledOptionValues = [],
+  style,
+  defaultValue,
+  selectorShowAction,
+  multiple,
+  onKeyDown,
+  optionClass,
+  dropDownStyle,
+  virtual,
+  className,
+  onFocus,
+  onBlur,
+  disabled,
+  ref,
+}: Props) {
   const handleChange = (selectedValues: any) => {
     if (onChangeOptions) {
       onChangeOptions(name, selectedValues, defaultValue);
@@ -155,6 +154,6 @@ const DropDownAtom = forwardRef(function DropDownAtom(
       )}
     </>
   );
-});
+};
 
 export default DropDownAtom;

@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect } from 'react';
+import React from 'react';
 import { Input, InputRef } from 'antd';
 
 export interface Props {
@@ -17,28 +17,27 @@ export interface Props {
   onBlur?: () => void;
   inputType?: string;
   allowClear?: boolean;
+  ref: React.Ref<InputRef>;
 }
 
-export const BaseInputAtom = forwardRef(function BaseInputAtom(
-  {
-    name,
-    label,
-    placeholder,
-    type = 'text',
-    value = '',
-    readonly,
-    disable,
-    onChange,
-    onKeyDown,
-    style,
-    maxLength,
-    onFocus,
-    onBlur,
-    inputType,
-    allowClear,
-  }: Props,
-  ref: React.ForwardedRef<InputRef>,
-) {
+export const BaseInputAtom = function BaseInputAtom({
+  name,
+  label,
+  placeholder,
+  type = 'text',
+  value = '',
+  readonly,
+  disable,
+  onChange,
+  onKeyDown,
+  style,
+  maxLength,
+  onFocus,
+  onBlur,
+  inputType,
+  allowClear,
+  ref,
+}: Props) {
   return (
     <>
       {inputType === 'password' ? (
@@ -80,4 +79,4 @@ export const BaseInputAtom = forwardRef(function BaseInputAtom(
       )}
     </>
   );
-});
+};

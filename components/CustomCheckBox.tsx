@@ -1,4 +1,4 @@
-import React, { forwardRef, RefAttributes } from 'react';
+import React from 'react';
 import { Checkbox, CheckboxRef } from 'antd';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { useController, Control, FieldValues, Path } from 'react-hook-form';
@@ -14,12 +14,22 @@ type ICheckBoxProps<T extends FieldValues> = {
   onChange?: (checked: boolean) => void; // 외부 onChange 추가
   className?: string;
   disabled?: boolean;
+  ref?: React.Ref<CheckboxRef>;
 };
 
-const InnerCustomCheckBox = <T extends FieldValues>(
-  { control, name, label, rules, checked, onCheckedChange, onChange: externalOnChange, children, className, disabled }: ICheckBoxProps<T>,
-  ref: React.Ref<CheckboxRef> | null,
-) => {
+const CustomCheckBox = <T extends FieldValues>({
+  control,
+  name,
+  label,
+  rules,
+  checked,
+  onCheckedChange,
+  onChange: externalOnChange,
+  children,
+  className,
+  disabled,
+  ref,
+}: ICheckBoxProps<T>) => {
   const {
     field: { value, onChange },
     fieldState: { error },
@@ -50,11 +60,5 @@ const InnerCustomCheckBox = <T extends FieldValues>(
     </div>
   );
 };
-function fixedForwardRef<P>(
-  render: (props: P, ref: React.Ref<CheckboxRef> | null) => JSX.Element,
-): (props: P & React.RefAttributes<CheckboxRef>) => JSX.Element {
-  return forwardRef(render) as (props: P & RefAttributes<CheckboxRef>) => JSX.Element;
-}
 
-const CustomCheckBox = fixedForwardRef(InnerCustomCheckBox);
 export default CustomCheckBox;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useEffect, useImperativeHandle } from 'react';
 import { Checkbox } from 'antd';
 import { useController, Control, FieldValues, Path } from 'react-hook-form';
 
@@ -11,12 +11,20 @@ type CustomCheckBoxGroupProps<T extends FieldValues> = {
   title?: string;
   required?: boolean;
   className?: string;
+  ref?: React.Ref<{ focusOnInput: () => void }>;
 };
 
-const CustomCheckBoxGroup = forwardRef(function CustomCheckBoxGroup<T extends FieldValues>(
-  { control, name, values, checkedValues, onCheckedChange, title, required, className }: CustomCheckBoxGroupProps<T>,
-  ref?: React.ForwardedRef<any>,
-) {
+const CustomCheckBoxGroup = function CustomCheckBoxGroup<T extends FieldValues>({
+  control,
+  name,
+  values,
+  checkedValues,
+  onCheckedChange,
+  title,
+  required,
+  className,
+  ref,
+}: CustomCheckBoxGroupProps<T>) {
   const {
     field,
     fieldState: { error },
@@ -105,6 +113,5 @@ const CustomCheckBoxGroup = forwardRef(function CustomCheckBoxGroup<T extends Fi
       )}
     </>
   );
-}) as <T extends FieldValues>(props: CustomCheckBoxGroupProps<T> & { ref?: React.ForwardedRef<any> }) => React.ReactElement;
-
+};
 export default CustomCheckBoxGroup;

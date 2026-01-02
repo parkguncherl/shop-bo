@@ -48,9 +48,10 @@ interface Props {
   initDatePicker?: (selectedType: DatePickerSelectType, startDate: Dayjs, endDate: Dayjs) => void;
   disabled?: boolean; // 디스에이블 여부 date타입만 적용 20250326
   //upperComponentIsOpened?: boolean; // 상위 컴포넌트가 열림으로 인하여 CustomNewDatePicker 가 랜더링 될 시 상위 컴포넌트 열림 상태를 인자로 할당하면 초기 랜더링 시 사용 가능한 기능들을 팝업과 같은 영역에서도 사용할 수 있다.
+  ref?: React.Ref<CustomNewDatePickerRefInterface>;
 }
 
-const CustomNewDatePicker = React.forwardRef<CustomNewDatePickerRefInterface, Props>((props, ref) => {
+const CustomNewDatePicker = ({ ref, ...props }: Props) => {
   const {
     title,
     startName,
@@ -75,7 +76,7 @@ const CustomNewDatePicker = React.forwardRef<CustomNewDatePickerRefInterface, Pr
     //upperComponentIsOpened,
     disabled,
   } = props;
-  CustomNewDatePicker.displayName = 'CustomNewDatePicker';
+  //CustomNewDatePicker.displayName = 'CustomNewDatePicker';
   const session = useSession();
   const [dropDownValue, setDropDownValue] = useState(defaultType || 'type');
   const [saveDefaultValue, setSaveDefaultValue] = useState(value);
@@ -1161,5 +1162,5 @@ const CustomNewDatePicker = React.forwardRef<CustomNewDatePickerRefInterface, Pr
       )}
     </div>
   );
-});
+};
 export default CustomNewDatePicker;

@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { Select, Spin, Input, InputRef } from 'antd';
 import debounce from 'lodash/debounce';
 import { authApi } from '../libs';
@@ -20,13 +20,14 @@ interface DebounceSelectProps {
   className?: string;
   placeholder?: string;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  ref?: React.Ref<DebounceSelectRefInterface>;
 }
 
 export interface DebounceSelectRefInterface {
   focusOnInput: () => void;
 }
 
-const DebounceSelect = forwardRef<DebounceSelectRefInterface, DebounceSelectProps>((props, ref) => {
+const DebounceSelect = ({ ref, ...props }: DebounceSelectProps) => {
   const [fetching, setFetching] = useState(false);
   const [options, setOptions] = useState<string[]>([]);
   const [searchValue, setSearchValue] = useState<string>('');
@@ -261,7 +262,7 @@ const DebounceSelect = forwardRef<DebounceSelectRefInterface, DebounceSelectProp
       ) : null}
     </>
   );
-});
+};
 
 export default DebounceSelect;
 

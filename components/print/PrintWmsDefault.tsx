@@ -1,6 +1,6 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 import dayjs from 'dayjs';
-import QRCode from '../../pages/system/components/QRCode';
+import QRCode from '../../app/(app)/system/components/QRCode';
 
 interface Props {
   children?: React.ReactNode;
@@ -9,10 +9,10 @@ interface Props {
   setIsPrinting?: any;
   type?: string;
   className?: string;
-  ref?: any;
+  ref?: React.Ref<HTMLInputElement>;
 }
 
-const PrintWmsDefault = forwardRef<HTMLDivElement, Props>(({ selectedDetail, type, children, className }, ref) => {
+const PrintWmsDefault = ({ selectedDetail, type, children, className, ref }: Props) => {
   return (
     <div className={`printComponent ${className}`} ref={ref}>
       <div className="inner">
@@ -116,6 +116,5 @@ const PrintWmsDefault = forwardRef<HTMLDivElement, Props>(({ selectedDetail, typ
       </div>
     </div>
   );
-});
-PrintWmsDefault.displayName = 'PrintWmsDefault';
+};
 export default PrintWmsDefault;

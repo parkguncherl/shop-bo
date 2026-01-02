@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useRef, useState, forwardRef } from 'react';
-import { Input, InputRef, Select, Spin } from 'antd';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Input, Select, Spin } from 'antd';
 import { FieldValues } from 'react-hook-form';
+import { BaseSelectRef } from 'rc-select';
 
 interface Props<T extends FieldValues> {
   fetchOptions: string; // 검색어 기반 옵션 가져오기
@@ -12,12 +13,21 @@ interface Props<T extends FieldValues> {
   title?: string;
   required?: boolean;
   defaultValue?: string | string[];
+  selectRef?: React.Ref<BaseSelectRef>;
 }
 
-const CustomDoubleSelect = forwardRef(function CustomDoubleSelect<T extends FieldValues>(
-  { fetchOptions, debounceTimeout = 0, onChange, onEditItem, type, title, required, defaultValue, ...props }: Props<T>,
-  ref?: React.ForwardedRef<any>,
-) {
+const CustomDoubleSelect = function CustomDoubleSelect<T extends FieldValues>({
+  fetchOptions,
+  debounceTimeout = 0,
+  onChange,
+  onEditItem,
+  type,
+  title,
+  required,
+  defaultValue,
+  selectRef,
+  ...props
+}: Props<T>) {
   const [fetching, setFetching] = useState(false);
   const [options, setOptions] = useState<string[]>([]);
   const [value, setValue] = useState<string[] | null>(null); // 여러 개의 선택값을 저장하는 배열로 변경
@@ -70,7 +80,7 @@ const CustomDoubleSelect = forwardRef(function CustomDoubleSelect<T extends Fiel
   // 옵션 추가 관련 상태 및 함수
   const [inputValue, setInputValue] = useState('');
   const [addOn, setAddOn] = useState(false);
-  const inputRef = useRef<InputRef>(null);
+  //const inputRef = useRef<InputRef>(null);
 
   const addItem = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -133,7 +143,7 @@ const CustomDoubleSelect = forwardRef(function CustomDoubleSelect<T extends Fiel
               <button onClick={() => setAddOn(true)}>추가하기</button>
             ) : (
               <div className={'formBox border'}>
-                <Input ref={inputRef} value={inputValue} onChange={(e) => setInputValue(e.target.value)} onPressEnter={handleInputKeyDown} />
+                <Input value={inputValue} onChange={(e) => setInputValue(e.target.value)} onPressEnter={handleInputKeyDown} />
               </div>
             )}
           </div>
@@ -141,7 +151,7 @@ const CustomDoubleSelect = forwardRef(function CustomDoubleSelect<T extends Fiel
       )}
       onDropdownVisibleChange={handleDropdownVisibleChange}
       {...props}
-      ref={ref}
+      ref={selectRef}
       onInputKeyDown={(e) => {
         if (e.key === 'Tab') {
           e.stopPropagation();
@@ -167,6 +177,5 @@ const CustomDoubleSelect = forwardRef(function CustomDoubleSelect<T extends Fiel
       ) : null}
     </>
   );
-}) as <T extends FieldValues>(props: Props<T> & { ref?: React.ForwardedRef<any> }) => React.ReactElement;
-
+};
 export default CustomDoubleSelect;

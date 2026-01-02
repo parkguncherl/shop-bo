@@ -1,6 +1,6 @@
 // components/CustomShortcutButton.tsx
 
-import React, { useEffect, useCallback, useState, useId, useRef } from 'react';
+import React, { useEffect, useCallback, useId } from 'react';
 import { Tooltip } from 'react-tooltip';
 import { useOrderStore } from '../stores/useOrderStore';
 
@@ -49,10 +49,10 @@ interface CustomShortcutButtonProps {
   loadingText?: string;
   isLoading?: boolean;
   disabled?: boolean;
-  ref?: React.Ref<HTMLButtonElement>;
   tooltipPlace?: 'top' | 'bottom' | 'left' | 'right';
   dataCount?: number;
   isBlueRounded?: boolean;
+  ref: React.Ref<HTMLButtonElement>;
 }
 
 /**
@@ -159,158 +159,152 @@ export const COMMON_SHORTCUTS = {
  * 커스텀 단축키 버튼 컴포넌트
  * @component CustomShortcutButton
  */
-const CustomShortcutButton = React.forwardRef<HTMLButtonElement, CustomShortcutButtonProps>(
-  (
-    {
-      onClick,
-      shortcut,
-      className = '',
-      children,
-      tooltipId,
-      title,
-      disableOnInput = true,
-      loadingText,
-      isLoading = false,
-      disabled = false,
-      tooltipPlace,
-      isButton = true,
-      as = 'button',
-      dataCount = 0,
-      isBlueRounded = false,
-    },
-    ref,
-  ) => {
-    const [orderModalType] = useOrderStore((s) => [s.modalType]);
-    const uniqueId = useId(); // 고유 ID 생성
-    tooltipId = `tooltip-${uniqueId}`; // 고유 Tooltip ID
-    /**
-     * 단축키 텍스트 생성
-     * @returns {string} 포맷팅된 단축키 텍스트
-     */
-    const getShortcutText = () => {
-      const keys = [];
-      if (shortcut.ctrl) keys.push('Ctrl');
-      if (shortcut.alt) keys.push('Alt');
-      if (shortcut.shift) keys.push('Shift');
-      const key = shortcut.key === ' ' ? 'Spacebar' : shortcut.key;
+const CustomShortcutButton = ({
+  onClick,
+  shortcut,
+  className = '',
+  children,
+  tooltipId,
+  title,
+  disableOnInput = true,
+  loadingText,
+  isLoading = false,
+  disabled = false,
+  tooltipPlace,
+  isButton = true,
+  as = 'button',
+  dataCount = 0,
+  isBlueRounded = false,
+  ref,
+}: CustomShortcutButtonProps) => {
+  const [orderModalType] = useOrderStore((s) => [s.modalType]);
+  const uniqueId = useId(); // 고유 ID 생성
+  tooltipId = `tooltip-${uniqueId}`; // 고유 Tooltip ID
+  /**
+   * 단축키 텍스트 생성
+   * @returns {string} 포맷팅된 단축키 텍스트
+   */
+  const getShortcutText = () => {
+    const keys = [];
+    if (shortcut.ctrl) keys.push('Ctrl');
+    if (shortcut.alt) keys.push('Alt');
+    if (shortcut.shift) keys.push('Shift');
+    const key = shortcut.key === ' ' ? 'Spacebar' : shortcut.key;
 
-      // 기능키는 그대로 사용, 일반 키는 대문자로 변환
-      /*const isFunctionKey = Object.values(FUNCTION_KEYS).includes(shortcut.key as any);
+    // 기능키는 그대로 사용, 일반 키는 대문자로 변환
+    /*const isFunctionKey = Object.values(FUNCTION_KEYS).includes(shortcut.key as any);
     keys.push(isFunctionKey ? shortcut.key : shortcut.key.toUpperCase());*/
-      keys.push(key);
+    keys.push(key);
 
-      return keys.join(' + ');
-    };
+    return keys.join(' + ');
+  };
 
-    /**
-     * 클릭 이벤트 핸들러
-     */
-    const handleClick = async () => {
-      if (isLoading) return;
-      try {
-        await onClick();
-      } catch (error) {
-        console.error('Button click error:', error);
-      }
-    };
-
-    /**
-     * 키보드 이벤트 핸들러
-     * 단축키 감지 및 처리
-     */
-    const handleKeyPress = useCallback(
-      (e: KeyboardEvent) => {
-        if (shortcut.enableShortcut === false) return;
-        if (isLoading || disabled) return;
-        // if (shortcut.key === 'F5') return;
-
-        if (disableOnInput && (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement)) {
-          return;
-        }
-
-        let keyMatch = false;
-
-        // 숫자키 매칭
-        if (/^[0-9]$/.test(shortcut.key)) {
-          keyMatch = e.key === shortcut.key || e.code === `Digit${shortcut.key}`;
-        }
-        // 기능키 매칭
-        else if (Object.values(FUNCTION_KEYS).includes(shortcut.key as any)) {
-          keyMatch = e.key === shortcut.key;
-        }
-        // 일반 키 매칭
-        else {
-          keyMatch = e.key.toLowerCase() === shortcut.key.toLowerCase();
-        }
-
-        // 보조키 매칭
-        const modifierMatch =
-          (!shortcut.alt || e.altKey) &&
-          (!e.altKey || shortcut.alt) &&
-          (!shortcut.ctrl || e.ctrlKey) &&
-          (!e.ctrlKey || shortcut.ctrl) &&
-          (!shortcut.shift || e.shiftKey) &&
-          (!e.shiftKey || shortcut.shift);
-
-        if (keyMatch && modifierMatch) {
-          if (BROWSER_FUNCTION_KEYS[shortcut.key as keyof typeof BROWSER_FUNCTION_KEYS]) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-          }
-          onClick();
-        }
-      },
-      [onClick, shortcut, isLoading, disabled, disableOnInput],
-    );
-
-    useEffect(() => {
-      // 전역 이벤트 리스너 등록 (캡처 페이즈)
-      if (!orderModalType.active) {
-        window.addEventListener('keydown', handleKeyPress, { capture: true });
-        return () => window.removeEventListener('keydown', handleKeyPress, { capture: true });
-      }
-    }, [handleKeyPress]);
-
-    if (isButton) {
-      return (
-        <>
-          <button
-            ref={ref as React.Ref<HTMLButtonElement>}
-            className={`shortcut-button ${className} ${isLoading || disabled ? 'opacity-50 cursor-not-allowed' : ''} ${
-              isBlueRounded ? 'border-blue-thick' : ''
-            }`}
-            onClick={handleClick}
-            disabled={isLoading || disabled}
-            data-tooltip-id={tooltipId}
-            data-tooltip-content={`${getShortcutText()}`}
-            type="button"
-            data-count={dataCount ? dataCount : 0}
-          >
-            {isLoading ? loadingText || 'Loading...' : children}
-          </button>
-          <Tooltip id={tooltipId} place={tooltipPlace || 'top'} />
-        </>
-      );
+  /**
+   * 클릭 이벤트 핸들러
+   */
+  const handleClick = async () => {
+    if (isLoading) return;
+    try {
+      await onClick();
+    } catch (error) {
+      console.error('Button click error:', error);
     }
+  };
 
+  /**
+   * 키보드 이벤트 핸들러
+   * 단축키 감지 및 처리
+   */
+  const handleKeyPress = useCallback(
+    (e: KeyboardEvent) => {
+      if (shortcut.enableShortcut === false) return;
+      if (isLoading || disabled) return;
+      // if (shortcut.key === 'F5') return;
+
+      if (disableOnInput && (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement)) {
+        return;
+      }
+
+      let keyMatch = false;
+
+      // 숫자키 매칭
+      if (/^[0-9]$/.test(shortcut.key)) {
+        keyMatch = e.key === shortcut.key || e.code === `Digit${shortcut.key}`;
+      }
+      // 기능키 매칭
+      else if (Object.values(FUNCTION_KEYS).includes(shortcut.key as any)) {
+        keyMatch = e.key === shortcut.key;
+      }
+      // 일반 키 매칭
+      else {
+        keyMatch = e.key.toLowerCase() === shortcut.key.toLowerCase();
+      }
+
+      // 보조키 매칭
+      const modifierMatch =
+        (!shortcut.alt || e.altKey) &&
+        (!e.altKey || shortcut.alt) &&
+        (!shortcut.ctrl || e.ctrlKey) &&
+        (!e.ctrlKey || shortcut.ctrl) &&
+        (!shortcut.shift || e.shiftKey) &&
+        (!e.shiftKey || shortcut.shift);
+
+      if (keyMatch && modifierMatch) {
+        if (BROWSER_FUNCTION_KEYS[shortcut.key as keyof typeof BROWSER_FUNCTION_KEYS]) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+        }
+        onClick();
+      }
+    },
+    [onClick, shortcut, isLoading, disabled, disableOnInput],
+  );
+
+  useEffect(() => {
+    // 전역 이벤트 리스너 등록 (캡처 페이즈)
+    if (!orderModalType.active) {
+      window.addEventListener('keydown', handleKeyPress, { capture: true });
+      return () => window.removeEventListener('keydown', handleKeyPress, { capture: true });
+    }
+  }, [handleKeyPress]);
+
+  if (isButton) {
     return (
       <>
-        <li
-          ref={ref as React.Ref<HTMLLIElement>}
-          className={`shortcut-item ${className} ${isLoading || disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        <button
+          ref={ref as React.Ref<HTMLButtonElement>}
+          className={`shortcut-button ${className} ${isLoading || disabled ? 'opacity-50 cursor-not-allowed' : ''} ${isBlueRounded ? 'border-blue-thick' : ''}`}
           onClick={handleClick}
-          aria-disabled={isLoading || disabled}
+          disabled={isLoading || disabled}
           data-tooltip-id={tooltipId}
-          data-tooltip-content={`Tip : ${title || shortcut.description || ''} ${title ? ' ' : ''}단축키는 ( ${getShortcutText()} ) 이에요`}
+          data-tooltip-content={`${getShortcutText()}`}
+          type="button"
+          data-count={dataCount ? dataCount : 0}
         >
           {isLoading ? loadingText || 'Loading...' : children}
-        </li>
+        </button>
         <Tooltip id={tooltipId} place={tooltipPlace || 'top'} />
       </>
     );
-  },
-);
+  }
+
+  return (
+    <>
+      <li
+        ref={ref as React.Ref<HTMLLIElement>}
+        className={`shortcut-item ${className} ${isLoading || disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        onClick={handleClick}
+        aria-disabled={isLoading || disabled}
+        data-tooltip-id={tooltipId}
+        data-tooltip-content={`Tip : ${title || shortcut.description || ''} ${title ? ' ' : ''}단축키는 ( ${getShortcutText()} ) 이에요`}
+      >
+        {isLoading ? loadingText || 'Loading...' : children}
+      </li>
+      <Tooltip id={tooltipId} place={tooltipPlace || 'top'} />
+    </>
+  );
+};
 
 /**
  * 사용 예시:
@@ -331,5 +325,4 @@ const CustomShortcutButton = React.forwardRef<HTMLButtonElement, CustomShortcutB
  *   커스텀버튼
  * </CustomShortcutButton>
  */
-CustomShortcutButton.displayName = 'CustomShortcutButton';
 export default CustomShortcutButton;
