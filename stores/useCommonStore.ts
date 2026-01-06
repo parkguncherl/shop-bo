@@ -4,7 +4,6 @@ import { immer } from 'zustand/middleware/immer';
 import { ApiResponse, CommonRequestFileDownload, GridRequest } from '../generated';
 import { AxiosPromise } from 'axios';
 import { authApi, authDownApi } from '../libs';
-import { toastError } from '../components';
 
 type ModalType = 'UPLOAD' | 'UPLOADS' | 'IMAGES' | 'PRIVACY' | 'FILES';
 
@@ -30,8 +29,6 @@ interface CommonState {
   setUpMenuNm: (upMenuNm: string) => void;
   menuNm: string | undefined;
   setMenuNm: (menuNm: string) => void;
-  isOrderOn: boolean;
-  setIsOrderOn: (isOrderOn: boolean) => void;
   menuUpdYn: boolean;
   setMenuUpdYn: (menuUpdYn: boolean) => void;
   menuExcelYn: boolean;
@@ -46,7 +43,6 @@ interface CommonState {
   removeEmptyRows: <P>(rows: P[], colField?: string) => P[];
   filterDataList: FilterData[];
   setFilterDataList: (filterDataList: FilterData[]) => void;
-  partnerOptions: PartnerOption[];
 }
 
 interface CommonApiState {
@@ -90,12 +86,6 @@ const initialStateCreator: StateCreator<CommonState & CommonApiState, any> = (se
     setMenuNm: (menuNm: string) => {
       set((state) => ({
         menuNm: menuNm,
-      }));
-    },
-    isOrderOn: false,
-    setIsOrderOn: (isOrderOn: boolean) => {
-      set((state) => ({
-        isOrderOn: isOrderOn,
       }));
     },
     menuUpdYn: false,
@@ -244,7 +234,6 @@ const initialStateCreator: StateCreator<CommonState & CommonApiState, any> = (se
         return JSON.parse(JSON.stringify(rows)).filter((row: any) => row[colField] != undefined);
       }
     },
-    partnerOptions: [],
   };
 };
 

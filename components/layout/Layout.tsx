@@ -56,11 +56,7 @@ export const Layout = ({ children }: Props) => {
   /** 컴포넌트 상수 */
   const authGroupCd = session.data?.user?.authCd ? session.data?.user.authCd?.substring(0, 1) : '';
 
-  const {
-    data: menuAuthList,
-    isLoading,
-    isSuccess: isMenuCheckSuccess,
-  } = useQuery({
+  const { data: menuAuthList, isLoading } = useQuery({
     queryKey: ['/auth/check/menu', pathname],
     queryFn: () =>
       authApi.get<ApiResponseAuthResponseMenuAuth>('/auth/check/menu', {
@@ -137,27 +133,6 @@ export const Layout = ({ children }: Props) => {
     //router.push('/login', undefined, { shallow: true });
     router.push('/login');
   }
-
-  // body에 class 부여 todo 단일 레이아웃을 사용하므로 해당 영역 주석
-  // useEffect(() => {
-  //   if (typeof window !== 'undefined') {
-  //     const bodyClassList = document.querySelector('body')?.classList;
-  //     if (authGroupCd === '3') {
-  //       bodyClassList?.remove('wms');
-  //       bodyClassList?.add('oms');
-  //     } else if (authGroupCd === '6') {
-  //       // 6은 모바일
-  //       bodyClassList?.remove('oms');
-  //       bodyClassList?.remove('wms');
-  //     } else if (authGroupCd === '7') {
-  //       bodyClassList?.remove('oms');
-  //       bodyClassList?.add('wms');
-  //     } else {
-  //       bodyClassList?.remove('oms');
-  //       bodyClassList?.add('wms');
-  //     }
-  //   }
-  // }, [authGroupCd]);
 
   // 반환 영역
   if (session.status === 'loading') {

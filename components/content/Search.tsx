@@ -9,7 +9,6 @@ import { CustomSearchRadio } from '../CustomSearchRadio';
 import { CustomSearchCheckBox } from '../CustomSearchCheckBox';
 import CustomMonthPicker from '../CustomDatePickerM';
 import { CustomSwitch } from '../CustomSwitch';
-import { RetailSearchBar } from '../search/retail/RetailSearchBar';
 import { CustomSegmented } from '../CustomSegmented';
 import SearchBar from '../search/SearchBar';
 
@@ -93,7 +92,6 @@ Search.Radio = CustomSearchRadio;
 Search.Check = CustomSearchCheckBox;
 Search.Switch = CustomSwitch;
 Search.Segmented = CustomSegmented;
-Search.RetailBar = RetailSearchBar;
 Search.Bar = SearchBar;
 
 export default React.memo(Search);
