@@ -1,11 +1,10 @@
 import { create, StateCreator } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { ApiResponse, CommonRequestFileDownload, GridRequest, RetailResponseDetail, RetailResponsePaging } from '../generated';
+import { ApiResponse, CommonRequestFileDownload, GridRequest } from '../generated';
 import { AxiosPromise } from 'axios';
 import { authApi, authDownApi } from '../libs';
 import { toastError } from '../components';
-import { fetchPartners } from '../api/wms-api';
 
 type ModalType = 'UPLOAD' | 'UPLOADS' | 'IMAGES' | 'PRIVACY' | 'FILES';
 
@@ -27,8 +26,6 @@ interface CommonState {
   modalType: { type: ModalType; active: boolean };
   openModal: (type: ModalType, index?: number) => void;
   closeModal: (type: ModalType) => void;
-  selectedRetail: RetailResponseDetail | undefined;
-  setSelectedRetail: (retail?: RetailResponseDetail) => void;
   upMenuNm: string | undefined;
   setUpMenuNm: (upMenuNm: string) => void;
   menuNm: string | undefined;
@@ -39,8 +36,6 @@ interface CommonState {
   setMenuUpdYn: (menuUpdYn: boolean) => void;
   menuExcelYn: boolean;
   setMenuExcelYn: (menuExcelYn: boolean) => void;
-  //downedFunctionKey: string | undefined; // 기능 키 (f1 ~ f12) 상태 관리
-  //setDownedFunctionKey: (downedFunctionKey: string) => void;
   historyList: HistoryType[];
   setHistoryList: (historyList: HistoryType[]) => void;
   removeDuplicatedRows: <P>(
@@ -63,7 +58,6 @@ interface CommonApiState {
   updateGridColumnState: (gridRequest: GridRequest) => AxiosPromise<ApiResponse>;
   initGridColumnState: (gridRequest: GridRequest) => AxiosPromise<ApiResponse>;
   getFilterData: (filterDataList: FilterData[], uri: string) => any;
-  fetchPartnerOptions: (workLogisId: number, allDataText?: string) => Promise<void>;
 }
 
 const initialStateCreator: StateCreator<CommonState & CommonApiState, any> = (set, get, api) => {
@@ -84,13 +78,6 @@ const initialStateCreator: StateCreator<CommonState & CommonApiState, any> = (se
           type,
           active: false,
         },
-      }));
-    },
-    /** 전역 상태로 다루어지는 소매처 정보 (국소적으로 사용할 소매처 정보는 타 store 혹은 해당 페이지 컴포넌트에 별도로 정의하여 사용할 것) */
-    selectedRetail: undefined,
-    setSelectedRetail: (retail?: RetailResponsePaging) => {
-      set((state) => ({
-        selectedRetail: retail,
       }));
     },
     upMenuNm: undefined,
@@ -258,29 +245,6 @@ const initialStateCreator: StateCreator<CommonState & CommonApiState, any> = (se
       }
     },
     partnerOptions: [],
-    fetchPartnerOptions: async (workLogisId: number, allDataText?: string) => {
-      try {
-        const { data } = await fetchPartners(workLogisId);
-        const { resultCode, body, resultMessage } = data;
-
-        if (resultCode === 200) {
-          const partnerCodes =
-            body?.map((item: any) => ({
-              value: item.id,
-              label: item.partnerNm,
-            })) ?? [];
-          if (allDataText) {
-            set({ partnerOptions: [{ value: null, label: allDataText }, ...partnerCodes] });
-          } else {
-            set({ partnerOptions: partnerCodes });
-          }
-        } else {
-          toastError(resultMessage);
-        }
-      } catch (err) {
-        toastError('파트너 조회 실패');
-      }
-    },
   };
 };
 
