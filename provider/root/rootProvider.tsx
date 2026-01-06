@@ -17,8 +17,10 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
-import 'ag-grid-community/styles/ag-grid.css'; // Mandatory CSS required by the Data Grid
-import 'ag-grid-community/styles/ag-theme-alpine.css';
+
+//import 'ag-grid-community/styles/ag-grid.css'; // Mandatory CSS required by the Data Grid
+//import 'ag-grid-community/styles/ag-theme-alpine.css';
+
 import 'react-datepicker/dist/react-datepicker.css';
 //import 'ag-grid-enterprise';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
