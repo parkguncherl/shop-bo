@@ -1,40 +1,23 @@
-import { AgGridReact } from 'ag-grid-react';
-import React, { RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { AgGridReact, AgGridReactProps } from 'ag-grid-react';
+import React, { forwardRef, RefAttributes, RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import {
-  BodyScrollEvent,
   CellClickedEvent,
-  CellDoubleClickedEvent,
-  CellEditingStartedEvent,
-  CellEditingStoppedEvent,
-  CellFocusedEvent,
   CellKeyDownEvent,
-  CellMouseDownEvent,
-  CellValueChangedEvent,
   ColDef,
+  Column,
+  ColumnHeaderClickedEvent,
   ColumnMovedEvent,
   ColumnVisibleEvent,
-  FirstDataRenderedEvent,
   FullWidthCellKeyDownEvent,
   GetContextMenuItemsParams,
   type GridOptions,
   GridReadyEvent,
   IRowNode,
   MenuItemDef,
-  PasteEndEvent,
-  PasteStartEvent,
-  ProcessCellForExportParams,
-  ProcessDataFromClipboardParams,
-  RowClassParams,
-  RowClickedEvent,
-  RowDataUpdatedEvent,
-  RowDoubleClickedEvent,
-  RowGroupOpenedEvent,
-  RowModelType,
-  RowStyle,
-  SelectionChangedEvent,
+  ProvidedColumnGroup,
+  RowSelectionOptions,
   SortChangedEvent,
 } from 'ag-grid-community';
-import { useRouter, usePathname } from 'next/navigation';
 import { AG_GRID_LOCALE_KO, GridSetting, withCommonKeyboardSuppress } from '../../libs/ag-grid';
 import { useCommonStore } from '../../stores';
 import { GridResponse } from '../../generated';
@@ -48,90 +31,45 @@ export interface copiedRowPastedEvent<P> {
   pastedRowNodes: IRowNode<P>[];
 }
 
-export interface TunedGridProps<P> {
-  colIndexForSuppressKeyEvent?: number; // 인자 제공할 경우 다중 선택 사용 시 해당 인덱스의 컬럼으로 포커싱 후 이후 동작을 진행함
-  columnDefs: ColDef<P>[];
-  headerHeight?: number;
-  onGridReady?: (event: GridReadyEvent<P, any>) => void;
-  onWheel?: (event: any) => void;
-  rowData?: P[];
-  defaultColDef?: ColDef;
-  gridOptions?: GridOptions;
-  components?: any;
-  onCellMouseDown?: (event: CellMouseDownEvent<P, any>) => void;
-  onCellKeyDown?: (event: CellKeyDownEvent<P, any> | FullWidthCellKeyDownEvent<P, any>) => void;
-  onCellFocused?: (event: CellFocusedEvent<P, any>) => void;
-  getRowClass?: (params: RowClassParams<P, any>) => string;
-  getRowStyle?: (params: RowClassParams<P, any>) => RowStyle | undefined;
-  onCellEditingStarted?: (event: CellEditingStartedEvent<P, any>) => void;
-  onCellEditingStopped?: (event: CellEditingStoppedEvent<P, any>) => void;
-  onRowClicked?: (event: RowClickedEvent<P, any>) => void;
-  onRowDoubleClicked?: (event: RowDoubleClickedEvent<P, any>) => void;
-  onCellClicked?: (event: CellClickedEvent<P>) => void;
-  onCellDoubleClicked?: (event: CellDoubleClickedEvent<P>) => void;
-  onCellValueChanged?: (event: CellValueChangedEvent<P>) => void;
-  //onRowValueChanged?: (event: RowValueChangedEvent) => void;
-  onBodyScroll?: (event: BodyScrollEvent<P, any>) => void;
+export type clickSelectionConfig = {
+  colField: string; // 적용 대상 컬럼
+  withoutDeselection: boolean; // 타 행 선택해제 없이 선택될지 여부
+  selectAllByHeaderClick?: boolean; // 헤더 클릭할 경우 전체선택할지 여부
+};
+export type extendedRowSelectionOptions<P> = RowSelectionOptions<P> & {
+  // 기본 설정과 겹치는 영역이 존재할 시 이하 정의된 확장 설정이 우선
+  clickSelectionConfigByPerCol?: clickSelectionConfig[]; // 유효한 값이 주어질 시 rowSelection 일부 속성 잠금, selection 동작은 api를 통해 명시적으로 통제함
+};
+
+export interface TunedGridApi<P> {
   onReachEachSide?: (event: 'T' | 'B') => void;
-  onPasteStart?: (event: PasteStartEvent) => void;
-  onPasteEnd?: (event: PasteEndEvent) => void;
-  className?: string;
-  loading?: boolean;
-  paginationPageSize?: number;
-  loadingOverlayComponent?: any;
-  noRowsOverlayComponent?: any;
-  pinnedBottomRowData?: any;
-  processCellForClipboard?: (params: ProcessCellForExportParams<P, any>) => void;
-  processCellFromClipboard?: (params: ProcessCellForExportParams<P, any>) => void;
-  processDataFromClipboard?: (params: ProcessDataFromClipboardParams<P, any>) => string[][] | null;
   onSelectedRowCopied?: (event: selectedRowCopiedEvent<P>) => void;
   onCopiedRowNodePasted?: (event: copiedRowPastedEvent<P>) => void;
-  onSelectionChanged?: (event: SelectionChangedEvent<P>) => void;
-  suppressRowClickSelection?: boolean;
-  //suppressMultiRangeSelection?: boolean;
-  rowModelType?: RowModelType;
-  infiniteInitialRowCount?: number;
-  cacheBlockSize?: number;
-  preventPersonalizedColumnSetting?: boolean; // true 값을 명시적으로 제공해야만 비활성화
-  autoGroupColumnDef?: ColDef<P, any>;
-  rowSelection?: 'multiple' | 'single';
-  suppressContextMenu?: boolean;
-  singleClickEdit?: boolean;
-  savedPrevClickedNodeCnt?: number; // 2 이상의 값을 할당하여야
-  onSortChanged?: (event: SortChangedEvent<P, any>) => void;
-  enableRangeSelection?: boolean;
-  enableFillHandle?: boolean;
-  treeData?: boolean;
-  masterDetail?: boolean;
-  detailRowHeight?: number;
-  detailCellRendererParams?: any;
-  getDataPath?: any;
-  uppressMaintainIndex?: any;
-  rowGroupPanelShow?: any;
-  groupDefaultExpanded?: number;
-  suppressMakeColumnVisibleAfterUnGroup?: boolean;
-  keepDetailRows?: boolean;
-  groupDisplayType?: string;
-  groupSelectsChildren?: boolean;
-  isExternalFilterPresent?: () => boolean;
-  doesExternalFilterPass?: (node: any) => boolean;
-  containerStyle?: React.CSSProperties;
-  domLayout?: 'normal' | 'autoHeight' | 'print';
-  onFirstDataRendered?: (event: FirstDataRenderedEvent) => void;
-  onRowDataUpdated?: (event: RowDataUpdatedEvent) => void;
-  onRowGroupOpened?: (event: RowGroupOpenedEvent) => void;
-  suppressClickEdit?: boolean;
+  onWheel?: (event: any) => void;
   ref?: React.Ref<AgGridReact>;
 }
+//GridOptions<TData>.rowSelection
+export interface TunedGridOptions<P> extends GridOptions<P> {
+  columnDefs: ColDef<P>[]; // 컬럼 정의 제공을 의무화하는 차원에서 재정의
+  colIndexForSuppressKeyEvent?: number; // 인자 제공할 경우 다중 선택 사용 시 해당 인덱스의 컬럼으로 포커싱 후 이후 동작을 진행함
+  preventPersonalizedColumnSetting?: boolean; // 개인화된 컬럼 셋팅 비활성 여부, true 값을 명시적으로 제공해야만 비활성화
+  gridId?: string;
+  className?: string;
+  rowData?: P[];
+  gridOptions?: GridOptions<P>;
+  savedPrevClickedNodeCnt?: number; // 이전에 클릭된 행(node)들 중 저장될 행의 개수(2 이상의 값을 할당하여야)
+  enableBrowserTooltips?: boolean;
+  rowSelection?: extendedRowSelectionOptions<P>;
+}
+
+type excludedTypes = 'columnDefs';
+type TunedGridProps<P> = Omit<AgGridReactProps<P>, excludedTypes> & TunedGridOptions<P> & TunedGridApi<P>; // 추후 일부 api를 노출하지 않고자 할 때 Omit key에 해당 타입 지정
 
 /**
  * keyForBeingPressed 인자로 들어온 키에 해당하는 키가 눌린 상태로 화살표 이동할 시 다중 행 선택이 이루어짐
  * ArrowDown, ArrowUp 키는 본 요소 내부에서 사용되므로 외부에서 이벤트 리스너를 던질 시 유의하여야 함
  * */
 const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
-  const router = useRouter();
-  const pathname = usePathname();
-
   const [selectGridColumnState, updateGridColumnState, initGridColumnState] = useCommonStore((s) => [
     s.selectGridColumnState,
     s.updateGridColumnState,
@@ -144,20 +82,97 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
     innerRef = ref as RefObject<AgGridReact>; // 외부에서 전달된 ref 를 사용하기 위해 타입 단언
   }
   /** 컬럼 정의는 상태로서 관리됨 */
-  const [columnDefs, setColumnDefs] = useState(props.columnDefs || []);
+  const [columnDefs, setColumnDefs] = useState<ColDef<P>[]>(props.columnDefs || []);
+
   /** 인자로 들어온 키 목록 중 그리드에서 눌려있는 키 목록을 상태로서 관리 */
   const [pressedKeys, setPressedKeys] = useState<string[]>([]);
+
   const [firstRender, setFirstRender] = useState(true);
   const isLoadingRef = useRef(false);
-  const [prevClickedNodeList, setPrevClickedNodeList] = useState<IRowNode[]>([]); // todo get 메서드 등을 사용하여 외부에서 클릭된 노드 히스토리를 사용하도록 구현 가능
+  //const [prevClickedNodeList, setPrevClickedNodeList] = useState<IRowNode[]>([]);
 
   /** 본 페이지에서 사용되는 클립보드(복사 이후 사용하기 위해 임시 저장되는 값) 상태 관리 */
   const [copiedRowNode, setCopiedRowNode] = useState<IRowNode[]>([]);
 
+  //props.rowSelection.clickSelectionConfigByPerCol
+  /** cell click 이벤트를 외부 값과 동기화 */
+  const onCellClicked = useCallback(
+    (event: CellClickedEvent<P>) => {
+      if (props.onCellClicked) {
+        props.onCellClicked(event);
+      }
+      if (
+        props.rowSelection?.mode == 'multiRow' && // 다중선택 옵션이 주어지지 않을 경우 이하 동작 미시행
+        props.rowSelection?.clickSelectionConfigByPerCol &&
+        props.rowSelection?.clickSelectionConfigByPerCol.length > 0
+      ) {
+        // clickSelectionConfigByPerCol 이 유효하게 주어진 경우 이하 동작 수행
+        const clickSelectionConfigList = props.rowSelection?.clickSelectionConfigByPerCol as clickSelectionConfig[];
+        if (
+          clickSelectionConfigList.filter((value) => value.colField == event.column.getColDef().field).length > 0 &&
+          clickSelectionConfigList.filter((value) => value.colField == event.column.getColDef().field)[0].withoutDeselection
+        ) {
+          // deselect 없이 단일 선택
+          event.node.setSelected(!event.node.isSelected());
+        } else {
+          event.api.deselectAll();
+          event.node.setSelected(!event.node.isSelected());
+        }
+      }
+    },
+    [props.onCellClicked, props.rowSelection],
+  );
+
+  const onColumnHeaderClicked = useCallback(
+    (event: ColumnHeaderClickedEvent<P, any>) => {
+      if (props.onColumnHeaderClicked) {
+        props.onColumnHeaderClicked(event);
+      }
+      if (
+        props.rowSelection?.mode == 'multiRow' && // 다중선택 옵션이 주어지지 않을 경우 이하 동작 미시행
+        props.rowSelection?.clickSelectionConfigByPerCol &&
+        props.rowSelection?.clickSelectionConfigByPerCol.length > 0
+      ) {
+        const clickSelectionConfigList = props.rowSelection?.clickSelectionConfigByPerCol as clickSelectionConfig[];
+        if (
+          clickSelectionConfigList.filter((value) => value.colField == (event.column as Column).getColDef().field).length > 0 &&
+          clickSelectionConfigList.filter((value) => value.colField == (event.column as Column).getColDef().field)[0].withoutDeselection
+        ) {
+          if (event.api.getSelectedNodes().length > 0) {
+            event.api.deselectAll();
+          } else {
+            event.api.selectAll();
+          }
+        }
+        // for (let i = 0; i < clickSelectionConfigList.length; i++) {
+        //   console.log((event.column as Column).getColDef().field);
+        // }
+      }
+    },
+    [props.onColumnHeaderClicked, props.rowSelection?.clickSelectionConfigByPerCol],
+  );
+
+  /** coldef 상태 동기화할 시 사용할 함수를 역시 외부 값과 동기화 */
+  // const synchronizedColDef = useCallback<P>(
+  //   (colDefs: ColDef<P>[]): ColDef<P>[] => {
+  //     if (props.rowSelection?.clickSelectionConfigByPerCol && props.rowSelection?.clickSelectionConfigByPerCol.length > 0) {
+  //       const clickSelectionConfigList = props.rowSelection?.clickSelectionConfigByPerCol as clickSelectionConfig[];
+  //       for (let i = 0; i < clickSelectionConfigList.length; i++) {
+  //         for (let j = 0; j < colDefs.length; j++) {
+  //           if (clickSelectionConfigList[i].colField == colDefs[j].field) {
+  //             colDefs[j] = { ...colDefs[j], sortable: !clickSelectionConfigList[i].selectAllByHeaderClick };
+  //           }
+  //         }
+  //       }
+  //     }
+  //   },
+  //   [props.rowSelection?.clickSelectionConfigByPerCol],
+  // );
+
   useEffect(() => {
     if (props.columnDefs && !firstRender) {
-      if (!props.preventPersonalizedColumnSetting) {
-        selectGridColumnState(pathname).then((result) => {
+      if (!props.preventPersonalizedColumnSetting && props.gridId) {
+        selectGridColumnState(props.gridId).then((result) => {
           const { resultCode, body } = result.data;
           if (resultCode === 200 && body) {
             const GridResponse = body as GridResponse;
@@ -176,11 +191,8 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
                     }
                   : origCol;
               });
-
               setColumnDefs(mergedColumns);
             }
-          } else {
-            setColumnDefs(props.columnDefs);
           }
         });
       } else {
@@ -197,8 +209,8 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
 
   const onGridReady = (event: GridReadyEvent) => {
     setFirstRender(false);
-    if (!props.preventPersonalizedColumnSetting) {
-      selectGridColumnState(pathname).then((result) => {
+    if (!props.preventPersonalizedColumnSetting && props.gridId) {
+      selectGridColumnState(props.gridId).then((result) => {
         const { resultCode, body } = result.data;
         // console.log('result.data>>', result.data);
         if (resultCode === 200 && body) {
@@ -228,7 +240,7 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
         name: '그리드컬럼 설정 초기화',
         action: () => {
           initGridColumnState({
-            uri: pathname,
+            uri: props.gridId,
             columnState: JSON.stringify(props.columnDefs),
           }).then((result) => {
             if (result.data.resultCode === 200) {
@@ -261,45 +273,19 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
     ];
   };
 
-  const localeText = {
-    // 일반 메시지
-    noRowsToShow: '표시할 행이 없습니다',
-    loadingOoo: '불러오는 중...',
-    // 필터
-    equals: '같음',
-    notEqual: '같지 않음',
-    lessThan: '보다 작음',
-    greaterThan: '보다 큼',
-    contains: '포함',
-    notContains: '포함하지 않음',
-    startsWith: '시작 문자',
-    endsWith: '끝 문자',
-    // 메뉴
-    pinColumn: '컬럼 고정',
-    autosizeThiscolumn: '이 컬럼 크기 자동조정',
-    autosizeAllColumns: '모든 컬럼 크기 자동조정',
-    resetColumns: '컬럼 초기화',
-    expandAll: '모두 펼치기',
-    collapseAll: '모두 접기',
-    // 페이징
-    page: '페이지',
-    more: '더보기',
-    to: '까지',
-    of: '의',
-    next: '다음',
-    last: '마지막',
-    first: '처음',
-    previous: '이전',
-    // 선택
-    selectAll: '전체 선택',
-    searchOoo: '검색...',
-    blanks: '빈 값',
-  };
-
   const defaultGridOption: GridOptions = {
     rowHeight: 28,
-    localeText: localeText,
+    //localeText: AG_CHARTS_LOCALE_KO_KR,
     getContextMenuItems: getContextMenuItems,
+  };
+
+  /** 컨트롤 키 press 가 발생할 시 일부 설정을 고정하여 연관 동작의 원할한 실행을 가능토록 하는 상수 */
+  const rowSelectionOptionInCtrlInterrupt: RowSelectionOptions<P, any, any> = {
+    mode: 'multiRow',
+    checkboxes: false, // 기본적으로 체크박스 비활성화
+    headerCheckbox: false, // 헤더 체크박스 안 보이게
+    enableClickSelection: true,
+    enableSelectionWithoutKeys: true,
   };
 
   // 기존 키에 관한 정보 저장(여기서는 arrowDown, arrowUp)
@@ -345,86 +331,13 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
           });
         }
       }
-      return keyList;
-    });
-  }, []);
-
-  const onCellMouseDown = useCallback((event: CellMouseDownEvent<P, any>, pressedKeys: string[], savedPrevClickedNodeCnt: number | undefined) => {
-    setPrevClickedNodeList((prevClickedNodeList) => {
-      // setState 내부 콜백 함수는 외부 함수에 비해 실행 시점이 뒤에 위치함에 유의
-      if (savedPrevClickedNodeCnt == undefined || savedPrevClickedNodeCnt < 2 || prevClickedNodeList.length == savedPrevClickedNodeCnt) {
-        // 길이 인자(savedPrevClickedNodeCnt)가 제공되지 않았거나 인자의 값이 유효하지 않거나 값에 해당하는 길이만큼의 node 가 이미 저장된 경우
-        if (prevClickedNodeList.length == 2) {
-          // 배열의 앞 요소(가장 이전에 클릭된)를 제거
-          prevClickedNodeList.shift();
-        }
-      }
-
-      /** 마우스 클릭 관련 동작 실행 영역 */
-      const previousClickedRowIndex =
-        (prevClickedNodeList[prevClickedNodeList.length - 1] && prevClickedNodeList[prevClickedNodeList.length - 1].rowIndex) || -1; // 본 mouseDown 이벤트 발생 이전에 클릭된 행의 rowIndex
-      if (pressedKeys.includes('Control')) {
-        // 컨트롤 키 클릭된 상태에서 마우스 클릭시 행 선택, 해제
-        if (event.api.getSelectedNodes().length == 0) {
-          event.api.forEachNodeAfterFilterAndSort((rowNodeInFor, indexInFor) => {
-            if (event.node.rowIndex == indexInFor || previousClickedRowIndex == indexInFor) {
-              // 클릭한 행, 이전에 마지막으로 클릭한 행을 select
-              rowNodeInFor.setSelected(true);
-            }
-          });
-        } else {
-          // 최초 이후 동작
-          event.node.setSelected(true);
-        }
-      } else {
-        if (event.api.getSelectedNodes().length > 1) {
-          // 선택된 행이 2개 이상일 경우에만 다음 동작이 수행됨(전체 선택해제 후 클릭된 행을 선택)
-          const focusedCell = event.api.getFocusedCell(); // 현재 포커스된 셀 정보 가져오기
-          if (focusedCell) {
-            const focusedRowIndex = focusedCell.rowIndex; // 포커스된 셀의 rowIndex 가져오기
-            event.api.deselectAll(); // 전체 선택 해제
-            const focusedNode = event.api.getDisplayedRowAtIndex(focusedRowIndex); // 포커스된 RowNode 가져오기
-            if (focusedNode) {
-              focusedNode.setSelected(true); // 포커스(클릭)된 행 다시 선택
-            }
-          }
-        }
-      }
-      if (pressedKeys.includes('Shift')) {
-        if (event.rowIndex != null && previousClickedRowIndex != -1) {
-          const eventRowIndex = event.api.getFocusedCell()?.rowIndex;
-          if (eventRowIndex) {
-            event.api.forEachNodeAfterFilterAndSort((rowNode, index) => {
-              if (
-                previousClickedRowIndex > eventRowIndex
-                  ? index >= eventRowIndex && index <= previousClickedRowIndex
-                  : index <= eventRowIndex && index >= previousClickedRowIndex
-              ) {
-                rowNode.setSelected(true);
-              }
-            });
-            // 마지막 클릭된 셀에 포커스 설정
-            const lastSelectedNode = event.api.getRowNode(String(event.rowIndex));
-            if (lastSelectedNode) {
-              event.api.setFocusedCell(event.rowIndex, event.column.getColId());
-            }
-          }
-        }
-      }
-
-      /** 최신화된 상태 반영 영역 */
-      prevClickedNodeList.push(event.node);
-      return prevClickedNodeList;
+      return [...keyList];
     });
   }, []);
 
   const onSortChanged = useCallback(
     (event: SortChangedEvent<P, any>) => {
       // 정렬 발생할 시 prevClickedNodeList 초기화
-      setPrevClickedNodeList((prevState) => {
-        prevState.length = 0;
-        return prevState;
-      });
 
       if (props.onSortChanged) {
         props.onSortChanged(event);
@@ -434,13 +347,13 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
   );
 
   const onColumnMoved = (event: ColumnMovedEvent) => {
-    if (event.finished && !props.preventPersonalizedColumnSetting) {
+    if (event.finished && !props.preventPersonalizedColumnSetting && props.gridId) {
       const currentColumns = event.api.getColumnDefs();
       if (currentColumns) {
         // undefined 체크 추가
         const serializableColumns = JSON.stringify(event.api.getColumnDefs());
         updateGridColumnState({
-          uri: pathname,
+          uri: props.gridId,
           columnState: serializableColumns,
         });
       }
@@ -448,13 +361,13 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
   };
 
   const onColumnVisible = (event: ColumnVisibleEvent) => {
-    if (!props.preventPersonalizedColumnSetting) {
+    if (!props.preventPersonalizedColumnSetting && props.gridId) {
       const currentColumns = event.api.getColumnDefs();
       if (currentColumns) {
         // undefined 체크 추가
         const serializableColumns = JSON.stringify(event.api.getColumnDefs());
         updateGridColumnState({
-          uri: pathname,
+          uri: props.gridId,
           columnState: serializableColumns,
         });
       }
@@ -462,25 +375,20 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
   };
 
   const MultiChoiceFn = useCallback(
-    (
-      keyDownEvent: CellKeyDownEvent | FullWidthCellKeyDownEvent,
-      AgGridRef: AgGridReact,
-      prevEventKey: React.MutableRefObject<string | undefined>,
-      targetColId?: string,
-    ) => {
+    (keyDownEvent: CellKeyDownEvent | FullWidthCellKeyDownEvent, prevEventKey: React.MutableRefObject<string | undefined>, targetColId?: string) => {
       const clickedRowIndex = keyDownEvent.rowIndex || 0;
-      const gridDataLength = AgGridRef.api.getDisplayedRowCount() || 0;
+      const gridDataLength = keyDownEvent.api.getDisplayedRowCount() || 0;
 
       /** 키보드 이벤트 및 하위 요소들 */
       const keyBoardEvent = keyDownEvent.event as KeyboardEvent;
       const key = keyBoardEvent.key;
       const rowNode = keyDownEvent.node;
 
-      const focusedCell = AgGridRef.api.getFocusedCell();
+      const focusedCell = keyDownEvent.api.getFocusedCell();
       if ((key == 'ArrowDown' || key == 'ArrowUp') && keyBoardEvent.shiftKey) {
         if (targetColId && keyDownEvent.api.getFocusedCell()?.column.getColId() != targetColId) {
-          /** targetColId 가 인자로 존재할 시 해당 colId 에 해당하는 영역으로 포커싱 */
-          AgGridRef?.api.setFocusedCell(keyDownEvent.rowIndex as number, targetColId);
+          /** targetColId 가 인자로 존재할 시 해당 colId 에 해당하는 영역으로 포커싱, 이 동작 직후 다중 선택 가능 */
+          keyDownEvent?.api.setFocusedCell(keyDownEvent.rowIndex as number, targetColId);
         } else {
           /** 여기서부터 본 다중선택 영역 */
           if (prevEventKey.current == key && focusedCell) {
@@ -488,8 +396,8 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
             const conditionForArrowDown = clickedRowIndex + 1 < gridDataLength; // 클릭된 행의 인덱스 + 1(다음 행으로 이동하므로 1을 추가하여 보정) 이 데이터 배열의 길이보다 작아야 한다(초과 시 그리드 영역을 벗어남)
             const conditionForArrowUp = clickedRowIndex != 0; // 클릭된 행의 인덱스가 0이면 안 된다(작을 경우 역시 그리드 영역을 벗어나므로)
             if (key == 'ArrowDown' ? conditionForArrowDown : conditionForArrowUp) {
-              AgGridRef.api.setFocusedCell(key == 'ArrowDown' ? clickedRowIndex + 1 : clickedRowIndex - 1, targetColId || focusedCell.column.getColId());
-              AgGridRef.api.forEachNodeAfterFilterAndSort((rowNodeInFor, indexInFor) => {
+              keyDownEvent.api.setFocusedCell(key == 'ArrowDown' ? clickedRowIndex + 1 : clickedRowIndex - 1, targetColId || focusedCell.column.getColId()); // 각각 화살표 키 방향에 해당하는 쪽으로 포커싱 이동
+              keyDownEvent.api.forEachNodeAfterFilterAndSort((rowNodeInFor, indexInFor) => {
                 if (indexInFor == (key == 'ArrowDown' ? clickedRowIndex + 1 : clickedRowIndex - 1)) {
                   rowNodeInFor.setSelected(!rowNodeInFor.isSelected());
                 }
@@ -498,6 +406,9 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
           } else {
             /** 기존 키와 다른 키가 사용됨(방향이 변경되었거나 최초 선택) */
             rowNode.setSelected(!rowNode.isSelected());
+            if (focusedCell) {
+              keyDownEvent.api.setFocusedCell(clickedRowIndex, targetColId || focusedCell.column.getColId()); // 해당 행 포커싱(동작 일관성 유지)
+            }
           }
           prevEventKey.current = key; // 동기화
         }
@@ -513,25 +424,24 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
       colIndexForSuppressKeyEvent: number | undefined,
       rowData: P[] | undefined,
     ) => {
+      // 기존 innerRef.current 사용 영역들은 전달된 keydownEvent 값으로 대체됨
       const keyBoardEvent = event.event as KeyboardEvent;
       const targetColId = colIndexForSuppressKeyEvent
         ? columnDefs[colIndexForSuppressKeyEvent].colId || columnDefs[colIndexForSuppressKeyEvent].field
         : undefined;
       if (keyBoardEvent.key == 'ArrowDown' || keyBoardEvent.key == 'ArrowUp') {
         /** 복수의 행 선택을 처리하는 함수 */
-        if (innerRef.current) {
-          MultiChoiceFn(event, innerRef.current, prevEventKey, targetColId);
-          if (pressedKeys.find((key) => key == 'Shift') != undefined && pressedKeys.find((key) => key == 'Control') != undefined) {
-            /** Shift, Control 키가 모두 눌린 상태에서 화살표 키를 사용한 경우 */
-            if (event.rowIndex) {
-              const rowIndex = event.rowIndex;
-              /** 필터링과 정렬(소팅)이 이루어진 노드를 순환 */
-              innerRef.current.api.forEachNodeAfterFilterAndSort((rowNode, index) => {
-                if (keyBoardEvent.key == 'ArrowDown' ? index >= rowIndex : index <= rowIndex) {
-                  rowNode.setSelected(true);
-                }
-              });
-            }
+        MultiChoiceFn(event, prevEventKey, targetColId);
+        if (pressedKeys.find((key) => key == 'Shift') != undefined && pressedKeys.find((key) => key == 'Control') != undefined) {
+          /** Shift, Control 키가 모두 눌린 상태에서 화살표 키를 사용한 경우 */
+          if (event.rowIndex) {
+            const rowIndex = event.rowIndex;
+            /** 필터링과 정렬(소팅)이 이루어진 노드를 순환 */
+            event.api.forEachNodeAfterFilterAndSort((rowNode, index) => {
+              if (keyBoardEvent.key == 'ArrowDown' ? index >= rowIndex : index <= rowIndex) {
+                rowNode.setSelected(true);
+              }
+            });
           }
         }
       } else {
@@ -541,7 +451,7 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
             // client 영역에서 전체 로드되지 않는 경우(예: dataSource 사용) 전체선택 비활성화
             //innerRef.current?.api.selectAllFiltered(); // ctrl + a(A) => 전체선택
             // 1. rowNode들을 가져와서 필터링된 노드만 선택
-            innerRef.current?.api.forEachNodeAfterFilter((node) => {
+            event.api.forEachNodeAfterFilter((node) => {
               node.setSelected(true);
             });
           }
@@ -549,7 +459,7 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
           // ctrl + 'D'
           if (rowData != undefined) {
             // client 영역에서 전체 로드되지 않는 경우(예: dataSource 사용) 전체선택해제 비활성화
-            innerRef.current?.api.deselectAll(); // ctrl + d(D) => 전체선택해제
+            event.api.deselectAll(); // ctrl + d(D) => 전체선택해제
           }
         } else if (keyBoardEvent.code == 'KeyC' && pressedKeys.find((key) => key == 'Control') != undefined) {
           // ctrl + c
@@ -578,21 +488,6 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
     [pressedKeys, props.onCellKeyDown, props.onSelectedRowCopied, props.onCopiedRowNodePasted],
   );
 
-  const onColumnEverythingChanged = (params: any) => {
-    // console.log('param ==============>', params);
-    if (params.source === 'columnMenu') {
-      initGridColumnState({
-        uri: pathname,
-        columnState: JSON.stringify(props.columnDefs),
-      }).then((result) => {
-        const { resultCode, body, resultMessage } = result.data;
-        if (resultCode === 200) {
-          console.log('initiated');
-        }
-      });
-    }
-  };
-
   const gridComponents = {
     ...props.components,
     NUMBER_COMMA: GridSetting.CellRenderer.NUMBER_COMMA,
@@ -602,55 +497,50 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
   return (
     <div className={`ag-theme-alpine ${props.className}`} onWheel={props.onWheel} onKeyDown={onKeyDown} onKeyUp={onKeyUp} tabIndex={-1}>
       <AgGridReact<P>
+        {...props}
         columnDefs={columnDefs.map(withCommonKeyboardSuppress)} // React 상태컬럼 방향키로 헤더까지 안올라가게 수정 2025-08-27
         headerHeight={props.headerHeight ? props.headerHeight : 35}
         onGridReady={onGridReady}
         rowData={props.rowData}
-        defaultColDef={props.defaultColDef}
         gridOptions={{
           ...defaultGridOption,
           ...props.gridOptions,
         }}
+        onColumnHeaderClicked={onColumnHeaderClicked}
         components={gridComponents}
-        suppressContextMenu={props.suppressContextMenu}
-        singleClickEdit={props.singleClickEdit === null ? true : props.singleClickEdit}
-        onCellMouseDown={(event) => {
-          onCellMouseDown(event, pressedKeys, props.savedPrevClickedNodeCnt);
-          if (props.onCellMouseDown) {
-            props.onCellMouseDown(event);
-          }
-        }}
         onCellKeyDown={(event) => {
           onCellKeyDown(event, props.columnDefs, props.colIndexForSuppressKeyEvent, props.rowData);
         }}
-        onCellFocused={props.onCellFocused}
-        onCellDoubleClicked={props.onCellDoubleClicked}
-        paginationPageSize={props.paginationPageSize}
-        getRowClass={props.getRowClass}
-        getRowStyle={props.getRowStyle}
-        onCellEditingStarted={props.onCellEditingStarted}
-        onCellEditingStopped={props.onCellEditingStopped}
-        onCellValueChanged={props.onCellValueChanged}
-        onRowClicked={props.onRowClicked}
-        onCellClicked={props.onCellClicked}
         loading={isLoadingRef.current}
-        noRowsOverlayComponent={props.noRowsOverlayComponent}
-        pinnedBottomRowData={props.pinnedBottomRowData}
         ref={ref}
+        onCellClicked={onCellClicked}
         onSortChanged={onSortChanged}
-        rowModelType={props.rowModelType}
-        rowSelection={props.rowSelection || 'multiple'}
-        suppressRowClickSelection={props.suppressRowClickSelection !== undefined ? props.suppressRowClickSelection : true}
-        //suppressMultiRangeSelection={props.suppressMultiRangeSelection}
-        processCellForClipboard={props.processCellForClipboard} // 클립보드를 위해 -> 복사 동작 발생 시 촉발
-        processCellFromClipboard={props.processCellFromClipboard} // 클립보드 로부터 -> 붙여넣기 동작 발생 시 촉발
-        processDataFromClipboard={props.processDataFromClipboard}
-        onSelectionChanged={props.onSelectionChanged}
-        onRowDoubleClicked={props.onRowDoubleClicked}
-        infiniteInitialRowCount={props.infiniteInitialRowCount}
-        cacheBlockSize={props.cacheBlockSize}
-        onPasteStart={props.onPasteStart}
-        onPasteEnd={props.onPasteEnd}
+        rowSelection={
+          pressedKeys.includes('Control') // Control(컨트롤(ctrl)) 키 누른 경우 별도로 지정한 옵션값으로 변경함
+            ? rowSelectionOptionInCtrlInterrupt
+            : (typeof props.rowSelection == 'object' // RowSelectionOptions 타입의 인자가 전달된 경우
+                ? props.rowSelection.mode == 'multiRow' // 다중 선택인 경우와 단일 선택인 경우 사용 가능한 옵션이 다른 관계로 분기
+                  ? {
+                      // 다중선택 case
+                      ...props.rowSelection,
+                      checkboxes: false, // 기본적으로 체크박스 비활성화
+                      headerCheckbox: false, // 다중 선택인 경우는 헤더 체크박스도 비활성화
+                      enableClickSelection:
+                        props.rowSelection.clickSelectionConfigByPerCol && props.rowSelection.clickSelectionConfigByPerCol.length > 0
+                          ? false // clickSelectionConfigByPerCol 이 유효하게 주어진 경우 설정을 '잠금'
+                          : props.rowSelection.enableClickSelection,
+                    }
+                  : {
+                      // 단일선택 case
+                      ...props.rowSelection,
+                      checkboxes: false, // 기본적으로 체크박스 비활성화
+                      enableClickSelection:
+                        props.rowSelection.clickSelectionConfigByPerCol && props.rowSelection.clickSelectionConfigByPerCol.length > 0
+                          ? false // clickSelectionConfigByPerCol 이 유효하게 주어진 경우 설정을 '잠금'
+                          : props.rowSelection.enableClickSelection,
+                    }
+                : props.rowSelection) || 'multiple' // 그 외에는 인자로 받은 값 사용 혹은 기본값 사용
+        } // Ctrl 키를 누른 상태에서 요구되는 별도 동작에 대처하고자 다음과 같이 처리함
         onColumnMoved={onColumnMoved}
         onColumnVisible={onColumnVisible}
         onBodyScroll={(e) => {
@@ -659,45 +549,23 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
             if (props.onReachEachSide) {
               props.onReachEachSide('B');
             }
-          } /*else if (
-            e.api.getGridOption('datasource') &&
-            (e.api.getGridOption('datasource') as IDatasource).rowCount &&
-            e.api.getVerticalPixelRange().bottom ==
-              (props.gridOptions.rowHeight || 24) * ((e.api.getGridOption('datasource') as IDatasource).rowCount as number)
-          ) {
-            if (props.onReachEachSide) {
-              props.onReachEachSide('B');
-            }
-          }*/
+          }
           if (props.onBodyScroll) {
             /** 최상단 도달 시의 이벤트는 현재 미지원 */
             props.onBodyScroll(e);
           }
-          /** 스크롤시 자동 컬럼 사이징 처리 */
-          // e.api.autoSizeAllColumns();
         }}
         localeText={AG_GRID_LOCALE_KO}
-        enableRangeSelection={props.enableRangeSelection}
-        enableFillHandle={props.enableFillHandle}
-        treeData={props.treeData}
-        getDataPath={props.getDataPath}
         autoSizeStrategy={{
           type: 'fitCellContents',
         }}
-        groupDefaultExpanded={props.groupDefaultExpanded}
-        onFirstDataRendered={props.onFirstDataRendered}
-        onRowDataUpdated={props.onRowDataUpdated}
-        autoGroupColumnDef={props.autoGroupColumnDef}
-        onRowGroupOpened={props.onRowGroupOpened}
-        //onColumnHeaderContextMenu={onColumnHeaderContextMenu}
-        //onColumnEverythingChanged={onColumnEverythingChanged}
-        enableBrowserTooltips={true} // 브라우저 기본 툴팁 비활성화
-        tooltipShowDelay={100}
-        tooltipHideDelay={50000}
+        //enableBrowserTooltips={props.enableBrowserTooltips === undefined ? true : props.enableBrowserTooltips} // todo 커스텀 툴팁을 써야 하는경우
+        // tooltipShowDelay={100}
+        // tooltipHideDelay={50000}
         stopEditingWhenCellsLoseFocus={true}
-        suppressClickEdit={props.suppressClickEdit}
       />
     </div>
   );
 };
+
 export default TunedGrid;
