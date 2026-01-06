@@ -47,7 +47,7 @@ export const Layout = ({ children }: Props) => {
   });
 
   /** 전역 상태 혹은 이와 유사한 hook */
-  const [setHistoryList, isOrderOn, setIsOrderOn] = useCommonStore((s) => [s.setHistoryList, s.isOrderOn, s.setIsOrderOn]);
+  const [setHistoryList] = useCommonStore((s) => [s.setHistoryList]);
   const { session: storeSession } = useAppStore();
 
   /** 참조 */

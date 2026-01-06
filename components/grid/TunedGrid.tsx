@@ -1,5 +1,5 @@
 import { AgGridReact, AgGridReactProps } from 'ag-grid-react';
-import React, { forwardRef, RefAttributes, RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import React, { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import {
   CellClickedEvent,
   CellKeyDownEvent,
@@ -14,7 +14,6 @@ import {
   GridReadyEvent,
   IRowNode,
   MenuItemDef,
-  ProvidedColumnGroup,
   RowSelectionOptions,
   SortChangedEvent,
 } from 'ag-grid-community';
@@ -234,49 +233,49 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
   };
 
   /** 컨텍스트 메뉴(팝업창) 관리 */
-  const getContextMenuItems = (params: GetContextMenuItemsParams) => {
-    const customMenuItem: MenuItemDef[] = [
-      {
-        name: '그리드컬럼 설정 초기화',
-        action: () => {
-          initGridColumnState({
-            uri: props.gridId,
-            columnState: JSON.stringify(props.columnDefs),
-          }).then((result) => {
-            if (result.data.resultCode === 200) {
-              innerRef.current?.api.resetColumnState();
-            }
-          });
-        },
-        cssClasses: ['blue', 'bold'],
-        icon: '<span class="ag-icon ico_refresh"></span>',
-      },
-      {
-        name: '엑셀다운로드',
-        action: () => {
-          innerRef.current?.api.exportDataAsExcel();
-        },
-        cssClasses: ['blue', 'bold'],
-        icon: '<span class="ag-icon ico_refresh"></span>',
-      },
-    ];
-
-    // separator를 MenuItemDef로 정의 (타입 단언 사용)
-    const separatorItem = {
-      name: '',
-      separator: true,
-    } as MenuItemDef;
-
-    return [
-      separatorItem,
-      ...customMenuItem, // 전개연산자 사용하여 펼쳐줘야 함
-    ];
-  };
+  // const getContextMenuItems = (params: GetContextMenuItemsParams) => {
+  //   const customMenuItem: MenuItemDef[] = [
+  //     {
+  //       name: '그리드컬럼 설정 초기화',
+  //       action: () => {
+  //         initGridColumnState({
+  //           uri: props.gridId,
+  //           columnState: JSON.stringify(props.columnDefs),
+  //         }).then((result) => {
+  //           if (result.data.resultCode === 200) {
+  //             innerRef.current?.api.resetColumnState();
+  //           }
+  //         });
+  //       },
+  //       cssClasses: ['blue', 'bold'],
+  //       icon: '<span class="ag-icon ico_refresh"></span>',
+  //     },
+  //     {
+  //       name: '엑셀다운로드',
+  //       action: () => {
+  //         innerRef.current?.api.exportDataAsExcel();
+  //       },
+  //       cssClasses: ['blue', 'bold'],
+  //       icon: '<span class="ag-icon ico_refresh"></span>',
+  //     },
+  //   ];
+  //
+  //   // separator를 MenuItemDef로 정의 (타입 단언 사용)
+  //   const separatorItem = {
+  //     name: '',
+  //     separator: true,
+  //   } as MenuItemDef;
+  //
+  //   return [
+  //     separatorItem,
+  //     ...customMenuItem, // 전개연산자 사용하여 펼쳐줘야 함
+  //   ];
+  // };
 
   const defaultGridOption: GridOptions = {
     rowHeight: 28,
     //localeText: AG_CHARTS_LOCALE_KO_KR,
-    getContextMenuItems: getContextMenuItems,
+    //getContextMenuItems: getContextMenuItems,
   };
 
   /** 컨트롤 키 press 가 발생할 시 일부 설정을 고정하여 연관 동작의 원할한 실행을 가능토록 하는 상수 */
@@ -291,7 +290,7 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
   // 기존 키에 관한 정보 저장(여기서는 arrowDown, arrowUp)
   const prevEventKey = useRef<string | undefined>(undefined);
 
-  const onKeyUp = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
+  const onKeyUp = (event: React.KeyboardEvent<HTMLDivElement>) => {
     /** 눌린 키 목록 최신화(목록에서 제거) */
     setPressedKeys((keyList) => {
       if (event.key == 'Shift') {
@@ -310,9 +309,9 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
 
       return keyList.filter((key) => key != event.key); // 키 목록에서 해당 키 제거;
     });
-  }, []);
+  };
 
-  const onKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
+  const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     /** 눌린 키 목록 최신화(목록에 추가) */
     setPressedKeys((keyList) => {
       if (!keyList.includes(event.key)) {
@@ -333,18 +332,15 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
       }
       return [...keyList];
     });
-  }, []);
+  };
 
-  const onSortChanged = useCallback(
-    (event: SortChangedEvent<P, any>) => {
-      // 정렬 발생할 시 prevClickedNodeList 초기화
+  const onSortChanged = (event: SortChangedEvent<P, any>) => {
+    // 정렬 발생할 시 prevClickedNodeList 초기화
 
-      if (props.onSortChanged) {
-        props.onSortChanged(event);
-      }
-    },
-    [props.onSortChanged],
-  );
+    if (props.onSortChanged) {
+      props.onSortChanged(event);
+    }
+  };
 
   const onColumnMoved = (event: ColumnMovedEvent) => {
     if (event.finished && !props.preventPersonalizedColumnSetting && props.gridId) {
@@ -374,48 +370,49 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
     }
   };
 
-  const MultiChoiceFn = useCallback(
-    (keyDownEvent: CellKeyDownEvent | FullWidthCellKeyDownEvent, prevEventKey: React.MutableRefObject<string | undefined>, targetColId?: string) => {
-      const clickedRowIndex = keyDownEvent.rowIndex || 0;
-      const gridDataLength = keyDownEvent.api.getDisplayedRowCount() || 0;
+  const MultiChoiceFn = (
+    keyDownEvent: CellKeyDownEvent | FullWidthCellKeyDownEvent,
+    prevEventKey: React.MutableRefObject<string | undefined>,
+    targetColId?: string,
+  ) => {
+    const clickedRowIndex = keyDownEvent.rowIndex || 0;
+    const gridDataLength = keyDownEvent.api.getDisplayedRowCount() || 0;
 
-      /** 키보드 이벤트 및 하위 요소들 */
-      const keyBoardEvent = keyDownEvent.event as KeyboardEvent;
-      const key = keyBoardEvent.key;
-      const rowNode = keyDownEvent.node;
+    /** 키보드 이벤트 및 하위 요소들 */
+    const keyBoardEvent = keyDownEvent.event as KeyboardEvent;
+    const key = keyBoardEvent.key;
+    const rowNode = keyDownEvent.node;
 
-      const focusedCell = keyDownEvent.api.getFocusedCell();
-      if ((key == 'ArrowDown' || key == 'ArrowUp') && keyBoardEvent.shiftKey) {
-        if (targetColId && keyDownEvent.api.getFocusedCell()?.column.getColId() != targetColId) {
-          /** targetColId 가 인자로 존재할 시 해당 colId 에 해당하는 영역으로 포커싱, 이 동작 직후 다중 선택 가능 */
-          keyDownEvent?.api.setFocusedCell(keyDownEvent.rowIndex as number, targetColId);
-        } else {
-          /** 여기서부터 본 다중선택 영역 */
-          if (prevEventKey.current == key && focusedCell) {
-            /** 기존 키와 동일한 키가 사용됨(방향 동일), 최초 선택이 아닌 경우이므로 focusedCell 값 존재 */
-            const conditionForArrowDown = clickedRowIndex + 1 < gridDataLength; // 클릭된 행의 인덱스 + 1(다음 행으로 이동하므로 1을 추가하여 보정) 이 데이터 배열의 길이보다 작아야 한다(초과 시 그리드 영역을 벗어남)
-            const conditionForArrowUp = clickedRowIndex != 0; // 클릭된 행의 인덱스가 0이면 안 된다(작을 경우 역시 그리드 영역을 벗어나므로)
-            if (key == 'ArrowDown' ? conditionForArrowDown : conditionForArrowUp) {
-              keyDownEvent.api.setFocusedCell(key == 'ArrowDown' ? clickedRowIndex + 1 : clickedRowIndex - 1, targetColId || focusedCell.column.getColId()); // 각각 화살표 키 방향에 해당하는 쪽으로 포커싱 이동
-              keyDownEvent.api.forEachNodeAfterFilterAndSort((rowNodeInFor, indexInFor) => {
-                if (indexInFor == (key == 'ArrowDown' ? clickedRowIndex + 1 : clickedRowIndex - 1)) {
-                  rowNodeInFor.setSelected(!rowNodeInFor.isSelected());
-                }
-              });
-            }
-          } else {
-            /** 기존 키와 다른 키가 사용됨(방향이 변경되었거나 최초 선택) */
-            rowNode.setSelected(!rowNode.isSelected());
-            if (focusedCell) {
-              keyDownEvent.api.setFocusedCell(clickedRowIndex, targetColId || focusedCell.column.getColId()); // 해당 행 포커싱(동작 일관성 유지)
-            }
+    const focusedCell = keyDownEvent.api.getFocusedCell();
+    if ((key == 'ArrowDown' || key == 'ArrowUp') && keyBoardEvent.shiftKey) {
+      if (targetColId && keyDownEvent.api.getFocusedCell()?.column.getColId() != targetColId) {
+        /** targetColId 가 인자로 존재할 시 해당 colId 에 해당하는 영역으로 포커싱, 이 동작 직후 다중 선택 가능 */
+        keyDownEvent?.api.setFocusedCell(keyDownEvent.rowIndex as number, targetColId);
+      } else {
+        /** 여기서부터 본 다중선택 영역 */
+        if (prevEventKey.current == key && focusedCell) {
+          /** 기존 키와 동일한 키가 사용됨(방향 동일), 최초 선택이 아닌 경우이므로 focusedCell 값 존재 */
+          const conditionForArrowDown = clickedRowIndex + 1 < gridDataLength; // 클릭된 행의 인덱스 + 1(다음 행으로 이동하므로 1을 추가하여 보정) 이 데이터 배열의 길이보다 작아야 한다(초과 시 그리드 영역을 벗어남)
+          const conditionForArrowUp = clickedRowIndex != 0; // 클릭된 행의 인덱스가 0이면 안 된다(작을 경우 역시 그리드 영역을 벗어나므로)
+          if (key == 'ArrowDown' ? conditionForArrowDown : conditionForArrowUp) {
+            keyDownEvent.api.setFocusedCell(key == 'ArrowDown' ? clickedRowIndex + 1 : clickedRowIndex - 1, targetColId || focusedCell.column.getColId()); // 각각 화살표 키 방향에 해당하는 쪽으로 포커싱 이동
+            keyDownEvent.api.forEachNodeAfterFilterAndSort((rowNodeInFor, indexInFor) => {
+              if (indexInFor == (key == 'ArrowDown' ? clickedRowIndex + 1 : clickedRowIndex - 1)) {
+                rowNodeInFor.setSelected(!rowNodeInFor.isSelected());
+              }
+            });
           }
-          prevEventKey.current = key; // 동기화
+        } else {
+          /** 기존 키와 다른 키가 사용됨(방향이 변경되었거나 최초 선택) */
+          rowNode.setSelected(!rowNode.isSelected());
+          if (focusedCell) {
+            keyDownEvent.api.setFocusedCell(clickedRowIndex, targetColId || focusedCell.column.getColId()); // 해당 행 포커싱(동작 일관성 유지)
+          }
         }
+        prevEventKey.current = key; // 동기화
       }
-    },
-    [],
-  );
+    }
+  };
 
   const onCellKeyDown = useCallback(
     (
