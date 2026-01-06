@@ -1,13 +1,4 @@
-// C:\work\shop-frontend\components\popup\system\accountMng\AccountModPop.tsx
-
-import {
-  PartnerResponseSelect,
-  UserRequestCreateUseYn,
-  UserRequestDelete,
-  UserRequestPasswordInit,
-  UserRequestUpdate,
-  UserResponseSelectByLoginId,
-} from '../../../../generated';
+import { UserRequestCreateUseYn, UserRequestDelete, UserRequestPasswordInit, UserRequestUpdate, UserResponseSelectByLoginId } from '../../../../generated';
 import { useAccountStore, useCommonStore } from '../../../../stores';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useEffect, useRef, useState } from 'react';
@@ -28,7 +19,6 @@ import { PopupLayout } from '../../PopupLayout';
 import { useSession } from 'next-auth/react';
 import { useLogisStore, LogisDetail } from '../../../../stores/wms/useLogisStore';
 import { DropDownOption } from '../../../../types/DropDownOptions';
-import { fetchPartners } from '../../../../api/wms-api';
 import { TunedReactSelector } from '../../../TunedReactSelector';
 
 export type AccountRequestUpdateFields = {
@@ -107,24 +97,6 @@ export const AccountModPop = ({ data }: Props) => {
   const [partnerList, setPartnerList] = useState([]);
 
   const queryClient = useQueryClient();
-
-  /** 화주리스트 조회하기 */
-  const { data: partners, isSuccess: isFetchPartnerSuccess } = useQuery(['fetchPartners'], () => fetchPartners(workLogisId));
-
-  useEffect(() => {
-    if (isFetchPartnerSuccess && partners) {
-      const { resultCode, body, resultMessage } = partners.data;
-      if (resultCode === 200) {
-        const partnerCodes = body?.map((item: PartnerResponseSelect) => ({
-          value: item.id,
-          label: item.partnerNm,
-        }));
-        setPartnerOption([defaultOption, ...partnerCodes]);
-      } else {
-        toastError(resultMessage);
-      }
-    }
-  }, [isFetchPartnerSuccess, partners]);
 
   // 창고 스토어에서 필요한 함수 가져오기
   const { fetchLogis } = useLogisStore();
