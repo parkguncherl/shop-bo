@@ -41,7 +41,9 @@ const AccountMng = () => {
     s.openModal,
   ]);
 
-  const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<AccountPagingFilter>({});
+  const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<AccountPagingFilter>({
+    partnerNm: ''
+  });
 
   const [loginId, setLoginId] = useState<string | undefined>(undefined);
 
@@ -181,15 +183,6 @@ const AccountMng = () => {
           name={'phoneNo'}
           placeholder={Placeholder.Default}
           value={filters.phoneNo}
-          onChange={onChangeFilters}
-          onEnter={search}
-          filters={filters}
-        />
-        <Search.Input
-          title={'화주'}
-          name={'partnerNm'}
-          placeholder={Placeholder.Default}
-          value={filters.partnerNm}
           onChange={onChangeFilters}
           onEnter={search}
           filters={filters}
