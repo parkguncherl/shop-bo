@@ -181,18 +181,21 @@ interface Props {
 
 export const LeftNav = ({ closed = false }: Props) => {
   const [nowTime, setNowTime] = useState(new Date());
-  const [delayTime, setDelaytime] = useState(new Date());
+  //const [delayTime, setDelaytime] = useState(new Date());
   const { data: session, update: updateSession } = useSession();
   // 센터관련
-  const initialCenters = [''];
-  const centerRef = useRef<HTMLLIElement | null>(null);
+  // const initialCenters = [''];
+  // const centerRef = useRef<HTMLLIElement | null>(null);
+
   useEffect(() => {
     const timer = setInterval(() => {
       const now = new Date();
       now.setHours(now.getHours() - (session?.user?.addTime ? session?.user?.addTime : DEFAULT_ADD_HOURE));
-      setDelaytime(now);
+      //setDelaytime(now);
       setNowTime(new Date());
     }, 1000);
+
+    return () => clearInterval(timer); // clean up
   }, []);
 
   const sessions = useSession();
@@ -225,7 +228,7 @@ export const LeftNav = ({ closed = false }: Props) => {
         </li>
         <li className="ico_date">
           <div>
-            <span>{format(delayTime, 'M/d')}</span>
+            {/*<span>{format(delayTime, 'M/d')}</span>*/}
             <span>{format(nowTime, 'M/d(EEE) HH:mm:ss', { locale: ko })}</span>
           </div>
         </li>
