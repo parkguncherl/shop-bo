@@ -34,7 +34,7 @@ import {
   SelectionChangedEvent,
   SortChangedEvent,
 } from 'ag-grid-community';
-import { useRouter } from 'next/router';
+import { useRouter, usePathname } from 'next/navigation';
 import { AG_GRID_LOCALE_KO, GridSetting, withCommonKeyboardSuppress } from '../../libs/ag-grid';
 import { useCommonStore } from '../../stores';
 import { GridResponse } from '../../generated';
@@ -130,6 +130,7 @@ export interface TunedGridProps<P> {
  * */
 const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
   const router = useRouter();
+  const pathname = usePathname();
 
   const [selectGridColumnState, updateGridColumnState, initGridColumnState] = useCommonStore((s) => [
     s.selectGridColumnState,
@@ -156,7 +157,7 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
   useEffect(() => {
     if (props.columnDefs && !firstRender) {
       if (!props.preventPersonalizedColumnSetting) {
-        selectGridColumnState(router.pathname).then((result) => {
+        selectGridColumnState(pathname).then((result) => {
           const { resultCode, body } = result.data;
           if (resultCode === 200 && body) {
             const GridResponse = body as GridResponse;
@@ -197,7 +198,7 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
   const onGridReady = (event: GridReadyEvent) => {
     setFirstRender(false);
     if (!props.preventPersonalizedColumnSetting) {
-      selectGridColumnState(router.pathname).then((result) => {
+      selectGridColumnState(pathname).then((result) => {
         const { resultCode, body } = result.data;
         // console.log('result.data>>', result.data);
         if (resultCode === 200 && body) {
@@ -227,7 +228,7 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
         name: '그리드컬럼 설정 초기화',
         action: () => {
           initGridColumnState({
-            uri: router.pathname,
+            uri: pathname,
             columnState: JSON.stringify(props.columnDefs),
           }).then((result) => {
             if (result.data.resultCode === 200) {
@@ -439,7 +440,7 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
         // undefined 체크 추가
         const serializableColumns = JSON.stringify(event.api.getColumnDefs());
         updateGridColumnState({
-          uri: router.pathname,
+          uri: pathname,
           columnState: serializableColumns,
         });
       }
@@ -453,7 +454,7 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
         // undefined 체크 추가
         const serializableColumns = JSON.stringify(event.api.getColumnDefs());
         updateGridColumnState({
-          uri: router.pathname,
+          uri: pathname,
           columnState: serializableColumns,
         });
       }
@@ -581,7 +582,7 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
     // console.log('param ==============>', params);
     if (params.source === 'columnMenu') {
       initGridColumnState({
-        uri: router.pathname,
+        uri: pathname,
         columnState: JSON.stringify(props.columnDefs),
       }).then((result) => {
         const { resultCode, body, resultMessage } = result.data;
