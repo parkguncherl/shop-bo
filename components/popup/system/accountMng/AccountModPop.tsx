@@ -10,14 +10,13 @@ import { DefaultOptions, Placeholder } from '../../../../libs/const';
 import { DeleteConfirmModal } from '../../../DeleteConfirmModal';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { authApi, YupSchema } from '../../../../libs';
+import { YupSchema } from '../../../../libs';
 import FormInput from '../../../FormInput';
 import FormDropDown from '../../../FormDropDown';
 import { Input } from '../../../Input';
 import Loading from '../../../Loading';
 import { PopupLayout } from '../../PopupLayout';
 import { useSession } from 'next-auth/react';
-import { useLogisStore, LogisDetail } from '../../../../stores/wms/useLogisStore';
 import { DropDownOption } from '../../../../types/DropDownOptions';
 import { TunedReactSelector } from '../../../TunedReactSelector';
 
@@ -98,27 +97,6 @@ export const AccountModPop = ({ data }: Props) => {
 
   const queryClient = useQueryClient();
 
-  // 창고 스토어에서 필요한 함수 가져오기
-  const { fetchLogis } = useLogisStore();
-  // 창고 목록 조회
-  const { data: logisData } = useQuery(['logisList'], () => fetchLogis({}), {
-    select: (response) => {
-      if (response.data.resultCode === 200 && response.data.body) {
-        const fetchedOptions = response.data.body.rows.map((item: LogisDetail) => ({
-          key: item.id.toString(),
-          value: item.id,
-          label: `${item.logisKey} - ${item.logisNm}`,
-          //label: item.logisNm,
-        }));
-        return [{ key: '', value: '', label: '선택' } as DropDownOption].concat(fetchedOptions);
-      }
-      return [{ key: '', value: '', label: '선택' } as DropDownOption];
-    },
-    onError: (error) => {
-      console.error('창고 목록 조회 오류:', error);
-      toastError('창고 목록 조회 중 오류가 발생했습니다.');
-    },
-  });
   /** 계정 수정 */
   const { mutate: updateUserMutate, isLoading: updateIsLoading } = useMutation(updateUser, {
     onSuccess: async (e) => {
@@ -304,25 +282,6 @@ export const AccountModPop = ({ data }: Props) => {
                   label={'휴대전화 번호'}
                   placeholder={Placeholder.PhoneNo || ''}
                   required={true}
-                />
-                <FormDropDown<AccountRequestUpdateFields>
-                  control={control}
-                  title={'연결창고'}
-                  name={'workLogisId'}
-                  options={logisData || []}
-                  required={false}
-                  onChange={(name, value) => {
-                    const selectedOption = logisData?.find((opt: DropDownOption) => opt.label === value);
-                    if (selectedOption && selectedOption.key) {
-                      const parsedKey = parseInt(selectedOption.key.toString());
-                      if (!isNaN(parsedKey)) {
-                        console.log('Setting workLogisId to:', parsedKey);
-                        setValue('workLogisId', parsedKey);
-                      } else {
-                        console.error('Invalid workLogisId:', selectedOption.key);
-                      }
-                    }
-                  }}
                 />
               </PopupSearchType>
               <PopupSearchType className={'type_2'}>

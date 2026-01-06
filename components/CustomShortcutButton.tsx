@@ -2,7 +2,6 @@
 
 import React, { useEffect, useCallback, useId } from 'react';
 import { Tooltip } from 'react-tooltip';
-import { useOrderStore } from '../stores/useOrderStore';
 
 /**
  * 단축키 설정 타입 정의
@@ -177,7 +176,6 @@ const CustomShortcutButton = ({
   isBlueRounded = false,
   ref,
 }: CustomShortcutButtonProps) => {
-  const [orderModalType] = useOrderStore((s) => [s.modalType]);
   const uniqueId = useId(); // 고유 ID 생성
   tooltipId = `tooltip-${uniqueId}`; // 고유 Tooltip ID
   /**
@@ -260,14 +258,6 @@ const CustomShortcutButton = ({
     },
     [onClick, shortcut, isLoading, disabled, disableOnInput],
   );
-
-  useEffect(() => {
-    // 전역 이벤트 리스너 등록 (캡처 페이즈)
-    if (!orderModalType.active) {
-      window.addEventListener('keydown', handleKeyPress, { capture: true });
-      return () => window.removeEventListener('keydown', handleKeyPress, { capture: true });
-    }
-  }, [handleKeyPress]);
 
   if (isButton) {
     return (
