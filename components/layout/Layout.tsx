@@ -39,7 +39,7 @@ export const Layout = ({ children }: Props) => {
   const session = useSession();
 
   /** local states */
-  const [closed, setClosed] = useState<boolean>(false);
+  //const [closed, setClosed] = useState<boolean>(false);
   const [menuHistoryState, setMenuHistoryState] = useState<MenuHistory>({
     histMenuNm: '',
     histMenuUri: '',
@@ -142,7 +142,8 @@ export const Layout = ({ children }: Props) => {
       <>
         {session.status === 'authenticated' && !isLoading && (
           <div className={`wmsLayout ${styles.layout}`}>
-            <HeaderWms closed={closed} toggle={() => setClosed(!closed)} />
+            {/*<HeaderWms closed={closed} toggle={() => setClosed(!closed)} />*/}
+            <HeaderWms />
             <div className={`container ${styles.container} ${closed ? styles.on : ''}`}>
               <LeftNav />
               <div className={`content ${styles.content}`}>{children}</div>

@@ -1,7 +1,8 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { signOut } from 'next-auth/react';
 import styles from '../../styles/layout/header.module.scss';
-import { Button } from '../Button';
 import Link from 'next/link';
 import useAppStore, { appStoreContext } from '../../stores/useAppStore';
 import { useAuthStore, useCommonStore, useMypageStore } from '../../stores';
@@ -18,9 +19,10 @@ interface Props {
   toggle?: () => void;
 }
 
-export const HeaderWms = ({ closed = false, toggle }: Props) => {
+export const ClientSideHeader = ({ closed = false, toggle }: Props) => {
   const pathname = usePathname();
-  const { session } = useAppStore();
+  const { session } = useAppStore(); // todo 로그인 영역 업그레이드와 함께 처리하여 useSession hook 사용 필요성을 없에고 역할을 명확히 재정립하여 구조 정렬
+
   const { logout } = useAuthStore();
   /** 공통 스토어 - State */
   const [setUpMenuNm, setMenuNm, setMenuUpdYn, setMenuExcelYn] = useCommonStore((s) => [s.setUpMenuNm, s.setMenuNm, s.setMenuUpdYn, s.setMenuExcelYn]);
