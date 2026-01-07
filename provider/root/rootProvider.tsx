@@ -24,6 +24,8 @@ import timezone from 'dayjs/plugin/timezone';
 import 'react-datepicker/dist/react-datepicker.css';
 //import 'ag-grid-enterprise';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import { AxiosResponse } from 'axios';
+import { ApiResponse } from '../../generated';
 //import { AllEnterpriseModule } from 'ag-grid-enterprise'; // Enterprise 사용 시
 
 // dayjs 플러그인 설정
@@ -39,12 +41,22 @@ ModuleRegistry.registerModules([
 
 export default function RootProvider({ children }: { children: ReactNode }) {
   const queryClient = new QueryClient({
+    /** 백앤드의 aop 구조에 대응하여 전역 핸들러 정의, 리다이렉트 */
     queryCache: new QueryCache({
-      onSuccess: async (e: any) => {
-        const resultCode = e?.data?.resultCode;
-        if ([990, 991, 992, 993].includes(resultCode)) {
-          signOut({ redirect: true, callbackUrl: '/login' });
-          console.debug('====> 인증토큰 값이 유효하지 않음');
+      onSuccess: async (data, query) => {
+        if (typeof data == 'object') {
+          const catchedResponse = data as AxiosResponse<ApiResponse>;
+          if (catchedResponse.data) {
+            const resultCode = catchedResponse.data.resultCode;
+            if (resultCode) {
+              if ([990, 991, 992, 993].includes(resultCode)) {
+                signOut({ redirect: true, callbackUrl: '/login' });
+                console.debug('====> 인증토큰 값이 유효하지 않음');
+              }
+            } else {
+              console.error('결과코드(resultCode) 를 찾을 수 없음');
+            }
+          }
         }
       },
     }),

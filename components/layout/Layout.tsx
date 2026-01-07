@@ -131,6 +131,7 @@ export const Layout = ({ children }: Props) => {
 
   if (!session?.data || authGroupCd === '') {
     //router.push('/login', undefined, { shallow: true });
+    // todo 추후 프록시로 이관
     router.push('/login');
   }
 
