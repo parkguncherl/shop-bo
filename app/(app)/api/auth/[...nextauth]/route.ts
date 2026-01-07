@@ -1,7 +1,6 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { ApiResponseLoginResponse } from '../../../../../generated';
-import { ISessionUser } from '../../../../../types/next-auth';
 import dayjs from 'dayjs';
 import axios from 'axios';
 
@@ -159,19 +158,17 @@ const authOptions: NextAuthOptions = {
       }
       return params.token;
     },
+
     async session({ session, token }) {
-      console.log('session checked: ', token.user);
       if (token?.user) {
         session.user = token.user;
       } else {
-        const errorMsg = token?.error || '토큰이 존재하지 않습니다';
-        return {
-          error: errorMsg,
-        } as any;
+        session.error = token.user.token.errMessage || '토큰이 존재하지 않습니다';
       }
       return session;
     },
   },
 };
+
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
