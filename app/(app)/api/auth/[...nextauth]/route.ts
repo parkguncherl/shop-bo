@@ -60,14 +60,23 @@ const authOptions: NextAuthOptions = {
           const token = body?.token;
           if (user && token) {
             console.log('user==>', user, token);
+
+            if (user.id) {
+              return {
+                ...user,
+                id: user.id.toString(),
+                token,
+                refreshCount,
+              }; // 인증
+            }
           }
-          return {
-            ...user,
-            token,
-            refreshCount,
-          } as ISessionUser & {
-            id: any;
-          };
+          // return {
+          //   ...user,
+          //   token,
+          //   refreshCount,
+          // } as ISessionUser & {
+          //   id: any;
+          // };
         }
         return null; // 인증 실패
       },
@@ -150,18 +159,18 @@ const authOptions: NextAuthOptions = {
       }
       return params.token;
     },
-    async session({ session, token }) {
-      console.log('session checked');
-      if (token?.user) {
-        session.user = token.user;
-      } else {
-        const errorMsg = token?.error || '토큰이 존재하지 않습니다';
-        return {
-          error: errorMsg,
-        } as any;
-      }
-      return session;
-    },
+    // async session({ session, token }) {
+    //   console.log('session checked: ', token.user);
+    //   if (token?.user) {
+    //     session.user = token.user;
+    //   } else {
+    //     const errorMsg = token?.error || '토큰이 존재하지 않습니다';
+    //     return {
+    //       error: errorMsg,
+    //     } as any;
+    //   }
+    //   return session;
+    // },
   },
 };
 const handler = NextAuth(authOptions);
