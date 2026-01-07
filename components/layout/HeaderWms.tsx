@@ -27,6 +27,9 @@ export const HeaderWms = ({ closed = false, toggle }: Props) => {
   const [setFavoriteList] = useMypageStore((s) => [s.setFavoriteList]);
   const [logoutConfirmModal, setLogoutConfirmModal] = useState(false);
 
+  /**
+   * 각 페이지(메뉴) 에 관한 사용자의 권한 확인, 권한 부재 시 역시 리다이렉트 및 로그아웃 처리
+   * */
   const authCheck = async (pathname: string | null) => {
     const result = await authApi.get<ApiResponseAuthResponseMenuAuth>('/auth/check/menu', {
       params: {

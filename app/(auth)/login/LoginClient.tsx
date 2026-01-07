@@ -173,6 +173,7 @@ const LoginClient = () => {
       //   localStorage.removeItem(LOCAL_STORAGE_GUBUN);
       // }
 
+      // todo 프록시 영역으로의 일부 역할 이동에도 해당 localStorage 초기화 동작은 보장하도록 처리
       const reFetch = async () => {
         const { data: favorites } = await favRefetch(); // 데이터가 로드될 때까지 기다림
         const favHistoryList = favorites?.data?.body?.map((menu: SelectFavorites) => ({
@@ -201,7 +202,7 @@ const LoginClient = () => {
         // setTimeout(() => {
         //   router.push(landingPage);
         // }, 1000);
-        router.push(landingPage);
+        router.push(landingPage); // todo 추후 이관 고려
       };
 
       reFetch();

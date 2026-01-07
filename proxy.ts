@@ -8,10 +8,18 @@ const PUBLIC_PATHS = ['/login', '/logout', '/noAuth'];
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // public path 인 경우 proxy 적용 생략
-  if (PUBLIC_PATHS.some((path) => pathname.startsWith(path))) {
-    return;
-  }
+  /**
+   * 배포 환경(HTTPS): __Secure-next-auth.session-token
+   * 개발 환경(HTTP): next-auth.session-token
+   * */
+  // const hasToken = req.cookies.has('next-auth.session-token') || req.cookies.has('__Secure-next-auth.session-token');
+  // if (!hasToken && !PUBLIC_PATHS.includes(pathname)) {
+  //   return NextResponse.redirect(new URL('/login', req.url));
+  // }
+  //
+  // if (hasToken && pathname == '/login') {
+  //   return NextResponse.redirect(new URL('/', req.url));
+  // }
 
   //console.log('req: ', req);
   // const jwtToken = await getToken({

@@ -41,7 +41,10 @@ ModuleRegistry.registerModules([
 
 export default function RootProvider({ children }: { children: ReactNode }) {
   const queryClient = new QueryClient({
-    /** 백앤드의 aop 구조에 대응하여 전역 핸들러 정의, 리다이렉트 */
+    /**
+     * 백앤드의 aop 구조에 대응하여 전역 핸들러 정의, 리다이렉트
+     * 역시 요청 시점에 전역적인 검증 영역을 추가함
+     * */
     queryCache: new QueryCache({
       onSuccess: async (data, query) => {
         if (typeof data == 'object') {
