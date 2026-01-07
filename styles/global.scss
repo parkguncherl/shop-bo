@@ -3,9 +3,9 @@
 //@import "ag-grid-community/styles/ag-grid.css";
 //@import "ag-grid-community/styles/ag-theme-alpine.css";
 
-@import "./reset.scss";
-@import "./style.scss";
-@import "./popup.scss";
+@use "reset.scss";
+@use "style.scss";
+@use "popup.scss";
 @import "../public/styles/print.css";
 .ag-theme-alpine, .ag-theme-alpine-dark, .ag-theme-alpine-auto-dark {
   //--ag-alpine-active-color: var(--main-color) !important; // 카피 앤 페이스트 컬러
