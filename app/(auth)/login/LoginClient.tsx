@@ -197,7 +197,7 @@ const LoginClient = () => {
     openModal('FINDPASS');
   };
 
-  // 서버 연결 로그인
+  /** 서버 연결 로그인(최종 절차) */
   const loginFinal = async (isMobileLogin: string) => {
     const { loginId, password } = getValues();
     const date = new Date();
@@ -210,6 +210,7 @@ const LoginClient = () => {
       deleteCookie('smartLoginId');
     }
 
+    /** 본 로그인 요청, 성공 시 즉시 리다이렉트 되므로 실패한 경우 이외에는 이후의 작성은 무의미 */
     const result = await signIn('credentials', {
       loginId,
       password,
@@ -221,10 +222,10 @@ const LoginClient = () => {
       return toastError(result.error);
     }
 
-    if (result?.ok) {
-      toast.dismiss();
-      processAfterSuccessOfLogin();
-    }
+    // if (result?.ok) {
+    //   toast.dismiss();
+    //   processAfterSuccessOfLogin();
+    // }
   };
 
   // 아이디, 비밀번호 정상 입력시
