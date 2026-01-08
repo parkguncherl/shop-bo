@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -21,7 +21,6 @@ import { LOCAL_STORAGE_GUBUN, LOCAL_STORAGE_HISTORY, LOCAL_STORAGE_WMS_HISTORY, 
 import { toast } from 'react-toastify';
 import Loading from '../../../components/Loading';
 import { UAParser } from 'ua-parser-js';
-import { InputRef } from 'antd';
 
 export interface LoginVerificationFields {
   loginId: string;
@@ -36,19 +35,22 @@ export interface LoginVerificationFields {
  * */
 // todo oms wms 구분 폐지한 관계로 상당 영역 주석처리, 추후 삭제
 const LoginClient = () => {
+  /** 전역 상태 */
   const [onVerification, modalType, onSendOtp, openModal] = useAuthStore((s) => [s.onVerification, s.modalType, s.onSendOtp, s.openModal, s.closeModal]);
+
+  /** provided by provider */
   const session = useSession();
+  const router = useRouter();
+
+  /** local state */
   const [otpNo, setOtpNo] = useState<string>('000000');
   const [changeType, setChangeType] = useState('F');
   const [validAccount, setVerification] = useState<boolean>(false);
   const [isCapsLockOn, setIsCapsLockOn] = useState(false);
   const [isWatingOtp, setIsWatingOtp] = useState(false);
-  const [isLoginPassVisible, setIsLoginPassVisible] = useState(true);
-  const [isLoginComplete, setIsLoginComplete] = useState(false);
-  const [checkedSaveId, setCheckedSaveId] = useState(!!getCookie('smartLoginId'));
+  const [isLoginPassVisible, setIsLoginPassVisible] = useState(true); // 비밀번호 노출 여부(입력 시)
+  const [checkedSaveId, setCheckedSaveId] = useState(!!getCookie('smartLoginId')); // id 저장 여부
   const [time, setTime] = useState(Otp.duration);
-  const router = useRouter();
-
   // 모바일 체크
   const [isMobileLogin, setIsMobileLogin] = useState<string>('N');
   const [deviceInfo, setDeviceInfo] = useState<{
@@ -58,6 +60,7 @@ const LoginClient = () => {
   } | null>(null);
 
   useEffect(() => {
+    // 최초 1회 동작 영역
     const parser = new UAParser();
     const result = parser.getResult();
 
@@ -69,6 +72,7 @@ const LoginClient = () => {
   }, []);
 
   useEffect(() => {
+    // 모바일 여부 변경
     if (deviceInfo && deviceInfo.deviceType === 'desktop') {
       setIsMobileLogin('N');
     } else {
@@ -81,13 +85,6 @@ const LoginClient = () => {
     password: '1230',
     isMobileLogin: isMobileLogin,
   };
-
-  /*
-  console.log('login session ===>', session);
-  if (session && session.status == 'authenticated') {
-    location.
-  }
-*/
 
   const {
     handleSubmit,
@@ -152,62 +149,23 @@ const LoginClient = () => {
     enabled: false, // 쿼리가 자동으로 실행되지 않도록 설정
   });
 
-  useEffect(() => {
+  const processAfterSuccessOfLogin = async () => {
     if (session && session.status === 'authenticated' && session.data?.user) {
       const myLocalStorage = LOCAL_STORAGE_WMS_HISTORY;
 
-      // const authGroupCd = session.data?.user?.authCd ? session.data?.user.authCd?.substring(0, 1) : '';
-      // const myLocalStorage = authGroupCd === '3' ? LOCAL_STORAGE_HISTORY : LOCAL_STORAGE_WMS_HISTORY;
-      // const mygubunSetting = {
-      //   seller1: session.data.user.seller1 || '구분1',
-      //   seller2: session.data.user.seller2 || '구분2',
-      //   factory1: session.data.user.factory1 || '구분1',
-      //   factory2: session.data.user.factory2 || '구분2',
-      //   sku1: session.data.user.sku1 || '구분1',
-      //   sku2: session.data.user.sku2 || '구분2',
-      // };
-      // // oms 사용자인경우만 만들어준다.
-      // if (authGroupCd === '3') {
-      //   localStorage.setItem(LOCAL_STORAGE_GUBUN, JSON.stringify(mygubunSetting));
-      // } else {
-      //   localStorage.removeItem(LOCAL_STORAGE_GUBUN);
-      // }
+      const { data: favorites } = await favRefetch(); // 데이터가 로드될 때까지 기다림
+      const favHistoryList = favorites?.data?.body?.map((menu: SelectFavorites) => ({
+        histMenuNm: menu.menuNm,
+        histMenuUri: menu.menuUri,
+        histParamList: [],
+      }));
+      if (favHistoryList && favHistoryList.length > 0) {
+        localStorage.setItem(myLocalStorage, JSON.stringify(favHistoryList));
+      }
 
-      // todo 프록시 영역으로의 일부 역할 이동에도 해당 localStorage 초기화 동작은 보장하도록 처리
-      const reFetch = async () => {
-        const { data: favorites } = await favRefetch(); // 데이터가 로드될 때까지 기다림
-        const favHistoryList = favorites?.data?.body?.map((menu: SelectFavorites) => ({
-          histMenuNm: menu.menuNm,
-          histMenuUri: menu.menuUri,
-          histParamList: [],
-        }));
-        // const landingPage =
-        //   authGroupCd === '3'
-        //     ? session.data.user.isMobileLogin === 'Y'
-        //       ? '/mobile/asn/MobileAsn'
-        //       : '/oms/orderInfo/today'
-        //     : authGroupCd === '4'
-        //     ? '/wms/live/OrderListForSeller'
-        //     : authGroupCd === '6'
-        //     ? '/mobile/live/AccountConfirm'
-        //     : authGroupCd === '7'
-        //     ? '/oms/product/ProductScmMng'
-        //     : '/';
-        const landingPage = '/'; // 리다이렉트 고정
-
-        if (favHistoryList && favHistoryList.length > 0) {
-          localStorage.setItem(myLocalStorage, JSON.stringify(favHistoryList));
-        }
-
-        // setTimeout(() => {
-        //   router.push(landingPage);
-        // }, 1000);
-        router.push(landingPage); // todo 추후 이관 고려
-      };
-
-      reFetch();
+      router.refresh(); // proxy에 의한 리다리엑팅 동작을 이용함
     }
-  }, [favRefetch, isLoginComplete, router, session]);
+  };
 
   // otp 번호 재전송
   const handleOtp = (e?: React.MouseEvent<HTMLButtonElement>) => {
@@ -258,11 +216,7 @@ const LoginClient = () => {
       password,
       otpNo,
       isMobileLogin,
-      redirect: false,
     });
-
-    // console.log('result:==> ', result);
-    // alert(result);
 
     if (result?.error) {
       return toastError(result.error);
@@ -270,7 +224,7 @@ const LoginClient = () => {
 
     if (result?.ok) {
       toast.dismiss();
-      setIsLoginComplete(true);
+      processAfterSuccessOfLogin();
     }
   };
 
@@ -299,13 +253,11 @@ const LoginClient = () => {
     }
   };
 
-  if (session?.data) {
-    console.log('===> session data : ', session.data);
+  if (session.status == 'loading') {
     return <Loading />;
-  } else {
-    // 세션이 없을때만 로컬 스토리지를 삭제한다.
-    //localStorage.removeItem(LOCAL_STORAGE_HISTORY);
-    localStorage.removeItem(LOCAL_STORAGE_WMS_HISTORY); // todo appProvider 삭제로 인한 부수 효과로 not defined, 조치하기
+  } else if (session.status == 'unauthenticated') {
+    // 인증되지 아니한 경우 한정으로 로그인 페이지 유효
+    localStorage.removeItem(LOCAL_STORAGE_WMS_HISTORY);
     return (
       <div className={styles.login_box_group}>
         <div className={styles.login_box}>

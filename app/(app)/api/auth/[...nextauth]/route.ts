@@ -162,7 +162,7 @@ const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token?.user) {
         session.user = token.user; // todo 타입 불안정하므로 마이그레이션 이후 제거하여야
-        session.token = token.user.token;
+        session.token = token.user.token; // 토큰 명시적으로 포함
       } else {
         session.error = token.user.token.errMessage || '토큰이 존재하지 않습니다';
       }
