@@ -13,7 +13,7 @@ const serverApi = axios.create({
 });
 
 /** 최초 구성 */
-const authOptions: NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
     // maxAge(seconds) = 2시간 (만료)

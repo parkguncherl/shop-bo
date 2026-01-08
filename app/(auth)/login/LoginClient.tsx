@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -17,7 +17,7 @@ import { ApiResponseListSelectFavorites, LoginRequest, LoginResponse, SelectFavo
 import { SubmitErrorHandler } from 'react-hook-form/dist/types/form';
 import { deleteCookie, getCookie, setCookie } from 'cookies-next';
 import { CheckBox } from '../../../components/CheckBox';
-import { LOCAL_STORAGE_GUBUN, LOCAL_STORAGE_HISTORY, LOCAL_STORAGE_WMS_HISTORY, Otp } from '../../../libs/const';
+import { LOCAL_STORAGE_WMS_HISTORY, Otp } from '../../../libs/const';
 import { toast } from 'react-toastify';
 import Loading from '../../../components/Loading';
 import { UAParser } from 'ua-parser-js';
@@ -33,7 +33,6 @@ export interface LoginVerificationFields {
 /**
  * (client side)LoginClient
  * */
-// todo oms wms 구분 폐지한 관계로 상당 영역 주석처리, 추후 삭제
 const LoginClient = () => {
   /** 전역 상태 */
   const [onVerification, modalType, onSendOtp, openModal] = useAuthStore((s) => [s.onVerification, s.modalType, s.onSendOtp, s.openModal, s.closeModal]);
@@ -253,9 +252,7 @@ const LoginClient = () => {
     }
   };
 
-  if (session.status == 'loading') {
-    return <Loading />;
-  } else if (session.status == 'unauthenticated') {
+  if (session.status == 'unauthenticated') {
     // 인증되지 아니한 경우 한정으로 로그인 페이지 유효
     localStorage.removeItem(LOCAL_STORAGE_WMS_HISTORY);
     return (
@@ -369,6 +366,8 @@ const LoginClient = () => {
         {modalType.type === 'FINDPASS' && modalType.active && <FindPassPop />}
       </div>
     );
+  } else {
+    return <Loading />;
   }
 };
 
