@@ -4,11 +4,10 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '../../../libs';
 import { useMutation } from '@tanstack/react-query';
-import useAppStore from '../../../stores/useAppStore';
 import { toastError, toastSuccess } from '../../ToastMessage';
 import { PopupLayout } from '../PopupLayout';
 import { useAuthStore } from '../../../stores';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import TunedButtonAtom, { TunedButtonAtomRefInterface } from '../../atom/TunedButtonAtom';
 
 interface Props {
@@ -24,7 +23,7 @@ interface MypageChangePasswordFields {
 }
 
 function ChangePasswordPop({ open = false, onClose }: Props) {
-  const { session } = useAppStore();
+  const session = useSession();
 
   const chgBtnRef = useRef<TunedButtonAtomRefInterface>(null);
 
@@ -42,7 +41,7 @@ function ChangePasswordPop({ open = false, onClose }: Props) {
   const onValid = (data: any) => {
     if (validatePassword()) {
       const loginRequest: MypageChangePasswordFields = {
-        loginId: session?.user.loginId,
+        loginId: session.data?.user.loginId,
         rePassword: data.rePassword,
         modPassword: data.modPassword,
         reModpassword: data.reModpassword,
@@ -57,7 +56,7 @@ function ChangePasswordPop({ open = false, onClose }: Props) {
       const { resultCode, resultMessage } = e.data;
       if (resultCode === 200) {
         toastSuccess('변경되었습니다. 다시 로그인하세요');
-        await logout(session?.user?.loginId ? session?.user?.loginId : '');
+        await logout(session.data?.user?.loginId ? session.data?.user?.loginId : '');
         await signOut({ redirect: true, callbackUrl: '/login' });
       } else {
         toastError(resultMessage);

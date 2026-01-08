@@ -7,7 +7,6 @@ import Loading from '../Loading';
 import { useQuery } from '@tanstack/react-query';
 import { authApi } from '../../libs';
 import { ApiResponseAuthResponseMenuAuth } from '../../generated';
-import useAppStore from '../../stores/useAppStore';
 import { LOCAL_STORAGE_HISTORY, LOCAL_STORAGE_WMS_HISTORY } from '../../libs/const';
 import { LeftNav } from './LeftNav';
 import { HeaderWms } from './HeaderWms';
@@ -46,9 +45,8 @@ export const Layout = ({ children }: Props) => {
     histParamList: [{ paramNm: '', paramValue: '' }],
   });
 
-  /** 전역 상태 혹은 이와 유사한 hook */
+  /** 전역 상태 */
   const [setHistoryList] = useCommonStore((s) => [s.setHistoryList]);
-  const { session: storeSession } = useAppStore();
 
   /** 참조 */
   const isMatch = useRef(false);
@@ -64,7 +62,7 @@ export const Layout = ({ children }: Props) => {
           menuUri: pathname,
         },
       }),
-    enabled: !!storeSession?.user,
+    enabled: !!session.data?.user,
   });
 
   /** 히스토리탭에서 사용되는 uri 목록 생성 */
@@ -129,11 +127,11 @@ export const Layout = ({ children }: Props) => {
     }
   }, [menuAuthList]);
 
-  // if (!session?.data || authGroupCd === '') {
-  //   //router.push('/login', undefined, { shallow: true });
-  //   // todo 추후 프록시로 이관
-  //   router.push('/login');
-  // }
+  if (!session?.data || authGroupCd === '') {
+    //router.push('/login', undefined, { shallow: true });
+    // todo 추후 프록시로 이관
+    //router.push('/login');
+  }
 
   // 반환 영역
   if (session.status === 'loading') {

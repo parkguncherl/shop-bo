@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import styles from '../../styles/layout/mobileheader.module.scss';
 import Link from 'next/link';
-import useAppStore, { appStoreContext } from '../../stores/useAppStore';
 import { useAuthStore, useCommonStore, useMypageStore } from '../../stores';
 import { authApi } from '../../libs';
 import { useRouter } from 'next/router';
@@ -18,7 +17,7 @@ interface Props {
 
 export const HeaderDesignMobile = ({ closed = false, toggle }: Props) => {
   const router = useRouter();
-  const { session } = useAppStore();
+  const session = useSession();
   const [logout] = useAuthStore((s) => [s.logout]);
   /** 공통 스토어 - State */
   const [setUpMenuNm, setMenuNm, setMenuUpdYn, setMenuExcelYn] = useCommonStore((s) => [s.setUpMenuNm, s.setMenuNm, s.setMenuUpdYn, s.setMenuExcelYn]);
@@ -45,12 +44,15 @@ export const HeaderDesignMobile = ({ closed = false, toggle }: Props) => {
       }
     } else {
       toastError(' wms 비정상적인 접근입니다3.');
-      await logout(session?.user?.loginId ? session?.user?.loginId : '');
+      await logout(session.data?.user?.loginId ? session.data?.user?.loginId : '');
       await signOut({ redirect: true, callbackUrl: '/login' });
     }
   };
 
-  const { data: favoriteData, isSuccess: isFavSuccess } = useQuery([], () => authApi.get<ApiResponseListSelectFavorites>('/mypage/favorites', {}));
+  const { data: favoriteData, isSuccess: isFavSuccess } = useQuery({
+    queryKey: [],
+    queryFn: () => authApi.get<ApiResponseListSelectFavorites>('/mypage/favorites', {}),
+  });
 
   // 즐겨찾기 데이터가 변경될 때 상태 업데이트
   useEffect(() => {
@@ -63,11 +65,8 @@ export const HeaderDesignMobile = ({ closed = false, toggle }: Props) => {
 
   // 로그아웃 처리 함수
   const handleLogout = async () => {
-    await logout(session?.user?.loginId ? session?.user?.loginId : '');
+    await logout(session.data?.user?.loginId ? session.data?.user?.loginId : '');
     await signOut({ redirect: true, callbackUrl: '/login' });
-    appStoreContext.setState({
-      session: undefined,
-    });
   };
 
   return (

@@ -110,7 +110,8 @@ export default function RootProvider({ children }: { children: ReactNode }) {
         {process.env.NODE_ENV === 'production' ? <ReactQueryDevtools initialIsOpen={false} /> : ''}
         <SessionProvider refetchOnWindowFocus={true} refetchInterval={60}>
           <ToastContainer />
-          <AppProvider>{children}</AppProvider>
+          {/*<AppProvider>{children}</AppProvider>*/}
+          {children}
         </SessionProvider>
       </QueryClientProvider>
     </ConfigProvider>

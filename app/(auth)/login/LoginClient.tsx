@@ -305,7 +305,7 @@ const LoginClient = () => {
   } else {
     // 세션이 없을때만 로컬 스토리지를 삭제한다.
     //localStorage.removeItem(LOCAL_STORAGE_HISTORY);
-    localStorage.removeItem(LOCAL_STORAGE_WMS_HISTORY);
+    localStorage.removeItem(LOCAL_STORAGE_WMS_HISTORY); // todo appProvider 삭제로 인한 부수 효과로 not defined, 조치하기
     return (
       <div className={styles.login_box_group}>
         <div className={styles.login_box}>

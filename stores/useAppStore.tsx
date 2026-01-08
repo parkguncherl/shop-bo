@@ -23,6 +23,7 @@ export const appStoreContext = createStore<IContext>((set, get) => {
 
 export const AppProvider = ({ children }: IProps) => {
   const session = useSession();
+  console.log('session22: ', session);
   useEffect(() => {
     if (session.status === 'loading') return;
     if (session.data?.error) {
