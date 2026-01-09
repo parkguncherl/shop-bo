@@ -24,7 +24,6 @@ export const HeaderWms = ({ closed = false, toggle }: Props) => {
   /** 공통 스토어 - State */
   const [setUpMenuNm, setMenuNm, setMenuUpdYn, setMenuExcelYn] = useCommonStore((s) => [s.setUpMenuNm, s.setMenuNm, s.setMenuUpdYn, s.setMenuExcelYn]);
   const [setFavoriteList] = useMypageStore((s) => [s.setFavoriteList]);
-  const [logoutConfirmModal, setLogoutConfirmModal] = useState(false);
 
   /**
    * 각 페이지(메뉴) 에 관한 사용자의 권한 확인, 권한 부재 시 역시 리다이렉트 및 로그아웃 처리
@@ -65,7 +64,8 @@ export const HeaderWms = ({ closed = false, toggle }: Props) => {
   }, [favoriteData?.data?.body, isFavSuccess, setFavoriteList]);
 
   useEffect(() => {
-    authCheck(pathname); // 경로 변경 시점마다 호출하여 유효하지 아니할 시 대응
+    /** 경로 이동에 따른 권한 점검 영역 */
+    authCheck(pathname);
   }, [pathname]);
 
   // 로그아웃 처리 함수
@@ -87,14 +87,6 @@ export const HeaderWms = ({ closed = false, toggle }: Props) => {
           {'로그아웃'}
         </button>
       </div>
-      <ConfirmModal
-        title={'빈블러 시스템을 종료할까요?'}
-        open={logoutConfirmModal}
-        onConfirm={handleLogout}
-        onClose={() => {
-          setLogoutConfirmModal(false);
-        }}
-      />
     </header>
   );
 };

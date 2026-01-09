@@ -127,12 +127,6 @@ export const Layout = ({ children }: Props) => {
     }
   }, [menuAuthList]);
 
-  if (!session?.data || authGroupCd === '') {
-    //router.push('/login', undefined, { shallow: true });
-    // todo 추후 프록시로 이관
-    //router.push('/login');
-  }
-
   // 반환 영역
   if (session.status === 'loading') {
     return <Loading />;

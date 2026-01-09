@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import { authApi } from '../../libs';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';

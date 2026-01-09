@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { signOut, useSession } from 'next-auth/react';
 import styles from '../../styles/layout/header.module.scss';
 import Link from 'next/link';
@@ -10,24 +10,23 @@ import { toastError } from '../ToastMessage';
 import { ApiResponseAuthResponseMenuAuth, ApiResponseListSelectFavorites } from '../../generated';
 import { useQuery } from '@tanstack/react-query';
 import { TabMenu } from './TabMenu';
-import { ConfirmModal } from '../ConfirmModal';
 import { usePathname } from 'next/navigation';
 
 interface Props {
   closed?: boolean;
-  toggle?: () => void;
 }
 
-export const ClientSideHeader = ({ closed = false, toggle }: Props) => {
+export const Header = ({ closed }: Props) => {
   const pathname = usePathname();
   const session = useSession();
-
   const { logout } = useAuthStore();
   /** 공통 스토어 - State */
   const [setUpMenuNm, setMenuNm, setMenuUpdYn, setMenuExcelYn] = useCommonStore((s) => [s.setUpMenuNm, s.setMenuNm, s.setMenuUpdYn, s.setMenuExcelYn]);
   const [setFavoriteList] = useMypageStore((s) => [s.setFavoriteList]);
-  const [logoutConfirmModal, setLogoutConfirmModal] = useState(false);
 
+  /**
+   * 각 페이지(메뉴) 에 관한 사용자의 권한 확인, 권한 부재 시 역시 리다이렉트 및 로그아웃 처리
+   * */
   const authCheck = async (pathname: string | null) => {
     const result = await authApi.get<ApiResponseAuthResponseMenuAuth>('/auth/check/menu', {
       params: {
@@ -38,7 +37,7 @@ export const ClientSideHeader = ({ closed = false, toggle }: Props) => {
     if (body) {
       if (body.menuReadYn === 'N') {
         toastError('비정상적인 접근입니다2.');
-        await logout(session.data?.user.loginId ? session.data?.user.loginId : '');
+        await logout(session?.data?.user.loginId ? session?.data?.user.loginId : '');
         await signOut({ redirect: true, callbackUrl: '/login' });
       } else {
         setUpMenuNm(body.upMenuNm || '');
@@ -48,7 +47,7 @@ export const ClientSideHeader = ({ closed = false, toggle }: Props) => {
       }
     } else {
       toastError(' wms 비정상적인 접근입니다3.');
-      await logout(session.data?.user.loginId ? session.data?.user.loginId : '');
+      await logout(session?.data?.user.loginId ? session?.data?.user.loginId : '');
       await signOut({ redirect: true, callbackUrl: '/login' });
     }
   };
@@ -64,12 +63,13 @@ export const ClientSideHeader = ({ closed = false, toggle }: Props) => {
   }, [favoriteData?.data?.body, isFavSuccess, setFavoriteList]);
 
   useEffect(() => {
-    authCheck(pathname); // 경로 변경 시점마다 호출하여 유효하지 아니할 시 대응
+    /** 경로 이동에 따른 권한 점검 영역 */
+    authCheck(pathname);
   }, [pathname]);
 
   // 로그아웃 처리 함수
   const handleLogout = async () => {
-    await logout(session.data?.user.loginId ? session.data?.user.loginId : '');
+    await logout(session?.data?.user.loginId ? session?.data?.user.loginId : '');
     await signOut({ redirect: true, callbackUrl: '/login' });
   };
 
@@ -77,7 +77,7 @@ export const ClientSideHeader = ({ closed = false, toggle }: Props) => {
     <header className={`${styles.header} ${styles.wmsHeader}`}>
       <div className={styles.left}>
         <h1>
-          <Link href={'/wmsIndex'}>{'logo'}</Link>
+          <Link href={'/'}>{'logo'}</Link>
         </h1>
       </div>
       <TabMenu />
@@ -86,14 +86,6 @@ export const ClientSideHeader = ({ closed = false, toggle }: Props) => {
           {'로그아웃'}
         </button>
       </div>
-      <ConfirmModal
-        title={'빈블러 시스템을 종료할까요?'}
-        open={logoutConfirmModal}
-        onConfirm={handleLogout}
-        onClose={() => {
-          setLogoutConfirmModal(false);
-        }}
-      />
     </header>
   );
 };
