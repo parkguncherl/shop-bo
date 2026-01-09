@@ -5,6 +5,9 @@ import React from 'react';
 import styles from '../../styles/layout/layout.module.scss';
 import { Header } from '../../components/layout/Header';
 import { LeftNav } from '../../components/layout/LeftNav';
+import { LeftNavChildren } from '../../components/layout/LeftNavClient';
+import { format } from 'date-fns';
+import { ko } from 'date-fns/locale';
 
 /**
  * (server side)AppLayout
@@ -17,10 +20,35 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
     <div className={`wmsLayout ${styles.layout}`}>
       <Header />
       <div className={`container ${styles.container}`}>
-        <LeftNav />
+        <LeftNavChildren />
         <div className={`content ${styles.content}`}>{children}</div>
       </div>
     </div>
   );
+
+  // <aside className={`${closed ? 'on' : ''}`}>
+  //   <ul>
+  //     <li
+  //       className="ico_user"
+  //       onClick={() => {
+  //         router.push('/mypage');
+  //       }}
+  //     >
+  //       {session?.user?.userNm || ''}
+  //     </li>
+  //     <li className="ico_date">
+  //       <div>
+  //         <span>{format(nowTime, 'M/d(EEE) HH:mm:ss', { locale: ko })}</span>
+  //       </div>
+  //     </li>
+  //   </ul>
+  //   <nav>
+  //     <ul>
+  //       {menuList.map((item, key) => (
+  //         <MenuItem key={key} item={item} />
+  //       ))}
+  //     </ul>
+  //   </nav>
+  // </aside>
 };
 export default layout;
