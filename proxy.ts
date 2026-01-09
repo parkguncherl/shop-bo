@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-/** 인증 없이 접근 가능한 경로 모음 */
-const PUBLIC_PATHS = ['/login', '/logout', '/noAuth'];
+const LOGIN_PATH = '/login';
+const PUBLIC_PATHS = ['/login']; // 공공 경로는 인증된 사용자의 접근을 차단하여야 하는 경로를 나열함
 
 /**
  * 본 proxy 영역에서는 토큰의 존재 여부만을 확인
@@ -22,10 +22,16 @@ export async function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL('/login', req.url));
   }
 
-  // 토큰이 존재하는 상태에서 로그인 경로로 향하는 경우
-  if (hasToken && pathname == '/login') {
-    console.log('redirected because of trying to access to public path with access token'); // 접근 거부
+  // 토큰이 존재하는 상태에서 공공 경로로 향하는 경우
+  if (hasToken && PUBLIC_PATHS.includes(pathname)) {
+    console.log('redirected because of trying to access to public path without access token'); // 접근 거부
     return NextResponse.redirect(new URL('/', req.url));
+  }
+
+  // 토큰이 존재하는 상태에서 로그인 경로로 향하는 경우
+  if (hasToken && LOGIN_PATH == pathname) {
+    console.log('redirected because of trying to access to login path with access token'); // 접근 거부
+    return NextResponse.redirect(new URL('/success', req.url)); // 로그인 성공 직후의 동작 처리
   }
 
   return NextResponse.next();

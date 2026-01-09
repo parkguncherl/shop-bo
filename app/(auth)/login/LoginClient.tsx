@@ -3,23 +3,20 @@
 import React, { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import Link from 'next/link';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useAuthStore } from '../../../stores';
-import { signIn, useSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { toastError, toastSuccess } from '../../../components';
 import styles from '../../../styles/login.module.scss';
-import { useRouter } from 'next/navigation';
 import { FindPassPop, FirstPassChangePop } from '../../../components/popup/system/login';
 import FormInput from '../../../components/FormInput';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { authApi, Timer, YupSchema } from '../../../libs';
-import { ApiResponseListSelectFavorites, LoginRequest, LoginResponse, SelectFavorites } from '../../../generated';
+import { Timer, YupSchema } from '../../../libs';
+import { LoginRequest, LoginResponse } from '../../../generated';
 import { SubmitErrorHandler } from 'react-hook-form/dist/types/form';
 import { deleteCookie, getCookie, setCookie } from 'cookies-next';
 import { CheckBox } from '../../../components/CheckBox';
 import { LOCAL_STORAGE_WMS_HISTORY, Otp } from '../../../libs/const';
-import { toast } from 'react-toastify';
-import Loading from '../../../components/Loading';
 import { UAParser } from 'ua-parser-js';
 
 export interface LoginVerificationFields {
@@ -36,10 +33,6 @@ export interface LoginVerificationFields {
 const LoginClient = () => {
   /** 전역 상태 */
   const [onVerification, modalType, onSendOtp, openModal] = useAuthStore((s) => [s.onVerification, s.modalType, s.onSendOtp, s.openModal, s.closeModal]);
-
-  /** provided by provider */
-  const session = useSession();
-  const router = useRouter();
 
   /** local state */
   const [otpNo, setOtpNo] = useState<string>('000000');
@@ -68,6 +61,8 @@ const LoginClient = () => {
       os: result.os.name || 'Unknown',
       browser: result.browser.name || 'Unknown',
     });
+
+    localStorage.removeItem(LOCAL_STORAGE_WMS_HISTORY); // 로그인 페이지 랜더링 시(proxy 차원의 제제 부재한 경우) 즉시 동작
   }, []);
 
   useEffect(() => {
@@ -141,31 +136,6 @@ const LoginClient = () => {
     }
   }, [isWatingOtp]);
 
-  // 세션이 생겼을때 즐겨찾기 목록 가져오기
-  const { refetch: favRefetch } = useQuery({
-    queryKey: [],
-    queryFn: () => authApi.get<ApiResponseListSelectFavorites>('/mypage/favorites', {}),
-    enabled: false, // 쿼리가 자동으로 실행되지 않도록 설정
-  });
-
-  const processAfterSuccessOfLogin = async () => {
-    if (session && session.status === 'authenticated' && session.data?.user) {
-      const myLocalStorage = LOCAL_STORAGE_WMS_HISTORY;
-
-      const { data: favorites } = await favRefetch(); // 데이터가 로드될 때까지 기다림
-      const favHistoryList = favorites?.data?.body?.map((menu: SelectFavorites) => ({
-        histMenuNm: menu.menuNm,
-        histMenuUri: menu.menuUri,
-        histParamList: [],
-      }));
-      if (favHistoryList && favHistoryList.length > 0) {
-        localStorage.setItem(myLocalStorage, JSON.stringify(favHistoryList));
-      }
-
-      router.refresh(); // proxy에 의한 리다리엑팅 동작을 이용함
-    }
-  };
-
   // otp 번호 재전송
   const handleOtp = (e?: React.MouseEvent<HTMLButtonElement>) => {
     if (e) {
@@ -218,14 +188,10 @@ const LoginClient = () => {
       isMobileLogin,
     });
 
+    /** 실패한 경우 */
     if (result?.error) {
       return toastError(result.error);
     }
-
-    // if (result?.ok) {
-    //   toast.dismiss();
-    //   processAfterSuccessOfLogin();
-    // }
   };
 
   // 아이디, 비밀번호 정상 입력시
@@ -253,123 +219,117 @@ const LoginClient = () => {
     }
   };
 
-  if (session.status == 'unauthenticated') {
-    // 인증되지 아니한 경우 한정으로 로그인 페이지 유효
-    localStorage.removeItem(LOCAL_STORAGE_WMS_HISTORY);
-    return (
-      <div className={styles.login_box_group}>
-        <div className={styles.login_box}>
-          <form>
-            <div className={styles.content}>
-              <div className={styles.logo}>
-                <span className={styles.img}></span>
+  return (
+    <div className={styles.login_box_group}>
+      <div className={styles.login_box}>
+        <form>
+          <div className={styles.content}>
+            <div className={styles.logo}>
+              <span className={styles.img}></span>
+            </div>
+            <div className={`${styles.login_inp} ${validAccount ? styles.id_pw_close : styles.id_pw_open}`}>
+              <div className={styles.inp_id}>
+                <FormInput<LoginVerificationFields>
+                  control={control}
+                  name={'loginId'}
+                  onKeyDown={(e) => {
+                    setIsCapsLockOn(e.getModifierState('CapsLock'));
+                    onKeyDownEnter(e as unknown as KeyboardEvent);
+                  }}
+                  inputType={'login'}
+                />
               </div>
-              <div className={`${styles.login_inp} ${validAccount ? styles.id_pw_close : styles.id_pw_open}`}>
-                <div className={styles.inp_id}>
-                  <FormInput<LoginVerificationFields>
-                    control={control}
-                    name={'loginId'}
-                    onKeyDown={(e) => {
-                      setIsCapsLockOn(e.getModifierState('CapsLock'));
-                      onKeyDownEnter(e as unknown as KeyboardEvent);
-                    }}
-                    inputType={'login'}
-                  />
-                </div>
-                <div className={styles.inp_pw}>
-                  <FormInput<LoginVerificationFields>
-                    control={control}
-                    name={'password'}
-                    type={isLoginPassVisible ? 'password' : 'text'}
-                    onKeyDown={(e) => {
-                      setIsCapsLockOn(e.getModifierState('CapsLock'));
-                      onKeyDownEnter(e as unknown as KeyboardEvent);
-                    }}
-                    inputType={'login'}
-                  />
-                  <button
-                    type={'button'}
-                    className={`${styles.ico_eye} ${!isLoginPassVisible ? styles.on : ''}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setIsLoginPassVisible(!isLoginPassVisible);
-                    }}
-                  />
-                </div>
-                {isCapsLockOn && (
-                  <div className={styles.inp_txt}>
-                    <span>{`CapsLock이 켜져 있습니다!`}</span>
-                  </div>
-                )}
-                <div className={styles.inp_certification}>
-                  <div className={styles.result_box}>
-                    <label htmlFor={'inp_certification'}>{'인증번호 입력'}</label>
-                    <input
-                      type={'text'}
-                      id={'inp_certification'}
-                      value={otpNo || ''}
-                      onChange={(e) => {
-                        setOtpNo(e.target.value);
-                      }}
-                      onKeyDown={(e) => {
-                        onKeyDownEnter(e as unknown as KeyboardEvent);
-                      }}
-                      placeholder={'인증번호를 입력하세요.'}
-                    />
-                  </div>
-                  {!isWatingOtp && (
-                    <button onClick={handleOtp}>
-                      {'인증번호'}
-                      <br />
-                      {'다시받기'}
-                    </button>
-                  )}
-                </div>
+              <div className={styles.inp_pw}>
+                <FormInput<LoginVerificationFields>
+                  control={control}
+                  name={'password'}
+                  type={isLoginPassVisible ? 'password' : 'text'}
+                  onKeyDown={(e) => {
+                    setIsCapsLockOn(e.getModifierState('CapsLock'));
+                    onKeyDownEnter(e as unknown as KeyboardEvent);
+                  }}
+                  inputType={'login'}
+                />
+                <button
+                  type={'button'}
+                  className={`${styles.ico_eye} ${!isLoginPassVisible ? styles.on : ''}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsLoginPassVisible(!isLoginPassVisible);
+                  }}
+                />
               </div>
-              {isWatingOtp && (
+              {isCapsLockOn && (
                 <div className={styles.inp_txt}>
-                  <span>
-                    {'입력까지 남은시간'}[{Math.round(time / 1000)} {'초]입니다.'}
-                  </span>
+                  <span>{`CapsLock이 켜져 있습니다!`}</span>
                 </div>
               )}
-              <div className={`${styles.login_btn} login_btn`}>
-                {!validAccount && (
-                  <div className={`${styles.chk_box}`}>
-                    <span style={{ minWidth: 120 }}>
-                      <CheckBox
-                        checked={checkedSaveId}
-                        onChange={(e) => {
-                          setCheckedSaveId(e.target.checked);
-                        }}
-                      >
-                        {'아이디 저장하기'}
-                      </CheckBox>
-                    </span>
-                  </div>
-                )}
-                <button className={styles.clickbtn} onClick={validAccount ? handleLogin : handleSubmit(onValid, onInvalid)} disabled={verificationIsLoading}>
-                  {'로그인'}
-                </button>
-                {!validAccount && (
-                  <div className={styles.etc_btn}>
-                    <Link href={'#'} onClick={findPassFn}>
-                      {'비밀번호 찾기'}
-                    </Link>
-                  </div>
+              <div className={styles.inp_certification}>
+                <div className={styles.result_box}>
+                  <label htmlFor={'inp_certification'}>{'인증번호 입력'}</label>
+                  <input
+                    type={'text'}
+                    id={'inp_certification'}
+                    value={otpNo || ''}
+                    onChange={(e) => {
+                      setOtpNo(e.target.value);
+                    }}
+                    onKeyDown={(e) => {
+                      onKeyDownEnter(e as unknown as KeyboardEvent);
+                    }}
+                    placeholder={'인증번호를 입력하세요.'}
+                  />
+                </div>
+                {!isWatingOtp && (
+                  <button onClick={handleOtp}>
+                    {'인증번호'}
+                    <br />
+                    {'다시받기'}
+                  </button>
                 )}
               </div>
             </div>
-          </form>
-          <div className={styles.login_footer}>COPYRIGHT 2024 © WISE NETWORK. ALL RIGHTS RESERVED.</div>
-        </div>
-        {modalType.type === 'FIRST' && modalType.active && <FirstPassChangePop loginId={getValues().loginId} country={'ko'} changeType={changeType} />}
-        {modalType.type === 'FINDPASS' && modalType.active && <FindPassPop />}
+            {isWatingOtp && (
+              <div className={styles.inp_txt}>
+                <span>
+                  {'입력까지 남은시간'}[{Math.round(time / 1000)} {'초]입니다.'}
+                </span>
+              </div>
+            )}
+            <div className={`${styles.login_btn} login_btn`}>
+              {!validAccount && (
+                <div className={`${styles.chk_box}`}>
+                  <span style={{ minWidth: 120 }}>
+                    <CheckBox
+                      checked={checkedSaveId}
+                      onChange={(e) => {
+                        setCheckedSaveId(e.target.checked);
+                      }}
+                    >
+                      {'아이디 저장하기'}
+                    </CheckBox>
+                  </span>
+                </div>
+              )}
+              <button className={styles.clickbtn} onClick={validAccount ? handleLogin : handleSubmit(onValid, onInvalid)} disabled={verificationIsLoading}>
+                {'로그인'}
+              </button>
+              {!validAccount && (
+                <div className={styles.etc_btn}>
+                  <Link href={'#'} onClick={findPassFn}>
+                    {'비밀번호 찾기'}
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </form>
+        <div className={styles.login_footer}>COPYRIGHT 2024 © WISE NETWORK. ALL RIGHTS RESERVED.</div>
       </div>
-    );
-  } else {
-    return <Loading />;
-  }
+      {modalType.type === 'FIRST' && modalType.active && <FirstPassChangePop loginId={getValues().loginId} country={'ko'} changeType={changeType} />}
+      {modalType.type === 'FINDPASS' && modalType.active && <FindPassPop />}
+    </div>
+  );
 };
 
 export default LoginClient;
