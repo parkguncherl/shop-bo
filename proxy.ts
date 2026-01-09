@@ -24,14 +24,14 @@ export async function proxy(req: NextRequest) {
 
   // 토큰이 존재하는 상태에서 공공 경로로 향하는 경우
   if (hasToken && PUBLIC_PATHS.includes(pathname)) {
-    console.log('redirected because of trying to access to public path without access token'); // 접근 거부
-    return NextResponse.redirect(new URL('/', req.url));
-  }
-
-  // 토큰이 존재하는 상태에서 로그인 경로로 향하는 경우
-  if (hasToken && LOGIN_PATH == pathname) {
-    console.log('redirected because of trying to access to login path with access token'); // 접근 거부
-    return NextResponse.redirect(new URL('/success', req.url)); // 로그인 성공 직후의 동작 처리
+    if (pathname == LOGIN_PATH) {
+      // 토큰이 존재하는 상태에서 로그인 경로로 향하는 경우
+      console.log('redirected because of trying to access to login path with access token'); // 로그인 성공 직후로 간주
+      return NextResponse.redirect(new URL('/success', req.url)); // 로그인 성공 직후의 동작 처리
+    } else {
+      console.log('redirected because of trying to access to public path without access token'); // 접근 거부
+      return NextResponse.redirect(new URL('/', req.url));
+    }
   }
 
   return NextResponse.next();

@@ -15,6 +15,7 @@ import { toastError } from '../../../components';
  * 로그인 성공 직후 리다이렉트 되는 영역
  * 해당 영역에서 로그인 직후 필요한 동작(초기 구성 등) 처리
  * 또한 해당 영역에서 리다이렉트 경로 지정 가능
+ * 사용자가 임의로 진입할 수도 있다고 전제하고 설계
  * */
 const LoginSuccess = () => {
   /** 세션 기반으로 로그인 직후 초기 동작 정의 */
@@ -31,12 +32,14 @@ const LoginSuccess = () => {
   });
 
   useEffect(() => {
-    if (session.status == 'authenticated' && session.data?.user && session.data.token.errMessage == undefined) {
-      // 리다이렉트 이후 인증 상태 정상인 경우
-      processAfterSuccess();
-    } else {
+    if (session.status == 'unauthenticated') {
       // 비정상일 시 로그아웃 절차 전개
       processAfterFailure();
+    } else {
+      if (session.status == 'authenticated' && session.data?.user && session.data.token.errMessage == undefined) {
+        // 리다이렉트 이후 인증 상태 정상인 경우
+        processAfterSuccess();
+      }
     }
   }, [session]);
 
