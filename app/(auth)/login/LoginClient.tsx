@@ -41,8 +41,10 @@ const LoginClient = () => {
   const [isCapsLockOn, setIsCapsLockOn] = useState(false);
   const [isWatingOtp, setIsWatingOtp] = useState(false);
   const [isLoginPassVisible, setIsLoginPassVisible] = useState(true); // 비밀번호 노출 여부(입력 시)
-  const [checkedSaveId, setCheckedSaveId] = useState(!!getCookie('smartLoginId')); // id 저장 여부
+
+  const [persistTypedId, setPersistTypedId] = useState(false); // id 저장 여부
   const [time, setTime] = useState(Otp.duration);
+
   // 모바일 체크
   const [isMobileLogin, setIsMobileLogin] = useState<string>('N');
   const [deviceInfo, setDeviceInfo] = useState<{
@@ -55,6 +57,7 @@ const LoginClient = () => {
     // 최초 1회 동작 영역
     const parser = new UAParser();
     const result = parser.getResult();
+    setPersistTypedId(!!getCookie('smartLoginId')); // 최초 시점에 브라우저에 체크 활성화 값이 존재하는지 확인
 
     setDeviceInfo({
       deviceType: result.device.type || 'desktop',
@@ -174,7 +177,7 @@ const LoginClient = () => {
     date.setDate(date.getDate() + 7); // 일
 
     // id 저장하기 버튼 체크
-    if (checkedSaveId) {
+    if (persistTypedId) {
       setCookie('smartLoginId', loginId, { expires: date });
     } else {
       deleteCookie('smartLoginId');
@@ -301,9 +304,9 @@ const LoginClient = () => {
                 <div className={`${styles.chk_box}`}>
                   <span style={{ minWidth: 120 }}>
                     <CheckBox
-                      checked={checkedSaveId}
+                      checked={persistTypedId}
                       onChange={(e) => {
-                        setCheckedSaveId(e.target.checked);
+                        setPersistTypedId(e.target.checked);
                       }}
                     >
                       {'아이디 저장하기'}
