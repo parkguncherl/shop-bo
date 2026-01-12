@@ -201,7 +201,7 @@ export const LeftNavChildren = ({ closed = false }: Props) => {
   }
 
   return (
-    <aside className={`${closed ? 'on' : ''}`}>
+    <aside>
       <ul>
         <li
           className="ico_user"

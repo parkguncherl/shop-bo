@@ -1,9 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
-import { LeftMenu } from '../../../generated';
+import React, { useEffect, useState } from 'react';
+import { ApiResponseListLeftMenu, LeftMenu } from '../../../generated';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import { authApi } from '../../../libs';
+import { toastError } from '../../ToastMessage';
+import { useSession } from 'next-auth/react';
 
 interface IMenu {
   menuNm?: string;
@@ -12,9 +16,7 @@ interface IMenu {
   menuUri?: string;
   items?: Array<IMenu>;
 }
-interface Props {
-  closed?: boolean;
-}
+interface Props {}
 
 const hasChildren = (item: IMenu) => {
   const { items: children } = item;
@@ -118,8 +120,27 @@ const ChildLevel = ({ item }: { item: IMenu }) => {
 /**
  * nav 태그 이하에서 사용 가능한 고수준 client side 컴포넌트
  * */
-const NavList = ({ closed = false }: Props) => {
+const NavList = () => {
+  const sessions = useSession();
+
   const [menuList, setMenuList] = useState<LeftMenu[]>([]);
+
+  const { data: menus, isSuccess: isMenuListFetchSuccess } = useQuery({
+    queryKey: ['/menu/leftMenu'],
+    queryFn: () => authApi.get<ApiResponseListLeftMenu>('/menu/leftMenu'),
+    enabled: sessions.status === 'authenticated',
+  });
+
+  useEffect(() => {
+    if (isMenuListFetchSuccess) {
+      const { resultCode, body, resultMessage } = menus.data;
+      if (resultCode == 200) {
+        setMenuList(body || []);
+      } else {
+        toastError(resultMessage);
+      }
+    }
+  }, [menus, isMenuListFetchSuccess]);
 
   return (
     <ul>
