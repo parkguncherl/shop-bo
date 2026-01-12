@@ -1,9 +1,14 @@
 import React from 'react';
-import styles from '../../styles/layout/layout.module.scss';
+import stylesForLayout from '../../styles/layout/layout.module.scss';
+import stylesForHeader from '../../styles/layout/header.module.scss';
+
 import { Header } from '../../components/layout/Header';
 import NavList from '../../components/layout/leftNav/NavList';
 import CurTime from '../../components/layout/leftNav/CurTime';
 import BriefUserInfo from '../../components/layout/leftNav/BriefUserInfo';
+import Link from 'next/link';
+import { TabMenu } from '../../components/layout/TabMenu';
+import SignOutBtn from '../../components/layout/header/SignOutBtn';
 
 /**
  * (server side)AppLayout
@@ -11,9 +16,19 @@ import BriefUserInfo from '../../components/layout/leftNav/BriefUserInfo';
  * */
 const layout = async ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className={`appLayout ${styles.layout}`}>
-      <Header />
-      <div className={`container ${styles.container}`}>
+    <div className={`appLayout ${stylesForLayout.layout}`}>
+      <header className={`${stylesForHeader.header}`}>
+        <div className={stylesForHeader.left}>
+          <h1>
+            <Link href={'/'}>{'logo'}</Link>
+          </h1>
+        </div>
+        {/*<TabMenu />*/}
+        <div className={stylesForHeader.right}>
+          <SignOutBtn />
+        </div>
+      </header>
+      <div className={`container ${stylesForLayout.container}`}>
         <aside>
           <ul>
             <li className="ico_user">
@@ -27,7 +42,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
             <NavList />
           </nav>
         </aside>
-        <div className={`content ${styles.content}`}>{children}</div>
+        <div className={`content ${stylesForLayout.content}`}>{children}</div>
       </div>
     </div>
   );
