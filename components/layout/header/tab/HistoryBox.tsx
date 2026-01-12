@@ -4,15 +4,20 @@ import { ReactSortable, SortableEvent } from 'react-sortablejs';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { redirect, RedirectType, usePathname } from 'next/navigation';
-import { HistoryType, useCommonStore, useMypageStore } from '../../../../stores';
+import { useCommonStore, useMypageStore } from '../../../../stores';
 import { LOCAL_STORAGE_HISTORY, LOCAL_STORAGE_WMS_HISTORY } from '../../../../libs/const';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 
 interface Props {
   ref?: React.Ref<{ closeAllTabs: () => void }>;
 }
 
+interface HistoryType {
+  id: number;
+  histMenuNm: string;
+  histMenuUri: string;
+}
 // 이하 local type, interface
 interface ExtendedSortableEvent extends SortableEvent {
   originalEvent: DragEvent;
@@ -23,17 +28,17 @@ type MenuHistory = {
   histParamList: [];
 };
 
-const HistoryTab = ({ ref }: Props) => {
+const HistoryBox = ({ ref }: Props) => {
   /** context hook(provided by Root Provider) */
   const session = useSession();
   const pathname = usePathname();
 
   const listRef = useRef<HTMLDivElement>(null); // list Ref 생성
   const listDivRef = useRef<HTMLDivElement>(null); // 전체 list div Ref 생성
+  const contextMenuRef = useRef<HTMLUListElement>(null);
 
   /** 전역 상태 */
   const [regFavoritesAll] = useMypageStore((s) => [s.regFavoritesAll]);
-  const [historyList, setHistoryList] = useCommonStore((s) => [s.historyList, s.setHistoryList]);
 
   /** 지역(local) states */
   const [activeIndex, setActiveIndex] = useState<number | null>(0); // 활성화 탭
@@ -45,6 +50,8 @@ const HistoryTab = ({ ref }: Props) => {
   const [authGroupCd] = useState<string | null>(session.data?.user?.authCd ? session.data?.user.authCd?.substring(0, 1) : '');
   const [hoverIndex, setHoverIndex] = useState<number | null>(null); // Hover 상태 관리
   const [localStorageHistory] = useState<string>(authGroupCd === '3' ? LOCAL_STORAGE_HISTORY : LOCAL_STORAGE_WMS_HISTORY);
+
+  const [historyList, setHistoryList] = useState<HistoryType[]>([]);
 
   // 로컬스토리지 업데이트
   const updateHistoryListInStorage = (updatedList: HistoryType[]) => {
@@ -64,14 +71,13 @@ const HistoryTab = ({ ref }: Props) => {
     const endIndex = event.newIndex ?? -1; // 드래그 끝 인덱스
 
     if (startIndex >= 0 && endIndex >= 0 && startIndex !== endIndex) {
-      const updatedList = [...list];
+      const updatedList = [...historyList];
       const [movedItem] = updatedList.splice(startIndex, 1); // 시작 인덱스에서 아이템 제거
       updatedList.splice(endIndex, 0, movedItem); // 끝 인덱스에 아이템 삽입
 
-      setList(updatedList); // 리스트 상태 업데이트
+      setHistoryList(updatedList); // 리스트 상태 업데이트
       updateHistoryListInStorage(updatedList);
       // 드래그 종료된 페이지로 이동
-      //router.push(updatedList[endIndex].histMenuUri);
       redirect(updatedList[endIndex].histMenuUri, RedirectType.push);
     }
 
@@ -81,11 +87,9 @@ const HistoryTab = ({ ref }: Props) => {
 
   // 활성화 탭
   const handleActivateItem = (index: number, histMenuUri: string) => {
-    //setActiveIndex(index); // 활성화된 div의 인덱스 업데이트
     updateButtonVisibility();
     if (histMenuUri !== pathname) {
       setActiveIndex(index);
-      //router.push(histMenuUri || '');
       redirect(histMenuUri || '', RedirectType.push);
     }
   };
@@ -100,7 +104,7 @@ const HistoryTab = ({ ref }: Props) => {
     }
   }, [pathname, historyList]);
 
-  // 닫기
+  // 닫힘 동작
   const closeHistory = (index: number, historyList: HistoryType[]) => {
     updateButtonVisibility();
     // 리스트에서 선택된 히스토리를 삭제
@@ -112,13 +116,11 @@ const HistoryTab = ({ ref }: Props) => {
 
     // 남은 히스토리가 없으면 홈 페이지로 이동
     if (updatedList.length === 0) {
-      //router.push('/');
       redirect('/', RedirectType.push);
     } else {
       // 다음 히스토리가 있을 경우 해당 히스토리의 uri로 이동
       const nextIndex = index < updatedList.length ? index : updatedList.length - 1;
       const nextHistMenuUri = updatedList[nextIndex].histMenuUri;
-      //router.push(nextHistMenuUri);
       redirect(nextHistMenuUri, RedirectType.push);
     }
   };
@@ -177,17 +179,17 @@ const HistoryTab = ({ ref }: Props) => {
     // 상태 초기화
     setHistoryList([]);
     setActiveIndex(null);
-    //router.push('/', undefined, { shallow: true });
     redirect('/', RedirectType.push);
   };
+  const queryClient = useQueryClient();
 
   const { mutate: regFavoritesAllMutate } = useMutation(regFavoritesAll, {
     onSuccess: async (e) => {
-      const { resultCode, body, resultMessage } = e.data;
+      const { resultCode } = e.data;
       try {
         if (resultCode === 200) {
           toastSuccess('즐겨찾기 등록에 성공했습니다.');
-          // favRefetch(); todo key 값 기반 invalidation 으로 대체
+          await queryClient.invalidateQueries({ queryKey: ['favoriteList'] }); // 즐겨찾기 영역 cached fetch 무효화
         } else {
           console.log(e);
           toastError('등록 과정 중 문제 발생');
@@ -278,9 +280,7 @@ const HistoryTab = ({ ref }: Props) => {
     }
   };
 
-  //다른 곳 클릭시 전체탭 닫기 사라지게하기
-  const contextMenuRef = useRef<HTMLUListElement>(null);
-
+  // box 이외 영역 클릭 시 메뉴 비활성 동작
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (contextMenuRef.current && !contextMenuRef.current.contains(event.target as Node)) {
@@ -297,94 +297,82 @@ const HistoryTab = ({ ref }: Props) => {
     };
   }, []);
 
-  const [list, setList] = useState<any[]>([]);
-  useEffect(() => {
-    updateButtonVisibility();
-    const updateList = historyList.map((item, index) => ({
-      ...item,
-      id: index, // ReactSortable에 필요한 고유 ID 추가
-    }));
-    setList(updateList);
-  }, [historyList]);
-
+  // 3800
   return (
-    <div className="historyTab">
-      <div className="historyBox" onContextMenu={handleContextMenu}>
-        <div className="list" ref={listDivRef}>
-          <div style={{ transform: `translateX(${translateXValue}px)` }} ref={listRef}>
-            <ReactSortable
-              list={list}
-              setList={setList}
-              animation={200} // 드래그 애니메이션
-              multiDrag
-              swap
-              forceFallback
-              onStart={(event: any) => dragStart(event)}
-              onEnd={(event: any) => dragEnd(event)}
-            >
-              {list.map((item, index) => {
-                // 조건에 따라 클래스 설정
-                const isHover = index === hoverIndex;
-                const active = activeIndex || 0;
-                const activePrev = index === active - 1;
-                const isNotHover = hoverIndex !== null && index === hoverIndex - 1;
-
-                return (
-                  <div
-                    key={index}
-                    className={`item-${index} ${isHover ? 'hover' : ''} ${isNotHover ? 'notHover' : ''} ${activePrev ? 'notHover' : ''} ${
-                      index === activeIndex && pathname !== '/' && pathname !== '' ? 'on' : ''
-                    }`}
-                    onMouseEnter={() => setHoverIndex(index)} // 마우스가 들어오면 hover 상태 설정
-                    onMouseLeave={() => setHoverIndex(null)} // 마우스가 나가면 hover 상태 초기화
-                  >
-                    <div onClick={() => handleActivateItem(index, item.histMenuUri)}>{item.histMenuNm}</div>
-                    <button onClick={() => closeHistory(index, historyList)}>
-                      <span></span>
-                      <span></span>
-                    </button>
-                  </div>
-                );
-              })}
-            </ReactSortable>
-          </div>
-        </div>
-        <div className="listBtn" style={{ display: isButtonVisible ? 'flex' : 'none' }}>
-          <button onClick={moveLeft}>왼쪽</button>
-          <button onClick={moveRight}>오른쪽</button>
-        </div>
-        {contextMenu.visible && (
-          <ul
-            className={`rightClickMenu ${contextMenu.visible ? 'on' : ''}`}
-            ref={contextMenuRef}
-            style={{
-              top: `${contextMenu.y}px`,
-              left: `${contextMenu.x}px`,
-            }}
+    <div className="historyBox" onContextMenu={handleContextMenu}>
+      <div className="list" ref={listDivRef}>
+        <div style={{ transform: `translateX(${translateXValue}px)` }} ref={listRef}>
+          <ReactSortable
+            list={historyList}
+            setList={setHistoryList}
+            animation={200} // 드래그 애니메이션
+            multiDrag
+            swap
+            forceFallback
+            onStart={(event: any) => dragStart(event)}
+            onEnd={(event: any) => dragEnd(event)}
           >
-            <li>
-              <button onClick={makeFavorite}>· 즐겨찾기정보 일괄 생성</button>
-            </li>
-            <li>
-              <button onClick={closeAllTabs}>· 전체 탭 닫기</button>
-            </li>
-            <li>
-              <button onClick={closeOtherTabs}>· 다른 탭 닫기</button>
-            </li>
-            <li>
-              <button onClick={closeRightTabs}>· 우측 탭 닫기</button>
-            </li>
-            <li>
-              <button onClick={closeLeftTabs}>· 왼쪽 탭 닫기</button>
-            </li>
-            <li>
-              <button onClick={closeCurrentTab}>· 현재 탭 닫기</button>
-            </li>
-          </ul>
-        )}
+            {historyList.map((item, index) => {
+              const isHover = index === hoverIndex;
+              const active = activeIndex || 0;
+              const activePrev = index === active - 1;
+              const isNotHover = hoverIndex !== null && index === hoverIndex - 1;
+
+              return (
+                <div
+                  key={index}
+                  className={`item-${index} ${isHover ? 'hover' : ''} ${isNotHover ? 'notHover' : ''} ${activePrev ? 'notHover' : ''} ${
+                    index === activeIndex && pathname !== '/' && pathname !== '' ? 'on' : ''
+                  }`}
+                  onMouseEnter={() => setHoverIndex(index)} // 마우스가 들어오면 hover 상태 설정
+                  onMouseLeave={() => setHoverIndex(null)} // 마우스가 나가면 hover 상태 초기화
+                >
+                  <div onClick={() => handleActivateItem(index, item.histMenuUri)}>{item.histMenuNm}</div>
+                  <button onClick={() => closeHistory(index, historyList)}>
+                    <span></span>
+                    <span></span>
+                  </button>
+                </div>
+              );
+            })}
+          </ReactSortable>
+        </div>
       </div>
+      <div className="listBtn" style={{ display: isButtonVisible ? 'flex' : 'none' }}>
+        <button onClick={moveLeft}>왼쪽</button>
+        <button onClick={moveRight}>오른쪽</button>
+      </div>
+      {contextMenu.visible && (
+        <ul
+          className={`rightClickMenu ${contextMenu.visible ? 'on' : ''}`}
+          ref={contextMenuRef}
+          style={{
+            top: `${contextMenu.y}px`,
+            left: `${contextMenu.x}px`,
+          }}
+        >
+          <li>
+            <button onClick={makeFavorite}>· 즐겨찾기정보 일괄 생성</button>
+          </li>
+          <li>
+            <button onClick={closeAllTabs}>· 전체 탭 닫기</button>
+          </li>
+          <li>
+            <button onClick={closeOtherTabs}>· 다른 탭 닫기</button>
+          </li>
+          <li>
+            <button onClick={closeRightTabs}>· 우측 탭 닫기</button>
+          </li>
+          <li>
+            <button onClick={closeLeftTabs}>· 왼쪽 탭 닫기</button>
+          </li>
+          <li>
+            <button onClick={closeCurrentTab}>· 현재 탭 닫기</button>
+          </li>
+        </ul>
+      )}
     </div>
   );
 };
 
-export default HistoryTab;
+export default HistoryBox;

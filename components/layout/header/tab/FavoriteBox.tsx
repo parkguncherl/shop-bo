@@ -5,11 +5,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { redirect, RedirectType } from 'next/navigation';
 import { useMypageStore } from '../../../../stores';
-import { LOCAL_STORAGE_HISTORY, LOCAL_STORAGE_WMS_HISTORY } from '../../../../libs/const';
+import { LOCAL_STORAGE_WMS_HISTORY } from '../../../../libs/const';
 import { useQuery } from '@tanstack/react-query';
 import { toastError } from '../../../ToastMessage';
 import Link from 'next/link';
-import { ApiResponseListSelectFavorites } from '../../../../generated';
+import { ApiResponseListSelectFavorites, SelectFavorites } from '../../../../generated';
 import { authApi } from '../../../../libs';
 
 interface Props {}
@@ -24,8 +24,6 @@ const FavoriteBox = () => {
 
   /** 지역(local) states */
   const [favoriteBtn, setFavoriteBtn] = useState(false); // 즐겨찾기 onoff
-  const [authGroupCd] = useState<string>(session.data?.user?.authCd ? session.data?.user.authCd?.substring(0, 1) : '');
-  const [localStorageHistory] = useState<string>(authGroupCd === '3' ? LOCAL_STORAGE_HISTORY : LOCAL_STORAGE_WMS_HISTORY);
 
   // 즐겨찾기 버튼
   const handleFavoriteBtnOnOff = () => {
@@ -63,24 +61,20 @@ const FavoriteBox = () => {
 
   // 즐겨찾기 링크
   const handleFavoriteAllOpen = () => {
-    localStorage.removeItem(localStorageHistory);
-    // todo
-    // // 컨텍스트 메뉴 닫기
-    // closeContextMenu();
-    // // 상태 초기화
-    // const favHistoryList = favoriteList.map((menu: SelectFavorites) => ({
-    //   histMenuNm: menu.menuNm,
-    //   histMenuUri: menu.menuUri,
-    //   histParamList: [],
-    // }));
-    // localStorage.setItem(authGroupCd === '3' ? LOCAL_STORAGE_HISTORY : LOCAL_STORAGE_WMS_HISTORY, JSON.stringify(favHistoryList));
-    // //setHistoryList(favHistoryList && []);
-    // location.reload();
+    localStorage.removeItem(LOCAL_STORAGE_WMS_HISTORY);
+    // 상태 초기화
+    const favHistoryList = favoriteList.map((menu: SelectFavorites) => ({
+      histMenuNm: menu.menuNm,
+      histMenuUri: menu.menuUri,
+      histParamList: [],
+    }));
+    localStorage.setItem(LOCAL_STORAGE_WMS_HISTORY, JSON.stringify(favHistoryList));
+    setFavoriteList(favHistoryList && []);
+    location.reload();
   };
 
-  // todo queryKey 에 적절한 Key 추가하여 타 영역에서 invalidation 가능토록 하기
   const { data: favoriteData, isSuccess: isFavSuccess } = useQuery({
-    queryKey: [],
+    queryKey: ['favoriteList'],
     queryFn: () => authApi.get<ApiResponseListSelectFavorites>('/mypage/favorites', {}),
   });
 

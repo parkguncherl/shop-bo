@@ -174,9 +174,10 @@ export const TabMenu = ({ ref }: Props) => {
       histMenuUri: menu.menuUri,
       histParamList: [],
     }));
+    console.log('favHistoryList: ', favHistoryList);
     localStorage.setItem(authGroupCd === '3' ? LOCAL_STORAGE_HISTORY : LOCAL_STORAGE_WMS_HISTORY, JSON.stringify(favHistoryList));
-    //setHistoryList(favHistoryList && []);
-    location.reload();
+    setHistoryList(favHistoryList && []);
+    //location.reload();
   };
 
   // listRef와 listDivRef 크기 비교
