@@ -1,5 +1,4 @@
 'use client';
-import styles from '../../../../styles/error.module.scss';
 import { useRouter } from 'next/navigation';
 
 /**
@@ -8,9 +7,9 @@ import { useRouter } from 'next/navigation';
 const NoAuthClient = () => {
   const router = useRouter();
   return (
-    <div className={styles.wrap}>
-      <div className={styles.error_box}>
-        <div className={styles.img}></div>
+    <div>
+      <div>
+        <div></div>
         <dl>
           <dt>
             {'접근 권한이'} <span>{'없습니다.'}</span>
