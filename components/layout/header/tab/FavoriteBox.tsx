@@ -20,7 +20,7 @@ const FavoriteBox = () => {
 
   const containerRef = useRef<HTMLDivElement>(null); // 즐겨찾기 div 영역
 
-  const [favoriteList, setFavoriteList] = useMypageStore((s) => [s.favoriteList, s.setFavoriteList]);
+  const [favoriteList, setFavoriteList] = useMypageStore((s) => [s.favoriteList, s.setFavoriteList]); // todo 현재는 다른 영역에서의 사용이 식별되어 전역 상태 유지하나 이후 불필요하다 여겨질 시 즉시 지역 상태로 전환할 것!
 
   /** 지역(local) states */
   const [favoriteBtn, setFavoriteBtn] = useState(false); // 즐겨찾기 onoff
@@ -59,7 +59,7 @@ const FavoriteBox = () => {
     }
   };
 
-  // 즐겨찾기 링크
+  // 즐겨찾기 목록 전체 펼침
   const handleFavoriteAllOpen = () => {
     localStorage.removeItem(LOCAL_STORAGE_WMS_HISTORY);
     // 상태 초기화
@@ -69,8 +69,8 @@ const FavoriteBox = () => {
       histParamList: [],
     }));
     localStorage.setItem(LOCAL_STORAGE_WMS_HISTORY, JSON.stringify(favHistoryList));
-    setFavoriteList(favHistoryList && []);
-    location.reload();
+    //setFavoriteList(favHistoryList && []);
+    //location.reload(); todo
   };
 
   const { data: favoriteData, isSuccess: isFavSuccess } = useQuery({
