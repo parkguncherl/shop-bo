@@ -2,10 +2,6 @@
 
 import React from 'react';
 import { useSession } from 'next-auth/react';
-// import 'swiper/css';
-// import 'swiper/css/navigation';
-// import 'swiper/css/pagination';
-import styles from '../../../styles/mobile.module.scss'; // 경로 및 파일명 변경
 
 /**
  * 재고정보 메인 페이지 컴포넌트
