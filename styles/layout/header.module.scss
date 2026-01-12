@@ -181,49 +181,49 @@
     }
   }
   & .right {
-    & ul {
-      display: flex;
-      gap: 10px;
-      & li {
-        & button {
-          display: flex;
-          width: 30px;
-          height: 30px;
-          background: no-repeat center;
-          background-size: auto 70%;
-          text-indent: -9999em;
-          cursor: pointer;
-          &.ico_alarm {
-            position: relative;
-            background-image: url(../../public/images/ico_alarm.svg);
-            & span {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              position: absolute;
-              top: -2px;
-              left: 17px;
-              color: #fff;
-              text-indent: 0;
-              font-size: 11px;
-              font-weight: 500;
-              padding: 0 5px 1px 4px;
-              min-width: 18px;
-              box-sizing: border-box;
-              background-color: var(--red-color);
-              border-radius: 12px;
-            }
-          }
-          &.ico_logout {background-image: url(../../public/images/ico_logout.svg);}
-        }
-      }
-    }
-  }
-  &.wmsHeader {
+    //& ul {
+    //  display: flex;
+    //  gap: 10px;
+    //  & li {
+    //    & button {
+    //      display: flex;
+    //      width: 30px;
+    //      height: 30px;
+    //      background: no-repeat center;
+    //      background-size: auto 70%;
+    //      text-indent: -9999em;
+    //      cursor: pointer;
+    //      &.ico_alarm {
+    //        position: relative;
+    //        background-image: url(../../public/images/ico_alarm.svg);
+    //        & span {
+    //          display: flex;
+    //          justify-content: center;
+    //          align-items: center;
+    //          position: absolute;
+    //          top: -2px;
+    //          left: 17px;
+    //          color: #fff;
+    //          text-indent: 0;
+    //          font-size: 11px;
+    //          font-weight: 500;
+    //          padding: 0 5px 1px 4px;
+    //          min-width: 18px;
+    //          box-sizing: border-box;
+    //          background-color: var(--red-color);
+    //          border-radius: 12px;
+    //        }
+    //      }
+    //      &.ico_logout {background-image: url(../../public/images/ico_logout.svg);}
+    //    }
+    //  }
+    //}
+
     & .favoriteBox {
       right: 50px;
     }
-    & .right button {display: flex;
+    & > button {
+      display: flex;
       width: 30px;
       height: 30px;
       text-indent: -9999em;
@@ -232,6 +232,19 @@
       background-size: auto 70%;
     }
   }
+  //&.wmsHeader {
+  //  & .favoriteBox {
+  //    right: 50px;
+  //  }
+  //  & .right button {display: flex;
+  //    width: 30px;
+  //    height: 30px;
+  //    text-indent: -9999em;
+  //    cursor: pointer;
+  //    background: url(../../public/images/ico_logout.svg) no-repeat center;
+  //    background-size: auto 70%;
+  //  }
+  //}
   &.designMobileHeader {
     & .favoriteBox {
       right: 50px;
