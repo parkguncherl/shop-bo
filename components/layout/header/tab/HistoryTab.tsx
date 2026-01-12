@@ -1,16 +1,13 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useImperativeHandle } from 'react';
-import Link from 'next/link';
-import { LOCAL_STORAGE_HISTORY, LOCAL_STORAGE_WMS_HISTORY } from '../../libs/const';
-import { useCommonStore, useMypageStore, HistoryType } from '../../stores';
-import { useSession } from 'next-auth/react';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { toastError, toastSuccess } from '../ToastMessage';
-import { ApiResponseListSelectFavorites, SelectFavorites } from '../../generated';
-import { authApi } from '../../libs';
 import { ReactSortable, SortableEvent } from 'react-sortablejs';
+import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { useSession } from 'next-auth/react';
 import { redirect, RedirectType, usePathname } from 'next/navigation';
+import { HistoryType, useCommonStore, useMypageStore } from '../../../../stores';
+import { LOCAL_STORAGE_HISTORY, LOCAL_STORAGE_WMS_HISTORY } from '../../../../libs/const';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { toastError, toastSuccess } from '../../../ToastMessage';
 
 interface Props {
   ref?: React.Ref<{ closeAllTabs: () => void }>;
@@ -26,28 +23,26 @@ type MenuHistory = {
   histParamList: [];
 };
 
-/**
- * 탭 메뉴 컴포넌트 정의
- * */
-export const TabMenu = ({ ref }: Props) => {
+const HistoryTab = ({ ref }: Props) => {
   /** context hook(provided by Root Provider) */
   const session = useSession();
   const pathname = usePathname();
 
-  /** 지역(local) states */
-  const [favoriteBtn, setFavoriteBtn] = useState(false); // 즐겨찾기 onoff
-  const [historyList, setHistoryList] = useCommonStore((s) => [s.historyList, s.setHistoryList]);
-  const [activeIndex, setActiveIndex] = useState<number | null>(0); // 활성화 탭
-  const [translateXValue, setTranslateXValue] = useState<number>(0); // 왼쪽 오른쪽 이동
   const listRef = useRef<HTMLDivElement>(null); // list Ref 생성
   const listDivRef = useRef<HTMLDivElement>(null); // 전체 list div Ref 생성
+
+  /** 전역 상태 */
+  const [regFavoritesAll] = useMypageStore((s) => [s.regFavoritesAll]);
+  const [historyList, setHistoryList] = useCommonStore((s) => [s.historyList, s.setHistoryList]);
+
+  /** 지역(local) states */
+  const [activeIndex, setActiveIndex] = useState<number | null>(0); // 활성화 탭
+  const [translateXValue, setTranslateXValue] = useState<number>(0); // 왼쪽 오른쪽 이동
   const [maxTranslateX, setMaxTranslateX] = useState<number>(0); // 최대 이동 범위
   const [divWidth, setDivWidth] = useState<number>(0); // 최대 이동 범위
-  const containerRef = useRef<HTMLDivElement>(null); // 즐겨찾기 div 영역
-  const [isButtonVisible, setIsButtonVisible] = useState<any>(true); // 즐겨찾기영역 이동 버튼
-  const [favoriteList, setFavoriteList, regFavoritesAll] = useMypageStore((s) => [s.favoriteList, s.setFavoriteList, s.regFavoritesAll]);
+  const [isButtonVisible, setIsButtonVisible] = useState(true); // 즐겨찾기영역 이동 버튼
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 });
-  const [authGroupCd] = useState<string>(session.data?.user?.authCd ? session.data?.user.authCd?.substring(0, 1) : '');
+  const [authGroupCd] = useState<string | null>(session.data?.user?.authCd ? session.data?.user.authCd?.substring(0, 1) : '');
   const [hoverIndex, setHoverIndex] = useState<number | null>(null); // Hover 상태 관리
   const [localStorageHistory] = useState<string>(authGroupCd === '3' ? LOCAL_STORAGE_HISTORY : LOCAL_STORAGE_WMS_HISTORY);
 
@@ -83,32 +78,6 @@ export const TabMenu = ({ ref }: Props) => {
     // 최종 드래깅한 아이템에 on 클래스 추가
     setActiveIndex(endIndex);
   };
-
-  // 즐겨찾기 버튼
-  const handleFavoriteBtnOnOff = () => {
-    setFavoriteBtn(!favoriteBtn);
-  };
-
-  // 즐겨찾기 영역 외 클릭시 닫기
-  useEffect(() => {
-    // 컴포넌트가 마운트될 때 클릭 이벤트 리스너를 추가
-    const handleClickOutside = (event: MouseEvent) => {
-      // containerRef가 유효하고, 클릭된 요소가 containerRef의 외부에 있으면 드롭다운을 닫음
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setFavoriteBtn(false);
-      }
-    };
-    // document에 클릭 이벤트 리스너를 등록
-    if (typeof window !== 'undefined') {
-      document.addEventListener('click', handleClickOutside);
-    }
-    // 컴포넌트가 언마운트될 때 클릭 이벤트 리스너를 제거
-    return () => {
-      if (typeof window !== 'undefined') {
-        document.removeEventListener('click', handleClickOutside);
-      }
-    };
-  }, []);
 
   // 활성화 탭
   const handleActivateItem = (index: number, histMenuUri: string) => {
@@ -152,31 +121,6 @@ export const TabMenu = ({ ref }: Props) => {
       //router.push(nextHistMenuUri);
       redirect(nextHistMenuUri, RedirectType.push);
     }
-  };
-
-  // 즐겨찾기 링크
-  const handleFavoriteLink = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, menuUri: string | undefined) => {
-    e.preventDefault();
-    if (menuUri) {
-      //router.push(menuUri);
-      redirect(menuUri, RedirectType.push);
-    }
-  };
-
-  // 즐겨찾기 링크
-  const handleFavoriteAllOpen = () => {
-    localStorage.removeItem(localStorageHistory);
-    // 컨텍스트 메뉴 닫기
-    closeContextMenu();
-    // 상태 초기화
-    const favHistoryList = favoriteList.map((menu: SelectFavorites) => ({
-      histMenuNm: menu.menuNm,
-      histMenuUri: menu.menuUri,
-      histParamList: [],
-    }));
-    localStorage.setItem(authGroupCd === '3' ? LOCAL_STORAGE_HISTORY : LOCAL_STORAGE_WMS_HISTORY, JSON.stringify(favHistoryList));
-    //setHistoryList(favHistoryList && []);
-    location.reload();
   };
 
   // listRef와 listDivRef 크기 비교
@@ -237,23 +181,13 @@ export const TabMenu = ({ ref }: Props) => {
     redirect('/', RedirectType.push);
   };
 
-  const {
-    data: favoriteData,
-    refetch: favRefetch,
-    isSuccess: isFavSuccess,
-  } = useQuery([], () => authApi.get<ApiResponseListSelectFavorites>('/mypage/favorites', {}));
-
-  useEffect(() => {
-    setFavoriteList(favoriteData?.data?.body ? favoriteData?.data?.body : []);
-  }, [favoriteData?.data?.body, isFavSuccess, setFavoriteList]);
-
   const { mutate: regFavoritesAllMutate } = useMutation(regFavoritesAll, {
     onSuccess: async (e) => {
       const { resultCode, body, resultMessage } = e.data;
       try {
         if (resultCode === 200) {
           toastSuccess('즐겨찾기 등록에 성공했습니다.');
-          favRefetch();
+          // favRefetch(); todo key 값 기반 invalidation 으로 대체
         } else {
           console.log(e);
           toastError('등록 과정 중 문제 발생');
@@ -374,119 +308,83 @@ export const TabMenu = ({ ref }: Props) => {
   }, [historyList]);
 
   return (
-    <>
-      <div className="historyTab">
-        <div className="historyBox" onContextMenu={handleContextMenu}>
-          <div className="list" ref={listDivRef}>
-            <div style={{ transform: `translateX(${translateXValue}px)` }} ref={listRef}>
-              <ReactSortable
-                list={list}
-                setList={setList}
-                animation={200} // 드래그 애니메이션
-                multiDrag
-                swap
-                forceFallback
-                onStart={(event: any) => dragStart(event)}
-                onEnd={(event: any) => dragEnd(event)}
-              >
-                {list.map((item, index) => {
-                  // 조건에 따라 클래스 설정
-                  const isHover = index === hoverIndex;
-                  const active = activeIndex || 0;
-                  const activePrev = index === active - 1;
-                  const isNotHover = hoverIndex !== null && index === hoverIndex - 1;
+    <div className="historyTab">
+      <div className="historyBox" onContextMenu={handleContextMenu}>
+        <div className="list" ref={listDivRef}>
+          <div style={{ transform: `translateX(${translateXValue}px)` }} ref={listRef}>
+            <ReactSortable
+              list={list}
+              setList={setList}
+              animation={200} // 드래그 애니메이션
+              multiDrag
+              swap
+              forceFallback
+              onStart={(event: any) => dragStart(event)}
+              onEnd={(event: any) => dragEnd(event)}
+            >
+              {list.map((item, index) => {
+                // 조건에 따라 클래스 설정
+                const isHover = index === hoverIndex;
+                const active = activeIndex || 0;
+                const activePrev = index === active - 1;
+                const isNotHover = hoverIndex !== null && index === hoverIndex - 1;
 
-                  return (
-                    <div
-                      key={index}
-                      className={`item-${index} ${isHover ? 'hover' : ''} ${isNotHover ? 'notHover' : ''} ${activePrev ? 'notHover' : ''} ${
-                        index === activeIndex && pathname !== '/' && pathname !== '' ? 'on' : ''
-                      }`}
-                      onMouseEnter={() => setHoverIndex(index)} // 마우스가 들어오면 hover 상태 설정
-                      onMouseLeave={() => setHoverIndex(null)} // 마우스가 나가면 hover 상태 초기화
-                    >
-                      <div onClick={() => handleActivateItem(index, item.histMenuUri)}>{item.histMenuNm}</div>
-                      <button onClick={() => closeHistory(index, historyList)}>
-                        <span></span>
-                        <span></span>
-                      </button>
-                    </div>
-                  );
-                })}
-              </ReactSortable>
-            </div>
+                return (
+                  <div
+                    key={index}
+                    className={`item-${index} ${isHover ? 'hover' : ''} ${isNotHover ? 'notHover' : ''} ${activePrev ? 'notHover' : ''} ${
+                      index === activeIndex && pathname !== '/' && pathname !== '' ? 'on' : ''
+                    }`}
+                    onMouseEnter={() => setHoverIndex(index)} // 마우스가 들어오면 hover 상태 설정
+                    onMouseLeave={() => setHoverIndex(null)} // 마우스가 나가면 hover 상태 초기화
+                  >
+                    <div onClick={() => handleActivateItem(index, item.histMenuUri)}>{item.histMenuNm}</div>
+                    <button onClick={() => closeHistory(index, historyList)}>
+                      <span></span>
+                      <span></span>
+                    </button>
+                  </div>
+                );
+              })}
+            </ReactSortable>
           </div>
-          <div className="listBtn" style={{ display: isButtonVisible ? 'flex' : 'none' }}>
-            <button onClick={moveLeft}>왼쪽</button>
-            <button onClick={moveRight}>오른쪽</button>
-          </div>
-          {contextMenu.visible && (
-            <ul
-              className={`rightClickMenu ${contextMenu.visible ? 'on' : ''}`}
-              ref={contextMenuRef}
-              style={{
-                top: `${contextMenu.y}px`,
-                left: `${contextMenu.x}px`,
-              }}
-            >
-              <li>
-                <button onClick={makeFavorite}>· 즐겨찾기정보 일괄 생성</button>
-              </li>
-              <li>
-                <button onClick={closeAllTabs}>· 전체 탭 닫기</button>
-              </li>
-              <li>
-                <button onClick={closeOtherTabs}>· 다른 탭 닫기</button>
-              </li>
-              <li>
-                <button onClick={closeRightTabs}>· 우측 탭 닫기</button>
-              </li>
-              <li>
-                <button onClick={closeLeftTabs}>· 왼쪽 탭 닫기</button>
-              </li>
-              <li>
-                <button onClick={closeCurrentTab}>· 현재 탭 닫기</button>
-              </li>
-            </ul>
-          )}
         </div>
-      </div>
-      <div className={`favoriteBox ${favoriteBtn ? 'on' : ''}`} ref={containerRef}>
-        <button className="favoriteBtn" onClick={handleFavoriteBtnOnOff}>
-          즐겨찾기
-        </button>
-        <ul className="favoriteList">
-          <li className="tabMenuListAdd">
-            <Link
-              href={''}
-              onClick={(e) => {
-                handleFavoriteAllOpen();
-              }}
-            >
-              탭메뉴 생성
-            </Link>
-          </li>
-          {favoriteList && favoriteList.length > 0 ? (
-            favoriteList.map((data, index) => (
-              <li key={'FAV_LIST_' + index}>
-                <Link
-                  href=""
-                  onClick={(e) => {
-                    handleFavoriteLink(e, data?.menuUri);
-                  }}
-                >
-                  {data.menuNm}
-                </Link>
-              </li>
-            ))
-          ) : (
+        <div className="listBtn" style={{ display: isButtonVisible ? 'flex' : 'none' }}>
+          <button onClick={moveLeft}>왼쪽</button>
+          <button onClick={moveRight}>오른쪽</button>
+        </div>
+        {contextMenu.visible && (
+          <ul
+            className={`rightClickMenu ${contextMenu.visible ? 'on' : ''}`}
+            ref={contextMenuRef}
+            style={{
+              top: `${contextMenu.y}px`,
+              left: `${contextMenu.x}px`,
+            }}
+          >
             <li>
-              <span>즐겨찾기 메뉴가 없습니다.</span>
+              <button onClick={makeFavorite}>· 즐겨찾기정보 일괄 생성</button>
             </li>
-          )}
-        </ul>
+            <li>
+              <button onClick={closeAllTabs}>· 전체 탭 닫기</button>
+            </li>
+            <li>
+              <button onClick={closeOtherTabs}>· 다른 탭 닫기</button>
+            </li>
+            <li>
+              <button onClick={closeRightTabs}>· 우측 탭 닫기</button>
+            </li>
+            <li>
+              <button onClick={closeLeftTabs}>· 왼쪽 탭 닫기</button>
+            </li>
+            <li>
+              <button onClick={closeCurrentTab}>· 현재 탭 닫기</button>
+            </li>
+          </ul>
+        )}
       </div>
-    </>
+    </div>
   );
 };
-TabMenu.displayName = 'TabMenu';
+
+export default HistoryTab;

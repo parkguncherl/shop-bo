@@ -9,6 +9,7 @@ import BriefUserInfo from '../../components/layout/leftNav/BriefUserInfo';
 import Link from 'next/link';
 import { TabMenu } from '../../components/layout/TabMenu';
 import SignOutBtn from '../../components/layout/header/SignOutBtn';
+import HistoryTab from '../../components/layout/header/tab/HistoryTab';
 
 /**
  * (server side)AppLayout
@@ -23,6 +24,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
             <Link href={'/'}>{'logo'}</Link>
           </h1>
         </div>
+        <HistoryTab />
         {/*<TabMenu />*/}
         <div className={stylesForHeader.right}>
           <SignOutBtn />
