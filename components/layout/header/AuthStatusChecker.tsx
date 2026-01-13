@@ -31,7 +31,6 @@ const AuthStatusChecker = () => {
       },
     });
     const { body } = result.data;
-    console.log('body: ', body);
     if (body) {
       if (body.menuReadYn === 'N') {
         toastError('해당메뉴[' + pathname + ']에 접근권한이 없습니다. (history 삭제)');
