@@ -2,14 +2,18 @@
 
 import React from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 
 const CurTime = () => {
   const { data: session } = useSession();
-  const router = useRouter();
+  //const router = useRouter();
 
   return (
-    <div className="brief_user_info" onClick={() => router.push('/mypage')}>
+    <div
+      className="brief_user_info"
+      onClick={() => {
+        // todo
+      }}
+    >
       {session?.user?.userNm || ''}
     </div>
   );

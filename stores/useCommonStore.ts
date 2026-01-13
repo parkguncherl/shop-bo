@@ -8,6 +8,7 @@ import { authApi, authDownApi } from '../libs';
 type ModalType = 'UPLOAD' | 'UPLOADS' | 'IMAGES' | 'PRIVACY' | 'FILES';
 
 export interface HistoryType {
+  id: number; // id는 소팅 영역에서 필요하므로 필수값으로 지정함
   histMenuNm: string;
   histMenuUri: string;
 }

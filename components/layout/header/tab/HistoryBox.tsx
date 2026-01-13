@@ -3,19 +3,13 @@
 import { ReactSortable, SortableEvent } from 'react-sortablejs';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { redirect, RedirectType, usePathname } from 'next/navigation';
-import { useMypageStore } from '../../../../stores';
+import { HistoryType, useCommonStore, useMypageStore } from '../../../../stores';
 import { LOCAL_STORAGE_WMS_HISTORY } from '../../../../libs/const';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 
 interface Props {
   ref?: React.Ref<{ closeAllTabs: () => void }>;
-}
-
-interface HistoryType {
-  id: number;
-  histMenuNm: string;
-  histMenuUri: string;
 }
 // 이하 local type, interface
 type MenuHistory = {
@@ -54,7 +48,7 @@ const HistoryBox = ({ ref }: Props) => {
   const [hoverIndex, setHoverIndex] = useState<number | null>(null); // Hover 상태 관리
   //const [localStorageHistory] = useState<string>(LOCAL_STORAGE_WMS_HISTORY);
 
-  const [historyList, setHistoryList] = useState<HistoryType[]>([]);
+  const [historyList, setHistoryList] = useCommonStore((s) => [s.historyList, s.setHistoryList]);
 
   useImperativeHandle(ref, () => ({
     closeAllTabs,
