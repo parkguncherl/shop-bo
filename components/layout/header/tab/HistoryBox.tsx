@@ -2,11 +2,10 @@
 
 import { ReactSortable, SortableEvent } from 'react-sortablejs';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { redirect, RedirectType, usePathname } from 'next/navigation';
-import { useCommonStore, useMypageStore } from '../../../../stores';
-import { LOCAL_STORAGE_HISTORY, LOCAL_STORAGE_WMS_HISTORY } from '../../../../libs/const';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMypageStore } from '../../../../stores';
+import { LOCAL_STORAGE_WMS_HISTORY } from '../../../../libs/const';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 
 interface Props {
@@ -19,9 +18,6 @@ interface HistoryType {
   histMenuUri: string;
 }
 // 이하 local type, interface
-interface ExtendedSortableEvent extends SortableEvent {
-  originalEvent: DragEvent;
-}
 type MenuHistory = {
   histMenuUri: string;
   histMenuNm: string;
@@ -33,7 +29,7 @@ type MenuHistory = {
  * */
 const HistoryBox = ({ ref }: Props) => {
   /** context hook(provided by Root Provider) */
-  const session = useSession();
+  //const session = useSession();
   const pathname = usePathname();
 
   const listRef = useRef<HTMLDivElement>(null); // list Ref 생성
@@ -44,24 +40,33 @@ const HistoryBox = ({ ref }: Props) => {
   const [regFavoritesAll] = useMypageStore((s) => [s.regFavoritesAll]);
 
   /** 지역(local) states */
+  // 각각의 바 관리를 위한 상태
   const [activeIndex, setActiveIndex] = useState<number | null>(0); // 활성화 탭
   const [translateXValue, setTranslateXValue] = useState<number>(0); // 왼쪽 오른쪽 이동
-  const [maxTranslateX, setMaxTranslateX] = useState<number>(0); // 최대 이동 범위
-  const [divWidth, setDivWidth] = useState<number>(0); // 최대 이동 범위
-  const [isButtonVisible, setIsButtonVisible] = useState(true); // 즐겨찾기영역 이동 버튼
-  const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 });
-  const [authGroupCd] = useState<string | null>(session.data?.user?.authCd ? session.data?.user.authCd?.substring(0, 1) : '');
+
+  // 최대 이동 범위
+  const [maxTranslateX, setMaxTranslateX] = useState<number>(0);
+  const [divWidth, setDivWidth] = useState<number>(0);
+
+  const [isButtonVisible, setIsButtonVisible] = useState(false); // 즐겨찾기영역 이동 버튼
+  const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 }); // 우클릭시 출력되어지는 컨텍스트 메뉴의 상태
+  //const [authGroupCd] = useState<string | null>(session.data?.user?.authCd ? session.data?.user.authCd?.substring(0, 1) : '');
   const [hoverIndex, setHoverIndex] = useState<number | null>(null); // Hover 상태 관리
-  const [localStorageHistory] = useState<string>(authGroupCd === '3' ? LOCAL_STORAGE_HISTORY : LOCAL_STORAGE_WMS_HISTORY); // todo
+  //const [localStorageHistory] = useState<string>(LOCAL_STORAGE_WMS_HISTORY);
 
   const [historyList, setHistoryList] = useState<HistoryType[]>([]);
 
+  useImperativeHandle(ref, () => ({
+    closeAllTabs,
+    closeOtherTabs,
+  }));
+
   // 로컬스토리지 업데이트
   const updateHistoryListInStorage = (updatedList: HistoryType[]) => {
-    localStorage.setItem(localStorageHistory, JSON.stringify(updatedList));
+    localStorage.setItem(LOCAL_STORAGE_WMS_HISTORY, JSON.stringify(updatedList));
   };
 
-  const dragStart = (event: ExtendedSortableEvent) => {
+  const dragStart = (event: SortableEvent) => {
     const idx = event.oldIndex ?? -1; // 드래그 시작 시의 인덱스
     if (idx >= 0) {
       setActiveIndex(idx); // 드래깅 인덱스 업데이트
@@ -128,9 +133,10 @@ const HistoryBox = ({ ref }: Props) => {
     }
   };
 
-  // listRef와 listDivRef 크기 비교
+  /** 창 너비 혹은 고려할 만한 상호작용 발생 시 이에 맞추어 버튼 출력 동기화 */
   const updateButtonVisibility = () => {
     if (listRef.current && listDivRef.current) {
+      // listRef와 listDivRef 크기 비교
       const listWidth = listRef.current.offsetWidth;
       const divWidth = listDivRef.current.offsetWidth;
       // listRef가 listDivRef보다 크면 버튼 표시, 아니면 숨기기
@@ -143,12 +149,13 @@ const HistoryBox = ({ ref }: Props) => {
 
   // 초기 렌더링 및 창 크기 변경 이벤트 처리
   useEffect(() => {
-    const updateVisibility = () => {
-      updateButtonVisibility();
-    };
-
-    // 초기 계산을 약간 지연
-    setTimeout(updateVisibility, 0);
+    // const updateVisibility = () => {
+    //   updateButtonVisibility();
+    // };
+    //
+    // // 초기 계산을 약간 지연
+    // setTimeout(updateVisibility, 0);
+    updateButtonVisibility(); // todo 현재 리사이징 동작을 시험하기 곤란하니 추후 테스트 가능할 시 점검, 수정
 
     // 창 크기 변경 이벤트 추가
     window.addEventListener('resize', updateButtonVisibility);
@@ -163,7 +170,7 @@ const HistoryBox = ({ ref }: Props) => {
     if (translateXValue === 0) return; // 이미 최대값에 도달한 경우, 더 이상 이동하지 않음
 
     const newValue = translateXValue + 175; // 오른쪽으로 이동
-    setTranslateXValue(Math.min(0, newValue)); // 최대값을 0으로 제한
+    setTranslateXValue(Math.min(0, newValue)); // 최소값을 0으로 제한
   };
 
   const moveRight = () => {
@@ -176,7 +183,7 @@ const HistoryBox = ({ ref }: Props) => {
   // 모든탭 닫기
   const closeAllTabs = () => {
     // 로컬 스토리지에서 히스토리 제거
-    localStorage.removeItem(localStorageHistory);
+    localStorage.removeItem(LOCAL_STORAGE_WMS_HISTORY);
     // 컨텍스트 메뉴 닫기
     closeContextMenu();
     // 상태 초기화
@@ -204,16 +211,10 @@ const HistoryBox = ({ ref }: Props) => {
   });
 
   const makeFavorite = async () => {
-    const history: MenuHistory[] = JSON.parse(localStorage.getItem(authGroupCd === '3' ? LOCAL_STORAGE_HISTORY : LOCAL_STORAGE_WMS_HISTORY) || '[]');
+    const history: MenuHistory[] = JSON.parse(localStorage.getItem(LOCAL_STORAGE_WMS_HISTORY) || '[]');
     const historyArray: string[] = history.map((menu) => menu.histMenuUri); // Assuming 'name' is a string property in MenuHistory
     regFavoritesAllMutate({ menuUris: historyArray });
   };
-
-  // useImperativeHandle 추가
-  useImperativeHandle(ref, () => ({
-    closeAllTabs,
-    closeOtherTabs,
-  }));
 
   // 우클릭 전체 닫기 이벤트
   const handleContextMenu = (event: React.MouseEvent) => {
@@ -298,7 +299,6 @@ const HistoryBox = ({ ref }: Props) => {
     };
   }, []);
 
-  // 3800
   return (
     <div className="historyBox" onContextMenu={handleContextMenu}>
       <div className="list" ref={listDivRef}>
@@ -310,8 +310,8 @@ const HistoryBox = ({ ref }: Props) => {
             multiDrag
             swap
             forceFallback
-            onStart={(event: any) => dragStart(event)}
-            onEnd={(event: any) => dragEnd(event)}
+            onStart={(event) => dragStart(event)}
+            onEnd={(event) => dragEnd(event)}
           >
             {historyList.map((item, index) => {
               const isHover = index === hoverIndex;
