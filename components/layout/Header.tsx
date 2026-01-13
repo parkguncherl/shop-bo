@@ -15,6 +15,7 @@ import { usePathname } from 'next/navigation';
 interface Props {
   closed?: boolean;
 }
+// todo 정적 레이아웃 안정화 후 삭제
 
 export const Header = ({ closed }: Props) => {
   const pathname = usePathname();

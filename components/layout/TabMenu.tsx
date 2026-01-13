@@ -29,6 +29,7 @@ type MenuHistory = {
 /**
  * 탭 메뉴 컴포넌트 정의
  * */
+// todo 정적 레이아웃 안정화 후 삭제
 export const TabMenu = ({ ref }: Props) => {
   /** context hook(provided by Root Provider) */
   const session = useSession();

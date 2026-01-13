@@ -1,8 +1,6 @@
 'use client';
 
-import { SortableEvent } from 'react-sortablejs';
 import React, { useEffect, useRef, useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { redirect, RedirectType } from 'next/navigation';
 import { useMypageStore } from '../../../../stores';
 import { LOCAL_STORAGE_WMS_HISTORY } from '../../../../libs/const';
@@ -12,14 +10,14 @@ import Link from 'next/link';
 import { ApiResponseListSelectFavorites, SelectFavorites } from '../../../../generated';
 import { authApi } from '../../../../libs';
 
-interface Props {}
-
+/**
+ * 즐겨찾기 영역(버튼 및 활성 시점에 출력되는 tab)
+ * */
 const FavoriteBox = () => {
-  /** context hook(provided by Root Provider) */
-  const session = useSession();
-
+  /** 참조 */
   const containerRef = useRef<HTMLDivElement>(null); // 즐겨찾기 div 영역
 
+  /** 전역상태 */
   const [favoriteList, setFavoriteList] = useMypageStore((s) => [s.favoriteList, s.setFavoriteList]); // todo 현재는 다른 영역에서의 사용이 식별되어 전역 상태 유지하나 이후 불필요하다 여겨질 시 즉시 지역 상태로 전환할 것!
 
   /** 지역(local) states */
@@ -70,11 +68,11 @@ const FavoriteBox = () => {
     }));
     localStorage.setItem(LOCAL_STORAGE_WMS_HISTORY, JSON.stringify(favHistoryList));
     //setFavoriteList(favHistoryList && []);
-    //location.reload(); todo
+    //location.reload(); todo 현재 테스트할 페이지가 제한적인 관계로 주석 처리하나 추후 페이지가 추가되거나 테스트 가능 여건이 마련될 시 주석 해제 후 테스트 및 안정화하기 26/01/13
   };
 
   const { data: favoriteData, isSuccess: isFavSuccess } = useQuery({
-    queryKey: ['favoriteList'],
+    queryKey: ['favoriteList'], // 해당 키를 통한 무효화로 인하여 본 값에 의존적인 영역이 다수 존재함에 유념
     queryFn: () => authApi.get<ApiResponseListSelectFavorites>('/mypage/favorites', {}),
   });
 

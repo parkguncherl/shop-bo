@@ -28,6 +28,9 @@ type MenuHistory = {
   histParamList: [];
 };
 
+/**
+ * 페이지 방문 이력에 따른 즉시 이동 가능 bar 목록 생성 영역
+ * */
 const HistoryBox = ({ ref }: Props) => {
   /** context hook(provided by Root Provider) */
   const session = useSession();
@@ -49,7 +52,7 @@ const HistoryBox = ({ ref }: Props) => {
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 });
   const [authGroupCd] = useState<string | null>(session.data?.user?.authCd ? session.data?.user.authCd?.substring(0, 1) : '');
   const [hoverIndex, setHoverIndex] = useState<number | null>(null); // Hover 상태 관리
-  const [localStorageHistory] = useState<string>(authGroupCd === '3' ? LOCAL_STORAGE_HISTORY : LOCAL_STORAGE_WMS_HISTORY);
+  const [localStorageHistory] = useState<string>(authGroupCd === '3' ? LOCAL_STORAGE_HISTORY : LOCAL_STORAGE_WMS_HISTORY); // todo
 
   const [historyList, setHistoryList] = useState<HistoryType[]>([]);
 
@@ -267,14 +270,12 @@ const HistoryBox = ({ ref }: Props) => {
       closeContextMenu();
       if (updatedList.length === 0) {
         // 모든 탭이 닫혔다면 홈페이지로 이동
-        //router.push('/');
         redirect('/', RedirectType.push);
         setActiveIndex(null);
       } else {
         // 다음 탭으로 이동 (마지막 탭이었다면 이전 탭으로)
         const newActiveIndex = activeIndex >= updatedList.length ? updatedList.length - 1 : activeIndex;
         setActiveIndex(newActiveIndex);
-        //router.push(updatedList[newActiveIndex].histMenuUri);
         redirect(updatedList[newActiveIndex].histMenuUri, RedirectType.push);
       }
     }
