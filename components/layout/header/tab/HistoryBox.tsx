@@ -201,6 +201,7 @@ const HistoryBox = ({ ref }: Props) => {
   };
   const queryClient = useQueryClient();
 
+  /** 즐겨찾기 영역 등록 영역 */
   const { mutate: regFavoritesAllMutate } = useMutation(regFavoritesAll, {
     onSuccess: async (e) => {
       const { resultCode } = e.data;
@@ -218,7 +219,7 @@ const HistoryBox = ({ ref }: Props) => {
     },
   });
 
-  // 현재 탭을 즐겨찾기로 일괄 등록
+  // 현재 출력된 탭들을 즐겨찾기로 일괄 등록
   const makeFavorite = async () => {
     const history: HistoryType[] = [...historyList];
     const historyArray: string[] = history.map((menu) => menu.histMenuUri); // Assuming 'name' is a string property in MenuHistory
