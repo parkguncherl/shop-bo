@@ -3975,7 +3975,7 @@ aside[class*="orderBox"] {
     position: absolute;
     top: 6px;
     right: 78px;
-    & a {
+    & button { // 기존에는 a 태그 기준이였으나 변경
       display: flex;
       padding: 5px 10px;
       background: #f5f5f5;
@@ -3988,7 +3988,7 @@ aside[class*="orderBox"] {
       color: #666;
     }
     &:hover {
-      & a {
+      & button { // 기존에는 a 태그 기준이였으나 변경
         background-color: #ddd;
       }
     }

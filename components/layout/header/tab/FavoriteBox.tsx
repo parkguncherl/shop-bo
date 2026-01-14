@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { redirect, RedirectType } from 'next/navigation';
-import { useMypageStore } from '../../../../stores';
+import { HistoryType, useCommonStore, useMypageStore } from '../../../../stores';
 import { LOCAL_STORAGE_WMS_HISTORY } from '../../../../libs/const';
 import { useQuery } from '@tanstack/react-query';
 import { toastError } from '../../../ToastMessage';
@@ -19,6 +19,7 @@ const FavoriteBox = () => {
 
   /** 전역상태 */
   const [favoriteList, setFavoriteList] = useMypageStore((s) => [s.favoriteList, s.setFavoriteList]); // todo 현재는 다른 영역에서의 사용이 식별되어 전역 상태 유지하나 이후 불필요하다 여겨질 시 즉시 지역 상태로 전환할 것!
+  const [historyList, setHistoryList] = useCommonStore((s) => [s.historyList, s.setHistoryList]);
 
   /** 지역(local) states */
   const [favoriteBtn, setFavoriteBtn] = useState(false); // 즐겨찾기 onoff
@@ -59,16 +60,13 @@ const FavoriteBox = () => {
 
   // 즐겨찾기 목록 전체 펼침
   const handleFavoriteAllOpen = () => {
-    localStorage.removeItem(LOCAL_STORAGE_WMS_HISTORY);
-    // 상태 초기화
-    const favHistoryList = favoriteList.map((menu: SelectFavorites) => ({
+    const prevHistoryList = [...favoriteList];
+    const favHistoryList: HistoryType[] = prevHistoryList.map((menu: SelectFavorites, index) => ({
+      id: prevHistoryList.length + (index + 1),
       histMenuNm: menu.menuNm,
       histMenuUri: menu.menuUri,
-      histParamList: [],
     }));
-    localStorage.setItem(LOCAL_STORAGE_WMS_HISTORY, JSON.stringify(favHistoryList));
-    //setFavoriteList(favHistoryList && []);
-    //location.reload(); todo 현재 테스트할 페이지가 제한적인 관계로 주석 처리하나 추후 페이지가 추가되거나 테스트 가능 여건이 마련될 시 주석 해제 후 테스트 및 안정화하기 26/01/13
+    setHistoryList(favHistoryList); // 전역 상태 동기화
   };
 
   const { data: favoriteData, isSuccess: isFavSuccess } = useQuery({
@@ -94,14 +92,13 @@ const FavoriteBox = () => {
       </button>
       <ul className="favoriteList">
         <li className="tabMenuListAdd">
-          <Link
-            href={''}
+          <button
             onClick={() => {
               handleFavoriteAllOpen();
             }}
           >
             탭메뉴 생성
-          </Link>
+          </button>
         </li>
         {favoriteList && favoriteList.length > 0 ? (
           favoriteList.map((data, index) => (

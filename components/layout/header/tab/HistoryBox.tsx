@@ -19,6 +19,9 @@ type MenuHistory = {
   histMenuNm: string;
   histParamList: [];
 };
+interface HistoryTypeForSorting extends HistoryType {
+  id: number; // id는 소팅 영역에서 필요하므로 필수값으로 지정함, 최초 0부터 시작
+}
 
 /**
  * 페이지 방문 이력에 따른 즉시 이동 가능 bar 목록 생성 영역
@@ -37,6 +40,9 @@ const HistoryBox = ({ ref }: Props) => {
   const [historyList, setHistoryList] = useCommonStore((s) => [s.historyList, s.setHistoryList]);
 
   /** 지역(local) states */
+  // ReactSortable 내부 동작과 zustand 의 불변성 요구 모두를 충족하기 위한 완충 state, 상태 관리는 여전히 전역 관할이나 sortable 영역 상태의 동기화는 해당 state 관할
+  const [historyListAsMiddleState, setHistoryListAsMiddleState] = useState<HistoryTypeForSorting[]>([]);
+
   // 각각의 바 관리를 위한 상태
   const [activeIndex, setActiveIndex] = useState<number | null>(0); // 활성화 탭
   const [translateXValue, setTranslateXValue] = useState<number>(0); // 왼쪽 오른쪽 이동
@@ -78,7 +84,7 @@ const HistoryBox = ({ ref }: Props) => {
               // 메인페이지 외 경로만 추가 후보
               const pushedHistoryList = [...historyList];
               pushedHistoryList.push({
-                id: pushedHistoryList[pushedHistoryList.length - 1] ? pushedHistoryList[pushedHistoryList.length - 1].id : 1,
+                //id: pushedHistoryList[pushedHistoryList.length - 1] ? pushedHistoryList[pushedHistoryList.length - 1].id : 1, // 기본 1부터 시작
                 histMenuNm: body.menuNm,
                 histMenuUri: pathname,
               } as HistoryType);
@@ -111,7 +117,9 @@ const HistoryBox = ({ ref }: Props) => {
 
       setHistoryList(updatedList); // 리스트 상태 업데이트
       // 드래그 종료된 페이지로 이동
-      redirect(updatedList[endIndex].histMenuUri, RedirectType.push);
+      if (updatedList[endIndex].histMenuUri) {
+        redirect(updatedList[endIndex].histMenuUri as string, RedirectType.push);
+      }
     }
 
     // 최종 드래깅한 아이템에 on 클래스 추가
@@ -147,11 +155,6 @@ const HistoryBox = ({ ref }: Props) => {
     // 남은 히스토리가 없으면 홈 페이지로 이동
     if (updatedList.length === 0) {
       redirect('/', RedirectType.push);
-    } else {
-      // 다음 히스토리가 있을 경우 해당 히스토리의 uri로 이동
-      const nextIndex = index < updatedList.length ? index : updatedList.length - 1;
-      const nextHistMenuUri = updatedList[nextIndex].histMenuUri;
-      redirect(nextHistMenuUri, RedirectType.push);
     }
   };
 
@@ -287,7 +290,10 @@ const HistoryBox = ({ ref }: Props) => {
         // 다음 탭으로 이동 (마지막 탭이었다면 이전 탭으로)
         const newActiveIndex = activeIndex >= updatedList.length ? updatedList.length - 1 : activeIndex;
         setActiveIndex(newActiveIndex);
-        redirect(updatedList[newActiveIndex].histMenuUri, RedirectType.push);
+
+        if (updatedList[newActiveIndex].histMenuUri) {
+          redirect(updatedList[newActiveIndex].histMenuUri as string, RedirectType.push);
+        }
       }
     }
   };
@@ -309,13 +315,28 @@ const HistoryBox = ({ ref }: Props) => {
     };
   }, []);
 
+  useEffect(() => {
+    // historyList 에 따라 중간 상태 동기화
+    setHistoryListAsMiddleState(
+      historyList.map((history, index) => {
+        return {
+          ...history,
+          id: index,
+        };
+      }),
+    );
+  }, [historyList]);
+
   return (
     <div className="historyBox" onContextMenu={handleContextMenu}>
       <div className="list" ref={listDivRef}>
         <div style={{ transform: `translateX(${translateXValue}px)` }} ref={listRef}>
           <ReactSortable
-            list={historyList}
-            setList={setHistoryList}
+            list={historyListAsMiddleState}
+            setList={setHistoryListAsMiddleState}
+            // setList={(newState: HistoryTypeForSorting[], sortable: Sortable | null, store: Store) => {
+            //   console.log('(newState: HistoryTypeForSorting[], sortable: Sortable | null, store: Store): ', newState, sortable, store);
+            // }}
             animation={200} // 드래그 애니메이션
             multiDrag
             swap
@@ -338,8 +359,20 @@ const HistoryBox = ({ ref }: Props) => {
                   onMouseEnter={() => setHoverIndex(index)} // 마우스가 들어오면 hover 상태 설정
                   onMouseLeave={() => setHoverIndex(null)} // 마우스가 나가면 hover 상태 초기화
                 >
-                  <div onClick={() => handleActivateItem(index, item.histMenuUri)}>{item.histMenuNm}</div>
-                  <button onClick={() => closeHistory(index, historyList)}>
+                  <div
+                    onClick={() => {
+                      if (item.histMenuUri) {
+                        handleActivateItem(index, item.histMenuUri);
+                      }
+                    }}
+                  >
+                    {item.histMenuNm}
+                  </div>
+                  <button
+                    onClick={() => {
+                      closeHistory(index, historyList);
+                    }}
+                  >
                     <span></span>
                     <span></span>
                   </button>
