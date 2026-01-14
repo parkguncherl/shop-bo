@@ -5,8 +5,10 @@ import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { redirect, RedirectType, usePathname } from 'next/navigation';
 import { HistoryType, useCommonStore, useMypageStore } from '../../../../stores';
 import { LOCAL_STORAGE_WMS_HISTORY } from '../../../../libs/const';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toastError, toastSuccess } from '../../../ToastMessage';
+import { authApi } from '../../../../libs';
+import { ApiResponseAuthResponseMenuAuth } from '../../../../generated';
 
 interface Props {
   ref?: React.Ref<{ closeAllTabs: () => void }>;
@@ -54,6 +56,48 @@ const HistoryBox = ({ ref }: Props) => {
     closeAllTabs,
     closeOtherTabs,
   }));
+
+  const { data: menuAuthList, isSuccess: isMenuCheckSuccess } = useQuery({
+    queryKey: ['/auth/check/menu', pathname],
+    queryFn: () =>
+      authApi.get<ApiResponseAuthResponseMenuAuth>('/auth/check/menu', {
+        params: {
+          menuUri: pathname,
+        },
+      }),
+  });
+
+  /**
+   * 히스토리탭에서 사용되는 uri 목록 생성
+   * */
+  useEffect(() => {
+    if (isMenuCheckSuccess) {
+      const { resultCode, body, resultMessage } = menuAuthList.data;
+      if (resultCode == 200) {
+        if (body && body.menuNm) {
+          if (historyList.filter((history) => history.histMenuUri == pathname).length == 0) {
+            // 신규 경로
+            if (body.menuNm !== 'mainPage') {
+              // 메인페이지 외 경로만 추가 후보
+              const pushedHistoryList = [...historyList];
+              pushedHistoryList.push({
+                id: pushedHistoryList[pushedHistoryList.length - 1] ? pushedHistoryList[pushedHistoryList.length - 1].id : 1,
+                histMenuNm: body.menuNm,
+                histMenuUri: pathname,
+              } as HistoryType);
+              setHistoryList(pushedHistoryList);
+            }
+          }
+        }
+      } else {
+        toastError(resultMessage);
+      }
+    }
+  }, [isMenuCheckSuccess, menuAuthList]);
+
+  useEffect(() => {
+    console.log('historyListhistoryListhistoryListhistoryList: ', historyList);
+  }, [historyList]);
 
   // 로컬스토리지 업데이트
   const updateHistoryListInStorage = (updatedList: HistoryType[]) => {

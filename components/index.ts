@@ -17,4 +17,4 @@ export * from './CustomInput';
 export * from './Loading';
 export * from './DeleteConfirmModal';
 
-export { Layout } from './layout/Layout';
+//export { Layout } from './layout/Layout';
