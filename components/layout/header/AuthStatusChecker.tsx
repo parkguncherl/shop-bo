@@ -34,7 +34,7 @@ const AuthStatusChecker = () => {
     if (body) {
       if (body.menuReadYn === 'N') {
         toastError('해당메뉴[' + pathname + ']에 접근권한이 없습니다. (history 삭제)');
-        localStorage.removeItem(LOCAL_STORAGE_WMS_HISTORY);
+        //localStorage.removeItem(LOCAL_STORAGE_WMS_HISTORY);
         setHistoryList([]);
         router.back(); // 이전 경로로
       } else {

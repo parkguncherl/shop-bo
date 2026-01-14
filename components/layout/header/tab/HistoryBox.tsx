@@ -332,6 +332,7 @@ const HistoryBox = ({ ref }: Props) => {
       <div className="list" ref={listDivRef}>
         <div style={{ transform: `translateX(${translateXValue}px)` }} ref={listRef}>
           <ReactSortable
+            key={pathname} // 경로 변경 시점에 내부 Sortable 인스턴스 상태 초기화하여 내부 상태 부조화로 인한 드래그 동작 미동작 방지
             list={historyListAsMiddleState}
             setList={setHistoryListAsMiddleState}
             // setList={(newState: HistoryTypeForSorting[], sortable: Sortable | null, store: Store) => {
@@ -343,6 +344,7 @@ const HistoryBox = ({ ref }: Props) => {
             forceFallback
             onStart={(event) => dragStart(event)}
             onEnd={(event) => dragEnd(event)}
+            handle=".drag-handle" // 드래그 동작이 일어나는 요소를 클래스명으로 명확히 정의함
           >
             {historyList.map((item, index) => {
               const isHover = index === hoverIndex;
@@ -360,6 +362,10 @@ const HistoryBox = ({ ref }: Props) => {
                   onMouseLeave={() => setHoverIndex(null)} // 마우스가 나가면 hover 상태 초기화
                 >
                   <div
+                    className={'drag-handle'} // 드래그가 발생하는 요소
+                    style={{
+                      userSelect: 'none',
+                    }}
                     onClick={() => {
                       if (item.histMenuUri) {
                         handleActivateItem(index, item.histMenuUri);
