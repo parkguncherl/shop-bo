@@ -19,7 +19,7 @@ const FavoriteBox = () => {
 
   /** 전역상태 */
   const [favoriteList, setFavoriteList] = useMypageStore((s) => [s.favoriteList, s.setFavoriteList]); // todo 현재는 다른 영역에서의 사용이 식별되어 전역 상태 유지하나 이후 불필요하다 여겨질 시 즉시 지역 상태로 전환할 것!
-  const [historyList, setHistoryList] = useCommonStore((s) => [s.historyList, s.setHistoryList]);
+  const [setHistoryList] = useCommonStore((s) => [s.setHistoryList]);
 
   /** 지역(local) states */
   const [favoriteBtn, setFavoriteBtn] = useState(false); // 즐겨찾기 onoff
@@ -63,8 +63,8 @@ const FavoriteBox = () => {
     const prevHistoryList = [...favoriteList];
     const favHistoryList: HistoryType[] = prevHistoryList.map((menu: SelectFavorites, index) => ({
       id: prevHistoryList.length + (index + 1),
-      histMenuNm: menu.menuNm,
-      histMenuUri: menu.menuUri,
+      histMenuNm: menu.menuNm as string,
+      histMenuUri: menu.menuUri as string,
     }));
     setHistoryList(favHistoryList); // 전역 상태 동기화
   };

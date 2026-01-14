@@ -1,6 +1,7 @@
 import React, { useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import Select, { ActionMeta, InputActionMeta, SelectInstance } from 'react-select';
+import { ActionMeta, InputActionMeta, SelectInstance } from 'react-select';
 import { DropDownOption } from '../types/DropDownOptions';
+import ClientSidedReactSelect from './clientSideOnly/ClientSidedReactSelect';
 
 interface Props {
   title?: string;
@@ -129,7 +130,7 @@ export const TunedReactSelector = ({ title, name, values, placeholder, options =
             {required && <span className={'req'}>*</span>}
           </dt>
           <dd>
-            <Select
+            <ClientSidedReactSelect
               ref={selectRef}
               value={
                 InputValue
@@ -155,7 +156,7 @@ export const TunedReactSelector = ({ title, name, values, placeholder, options =
           </dd>
         </dl>
       ) : (
-        <Select
+        <ClientSidedReactSelect
           ref={selectRef}
           value={memoizedOptions.filter((option) => {
             return option.label === InputValue;

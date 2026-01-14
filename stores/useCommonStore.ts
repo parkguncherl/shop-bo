@@ -8,8 +8,8 @@ import { authApi, authDownApi } from '../libs';
 type ModalType = 'UPLOAD' | 'UPLOADS' | 'IMAGES' | 'PRIVACY' | 'FILES';
 
 export interface HistoryType {
-  histMenuNm?: string;
-  histMenuUri?: string;
+  histMenuNm: string;
+  histMenuUri: string;
 }
 
 export interface FilterData {

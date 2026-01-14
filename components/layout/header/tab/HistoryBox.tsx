@@ -4,7 +4,6 @@ import { ReactSortable, SortableEvent } from 'react-sortablejs';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { redirect, RedirectType, usePathname } from 'next/navigation';
 import { HistoryType, useCommonStore, useMypageStore } from '../../../../stores';
-import { LOCAL_STORAGE_WMS_HISTORY } from '../../../../libs/const';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import { authApi } from '../../../../libs';
@@ -14,11 +13,6 @@ interface Props {
   ref?: React.Ref<{ closeAllTabs: () => void }>;
 }
 // 이하 local type, interface
-type MenuHistory = {
-  histMenuUri: string;
-  histMenuNm: string;
-  histParamList: [];
-};
 interface HistoryTypeForSorting extends HistoryType {
   id: number; // id는 소팅 영역에서 필요하므로 필수값으로 지정함, 최초 0부터 시작
 }
@@ -28,7 +22,6 @@ interface HistoryTypeForSorting extends HistoryType {
  * */
 const HistoryBox = ({ ref }: Props) => {
   /** context hook(provided by Root Provider) */
-  //const session = useSession();
   const pathname = usePathname();
 
   const listRef = useRef<HTMLDivElement>(null); // list Ref 생성
@@ -85,7 +78,7 @@ const HistoryBox = ({ ref }: Props) => {
               const pushedHistoryList = [...historyList];
               pushedHistoryList.push({
                 //id: pushedHistoryList[pushedHistoryList.length - 1] ? pushedHistoryList[pushedHistoryList.length - 1].id : 1, // 기본 1부터 시작
-                histMenuNm: body.menuNm,
+                histMenuNm: body.menuNm as string,
                 histMenuUri: pathname,
               } as HistoryType);
               setHistoryList(pushedHistoryList);
@@ -117,9 +110,7 @@ const HistoryBox = ({ ref }: Props) => {
 
       setHistoryList(updatedList); // 리스트 상태 업데이트
       // 드래그 종료된 페이지로 이동
-      if (updatedList[endIndex].histMenuUri) {
-        redirect(updatedList[endIndex].histMenuUri as string, RedirectType.push);
-      }
+      redirect(updatedList[endIndex].histMenuUri, RedirectType.push);
     }
 
     // 최종 드래깅한 아이템에 on 클래스 추가
@@ -227,8 +218,9 @@ const HistoryBox = ({ ref }: Props) => {
     },
   });
 
+  // 현재 탭을 즐겨찾기로 일괄 등록
   const makeFavorite = async () => {
-    const history: MenuHistory[] = JSON.parse(localStorage.getItem(LOCAL_STORAGE_WMS_HISTORY) || '[]');
+    const history: HistoryType[] = [...historyList];
     const historyArray: string[] = history.map((menu) => menu.histMenuUri); // Assuming 'name' is a string property in MenuHistory
     regFavoritesAllMutate({ menuUris: historyArray });
   };
@@ -291,9 +283,7 @@ const HistoryBox = ({ ref }: Props) => {
         const newActiveIndex = activeIndex >= updatedList.length ? updatedList.length - 1 : activeIndex;
         setActiveIndex(newActiveIndex);
 
-        if (updatedList[newActiveIndex].histMenuUri) {
-          redirect(updatedList[newActiveIndex].histMenuUri as string, RedirectType.push);
-        }
+        redirect(updatedList[newActiveIndex].histMenuUri, RedirectType.push);
       }
     }
   };
