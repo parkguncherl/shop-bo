@@ -28,7 +28,7 @@ const HistoryBox = ({ ref }: Props) => {
   const listDivRef = useRef<HTMLDivElement>(null); // 전체 list div Ref 생성
   const contextMenuRef = useRef<HTMLUListElement>(null);
 
-  /** 전역 상태 */
+  /** 전역 상태(조건부 랜더링에 직접 사용하는 건 지양하기)*/
   const [regFavoritesAll] = useMypageStore((s) => [s.regFavoritesAll]);
   const [historyList, setHistoryList] = useCommonStore((s) => [s.historyList, s.setHistoryList]);
 
@@ -37,7 +37,7 @@ const HistoryBox = ({ ref }: Props) => {
   const [historyListAsMiddleState, setHistoryListAsMiddleState] = useState<HistoryTypeForSorting[]>([]);
 
   // 각각의 바 관리를 위한 상태
-  const [activeIndex, setActiveIndex] = useState<number | null>(0); // 활성화 탭
+  const [activeElementId, setActiveIndex] = useState<number | null>(0); // 활성화 탭
   const [translateXValue, setTranslateXValue] = useState<number>(0); // 왼쪽 오른쪽 이동
 
   // 최대 이동 범위
@@ -46,7 +46,7 @@ const HistoryBox = ({ ref }: Props) => {
 
   const [isButtonVisible, setIsButtonVisible] = useState(false); // 즐겨찾기영역 이동 버튼
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 }); // 우클릭시 출력되어지는 컨텍스트 메뉴의 상태
-  const [hoverIndex, setHoverIndex] = useState<number | null>(null); // Hover 상태 관리
+  const [hoverElementId, setHoverElementId] = useState<number | null>(null); // Hover 상태 관리
 
   useImperativeHandle(ref, () => ({
     closeAllTabs,
@@ -238,7 +238,7 @@ const HistoryBox = ({ ref }: Props) => {
 
   // 현재 탭을 제외한 다른 모든 탭 닫기
   const closeOtherTabs = () => {
-    if (activeIndex !== null) {
+    if (activeElementId !== null) {
       const currentTab = historyList[activeIndex];
       const updatedList = [currentTab];
       setHistoryList(updatedList);
@@ -251,7 +251,7 @@ const HistoryBox = ({ ref }: Props) => {
   };
   // 현재 탭의 오른쪽에 있는 모든 탭 닫기
   const closeRightTabs = () => {
-    if (activeIndex !== null) {
+    if (activeElementId !== null) {
       // 현재 탭까지만 유지하고 나머지 오른쪽 탭들은 제거
       const updatedList = historyList.slice(0, activeIndex + 1);
       setHistoryList(updatedList);
@@ -261,7 +261,7 @@ const HistoryBox = ({ ref }: Props) => {
 
   // 현재 탭의 왼쪽에 있는 모든 탭 닫기
   const closeLeftTabs = () => {
-    if (activeIndex !== null) {
+    if (activeElementId !== null) {
       // 현재 탭부터 끝까지 유지하고 나머지 왼쪽 탭들은 제거
       const updatedList = historyList.slice(activeIndex);
       setHistoryList(updatedList);
@@ -271,7 +271,7 @@ const HistoryBox = ({ ref }: Props) => {
   };
   // 현재 탭만 닫기
   const closeCurrentTab = () => {
-    if (activeIndex !== null) {
+    if (activeElementId !== null) {
       const updatedList = historyList.filter((_, index) => index !== activeIndex);
       setHistoryList(updatedList);
       closeContextMenu();
@@ -326,9 +326,6 @@ const HistoryBox = ({ ref }: Props) => {
             key={pathname} // 경로 변경 시점에 내부 Sortable 인스턴스 상태 초기화하여 내부 상태 부조화로 인한 드래그 동작 미동작 방지
             list={historyListAsMiddleState}
             setList={setHistoryListAsMiddleState}
-            // setList={(newState: HistoryTypeForSorting[], sortable: Sortable | null, store: Store) => {
-            //   console.log('(newState: HistoryTypeForSorting[], sortable: Sortable | null, store: Store): ', newState, sortable, store);
-            // }}
             animation={200} // 드래그 애니메이션
             multiDrag
             swap
@@ -337,20 +334,20 @@ const HistoryBox = ({ ref }: Props) => {
             onEnd={(event) => dragEnd(event)}
             handle=".drag-handle" // 드래그 동작이 일어나는 요소를 클래스명으로 명확히 정의함
           >
-            {historyList.map((item, index) => {
-              const isHover = index === hoverIndex;
-              const active = activeIndex || 0;
-              const activePrev = index === active - 1;
-              const isNotHover = hoverIndex !== null && index === hoverIndex - 1;
+            {historyListAsMiddleState.map((item, index) => {
+              const isHover = item.id === hoverElementId;
+              // const active = activeElementId || 0;
+              // const deactive = activeElementId != item.id;
+              const isNotHover = hoverElementId !== null && item.id === hoverElementId - 1;
 
               return (
                 <div
-                  key={index}
-                  className={`item-${index} ${isHover ? 'hover' : ''} ${isNotHover ? 'notHover' : ''} ${activePrev ? 'notHover' : ''} ${
-                    index === activeIndex && pathname !== '/' && pathname !== '' ? 'on' : ''
+                  key={item.id}
+                  className={`item-${index} ${isHover ? 'hover' : ''} ${isNotHover ? 'notHover' : ''} ${activeElementId != item.id ? 'notHover' : ''} ${
+                    activeElementId == item.id && pathname !== '/' && pathname !== '' ? 'on' : ''
                   }`}
-                  onMouseEnter={() => setHoverIndex(index)} // 마우스가 들어오면 hover 상태 설정
-                  onMouseLeave={() => setHoverIndex(null)} // 마우스가 나가면 hover 상태 초기화
+                  onMouseEnter={() => setHoverElementId(item.id)} // 마우스가 들어오면 hover 상태 설정
+                  onMouseLeave={() => setHoverElementId(null)} // 마우스가 나가면 hover 상태 초기화
                 >
                   <div
                     className={'drag-handle'} // 드래그가 발생하는 요소
