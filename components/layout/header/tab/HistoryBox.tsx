@@ -34,6 +34,7 @@ const HistoryBox = ({ ref }: Props) => {
 
   /** 전역 상태 */
   const [regFavoritesAll] = useMypageStore((s) => [s.regFavoritesAll]);
+  const [historyList, setHistoryList] = useCommonStore((s) => [s.historyList, s.setHistoryList]);
 
   /** 지역(local) states */
   // 각각의 바 관리를 위한 상태
@@ -46,11 +47,7 @@ const HistoryBox = ({ ref }: Props) => {
 
   const [isButtonVisible, setIsButtonVisible] = useState(false); // 즐겨찾기영역 이동 버튼
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 }); // 우클릭시 출력되어지는 컨텍스트 메뉴의 상태
-  //const [authGroupCd] = useState<string | null>(session.data?.user?.authCd ? session.data?.user.authCd?.substring(0, 1) : '');
   const [hoverIndex, setHoverIndex] = useState<number | null>(null); // Hover 상태 관리
-  //const [localStorageHistory] = useState<string>(LOCAL_STORAGE_WMS_HISTORY);
-
-  const [historyList, setHistoryList] = useCommonStore((s) => [s.historyList, s.setHistoryList]);
 
   useImperativeHandle(ref, () => ({
     closeAllTabs,
@@ -95,15 +92,6 @@ const HistoryBox = ({ ref }: Props) => {
     }
   }, [isMenuCheckSuccess, menuAuthList]);
 
-  useEffect(() => {
-    console.log('historyListhistoryListhistoryListhistoryList: ', historyList);
-  }, [historyList]);
-
-  // 로컬스토리지 업데이트
-  const updateHistoryListInStorage = (updatedList: HistoryType[]) => {
-    localStorage.setItem(LOCAL_STORAGE_WMS_HISTORY, JSON.stringify(updatedList));
-  };
-
   const dragStart = (event: SortableEvent) => {
     const idx = event.oldIndex ?? -1; // 드래그 시작 시의 인덱스
     if (idx >= 0) {
@@ -122,7 +110,6 @@ const HistoryBox = ({ ref }: Props) => {
       updatedList.splice(endIndex, 0, movedItem); // 끝 인덱스에 아이템 삽입
 
       setHistoryList(updatedList); // 리스트 상태 업데이트
-      updateHistoryListInStorage(updatedList);
       // 드래그 종료된 페이지로 이동
       redirect(updatedList[endIndex].histMenuUri, RedirectType.push);
     }
@@ -157,9 +144,6 @@ const HistoryBox = ({ ref }: Props) => {
     const updatedList = historyList.filter((_, idx) => idx !== index);
     setHistoryList(updatedList);
 
-    // 로컬 스토리지에 업데이트된 리스트 저장
-    updateHistoryListInStorage(updatedList);
-
     // 남은 히스토리가 없으면 홈 페이지로 이동
     if (updatedList.length === 0) {
       redirect('/', RedirectType.push);
@@ -187,13 +171,7 @@ const HistoryBox = ({ ref }: Props) => {
 
   // 초기 렌더링 및 창 크기 변경 이벤트 처리
   useEffect(() => {
-    // const updateVisibility = () => {
-    //   updateButtonVisibility();
-    // };
-    //
-    // // 초기 계산을 약간 지연
-    // setTimeout(updateVisibility, 0);
-    updateButtonVisibility(); // todo 현재 리사이징 동작을 시험하기 곤란하니 추후 테스트 가능할 시 점검, 수정
+    updateButtonVisibility();
 
     // 창 크기 변경 이벤트 추가
     window.addEventListener('resize', updateButtonVisibility);
@@ -220,8 +198,6 @@ const HistoryBox = ({ ref }: Props) => {
 
   // 모든탭 닫기
   const closeAllTabs = () => {
-    // 로컬 스토리지에서 히스토리 제거
-    localStorage.removeItem(LOCAL_STORAGE_WMS_HISTORY);
     // 컨텍스트 메뉴 닫기
     closeContextMenu();
     // 상태 초기화
@@ -270,7 +246,6 @@ const HistoryBox = ({ ref }: Props) => {
       const currentTab = historyList[activeIndex];
       const updatedList = [currentTab];
       setHistoryList(updatedList);
-      updateHistoryListInStorage(updatedList);
       closeContextMenu();
       setActiveIndex(0);
     } else {
@@ -284,7 +259,6 @@ const HistoryBox = ({ ref }: Props) => {
       // 현재 탭까지만 유지하고 나머지 오른쪽 탭들은 제거
       const updatedList = historyList.slice(0, activeIndex + 1);
       setHistoryList(updatedList);
-      updateHistoryListInStorage(updatedList);
       closeContextMenu();
     }
   };
@@ -295,7 +269,6 @@ const HistoryBox = ({ ref }: Props) => {
       // 현재 탭부터 끝까지 유지하고 나머지 왼쪽 탭들은 제거
       const updatedList = historyList.slice(activeIndex);
       setHistoryList(updatedList);
-      updateHistoryListInStorage(updatedList);
       setActiveIndex(0); // 현재 탭이 첫 번째 탭이 됨
       closeContextMenu();
     }
@@ -305,7 +278,6 @@ const HistoryBox = ({ ref }: Props) => {
     if (activeIndex !== null) {
       const updatedList = historyList.filter((_, index) => index !== activeIndex);
       setHistoryList(updatedList);
-      updateHistoryListInStorage(updatedList);
       closeContextMenu();
       if (updatedList.length === 0) {
         // 모든 탭이 닫혔다면 홈페이지로 이동
