@@ -37,7 +37,7 @@ const HistoryBox = ({ ref }: Props) => {
   const [historyListAsMiddleState, setHistoryListAsMiddleState] = useState<HistoryTypeForSorting[]>([]);
 
   // 각각의 바 관리를 위한 상태
-  const [activeElementId, setActiveIndex] = useState<number | null>(0); // 활성화 탭
+  const [activeElementId, setActiveElementId] = useState<number | null>(0); // 활성화 탭
   const [translateXValue, setTranslateXValue] = useState<number>(0); // 왼쪽 오른쪽 이동
 
   // 최대 이동 범위
@@ -92,36 +92,20 @@ const HistoryBox = ({ ref }: Props) => {
   }, [isMenuCheckSuccess, menuAuthList]);
 
   const dragStart = (event: SortableEvent) => {
-    const idx = event.oldIndex ?? -1; // 드래그 시작 시의 인덱스
-    if (idx >= 0) {
-      setActiveIndex(idx); // 드래깅 인덱스 업데이트
-    }
+    setActiveElementId(isNaN(Number(event.item.dataset.id)) ? null : Number(event.item.dataset.id));
   };
 
   // 드래그가 끝났을 때 최종 처리
   const dragEnd = (event: SortableEvent) => {
-    const startIndex = event.oldIndex ?? -1; // 드래그 시작 인덱스
-    const endIndex = event.newIndex ?? -1; // 드래그 끝 인덱스
-
-    if (startIndex >= 0 && endIndex >= 0 && startIndex !== endIndex) {
-      const updatedList = [...historyList];
-      const [movedItem] = updatedList.splice(startIndex, 1); // 시작 인덱스에서 아이템 제거
-      updatedList.splice(endIndex, 0, movedItem); // 끝 인덱스에 아이템 삽입
-
-      setHistoryList(updatedList); // 리스트 상태 업데이트
-      // 드래그 종료된 페이지로 이동
-      redirect(updatedList[endIndex].histMenuUri, RedirectType.push);
-    }
-
     // 최종 드래깅한 아이템에 on 클래스 추가
-    setActiveIndex(endIndex);
+    setActiveElementId(isNaN(Number(event.item.dataset.id)) ? null : Number(event.item.dataset.id));
   };
 
   // 활성화 탭
-  const handleActivateItem = (index: number, histMenuUri: string) => {
+  const handleActivateItem = (itemId: number, histMenuUri: string) => {
     updateButtonVisibility();
     if (histMenuUri !== pathname) {
-      setActiveIndex(index);
+      setActiveElementId(itemId);
       redirect(histMenuUri || '', RedirectType.push);
     }
   };
@@ -129,11 +113,11 @@ const HistoryBox = ({ ref }: Props) => {
   // 현재 URI와 같은 histMenuUri를 가진 탭을 찾아 활성화
   useEffect(() => {
     const foundIndex = historyList.findIndex((item) => item.histMenuUri === pathname);
-    if (foundIndex !== -1) {
-      setActiveIndex(foundIndex);
-    } else {
-      setActiveIndex(null); // 현재 URI와 일치하는 히스토리 탭이 없으면 activeIndex를 null로 설정
-    }
+    // if (foundIndex !== -1) {
+    //   setActiveIndex(foundIndex);
+    // } else {
+    //   setActiveIndex(null); // 현재 URI와 일치하는 히스토리 탭이 없으면 activeIndex를 null로 설정
+    // } todo
   }, [pathname, historyList]);
 
   // 닫힘 동작
@@ -196,7 +180,7 @@ const HistoryBox = ({ ref }: Props) => {
     closeContextMenu();
     // 상태 초기화
     setHistoryList([]);
-    setActiveIndex(null);
+    //setActiveIndex(null); todo
     redirect('/', RedirectType.push);
   };
   const queryClient = useQueryClient();
@@ -244,7 +228,7 @@ const HistoryBox = ({ ref }: Props) => {
       );
       setHistoryList(updatedList);
       closeContextMenu();
-      setActiveIndex(0);
+      //setActiveIndex(0); todo
     } else {
       console.log('활성화된 탭이 없습니다.');
       closeAllTabs();
@@ -281,13 +265,12 @@ const HistoryBox = ({ ref }: Props) => {
       if (updatedList.length === 0) {
         // 모든 탭이 닫혔다면 홈페이지로 이동
         redirect('/', RedirectType.push);
-        setActiveIndex(null);
+        //setActiveIndex(null); todo
       } else {
         // 다음 탭으로 이동 (마지막 탭이었다면 이전 탭으로)
-        const newActiveIndex = activeIndex >= updatedList.length ? updatedList.length - 1 : activeIndex;
-        setActiveIndex(newActiveIndex);
-
-        redirect(updatedList[newActiveIndex].histMenuUri, RedirectType.push);
+        // const newActiveIndex = activeIndex >= updatedList.length ? updatedList.length - 1 : activeIndex;
+        // setActiveIndex(newActiveIndex); todo
+        //redirect(updatedList[newActiveIndex].histMenuUri, RedirectType.push); todo
       }
     }
   };
@@ -346,6 +329,7 @@ const HistoryBox = ({ ref }: Props) => {
               return (
                 <div
                   key={item.id}
+                  data-id={item.id} // 각 요소 식별 목적
                   className={`item-${index} ${isHover ? 'hover' : ''} ${isNotHover ? 'notHover' : ''} ${activeElementId != item.id ? 'notHover' : ''} ${
                     activeElementId == item.id && pathname !== '/' && pathname !== '' ? 'on' : ''
                   }`}
@@ -359,7 +343,7 @@ const HistoryBox = ({ ref }: Props) => {
                     }}
                     onClick={() => {
                       if (item.histMenuUri) {
-                        handleActivateItem(index, item.histMenuUri);
+                        handleActivateItem(item.id, item.histMenuUri);
                       }
                     }}
                   >
