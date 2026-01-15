@@ -102,25 +102,44 @@ const HistoryBox = ({ ref }: Props) => {
   };
 
   // 활성화 탭
-  const handleActivateItem = (itemId: number, histMenuUri: string) => {
+  const handleActivateItem = (itemId: number) => {
     updateButtonVisibility();
-    if (histMenuUri !== pathname) {
-      setActiveElementId(itemId);
-      redirect(histMenuUri || '', RedirectType.push);
-    }
+    setActiveElementId(itemId);
+    // if (histMenuUri !== pathname) {
+    //   setActiveElementId(itemId);
+    //   redirect(histMenuUri || '', RedirectType.push);
+    // }
   };
 
   // 닫힘 동작
-  const closeHistory = (index: number, historyList: HistoryType[]) => {
+  const closeHistory = () => {
     updateButtonVisibility();
     // 리스트에서 선택된 히스토리를 삭제
-    const updatedList = historyList.filter((_, idx) => idx !== index);
-    setHistoryList(updatedList);
+    const updatedList = historyList.filter(
+      (history) => history.histMenuUri != historyListAsMiddleState.filter((middleState) => middleState.id == activeElementId)[0].histMenuUri,
+    );
 
-    // 남은 히스토리가 없으면 홈 페이지로 이동
     if (updatedList.length === 0) {
-      redirect('/', RedirectType.push);
+      // 모든 탭이 닫힘
+      //redirect('/', RedirectType.push);
+      setActiveElementId(null);
+    } else {
+      // 다음 탭으로 이동 (마지막 탭이었다면 이전 탭으로)
+      historyListAsMiddleState.forEach((value, index) => {
+        if (value.id == activeElementId) {
+          if (historyListAsMiddleState[index + 1]) {
+            // 이후 탭이 존재하는 경우 다음 탭으로 이동
+            setActiveElementId(historyListAsMiddleState[index + 1].id);
+            //redirect(historyListAsMiddleState[index + 1].histMenuUri, RedirectType.push);
+          } else {
+            // 그 외 이전 탭으로
+            setActiveElementId(historyListAsMiddleState[index - 1].id);
+            //redirect(historyListAsMiddleState[index - 1].histMenuUri, RedirectType.push);
+          }
+        }
+      });
     }
+    setHistoryList(updatedList);
   };
 
   /** 창 너비 혹은 고려할 만한 상호작용 발생 시 이에 맞추어 버튼 출력 동기화 */
@@ -170,8 +189,8 @@ const HistoryBox = ({ ref }: Props) => {
     closeContextMenu();
     // 상태 초기화
     setHistoryList([]);
-    //setActiveIndex(null); todo
-    redirect('/', RedirectType.push);
+    setActiveElementId(null);
+    //redirect('/', RedirectType.push);
   };
   const queryClient = useQueryClient();
 
@@ -218,7 +237,7 @@ const HistoryBox = ({ ref }: Props) => {
       );
       setHistoryList(updatedList);
       closeContextMenu();
-      //setActiveIndex(0); todo
+      setActiveElementId(null);
     } else {
       console.log('활성화된 탭이 없습니다.');
       closeAllTabs();
@@ -231,11 +250,9 @@ const HistoryBox = ({ ref }: Props) => {
       const updatedList = historyList.filter(
         (history) => history.histMenuUri != historyListAsMiddleState.filter((middleState) => middleState.id == activeElementId)[0].histMenuUri,
       );
-      setHistoryList(updatedList);
-      closeContextMenu();
       if (updatedList.length === 0) {
-        // 모든 탭이 닫혔다면 홈페이지로 이동
-        redirect('/', RedirectType.push);
+        // 모든 탭이 닫힘
+        //redirect('/', RedirectType.push);
         setActiveElementId(null);
       } else {
         // 다음 탭으로 이동 (마지막 탭이었다면 이전 탭으로)
@@ -244,15 +261,17 @@ const HistoryBox = ({ ref }: Props) => {
             if (historyListAsMiddleState[index + 1]) {
               // 이후 탭이 존재하는 경우 다음 탭으로 이동
               setActiveElementId(historyListAsMiddleState[index + 1].id);
-              redirect(historyListAsMiddleState[index + 1].histMenuUri, RedirectType.push);
+              //redirect(historyListAsMiddleState[index + 1].histMenuUri, RedirectType.push);
             } else {
               // 그 외 이전 탭으로
               setActiveElementId(historyListAsMiddleState[index - 1].id);
-              redirect(historyListAsMiddleState[index - 1].histMenuUri, RedirectType.push);
+              //redirect(historyListAsMiddleState[index - 1].histMenuUri, RedirectType.push);
             }
           }
         });
       }
+      setHistoryList(updatedList);
+      closeContextMenu();
     }
   };
 
@@ -324,7 +343,7 @@ const HistoryBox = ({ ref }: Props) => {
                     }}
                     onClick={() => {
                       if (item.histMenuUri) {
-                        handleActivateItem(item.id, item.histMenuUri);
+                        handleActivateItem(item.id);
                       }
                     }}
                   >
@@ -332,7 +351,7 @@ const HistoryBox = ({ ref }: Props) => {
                   </div>
                   <button
                     onClick={() => {
-                      closeHistory(index, historyList);
+                      closeHistory();
                     }}
                   >
                     <span></span>
