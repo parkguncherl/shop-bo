@@ -1,13 +1,13 @@
 'use client';
 
 import { ReactSortable, SortableEvent } from 'react-sortablejs';
-import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { HistoryType, useCommonStore, useMypageStore } from '../../../../stores';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import { authApi } from '../../../../libs';
-import { ApiResponseAuthResponseMenuAuth, AuthResponseMenuAuth } from '../../../../generated';
+import { ApiResponseAuthResponseMenuAuth } from '../../../../generated';
 
 interface Props {
   ref?: React.Ref<{ closeAllTabs: () => void }>;
@@ -38,7 +38,6 @@ const HistoryBox = ({ ref }: Props) => {
   const [historyListAsMiddleState, setHistoryListAsMiddleState] = useState<HistoryTypeForSorting[]>([]);
 
   // 각각의 바 관리를 위한 상태
-  //const [activeElementId, setActiveElementId] = useState<number | null>(0); // 활성화 탭(해당 상태에 기대어 historyListAsMiddleState 에 대한 인덱싱 수행, 리다이렉션 동작 등이 이에 의존)
   const [translateXValue, setTranslateXValue] = useState<number>(0); // 왼쪽 오른쪽 이동
 
   // 최대 이동 범위
@@ -131,12 +130,29 @@ const HistoryBox = ({ ref }: Props) => {
   };
 
   // 닫힘 동작
-  const closeHistory = (item: HistoryTypeForSorting) => {
-    updateButtonVisibility();
+  const closeHistory = (item: HistoryTypeForSorting, activeElementId?: number) => {
     // 리스트에서 선택된 히스토리를 삭제
     const updatedList = historyList.filter(
       (history) => history.histMenuUri != historyListAsMiddleState.filter((middleState) => middleState.id == item.id)[0].histMenuUri,
     );
+    if (activeElementId != undefined && activeElementId == item.id) {
+      // activeElementId 가 현재 닫힘 동작이 이루어진 요소의 id와 동일한 경우에만 동작에 따른 리다이렉트 수행됨, 이외의 경우는 history 상태 수정만 일어남
+      if (updatedList.length != 0) {
+        // 다음 탭으로 이동 (마지막 탭이었다면 이전 탭으로)
+        historyListAsMiddleState.forEach((value, index) => {
+          if (value.id == activeElementId) {
+            if (historyListAsMiddleState[index + 1]) {
+              // 이후 탭이 존재하는 경우 다음 탭으로 이동
+              router.push(historyListAsMiddleState[index + 1].histMenuUri);
+            } else {
+              // 그 외 이전 탭으로
+              router.push(historyListAsMiddleState[index - 1].histMenuUri);
+            }
+          }
+        });
+      }
+    }
+    updateButtonVisibility();
     setHistoryList(updatedList);
   };
 
@@ -329,7 +345,7 @@ const HistoryBox = ({ ref }: Props) => {
                   </div>
                   <button
                     onClick={() => {
-                      closeHistory(item);
+                      closeHistory(item, activeElementId);
                     }}
                   >
                     <span></span>
