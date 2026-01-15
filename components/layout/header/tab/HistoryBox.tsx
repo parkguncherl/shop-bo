@@ -110,16 +110,6 @@ const HistoryBox = ({ ref }: Props) => {
     }
   };
 
-  // 현재 URI와 같은 histMenuUri를 가진 탭을 찾아 활성화
-  useEffect(() => {
-    const foundIndex = historyList.findIndex((item) => item.histMenuUri === pathname);
-    // if (foundIndex !== -1) {
-    //   setActiveIndex(foundIndex);
-    // } else {
-    //   setActiveIndex(null); // 현재 URI와 일치하는 히스토리 탭이 없으면 activeIndex를 null로 설정
-    // } todo
-  }, [pathname, historyList]);
-
   // 닫힘 동작
   const closeHistory = (index: number, historyList: HistoryType[]) => {
     updateButtonVisibility();
@@ -234,26 +224,7 @@ const HistoryBox = ({ ref }: Props) => {
       closeAllTabs();
     }
   };
-  // // 현재 탭의 오른쪽에 있는 모든 탭 닫기
-  // const closeRightTabs = () => {
-  //   if (activeElementId !== null) {
-  //     // 현재 탭까지만 유지하고 나머지 오른쪽 탭들은 제거
-  //     const updatedList = historyList.slice(0, activeIndex + 1);
-  //     setHistoryList(updatedList);
-  //     closeContextMenu();
-  //   }
-  // };
-  //
-  // // 현재 탭의 왼쪽에 있는 모든 탭 닫기
-  // const closeLeftTabs = () => {
-  //   if (activeElementId !== null) {
-  //     // 현재 탭부터 끝까지 유지하고 나머지 왼쪽 탭들은 제거
-  //     const updatedList = historyList.slice(activeIndex);
-  //     setHistoryList(updatedList);
-  //     setActiveIndex(0); // 현재 탭이 첫 번째 탭이 됨
-  //     closeContextMenu();
-  //   }
-  // };
+
   // 현재 탭만 닫기
   const closeCurrentTab = () => {
     if (activeElementId !== null) {
@@ -265,12 +236,22 @@ const HistoryBox = ({ ref }: Props) => {
       if (updatedList.length === 0) {
         // 모든 탭이 닫혔다면 홈페이지로 이동
         redirect('/', RedirectType.push);
-        //setActiveIndex(null); todo
+        setActiveElementId(null);
       } else {
         // 다음 탭으로 이동 (마지막 탭이었다면 이전 탭으로)
-        // const newActiveIndex = activeIndex >= updatedList.length ? updatedList.length - 1 : activeIndex;
-        // setActiveIndex(newActiveIndex); todo
-        //redirect(updatedList[newActiveIndex].histMenuUri, RedirectType.push); todo
+        historyListAsMiddleState.forEach((value, index) => {
+          if (value.id == activeElementId) {
+            if (historyListAsMiddleState[index + 1]) {
+              // 이후 탭이 존재하는 경우 다음 탭으로 이동
+              setActiveElementId(historyListAsMiddleState[index + 1].id);
+              redirect(historyListAsMiddleState[index + 1].histMenuUri, RedirectType.push);
+            } else {
+              // 그 외 이전 탭으로
+              setActiveElementId(historyListAsMiddleState[index - 1].id);
+              redirect(historyListAsMiddleState[index - 1].histMenuUri, RedirectType.push);
+            }
+          }
+        });
       }
     }
   };
@@ -385,12 +366,6 @@ const HistoryBox = ({ ref }: Props) => {
           <li>
             <button onClick={closeOtherTabs}>· 다른 탭 닫기</button>
           </li>
-          {/*<li>*/}
-          {/*  <button onClick={closeRightTabs}>· 우측 탭 닫기</button>*/}
-          {/*</li>*/}
-          {/*<li>*/}
-          {/*  <button onClick={closeLeftTabs}>· 왼쪽 탭 닫기</button>*/}
-          {/*</li>*/}
           <li>
             <button onClick={closeCurrentTab}>· 현재 탭 닫기</button>
           </li>
