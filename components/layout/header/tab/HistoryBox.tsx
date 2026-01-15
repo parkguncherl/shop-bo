@@ -239,8 +239,9 @@ const HistoryBox = ({ ref }: Props) => {
   // 현재 탭을 제외한 다른 모든 탭 닫기
   const closeOtherTabs = () => {
     if (activeElementId !== null) {
-      const currentTab = historyList[activeIndex];
-      const updatedList = [currentTab];
+      const updatedList = historyList.filter(
+        (history) => history.histMenuUri == historyListAsMiddleState.filter((middleState) => middleState.id == activeElementId)[0].histMenuUri,
+      );
       setHistoryList(updatedList);
       closeContextMenu();
       setActiveIndex(0);
@@ -249,30 +250,32 @@ const HistoryBox = ({ ref }: Props) => {
       closeAllTabs();
     }
   };
-  // 현재 탭의 오른쪽에 있는 모든 탭 닫기
-  const closeRightTabs = () => {
-    if (activeElementId !== null) {
-      // 현재 탭까지만 유지하고 나머지 오른쪽 탭들은 제거
-      const updatedList = historyList.slice(0, activeIndex + 1);
-      setHistoryList(updatedList);
-      closeContextMenu();
-    }
-  };
-
-  // 현재 탭의 왼쪽에 있는 모든 탭 닫기
-  const closeLeftTabs = () => {
-    if (activeElementId !== null) {
-      // 현재 탭부터 끝까지 유지하고 나머지 왼쪽 탭들은 제거
-      const updatedList = historyList.slice(activeIndex);
-      setHistoryList(updatedList);
-      setActiveIndex(0); // 현재 탭이 첫 번째 탭이 됨
-      closeContextMenu();
-    }
-  };
+  // // 현재 탭의 오른쪽에 있는 모든 탭 닫기
+  // const closeRightTabs = () => {
+  //   if (activeElementId !== null) {
+  //     // 현재 탭까지만 유지하고 나머지 오른쪽 탭들은 제거
+  //     const updatedList = historyList.slice(0, activeIndex + 1);
+  //     setHistoryList(updatedList);
+  //     closeContextMenu();
+  //   }
+  // };
+  //
+  // // 현재 탭의 왼쪽에 있는 모든 탭 닫기
+  // const closeLeftTabs = () => {
+  //   if (activeElementId !== null) {
+  //     // 현재 탭부터 끝까지 유지하고 나머지 왼쪽 탭들은 제거
+  //     const updatedList = historyList.slice(activeIndex);
+  //     setHistoryList(updatedList);
+  //     setActiveIndex(0); // 현재 탭이 첫 번째 탭이 됨
+  //     closeContextMenu();
+  //   }
+  // };
   // 현재 탭만 닫기
   const closeCurrentTab = () => {
     if (activeElementId !== null) {
-      const updatedList = historyList.filter((_, index) => index !== activeIndex);
+      const updatedList = historyList.filter(
+        (history) => history.histMenuUri != historyListAsMiddleState.filter((middleState) => middleState.id == activeElementId)[0].histMenuUri,
+      );
       setHistoryList(updatedList);
       closeContextMenu();
       if (updatedList.length === 0) {
@@ -398,12 +401,12 @@ const HistoryBox = ({ ref }: Props) => {
           <li>
             <button onClick={closeOtherTabs}>· 다른 탭 닫기</button>
           </li>
-          <li>
-            <button onClick={closeRightTabs}>· 우측 탭 닫기</button>
-          </li>
-          <li>
-            <button onClick={closeLeftTabs}>· 왼쪽 탭 닫기</button>
-          </li>
+          {/*<li>*/}
+          {/*  <button onClick={closeRightTabs}>· 우측 탭 닫기</button>*/}
+          {/*</li>*/}
+          {/*<li>*/}
+          {/*  <button onClick={closeLeftTabs}>· 왼쪽 탭 닫기</button>*/}
+          {/*</li>*/}
           <li>
             <button onClick={closeCurrentTab}>· 현재 탭 닫기</button>
           </li>
