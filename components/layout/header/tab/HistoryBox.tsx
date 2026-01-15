@@ -2,7 +2,7 @@
 
 import { ReactSortable, SortableEvent } from 'react-sortablejs';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { redirect, RedirectType, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { HistoryType, useCommonStore, useMypageStore } from '../../../../stores';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toastError, toastSuccess } from '../../../ToastMessage';
@@ -23,6 +23,7 @@ interface HistoryTypeForSorting extends HistoryType {
 const HistoryBox = ({ ref }: Props) => {
   /** context hook(provided by Root Provider) */
   const pathname = usePathname();
+  const router = useRouter();
 
   const listRef = useRef<HTMLDivElement>(null); // list Ref 생성
   const listDivRef = useRef<HTMLDivElement>(null); // 전체 list div Ref 생성
@@ -37,7 +38,7 @@ const HistoryBox = ({ ref }: Props) => {
   const [historyListAsMiddleState, setHistoryListAsMiddleState] = useState<HistoryTypeForSorting[]>([]);
 
   // 각각의 바 관리를 위한 상태
-  const [activeElementId, setActiveElementId] = useState<number | null>(0); // 활성화 탭
+  const [activeElementId, setActiveElementId] = useState<number | null>(0); // 활성화 탭(해당 상태에 기대어 historyListAsMiddleState 에 대한 인덱싱 수행, 리다이렉션 동작 등이 이에 의존)
   const [translateXValue, setTranslateXValue] = useState<number>(0); // 왼쪽 오른쪽 이동
 
   // 최대 이동 범위
@@ -77,11 +78,11 @@ const HistoryBox = ({ ref }: Props) => {
               // 메인페이지 외 경로만 추가 후보
               const pushedHistoryList = [...historyList];
               pushedHistoryList.push({
-                //id: pushedHistoryList[pushedHistoryList.length - 1] ? pushedHistoryList[pushedHistoryList.length - 1].id : 1, // 기본 1부터 시작
                 histMenuNm: body.menuNm as string,
                 histMenuUri: pathname,
               } as HistoryType);
               setHistoryList(pushedHistoryList);
+              setActiveElementId(pushedHistoryList.length - 1); // 이동한 경로에 맞추어 포커싱
             }
           }
         }
@@ -90,6 +91,30 @@ const HistoryBox = ({ ref }: Props) => {
       }
     }
   }, [isMenuCheckSuccess, menuAuthList]);
+
+  useEffect(() => {
+    // historyList 에 따라 중간 상태 동기화
+    setHistoryListAsMiddleState(
+      historyList.map((history, index) => {
+        return {
+          ...history,
+          id: index,
+        };
+      }),
+    );
+  }, [historyList]);
+
+  useEffect(() => {
+    if (activeElementId == null) {
+      router.push('/');
+    } else {
+      historyListAsMiddleState.forEach((value, index) => {
+        if (value.id == activeElementId) {
+          router.push(value.histMenuUri);
+        }
+      });
+    }
+  }, [activeElementId]);
 
   const dragStart = (event: SortableEvent) => {
     setActiveElementId(isNaN(Number(event.item.dataset.id)) ? null : Number(event.item.dataset.id));
@@ -112,19 +137,17 @@ const HistoryBox = ({ ref }: Props) => {
   };
 
   // 닫힘 동작
-  const closeHistory = () => {
+  const closeHistory = (itemId: number) => {
     updateButtonVisibility();
     // 리스트에서 선택된 히스토리를 삭제
     const updatedList = historyList.filter(
-      (history) => history.histMenuUri != historyListAsMiddleState.filter((middleState) => middleState.id == activeElementId)[0].histMenuUri,
+      (history) => history.histMenuUri != historyListAsMiddleState.filter((middleState) => middleState.id == itemId)[0].histMenuUri,
     );
-
     if (updatedList.length === 0) {
       // 모든 탭이 닫힘
       //redirect('/', RedirectType.push);
       setActiveElementId(null);
     } else {
-      // 다음 탭으로 이동 (마지막 탭이었다면 이전 탭으로)
       historyListAsMiddleState.forEach((value, index) => {
         if (value.id == activeElementId) {
           if (historyListAsMiddleState[index + 1]) {
@@ -292,18 +315,6 @@ const HistoryBox = ({ ref }: Props) => {
     };
   }, []);
 
-  useEffect(() => {
-    // historyList 에 따라 중간 상태 동기화
-    setHistoryListAsMiddleState(
-      historyList.map((history, index) => {
-        return {
-          ...history,
-          id: index,
-        };
-      }),
-    );
-  }, [historyList]);
-
   return (
     <div className="historyBox" onContextMenu={handleContextMenu}>
       <div className="list" ref={listDivRef}>
@@ -351,7 +362,7 @@ const HistoryBox = ({ ref }: Props) => {
                   </div>
                   <button
                     onClick={() => {
-                      closeHistory();
+                      closeHistory(item.id);
                     }}
                   >
                     <span></span>
