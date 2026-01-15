@@ -1,13 +1,13 @@
 'use client';
 
 import { ReactSortable, SortableEvent } from 'react-sortablejs';
-import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { HistoryType, useCommonStore, useMypageStore } from '../../../../stores';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import { authApi } from '../../../../libs';
-import { ApiResponseAuthResponseMenuAuth } from '../../../../generated';
+import { ApiResponseAuthResponseMenuAuth, AuthResponseMenuAuth } from '../../../../generated';
 
 interface Props {
   ref?: React.Ref<{ closeAllTabs: () => void }>;
@@ -38,7 +38,7 @@ const HistoryBox = ({ ref }: Props) => {
   const [historyListAsMiddleState, setHistoryListAsMiddleState] = useState<HistoryTypeForSorting[]>([]);
 
   // 각각의 바 관리를 위한 상태
-  const [activeElementId, setActiveElementId] = useState<number | null>(0); // 활성화 탭(해당 상태에 기대어 historyListAsMiddleState 에 대한 인덱싱 수행, 리다이렉션 동작 등이 이에 의존)
+  //const [activeElementId, setActiveElementId] = useState<number | null>(0); // 활성화 탭(해당 상태에 기대어 historyListAsMiddleState 에 대한 인덱싱 수행, 리다이렉션 동작 등이 이에 의존)
   const [translateXValue, setTranslateXValue] = useState<number>(0); // 왼쪽 오른쪽 이동
 
   // 최대 이동 범위
@@ -82,7 +82,6 @@ const HistoryBox = ({ ref }: Props) => {
                 histMenuUri: pathname,
               } as HistoryType);
               setHistoryList(pushedHistoryList);
-              setActiveElementId(pushedHistoryList.length - 1); // 이동한 경로에 맞추어 포커싱
             }
           }
         }
@@ -94,74 +93,50 @@ const HistoryBox = ({ ref }: Props) => {
 
   useEffect(() => {
     // historyList 에 따라 중간 상태 동기화
-    setHistoryListAsMiddleState(
-      historyList.map((history, index) => {
-        return {
-          ...history,
-          id: index,
-        };
-      }),
-    );
+    if (historyList.length != 0) {
+      setHistoryListAsMiddleState(
+        historyList.map((history, index) => {
+          return {
+            ...history,
+            id: index,
+          };
+        }),
+      );
+    } else {
+      setHistoryListAsMiddleState([]);
+      router.push('/');
+    }
   }, [historyList]);
 
-  useEffect(() => {
-    if (activeElementId == null) {
-      router.push('/');
-    } else {
-      historyListAsMiddleState.forEach((value, index) => {
-        if (value.id == activeElementId) {
-          router.push(value.histMenuUri);
-        }
-      });
-    }
-  }, [activeElementId]);
-
-  const dragStart = (event: SortableEvent) => {
-    setActiveElementId(isNaN(Number(event.item.dataset.id)) ? null : Number(event.item.dataset.id));
-  };
+  // const dragStart = (event: SortableEvent) => {
+  //   //setActiveElementId(isNaN(Number(event.item.dataset.id)) ? null : Number(event.item.dataset.id));
+  // };
 
   // 드래그가 끝났을 때 최종 처리
   const dragEnd = (event: SortableEvent) => {
     // 최종 드래깅한 아이템에 on 클래스 추가
-    setActiveElementId(isNaN(Number(event.item.dataset.id)) ? null : Number(event.item.dataset.id));
+    //setActiveElementId(isNaN(Number(event.item.dataset.id)) ? null : Number(event.item.dataset.id));
+
+    // 최종 드래깅한 아이템에 대응하는 경로로 이동
+    const targetUri = historyListAsMiddleState.filter(
+      (history) => history.id == (isNaN(Number(event.item.dataset.id)) ? null : Number(event.item.dataset.id)),
+    )[0].histMenuUri;
+    router.push(targetUri);
   };
 
   // 활성화 탭
-  const handleActivateItem = (itemId: number) => {
+  const handleActivateItem = (item: HistoryTypeForSorting) => {
     updateButtonVisibility();
-    setActiveElementId(itemId);
-    // if (histMenuUri !== pathname) {
-    //   setActiveElementId(itemId);
-    //   redirect(histMenuUri || '', RedirectType.push);
-    // }
+    router.push(item.histMenuUri);
   };
 
   // 닫힘 동작
-  const closeHistory = (itemId: number) => {
+  const closeHistory = (item: HistoryTypeForSorting) => {
     updateButtonVisibility();
     // 리스트에서 선택된 히스토리를 삭제
     const updatedList = historyList.filter(
-      (history) => history.histMenuUri != historyListAsMiddleState.filter((middleState) => middleState.id == itemId)[0].histMenuUri,
+      (history) => history.histMenuUri != historyListAsMiddleState.filter((middleState) => middleState.id == item.id)[0].histMenuUri,
     );
-    if (updatedList.length === 0) {
-      // 모든 탭이 닫힘
-      //redirect('/', RedirectType.push);
-      setActiveElementId(null);
-    } else {
-      historyListAsMiddleState.forEach((value, index) => {
-        if (value.id == activeElementId) {
-          if (historyListAsMiddleState[index + 1]) {
-            // 이후 탭이 존재하는 경우 다음 탭으로 이동
-            setActiveElementId(historyListAsMiddleState[index + 1].id);
-            //redirect(historyListAsMiddleState[index + 1].histMenuUri, RedirectType.push);
-          } else {
-            // 그 외 이전 탭으로
-            setActiveElementId(historyListAsMiddleState[index - 1].id);
-            //redirect(historyListAsMiddleState[index - 1].histMenuUri, RedirectType.push);
-          }
-        }
-      });
-    }
     setHistoryList(updatedList);
   };
 
@@ -206,15 +181,6 @@ const HistoryBox = ({ ref }: Props) => {
     setTranslateXValue(Math.max(-maxTranslateX + divWidth, newValue)); // 최소값을 -maxTranslateX + divWidth로 제한
   };
 
-  // 모든탭 닫기
-  const closeAllTabs = () => {
-    // 컨텍스트 메뉴 닫기
-    closeContextMenu();
-    // 상태 초기화
-    setHistoryList([]);
-    setActiveElementId(null);
-    //redirect('/', RedirectType.push);
-  };
   const queryClient = useQueryClient();
 
   /** 즐겨찾기 영역 등록 영역 */
@@ -252,43 +218,45 @@ const HistoryBox = ({ ref }: Props) => {
     setContextMenu({ ...contextMenu, visible: false });
   };
 
+  // 모든탭 닫기
+  const closeAllTabs = () => {
+    // 컨텍스트 메뉴 닫기
+    closeContextMenu();
+    // 상태 초기화
+    setHistoryList([]);
+  };
+
   // 현재 탭을 제외한 다른 모든 탭 닫기
   const closeOtherTabs = () => {
-    if (activeElementId !== null) {
+    const activeElementId = historyListAsMiddleState.filter((history) => history.histMenuUri == pathname)[0]?.id;
+    if (activeElementId !== undefined) {
       const updatedList = historyList.filter(
         (history) => history.histMenuUri == historyListAsMiddleState.filter((middleState) => middleState.id == activeElementId)[0].histMenuUri,
       );
       setHistoryList(updatedList);
       closeContextMenu();
-      setActiveElementId(null);
     } else {
-      console.log('활성화된 탭이 없습니다.');
       closeAllTabs();
     }
   };
 
   // 현재 탭만 닫기
   const closeCurrentTab = () => {
-    if (activeElementId !== null) {
+    const activeElementId = historyListAsMiddleState.filter((history) => history.histMenuUri == pathname)[0]?.id;
+    if (activeElementId !== undefined) {
       const updatedList = historyList.filter(
         (history) => history.histMenuUri != historyListAsMiddleState.filter((middleState) => middleState.id == activeElementId)[0].histMenuUri,
       );
-      if (updatedList.length === 0) {
-        // 모든 탭이 닫힘
-        //redirect('/', RedirectType.push);
-        setActiveElementId(null);
-      } else {
+      if (updatedList.length != 0) {
         // 다음 탭으로 이동 (마지막 탭이었다면 이전 탭으로)
         historyListAsMiddleState.forEach((value, index) => {
           if (value.id == activeElementId) {
             if (historyListAsMiddleState[index + 1]) {
               // 이후 탭이 존재하는 경우 다음 탭으로 이동
-              setActiveElementId(historyListAsMiddleState[index + 1].id);
-              //redirect(historyListAsMiddleState[index + 1].histMenuUri, RedirectType.push);
+              router.push(historyListAsMiddleState[index + 1].histMenuUri);
             } else {
               // 그 외 이전 탭으로
-              setActiveElementId(historyListAsMiddleState[index - 1].id);
-              //redirect(historyListAsMiddleState[index - 1].histMenuUri, RedirectType.push);
+              router.push(historyListAsMiddleState[index - 1].histMenuUri);
             }
           }
         });
@@ -327,14 +295,13 @@ const HistoryBox = ({ ref }: Props) => {
             multiDrag
             swap
             forceFallback
-            onStart={(event) => dragStart(event)}
+            //onStart={(event) => dragStart(event)}
             onEnd={(event) => dragEnd(event)}
             handle=".drag-handle" // 드래그 동작이 일어나는 요소를 클래스명으로 명확히 정의함
           >
-            {historyListAsMiddleState.map((item, index) => {
+            {historyListAsMiddleState.map((item, index, array) => {
               const isHover = item.id === hoverElementId;
-              // const active = activeElementId || 0;
-              // const deactive = activeElementId != item.id;
+              const activeElementId = array.filter((element) => element.histMenuUri == pathname)[0]?.id;
               const isNotHover = hoverElementId !== null && item.id === hoverElementId - 1;
 
               return (
@@ -354,7 +321,7 @@ const HistoryBox = ({ ref }: Props) => {
                     }}
                     onClick={() => {
                       if (item.histMenuUri) {
-                        handleActivateItem(item.id);
+                        handleActivateItem(item);
                       }
                     }}
                   >
@@ -362,7 +329,7 @@ const HistoryBox = ({ ref }: Props) => {
                   </div>
                   <button
                     onClick={() => {
-                      closeHistory(item.id);
+                      closeHistory(item);
                     }}
                   >
                     <span></span>
@@ -388,16 +355,16 @@ const HistoryBox = ({ ref }: Props) => {
           }}
         >
           <li>
-            <button onClick={makeFavorite}>· 즐겨찾기정보 일괄 생성</button>
+            <button onClick={() => makeFavorite()}>· 즐겨찾기정보 일괄 생성</button>
           </li>
           <li>
-            <button onClick={closeAllTabs}>· 전체 탭 닫기</button>
+            <button onClick={() => closeAllTabs()}>· 전체 탭 닫기</button>
           </li>
           <li>
-            <button onClick={closeOtherTabs}>· 다른 탭 닫기</button>
+            <button onClick={() => closeOtherTabs()}>· 다른 탭 닫기</button>
           </li>
           <li>
-            <button onClick={closeCurrentTab}>· 현재 탭 닫기</button>
+            <button onClick={() => closeCurrentTab()}>· 현재 탭 닫기</button>
           </li>
         </ul>
       )}
