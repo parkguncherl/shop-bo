@@ -842,4 +842,6 @@ export const YupSchema = {
       orderFee: yup.number().required('주문 수수료는 반드시 입력하셔야 합니다.'),
       hangerFee: yup.number().required('행거 수수료는 반드시 입력하셔야 합니다.'),
     }) as yup.ObjectSchema<PartnerFeeResponse>,
+
+  ProductContentsRequest: (): yup.ObjectSchema<any> => yup.object().shape({}),
 };
