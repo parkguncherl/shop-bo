@@ -12,6 +12,11 @@
 
   & > textarea {
     height: 100%; // formBox 추종
+  }
 
+  .formBox {
+    .per_content_element {
+      width: 100%;
+    }
   }
 }
