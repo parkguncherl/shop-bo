@@ -103,7 +103,6 @@ const HistoryBox = ({ ref }: Props) => {
       );
     } else {
       setHistoryListAsMiddleState([]);
-      router.push('/');
     }
   }, [historyList]);
 
@@ -150,6 +149,9 @@ const HistoryBox = ({ ref }: Props) => {
             }
           }
         });
+      } else {
+        // 모든 탭 닫음, 이 경우 root 경로로 리다이렉트
+        router.push('/');
       }
     }
     updateButtonVisibility();
