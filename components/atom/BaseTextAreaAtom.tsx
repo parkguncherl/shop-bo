@@ -1,14 +1,17 @@
-import React, { TextareaHTMLAttributes } from 'react';
+import React from 'react';
+import { Input } from 'antd';
+import { TextAreaProps } from 'antd/es/input';
 
-export interface BaseTextAreaAtomProps extends TextareaHTMLAttributes<any> {
+export interface BaseTextAreaAtomProps extends TextAreaProps {
   type?: 'text' | 'number' | 'email' | 'password';
   ref?: React.Ref<HTMLTextAreaElement>;
 }
 
 export const BaseTextAreaAtom = ({ ref, ...props }: BaseTextAreaAtomProps) => {
+  const { TextArea } = Input;
   return (
     <>
-      <textarea {...props} ref={ref} autoComplete={'off'}></textarea>
+      <TextArea {...props} ref={ref} autoComplete={'off'}></TextArea>
     </>
   );
 };
