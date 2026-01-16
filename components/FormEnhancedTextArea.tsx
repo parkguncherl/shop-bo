@@ -20,8 +20,10 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
   } = useController({ name, rules, control });
 
   return (
-    <div className="formBox">
-      <BaseTextAreaAtom {...props} autoSize type={'text'} ref={mergeRefs<HTMLTextAreaElement>(ref, refForUseController)}></BaseTextAreaAtom>
+    <div className={'enhanced_textArea'}>
+      <div className={'formBox'}>
+        <BaseTextAreaAtom {...props} type={'text'} ref={mergeRefs<HTMLTextAreaElement>(ref, refForUseController)}></BaseTextAreaAtom>
+      </div>
     </div>
   );
 };

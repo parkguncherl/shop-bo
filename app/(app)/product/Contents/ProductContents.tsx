@@ -48,10 +48,12 @@ const ProductContents = () => {
             </div>
             <div className={'content'}>
               <div className={'content_boxing'}>
-                <FormEnhancedTextArea<ProductContentsFields> control={control} name={'content'} onKeyDown={(e) => {}} />
+                <FormEnhancedTextArea<ProductContentsFields> control={control} name={'content'} autoSize={{ minRows: 14, maxRows: 40 }} onKeyDown={(e) => {}} />
               </div>
             </div>
-            <div className={'bottom_boxing'}></div>
+            <div className={'bottom'}>
+              <div className={'bottom_boxing'}></div>
+            </div>
           </form>
         </div>
         <div className={'right_side'}></div>

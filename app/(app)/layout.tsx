@@ -2,6 +2,8 @@ import React from 'react';
 import stylesForLayout from '../../styles/layout/layout.module.scss';
 import stylesForHeader from '../../styles/layout/header.module.scss';
 
+import '../../styles/form/enhancedTextArea.scss';
+
 import NavList from '../../components/layout/leftNav/NavList';
 import CurTime from '../../components/layout/leftNav/CurTime';
 import BriefUserInfo from '../../components/layout/leftNav/BriefUserInfo';
