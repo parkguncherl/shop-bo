@@ -31,11 +31,18 @@ export const Title = ({ title, search, reset, children, detail, className }: Pro
     data: favoriteData,
     refetch: favRefetch,
     isSuccess: isFavSuccess,
-  } = useQuery([], () => authApi.get<ApiResponseListSelectFavorites>('/mypage/favorites', {}));
+  } = useQuery({ queryKey: [], queryFn: () => authApi.get<ApiResponseListSelectFavorites>('/mypage/favorites', {}) });
 
   useEffect(() => {
-    setFavoriteList(favoriteData?.data?.body ? favoriteData?.data?.body : []);
-  }, [favoriteData?.data?.body, isFavSuccess, setFavoriteList]);
+    if (isFavSuccess) {
+      const { resultCode, body, resultMessage } = favoriteData.data;
+      if (resultCode == 200) {
+        setFavoriteList(body || []);
+      } else {
+        toastError(resultMessage);
+      }
+    }
+  }, [favoriteData]);
 
   useEffect(() => {
     let isMatch = false;

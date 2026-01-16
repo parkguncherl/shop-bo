@@ -5,29 +5,46 @@
 ********************************/
 
 .productContents {
-  & > form {
-    .content_boxing {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      gap: 5px;
-      position: relative;
+  display: grid;
+  grid-template-columns: auto 200px;
 
-      .formBox {
-        display: flex;
-        flex-direction: column;
+  .left_side {
+    & > form {
+      .headed {
         width: 100%;
-        height: 100%;
 
-        & > textarea {
-          height: 100%; // formBox 추종
+        .title_boxing {
 
         }
       }
-    }
 
-    .bottom_boxing {
+      .content {
+        width: 100%;
 
+        .content_boxing {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+          gap: 5px;
+          position: relative;
+
+          .formBox {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+
+            & > textarea {
+              height: 100%; // formBox 추종
+
+            }
+          }
+        }
+      }
+
+      .bottom_boxing {
+
+      }
     }
   }
 }

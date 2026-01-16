@@ -7,13 +7,11 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '../../../../libs';
 import FormEnhancedTextArea from '../../../../components/FormEnhancedTextArea';
+import FormInput from '../../../../components/FormInput';
 
 export interface ProductContentsFields {
   title: string;
-  password: string;
-  isMobileLogin: string;
-  otpNo?: string;
-  countryCode?: string;
+  content: string;
 }
 
 /** 상품관리 - 상품컨텐츠 페이지 */
@@ -41,14 +39,22 @@ const ProductContents = () => {
     <div>
       <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} reset={reset}></Title>
       <div className={'productContents'}>
-        <form>
-          <div className={'headed'}></div>
-          <div className={'content_boxing'}>
-            {/* todo 적절한 컴포넌트를 새로 만들기*/}
-            <FormEnhancedTextArea<ProductContentsFields> control={control} name={'unknown'} onKeyDown={(e) => {}} />
-          </div>
-          <div className={'bottom_boxing'}></div>
-        </form>
+        <div className={'left_side'}>
+          <form>
+            <div className={'headed'}>
+              <div className={'title_boxing'}>
+                <FormInput<ProductContentsFields> control={control} name={'title'} onKeyDown={(e) => {}} inputType={'single'} />
+              </div>
+            </div>
+            <div className={'content'}>
+              <div className={'content_boxing'}>
+                <FormEnhancedTextArea<ProductContentsFields> control={control} name={'content'} onKeyDown={(e) => {}} />
+              </div>
+            </div>
+            <div className={'bottom_boxing'}></div>
+          </form>
+        </div>
+        <div className={'right_side'}></div>
       </div>
     </div>
   );
