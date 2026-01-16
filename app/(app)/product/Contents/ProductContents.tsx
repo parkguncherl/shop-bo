@@ -6,8 +6,15 @@ import { useCommonStore } from '../../../../stores';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '../../../../libs';
-import FormInput from '../../../../components/FormInput';
-import { LoginVerificationFields } from '../../../(auth)/login/LoginClient';
+import FormEnhancedTextArea from '../../../../components/FormEnhancedTextArea';
+
+export interface ProductContentsFields {
+  title: string;
+  password: string;
+  isMobileLogin: string;
+  otpNo?: string;
+  countryCode?: string;
+}
 
 /** 상품관리 - 상품컨텐츠 페이지 */
 const ProductContents = () => {
@@ -25,8 +32,8 @@ const ProductContents = () => {
     control,
     getValues,
     formState: { errors, isValid },
-  } = useForm<any>({
-    resolver: yupResolver(YupSchema.ProductContentsRequest()), // 완료
+  } = useForm<ProductContentsFields>({
+    resolver: yupResolver(YupSchema.ProductContentsRequest()),
     mode: 'onSubmit',
   });
 
@@ -34,11 +41,14 @@ const ProductContents = () => {
     <div>
       <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} reset={reset}></Title>
       <div className={'productContents'}>
-        <div className={'headedArea'}></div>
-        <div className={'contentArea'} style={{ height: '400px' }}>
-          {/* todo 적절한 컴포넌트를 새로 만들기*/}
-          <FormInput<LoginVerificationFields> control={control} style={{ height: '100%' }} name={'loginId'} onKeyDown={(e) => {}} inputType={'textarea'} />
-        </div>
+        <form>
+          <div className={'headed'}></div>
+          <div className={'content_boxing'}>
+            {/* todo 적절한 컴포넌트를 새로 만들기*/}
+            <FormEnhancedTextArea<ProductContentsFields> control={control} name={'unknown'} onKeyDown={(e) => {}} />
+          </div>
+          <div className={'bottom_boxing'}></div>
+        </form>
       </div>
     </div>
   );

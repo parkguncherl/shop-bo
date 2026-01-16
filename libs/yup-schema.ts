@@ -1,7 +1,6 @@
 // C:\work\shop-frontend\libs\yup-schema.ts
 
 import * as yup from 'yup';
-import { LoginVerificationFields } from '../pages/login';
 import { DropDownOption } from '../types/DropDownOptions';
 import {
   ExpenseRequestCreate,
@@ -29,6 +28,8 @@ import { MenuFormData, MenuRequestCreateFields } from '../components/popup/syste
 import { MypageSaveFields } from '../pages/mypage/mypage';
 import { WmsMypageSaveFields } from '../pages/mypage/mypageForWms';
 import { ProductRequestUpdateFields } from '../components/popup/prodMng/ProductModPop';
+import { LoginVerificationFields } from '../app/(auth)/login/LoginClient';
+import { ProductContentsFields } from '../app/(app)/product/Contents/ProductContents';
 
 export interface MenuRequestParams {
   menuCd?: string;
@@ -843,5 +844,5 @@ export const YupSchema = {
       hangerFee: yup.number().required('행거 수수료는 반드시 입력하셔야 합니다.'),
     }) as yup.ObjectSchema<PartnerFeeResponse>,
 
-  ProductContentsRequest: (): yup.ObjectSchema<any> => yup.object().shape({}),
+  ProductContentsRequest: (): yup.ObjectSchema<ProductContentsFields> => yup.object().shape({}),
 };
