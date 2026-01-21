@@ -16,7 +16,7 @@ type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
 interface ContentElement {
   id: number; // 기본 1부터 시작
   partialContent?: string; // 이미지인 경우 undefined
-  disable?: boolean; // 수동 통제, 기본적으로 최하단 요소 이외에는 true 이나 상호작용(수정을 위한 포커싱 등) 발생 시에는 예외적으로 조정 가능(다만 불변성 유지 차원에서 새 배열 생성 후 상태 최신화), 이미지인 경우 undefined
+  frozen?: boolean; // 수동 통제, 기본적으로 최하단 요소 이외에는 true 이나 상호작용(수정을 위한 포커싱 등) 발생 시에는 예외적으로 조정 가능(다만 불변성 유지 차원에서 새 배열 생성 후 상태 최신화), 이미지인 경우 undefined
 }
 
 /**
@@ -30,7 +30,10 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
   } = useController({ name, rules, control });
 
   /** 해당 지역 상태는 반드시 배열의 불변성을 유지할 것 */
-  const [contentElements, setContentElements] = useState<ContentElement[]>([{ id: 1, partialContent: '', disable: false }]);
+  const [contentElements, setContentElements] = useState<ContentElement[]>([
+    { id: 1, partialContent: 'ddsds', frozen: true },
+    { id: 2, partialContent: '', frozen: false },
+  ]);
 
   /** 기타 state */
   const [enableCompletionInterruptCallback, setEnableCompletionInterruptCallback] = useState(true); // 작성 완료 콜백의 무분별한 호출을 제한하는 상태
@@ -81,20 +84,33 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
     <div className={'enhanced_textArea'}>
       <div className={'formBox'}>
         {contentElements.map((contentElement) => {
-          return (
-            <div className={'per_content_element'} key={contentElement.id}>
-              <BaseTextAreaAtom
-                {...props}
-                value={value || ''}
-                type={'text'}
-                ref={mergeRefs<HTMLTextAreaElement>(ref, refForUseController)}
-                onChange={controlChange}
-                disabled={contentElement.disable}
-                onDrop={(e) => onDropEventHandler(e)}
-                onPaste={(e) => onPasteEventHandler(e)}
-              />
-            </div>
-          );
+          if (contentElement.frozen) {
+            return (
+              <div className={'per_content_element'} key={contentElement.id}>
+                <BaseTextAreaAtom
+                  value={contentElement.partialContent}
+                  type={'text'}
+                  onDrop={(e) => onDropEventHandler(e)}
+                  onPaste={(e) => onPasteEventHandler(e)}
+                  disabled={true}
+                />
+              </div>
+            );
+          } else {
+            return (
+              <div className={'per_content_element'} key={contentElement.id}>
+                <BaseTextAreaAtom
+                  //value={contentElement.partialContent}
+                  value={value || ''} // todo 추후 적절한 상태에 의존토록 하기
+                  type={'text'}
+                  ref={mergeRefs<HTMLTextAreaElement>(ref, refForUseController)}
+                  onChange={controlChange}
+                  onDrop={(e) => onDropEventHandler(e)}
+                  onPaste={(e) => onPasteEventHandler(e)}
+                />
+              </div>
+            );
+          }
         })}
       </div>
     </div>
