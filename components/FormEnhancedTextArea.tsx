@@ -125,13 +125,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
             // frozen(편집 제한)
             return (
               <div className={'per_content_element'} key={contentElement.id}>
-                <BaseTextAreaAtom
-                  value={contentElement.partialContent}
-                  type={'text'}
-                  onDrop={(e) => onDropEventHandler(e)}
-                  onPaste={(e) => onPasteEventHandler(e)}
-                  disabled={true}
-                />
+                <p>{contentElement.partialContent}</p>
               </div>
             );
           }

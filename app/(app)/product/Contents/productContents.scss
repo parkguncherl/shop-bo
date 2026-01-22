@@ -8,12 +8,15 @@
   display: grid;
   grid-template-columns: auto 300px;
 
+  min-height: 500px;
+
   .left_side {
     padding: 5px 5px 0 0;
 
     & > form {
-      display: grid;
-      grid-template-rows: 40px auto 30px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
 
       .headed {
         width: 100%;
@@ -50,7 +53,13 @@
       }
 
       .bottom {
+        position: absolute;
+        bottom: 50px;
+        width: 70%;
+        height: 50px;
         padding: 0 0 5px 0;
+
+        background-color: #4bb3ff;
 
         .bottom_boxing {
 
