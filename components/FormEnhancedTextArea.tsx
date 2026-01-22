@@ -11,7 +11,7 @@ type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
   TControl<T> & {
     ref?: React.Ref<HTMLTextAreaElement>;
 
-    onUploadRequestInterruptOccurred?: (event: UploadRequestInterruptEvent) => Promise<void> | undefined;
+    //onUploadRequestInterruptOccurred?: (event: UploadRequestInterruptEvent) => Promise<void> | undefined;
   };
 interface ContentElement {
   id: number; // 기본 1부터 시작
@@ -46,18 +46,16 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
   }, [contentElements]);
 
   // 업로드(파일, 이미지) 요청 동작 핸들링
-  const uploadRequestInterruptCallBack = (files: File[]): Promise<void> | undefined => {
+  const attachRequestInterruptCallBack = (files: File[]) => {
     setEnableCompletionInterruptCallback(false); // 중복 동작 차단
-    if (props.onUploadRequestInterruptOccurred) {
-      return props
-        .onUploadRequestInterruptOccurred({ files: files })
-        ?.then(() => {
-          setEnableCompletionInterruptCallback(true); // 동작 차단 해제
-        })
-        .catch(() => {
-          setEnableCompletionInterruptCallback(true); // 동작 차단 해제
-        });
-    }
+
+    // todo textArea 영역에 파일 첨부 동작 시행 시 기존 텍스트는 어디로 이동할 지, 중간 영역에서 해당 동작이 발생할 시 어떻게 처리할 지 정책으로서 결정하여야
+    setContentElements((prevState) => {
+      const updatedContentElements = prevState;
+      files.forEach((file) => {});
+      updatedContentElements.push();
+      return updatedContentElements;
+    });
   };
 
   // 드롭 이벤트
@@ -67,7 +65,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
       e.stopPropagation();
       const droppedFiles = Array.from(e.dataTransfer.files);
       if (droppedFiles.length > 0) {
-        uploadRequestInterruptCallBack(droppedFiles);
+        attachRequestInterruptCallBack(droppedFiles);
       }
     }
   };
@@ -79,7 +77,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
       e.stopPropagation();
       const pastedFiles = Array.from(e.clipboardData.files);
       if (pastedFiles.length > 0) {
-        uploadRequestInterruptCallBack(pastedFiles);
+        attachRequestInterruptCallBack(pastedFiles);
       }
     }
   };

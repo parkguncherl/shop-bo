@@ -43,7 +43,14 @@ const ProductContents = () => {
           <form>
             <div className={'headed'}>
               <div className={'title_boxing'}>
-                <FormInput<ProductContentsFields> control={control} name={'title'} onKeyDown={(e) => {}} inputType={'single'} />
+                <FormInput<ProductContentsFields>
+                  control={control}
+                  name={'title'}
+                  onKeyDown={(e) => {
+                    // todo 제목 영역
+                  }}
+                  inputType={'single'}
+                />
               </div>
             </div>
             <div className={'content'}>
