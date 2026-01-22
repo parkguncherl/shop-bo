@@ -36,9 +36,9 @@ const ProductContents = () => {
   });
 
   return (
-    <div>
+    <div className={'product_contents_root'}>
       <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} reset={reset}></Title>
-      <div className={'productContents'}>
+      <div className={'product_contents'}>
         <div className={'left_side'}>
           <form>
             <div className={'headed'}>
@@ -52,7 +52,16 @@ const ProductContents = () => {
               </div>
             </div>
             <div className={'bottom'}>
-              <div className={'bottom_boxing'}></div>
+              <div className={'bottom_boxing'}>
+                <div className={'btn-wrapper'}>
+                  <div className={'btn-per-wrapper'}>
+                    <button className={'btn'}>미리보기</button>
+                  </div>
+                  <div className={'btn-per-wrapper'}>
+                    <button className={'btn btn_blue'}>저장</button>
+                  </div>
+                </div>
+              </div>
             </div>
           </form>
         </div>

@@ -90,14 +90,14 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
   return (
     <div className={'enhanced_textArea'}>
       <div className={'formBox'}>
-        {contentElements.map((contentElement) => {
-          if (contentElement.id == unFrozenElementId) {
+        {contentElements.map((contentElement, index) => {
+          if (contentElements.length == index + 1 || contentElement.id == unFrozenElementId) {
+            // 최하단 영역, 혹은 상태로 관리되는 element id와 해당 content 의 id가 일치하는 경우
             return (
               <div className={'per_content_element'} key={contentElement.id}>
                 <BaseTextAreaAtom
                   value={contentElement.partialContent}
                   type={'text'}
-                  ref={mergeRefs<HTMLTextAreaElement>(ref, refForUseController)}
                   onChange={(e) => {
                     setContentElements((prevState) => {
                       return prevState.map((prev) => {
@@ -115,9 +115,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
                   onDrop={(e) => onDropEventHandler(e)}
                   onPaste={(e) => onPasteEventHandler(e)}
                   autoSize={autoSize}
-                  onDoubleClick={(e) => {
-                    setUnFrozenElementId(1);
-                  }}
+                  onFocus={() => setUnFrozenElementId(-1)}
                 />
               </div>
             );
@@ -125,7 +123,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
             // frozen(편집 제한)
             return (
               <div className={'per_content_element'} key={contentElement.id}>
-                <p>{contentElement.partialContent}</p>
+                <BaseTextAreaAtom value={contentElement.partialContent} type={'text'} readOnly={true} onFocus={() => setUnFrozenElementId(contentElement.id)} />
               </div>
             );
           }
