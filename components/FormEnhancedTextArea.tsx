@@ -23,7 +23,7 @@ interface ContentElement {
  * stateFul 컴포넌트
  * 기존 textArea 와 달리 이미지 삽입 및 이에 따라 필요한 동작 지원
  * */
-const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref, ...props }: FormEnhancedTextAreaProps<T>) => {
+const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref, autoSize, ...props }: FormEnhancedTextAreaProps<T>) => {
   /** react hook form 의 controller 는 현재 영역에서는 수정 대상 영역의 값(contentElement)에 한정되어 적용함(전역 적용하지 아니함) */
   const {
     field: { value, onChange: controlChange, ref: refForUseController },
@@ -95,7 +95,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
             return (
               <div className={'per_content_element'} key={contentElement.id}>
                 <BaseTextAreaAtom
-                  //value={contentElement.partialContent}
+                  value={contentElement.partialContent}
                   type={'text'}
                   ref={mergeRefs<HTMLTextAreaElement>(ref, refForUseController)}
                   onChange={(e) => {
@@ -114,6 +114,10 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
                   }}
                   onDrop={(e) => onDropEventHandler(e)}
                   onPaste={(e) => onPasteEventHandler(e)}
+                  autoSize={autoSize}
+                  onDoubleClick={(e) => {
+                    setUnFrozenElementId(1);
+                  }}
                 />
               </div>
             );

@@ -48,7 +48,7 @@ const ProductContents = () => {
             </div>
             <div className={'content'}>
               <div className={'content_boxing'}>
-                <FormEnhancedTextArea<ProductContentsFields> control={control} name={'content'} autoSize={{ minRows: 14, maxRows: 40 }} onKeyDown={(e) => {}} />
+                <FormEnhancedTextArea<ProductContentsFields> control={control} name={'content'} autoSize={{ minRows: 7, maxRows: 40 }} />
               </div>
             </div>
             <div className={'bottom'}>
