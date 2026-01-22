@@ -116,6 +116,13 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
                   onPaste={(e) => onPasteEventHandler(e)}
                   autoSize={autoSize}
                   onFocus={() => setUnFrozenElementId(-1)}
+                  onKeyDown={(e) => {
+                    if (e.key == 'Enter') {
+                      setContentElements((prevState) => {
+                        return [...prevState, { id: contentElement.id + 1, partialContent: '' }];
+                      });
+                    }
+                  }}
                 />
               </div>
             );

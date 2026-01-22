@@ -55,10 +55,10 @@ const ProductContents = () => {
               <div className={'bottom_boxing'}>
                 <div className={'btn-wrapper'}>
                   <div className={'btn-per-wrapper'}>
-                    <button className={'btn'}>미리보기</button>
+                    <button className={'btn btn_blue'}>저장</button>
                   </div>
                   <div className={'btn-per-wrapper'}>
-                    <button className={'btn btn_blue'}>저장</button>
+                    <button className={'btn'}>미리보기</button>
                   </div>
                 </div>
               </div>
