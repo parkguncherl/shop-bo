@@ -1,7 +1,7 @@
 import { BaseTextAreaAtom, BaseTextAreaAtomProps } from './atom/BaseTextAreaAtom';
 import { FieldValues, useController } from 'react-hook-form';
 import { TControl } from '../types/Control';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
   TControl<T> & {
@@ -29,6 +29,10 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   /** 해당 지역 상태는 반드시 배열의 불변성을 유지할 것 */
   const [contentElements, setContentElements] = useState<ContentElement[]>([{ id: 1, partialContent: '' }]);
   const [unFrozenElementId, setUnFrozenElementId] = useState<number>(-1);
+
+  useEffect(() => {
+    console.log('unFrozenElementId: ', unFrozenElementId);
+  }, [unFrozenElementId]);
 
   const attachRequestInterruptCallBack = (files: File[], contentElementOnTriggeredArea: ContentElement) => {
     setContentElements((prevState) => {
@@ -103,7 +107,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
             return (
               <div className={'per_content_element'} key={contentElement.id}>
                 {contentElement.fileSrcUrl != undefined ? (
-                  <div className={'img_wrapper'}>
+                  <div className={'img_wrapper unFrozen'}>
                     <img src={contentElement.fileSrcUrl} />
                   </div>
                 ) : (
@@ -156,8 +160,13 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
             return (
               <div className={'per_content_element'} key={contentElement.id}>
                 {contentElement.fileSrcUrl != undefined ? (
-                  <div className={'img_wrapper'}>
-                    <img src={contentElement.fileSrcUrl} />
+                  <div className={'img_wrapper frozen'}>
+                    <img
+                      src={contentElement.fileSrcUrl}
+                      onClick={() => {
+                        setUnFrozenElementId(contentElement.id);
+                      }}
+                    />
                   </div>
                 ) : (
                   <BaseTextAreaAtom

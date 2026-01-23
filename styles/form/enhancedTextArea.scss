@@ -18,12 +18,18 @@
     .per_content_element {
       width: 100%;
 
-      & > .ant-input-disabled {
-        border: none !important;
-        box-shadow: none !important;
-        background: transparent !important;
-        color: rgba(0, 0, 0, 0.85); /* 흐려지지 않게 */
-        cursor: default;
+      & > .ant-input {
+        font-size: medium;
+      }
+
+      @mixin wrapper-prev {
+        border: solid #ffffff 2px;
+        border-radius: 3px;
+      }
+
+      @mixin wrapper-applied {
+        border: solid #315fd9 2px;
+        border-radius: 3px;
       }
 
       .img_wrapper {
@@ -31,12 +37,45 @@
         display: flex;
         padding: 5px;
 
+        @include wrapper-prev;
+
+        @keyframes unFrozen-gradually-on-img {
+          from {
+            @include wrapper-prev
+          }
+
+          to {
+            @include wrapper-applied
+          }
+        }
+
+        @keyframes frozen-gradually-on-img {
+          from {
+            @include wrapper-applied
+          }
+
+          to {
+            @include wrapper-prev
+          }
+        }
+
         img {
           max-height: 100%;
           height: auto;
           width: auto;
           max-width: 100%;
           display: block;
+        }
+
+        &.unFrozen {
+          animation-duration: 0.3s;
+          animation-name: unFrozen-gradually-on-img;
+          @include wrapper-applied;
+        }
+        &.frozen {
+          animation-duration: 0.2s;
+          animation-name: frozen-gradually-on-img;
+          @include wrapper-prev;
         }
       }
     }
