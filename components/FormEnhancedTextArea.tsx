@@ -2,14 +2,14 @@ import { BaseTextAreaAtom, BaseTextAreaAtomProps } from './atom/BaseTextAreaAtom
 import { FieldValues, useController } from 'react-hook-form';
 import { TControl } from '../types/Control';
 import React, { useEffect, useRef, useState } from 'react';
+import { usePausedEventQueue } from '../customFn/pausedEventsQueue';
 
 export interface UploadRequestInterruptEvent {
   files: File[];
 }
 type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
   TControl<T> & {
-    ref?: React.Ref<HTMLTextAreaElement>;
-
+    //ref?: React.Ref<HTMLTextAreaElement>;
     //onUploadRequestInterruptOccurred?: (event: UploadRequestInterruptEvent) => Promise<void> | undefined;
   };
 interface ContentElement {
@@ -23,7 +23,7 @@ interface ContentElement {
  * stateFul 컴포넌트
  * 기존 textArea 와 달리 이미지 삽입 및 이에 따라 필요한 동작 지원
  * */
-const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref, autoSize, ...props }: FormEnhancedTextAreaProps<T>) => {
+const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, autoSize }: FormEnhancedTextAreaProps<T>) => {
   /** react hook form 의 controller 는 현재 영역에서는 수정 대상 영역의 값(contentElement)에 한정되어 적용함(전역 적용하지 아니함) */
   const {
     field: { value, onChange: controlChange, ref: refForUseController },
@@ -39,8 +39,6 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
 
   /** 기타 state */
   const [enableCompletionInterruptCallback, setEnableCompletionInterruptCallback] = useState(true); // 작성 완료 콜백의 무분별한 호출을 제한하는 상태
-
-  const unFrozenTextAreaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     // contentElements 상태에 따라 frozen 대상 요소의 id 동기화
@@ -149,7 +147,12 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
                         });
                       }
                     }}
-                    ref={unFrozenTextAreaRef}
+                    ref={(node) => {
+                      if (contentElements.length == index + 1) {
+                        // 최하단 영역 마운트 한정 포커싱
+                        node?.focus();
+                      }
+                    }}
                   />
                 )}
               </div>
