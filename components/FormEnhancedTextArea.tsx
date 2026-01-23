@@ -1,11 +1,8 @@
 import { BaseTextAreaAtom, BaseTextAreaAtomProps } from './atom/BaseTextAreaAtom';
 import { FieldValues, useController } from 'react-hook-form';
 import { TControl } from '../types/Control';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-export interface UploadRequestInterruptEvent {
-  files: File[];
-}
 type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
   TControl<T> & {
     //ref?: React.Ref<HTMLTextAreaElement>;
@@ -30,23 +27,10 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   } = useController({ name, rules, control });
 
   /** 해당 지역 상태는 반드시 배열의 불변성을 유지할 것 */
-  const [contentElements, setContentElements] = useState<ContentElement[]>([
-    { id: 1, partialContent: 'ddsds' },
-    { id: 2, partialContent: '' },
-  ]);
+  const [contentElements, setContentElements] = useState<ContentElement[]>([{ id: 1, partialContent: '' }]);
   const [unFrozenElementId, setUnFrozenElementId] = useState<number>(-1);
 
-  useEffect(() => {
-    console.log('unFrozenElementId: ', unFrozenElementId);
-  }, [unFrozenElementId]);
-
-  /** 기타 state */
-  const [enableCompletionInterruptCallback, setEnableCompletionInterruptCallback] = useState(true); // 작성 완료 콜백의 무분별한 호출을 제한하는 상태
-
-  // 업로드(파일, 이미지) 요청 동작 핸들링
   const attachRequestInterruptCallBack = (files: File[], contentElementOnTriggeredArea: ContentElement) => {
-    setEnableCompletionInterruptCallback(false); // 중복 동작 차단
-
     setContentElements((prevState) => {
       if (prevState[prevState.length - 1].id == contentElementOnTriggeredArea.id) {
         // 가장 마지막 입력 영역에서 첨부 동작 발생할 시
