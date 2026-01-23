@@ -119,7 +119,9 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
             return (
               <div className={'per_content_element'} key={contentElement.id}>
                 {contentElement.fileSrcUrl != undefined ? (
-                  <img src={contentElement.fileSrcUrl} />
+                  <div className={'img_wrapper'}>
+                    <img src={contentElement.fileSrcUrl} />
+                  </div>
                 ) : (
                   <BaseTextAreaAtom
                     value={contentElement.partialContent}
@@ -170,7 +172,9 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
             return (
               <div className={'per_content_element'} key={contentElement.id}>
                 {contentElement.fileSrcUrl != undefined ? (
-                  <img src={contentElement.fileSrcUrl} />
+                  <div className={'img_wrapper'}>
+                    <img src={contentElement.fileSrcUrl} />
+                  </div>
                 ) : (
                   <BaseTextAreaAtom
                     value={contentElement.partialContent}
