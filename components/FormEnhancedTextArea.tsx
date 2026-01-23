@@ -141,10 +141,14 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                     autoSize={autoSize}
                     onFocus={() => setUnFrozenElementId(-1)}
                     onKeyDown={(e) => {
-                      if (e.key == 'Enter') {
-                        setContentElements((prevState) => {
-                          return [...prevState, { id: contentElement.id + 1, partialContent: '' }];
-                        });
+                      if (e.key == 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (contentElement.partialContent != undefined && contentElement.partialContent != '') {
+                          // 값이 유효한 경우 한정으로만 정의된 동작 실행
+                          setContentElements((prevState) => {
+                            return [...prevState, { id: contentElement.id + 1, partialContent: '' }];
+                          });
+                        }
                       }
                     }}
                     ref={(node) => {
