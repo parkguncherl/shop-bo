@@ -1,7 +1,6 @@
 import { BaseTextAreaAtom, BaseTextAreaAtomProps } from './atom/BaseTextAreaAtom';
 import { FieldValues, useController } from 'react-hook-form';
 import { TControl } from '../types/Control';
-import mergeRefs from '../customFn/ref/mergeRefs';
 import React, { useEffect, useState } from 'react';
 
 export interface UploadRequestInterruptEvent {
@@ -16,6 +15,7 @@ type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
 interface ContentElement {
   id: number; // 기본 1부터 시작
   partialContent?: string; // 이미지인 경우 undefined
+  fileSrcUrl?: string; // 이미지(혹은 파일) 한정으로 정의함, 현재는 실 동작 영역에서 이미지 이외 파일에 대하여는 첨부를 제한하는 중
   //frozen?: boolean; // 수동 통제, 기본적으로 최하단 요소 이외에는 true 이나 상호작용(수정을 위한 포커싱 등) 발생 시에는 예외적으로 조정 가능(다만 불변성 유지 차원에서 새 배열 생성 후 상태 최신화), 이미지인 경우 undefined
 }
 
@@ -46,38 +46,61 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
   }, [contentElements]);
 
   // 업로드(파일, 이미지) 요청 동작 핸들링
-  const attachRequestInterruptCallBack = (files: File[]) => {
+  const attachRequestInterruptCallBack = (files: File[], contentElementOnTriggeredArea: ContentElement) => {
     setEnableCompletionInterruptCallback(false); // 중복 동작 차단
 
     // todo textArea 영역에 파일 첨부 동작 시행 시 기존 텍스트는 어디로 이동할 지, 중간 영역에서 해당 동작이 발생할 시 어떻게 처리할 지 정책으로서 결정하여야
     setContentElements((prevState) => {
-      const updatedContentElements = prevState;
-      files.forEach((file) => {});
-      updatedContentElements.push();
-      return updatedContentElements;
+      if (prevState[prevState.length - 1].id == contentElementOnTriggeredArea.id) {
+        // 가장 마지막 입력 영역에서 첨부 동작 발생할 시
+        const pushedContentElements = [...prevState];
+        //console.log('prevStatepushedContentElements: ', pushedContentElements);
+        files.forEach((file, index) => {
+          pushedContentElements[pushedContentElements.length] = {
+            id: contentElementOnTriggeredArea.id + (index + 1),
+            fileSrcUrl: URL.createObjectURL(file),
+          };
+        });
+        return pushedContentElements;
+      } else {
+        // 중간 영역에서 첨부 동작 발생한 경우
+        const splicedContentElements = [...prevState];
+        for (let i = 0; i < prevState.length; i++) {
+          if (contentElementOnTriggeredArea.id == prevState[i].id) {
+            // 대상 영역
+            files.forEach((file, index) => {
+              splicedContentElements.splice(i + index, 0, {
+                id: contentElementOnTriggeredArea.id + (index + 1),
+                fileSrcUrl: URL.createObjectURL(file),
+              });
+            });
+          }
+        }
+        return splicedContentElements;
+      }
     });
   };
 
   // 드롭 이벤트
-  const onDropEventHandler = (e: React.DragEvent<HTMLTextAreaElement>) => {
+  const onDropEventHandler = (e: React.DragEvent<HTMLTextAreaElement>, contentElementOnTriggeredArea: ContentElement) => {
     if (e.dataTransfer.files && e.dataTransfer.files.length != 0) {
       e.preventDefault();
       e.stopPropagation();
       const droppedFiles = Array.from(e.dataTransfer.files);
       if (droppedFiles.length > 0) {
-        attachRequestInterruptCallBack(droppedFiles);
+        attachRequestInterruptCallBack(droppedFiles, contentElementOnTriggeredArea);
       }
     }
   };
 
   // 붙여넣기 이벤트
-  const onPasteEventHandler = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+  const onPasteEventHandler = (e: React.ClipboardEvent<HTMLTextAreaElement>, contentElementOnTriggeredArea: ContentElement) => {
     if (e.clipboardData.files && e.clipboardData.files.length != 0) {
       e.preventDefault();
       e.stopPropagation();
       const pastedFiles = Array.from(e.clipboardData.files);
       if (pastedFiles.length > 0) {
-        attachRequestInterruptCallBack(pastedFiles);
+        attachRequestInterruptCallBack(pastedFiles, contentElementOnTriggeredArea);
       }
     }
   };
@@ -110,8 +133,8 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
                       });
                     });
                   }}
-                  onDrop={(e) => onDropEventHandler(e)}
-                  onPaste={(e) => onPasteEventHandler(e)}
+                  onDrop={(e) => onDropEventHandler(e, contentElement)}
+                  onPaste={(e) => onPasteEventHandler(e, contentElement)}
                   autoSize={autoSize}
                   onFocus={() => setUnFrozenElementId(-1)}
                   onKeyDown={(e) => {
