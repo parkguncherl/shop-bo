@@ -47,7 +47,6 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   const attachRequestInterruptCallBack = (files: File[], contentElementOnTriggeredArea: ContentElement) => {
     setEnableCompletionInterruptCallback(false); // 중복 동작 차단
 
-    // todo textArea 영역에 파일 첨부 동작 시행 시 기존 텍스트는 어디로 이동할 지, 중간 영역에서 해당 동작이 발생할 시 어떻게 처리할 지 정책으로서 결정하여야
     setContentElements((prevState) => {
       if (prevState[prevState.length - 1].id == contentElementOnTriggeredArea.id) {
         // 가장 마지막 입력 영역에서 첨부 동작 발생할 시
@@ -67,14 +66,19 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
             // 대상 영역
             files.forEach((file, index) => {
               splicedContentElements.splice(i + index, 0, {
-                // todo 추후 디버깅
                 id: contentElementOnTriggeredArea.id + (index + 1),
                 fileSrcUrl: URL.createObjectURL(file),
               });
             });
+          } else if (prevState[i].id > contentElementOnTriggeredArea.id) {
+            // 대상 영역 이후
+            splicedContentElements[i + files.length] = {
+              ...splicedContentElements[i + files.length],
+              id: prevState[i].id + files.length,
+            };
           }
         }
-        return [...splicedContentElements, { id: splicedContentElements[splicedContentElements.length - 1].id + 1, partialContent: '' }];
+        return splicedContentElements;
       }
     });
   };
