@@ -11,8 +11,11 @@ type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
 interface ContentElement {
   id: number; // 기본 1부터 시작, 순차적일 필요는 없으나 후행하는 요소의 id는 선행 요소의 id보다 커야 함
   partialContent?: string; // 이미지인 경우 undefined
-  fileSrcUrl?: string; // 이미지(혹은 파일) 한정으로 정의함, 현재는 실 동작 영역에서 이미지 이외 파일에 대하여는 첨부를 제한하는 중
-  //frozen?: boolean; // 수동 통제, 기본적으로 최하단 요소 이외에는 true 이나 상호작용(수정을 위한 포커싱 등) 발생 시에는 예외적으로 조정 가능(다만 불변성 유지 차원에서 새 배열 생성 후 상태 최신화), 이미지인 경우 undefined
+  fileInfo?: {
+    // 이미지(혹은 파일) 한정으로 정의함, 현재는 실 동작 영역에서 이미지 이외 파일에 대하여는 첨부를 제한하는 중
+    fileTitle: string;
+    fileSrcUrl: string;
+  };
 }
 
 /**
@@ -30,10 +33,6 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   const [contentElements, setContentElements] = useState<ContentElement[]>([{ id: 1, partialContent: '' }]);
   const [unFrozenElementId, setUnFrozenElementId] = useState<number>(-1);
 
-  useEffect(() => {
-    console.log('unFrozenElementId: ', unFrozenElementId);
-  }, [unFrozenElementId]);
-
   const attachRequestInterruptCallBack = (files: File[], contentElementOnTriggeredArea: ContentElement) => {
     setContentElements((prevState) => {
       if (prevState[prevState.length - 1].id == contentElementOnTriggeredArea.id) {
@@ -42,7 +41,10 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
         files.forEach((file, index) => {
           pushedContentElements[pushedContentElements.length - 1 + index] = {
             id: pushedContentElements[pushedContentElements.length - 1].id + index, // 최초 파일 한정 id 보존, 이후 순차 증가된 값 할당
-            fileSrcUrl: URL.createObjectURL(file),
+            fileInfo: {
+              fileTitle: `미정 ${pushedContentElements[pushedContentElements.length - 1].id + index}`,
+              fileSrcUrl: URL.createObjectURL(file),
+            },
           };
         });
         return [...pushedContentElements, { id: pushedContentElements[pushedContentElements.length - 1].id + 1, partialContent: '' }];
@@ -55,7 +57,10 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
             files.forEach((file, index) => {
               splicedContentElements.splice(i + index, 0, {
                 id: contentElementOnTriggeredArea.id + (index + 1),
-                fileSrcUrl: URL.createObjectURL(file),
+                fileInfo: {
+                  fileTitle: `미정 ${contentElementOnTriggeredArea.id + (index + 1)}`,
+                  fileSrcUrl: URL.createObjectURL(file),
+                },
               });
             });
           } else if (prevState[i].id > contentElementOnTriggeredArea.id) {
@@ -106,9 +111,9 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
             // 최하단 영역, 혹은 상태로 관리되는 element id와 해당 content 의 id가 일치하는 경우
             return (
               <div className={'per_content_element'} key={contentElement.id}>
-                {contentElement.fileSrcUrl != undefined ? (
+                {contentElement.fileInfo != undefined ? (
                   <div className={'img_wrapper unFrozen'}>
-                    <img src={contentElement.fileSrcUrl} />
+                    <img src={contentElement.fileInfo.fileSrcUrl} />
                   </div>
                 ) : (
                   <BaseTextAreaAtom
@@ -159,7 +164,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
             // frozen(편집 제한)
             return (
               <div className={'per_content_element'} key={contentElement.id}>
-                {contentElement.fileSrcUrl != undefined ? (
+                {contentElement.fileInfo != undefined ? (
                   <div
                     className={'img_wrapper frozen'}
                     onClick={() => {
@@ -174,7 +179,8 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                       e.currentTarget.classList.add('leaved');
                     }}
                   >
-                    <img src={contentElement.fileSrcUrl} />
+                    {/*<p>{contentElement.fileInfo.fileTitle}</p>*/}
+                    <img src={contentElement.fileInfo.fileSrcUrl} />
                   </div>
                 ) : (
                   <BaseTextAreaAtom
