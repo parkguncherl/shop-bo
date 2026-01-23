@@ -160,13 +160,21 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
             return (
               <div className={'per_content_element'} key={contentElement.id}>
                 {contentElement.fileSrcUrl != undefined ? (
-                  <div className={'img_wrapper frozen'}>
-                    <img
-                      src={contentElement.fileSrcUrl}
-                      onClick={() => {
-                        setUnFrozenElementId(contentElement.id);
-                      }}
-                    />
+                  <div
+                    className={'img_wrapper frozen'}
+                    onClick={() => {
+                      setUnFrozenElementId(contentElement.id);
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.classList.add('hovered');
+                      e.currentTarget.classList.remove('leaved');
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.classList.remove('hovered');
+                      e.currentTarget.classList.add('leaved');
+                    }}
+                  >
+                    <img src={contentElement.fileSrcUrl} />
                   </div>
                 ) : (
                   <BaseTextAreaAtom

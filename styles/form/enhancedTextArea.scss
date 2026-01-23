@@ -27,8 +27,13 @@
         border-radius: 3px;
       }
 
-      @mixin wrapper-applied {
-        border: solid #315fd9 2px;
+      @mixin wrapper-unfrozen {
+        border: solid #db5cf8 2px;
+        border-radius: 3px;
+      }
+
+      @mixin wrapper-idle {
+        border: solid #f1bc0f 2px;
         border-radius: 3px;
       }
 
@@ -41,17 +46,37 @@
 
         @keyframes unFrozen-gradually-on-img {
           from {
-            @include wrapper-prev
+            @include wrapper-idle
           }
 
           to {
-            @include wrapper-applied
+            @include wrapper-unfrozen
           }
         }
 
         @keyframes frozen-gradually-on-img {
           from {
-            @include wrapper-applied
+            @include wrapper-unfrozen
+          }
+
+          to {
+            @include wrapper-prev
+          }
+        }
+
+        @keyframes idled-gradually-on-img {
+          from {
+            @include wrapper-prev
+          }
+
+          to {
+            @include wrapper-idle
+          }
+        }
+
+        @keyframes deIdled-gradually-on-img {
+          from {
+            @include wrapper-idle
           }
 
           to {
@@ -70,12 +95,24 @@
         &.unFrozen {
           animation-duration: 0.3s;
           animation-name: unFrozen-gradually-on-img;
-          @include wrapper-applied;
+          @include wrapper-unfrozen;
         }
+
         &.frozen {
           animation-duration: 0.2s;
           animation-name: frozen-gradually-on-img;
           @include wrapper-prev;
+
+          &.hovered {
+            animation-duration: 0.2s;
+            animation-name: idled-gradually-on-img;
+            @include wrapper-idle;
+          }
+          &.leaved {
+            animation-duration: 0.2s;
+            animation-name: deIdled-gradually-on-img;
+            @include wrapper-prev;
+          }
         }
       }
     }
