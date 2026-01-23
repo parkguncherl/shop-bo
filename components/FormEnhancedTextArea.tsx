@@ -1,7 +1,7 @@
 import { BaseTextAreaAtom, BaseTextAreaAtomProps } from './atom/BaseTextAreaAtom';
 import { FieldValues, useController } from 'react-hook-form';
 import { TControl } from '../types/Control';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 export interface UploadRequestInterruptEvent {
   files: File[];
@@ -13,7 +13,7 @@ type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
     //onUploadRequestInterruptOccurred?: (event: UploadRequestInterruptEvent) => Promise<void> | undefined;
   };
 interface ContentElement {
-  id: number; // 기본 1부터 시작
+  id: number; // 기본 1부터 시작, 순차적일 필요는 없으나 후행하는 요소의 id는 선행 요소의 id보다 커야 함
   partialContent?: string; // 이미지인 경우 undefined
   fileSrcUrl?: string; // 이미지(혹은 파일) 한정으로 정의함, 현재는 실 동작 영역에서 이미지 이외 파일에 대하여는 첨부를 제한하는 중
   //frozen?: boolean; // 수동 통제, 기본적으로 최하단 요소 이외에는 true 이나 상호작용(수정을 위한 포커싱 등) 발생 시에는 예외적으로 조정 가능(다만 불변성 유지 차원에서 새 배열 생성 후 상태 최신화), 이미지인 경우 undefined
@@ -40,6 +40,8 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
   /** 기타 state */
   const [enableCompletionInterruptCallback, setEnableCompletionInterruptCallback] = useState(true); // 작성 완료 콜백의 무분별한 호출을 제한하는 상태
 
+  const unFrozenTextAreaRef = useRef<HTMLTextAreaElement>(null);
+
   useEffect(() => {
     // contentElements 상태에 따라 frozen 대상 요소의 id 동기화
     setUnFrozenElementId(contentElements[contentElements.length - 1] ? contentElements[contentElements.length - 1].id : 1);
@@ -54,14 +56,13 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
       if (prevState[prevState.length - 1].id == contentElementOnTriggeredArea.id) {
         // 가장 마지막 입력 영역에서 첨부 동작 발생할 시
         const pushedContentElements = [...prevState];
-        //console.log('prevStatepushedContentElements: ', pushedContentElements);
         files.forEach((file, index) => {
-          pushedContentElements[pushedContentElements.length] = {
-            id: contentElementOnTriggeredArea.id + (index + 1),
+          pushedContentElements[pushedContentElements.length - 1 + index] = {
+            id: pushedContentElements[pushedContentElements.length - 1].id + index, // 최초 파일 한정 id 보존, 이후 순차 증가된 값 할당
             fileSrcUrl: URL.createObjectURL(file),
           };
         });
-        return pushedContentElements;
+        return [...pushedContentElements, { id: pushedContentElements[pushedContentElements.length - 1].id + 1, partialContent: '' }];
       } else {
         // 중간 영역에서 첨부 동작 발생한 경우
         const splicedContentElements = [...prevState];
@@ -70,13 +71,14 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
             // 대상 영역
             files.forEach((file, index) => {
               splicedContentElements.splice(i + index, 0, {
+                // todo 추후 디버깅
                 id: contentElementOnTriggeredArea.id + (index + 1),
                 fileSrcUrl: URL.createObjectURL(file),
               });
             });
           }
         }
-        return splicedContentElements;
+        return [...splicedContentElements, { id: splicedContentElements[splicedContentElements.length - 1].id + 1, partialContent: '' }];
       }
     });
   };
@@ -116,42 +118,56 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, ref
             // 최하단 영역, 혹은 상태로 관리되는 element id와 해당 content 의 id가 일치하는 경우
             return (
               <div className={'per_content_element'} key={contentElement.id}>
-                <BaseTextAreaAtom
-                  value={contentElement.partialContent}
-                  type={'text'}
-                  onChange={(e) => {
-                    setContentElements((prevState) => {
-                      return prevState.map((prev) => {
-                        if (prev.id == contentElement.id) {
-                          return {
-                            ...prev,
-                            partialContent: e.target.value,
-                          };
-                        } else {
-                          return prev;
-                        }
-                      });
-                    });
-                  }}
-                  onDrop={(e) => onDropEventHandler(e, contentElement)}
-                  onPaste={(e) => onPasteEventHandler(e, contentElement)}
-                  autoSize={autoSize}
-                  onFocus={() => setUnFrozenElementId(-1)}
-                  onKeyDown={(e) => {
-                    if (e.key == 'Enter') {
+                {contentElement.fileSrcUrl != undefined ? (
+                  <img src={contentElement.fileSrcUrl} />
+                ) : (
+                  <BaseTextAreaAtom
+                    value={contentElement.partialContent}
+                    type={'text'}
+                    onChange={(e) => {
                       setContentElements((prevState) => {
-                        return [...prevState, { id: contentElement.id + 1, partialContent: '' }];
+                        return prevState.map((prev) => {
+                          if (prev.id == contentElement.id) {
+                            return {
+                              ...prev,
+                              partialContent: e.target.value,
+                            };
+                          } else {
+                            return prev;
+                          }
+                        });
                       });
-                    }
-                  }}
-                />
+                    }}
+                    onDrop={(e) => onDropEventHandler(e, contentElement)}
+                    onPaste={(e) => onPasteEventHandler(e, contentElement)}
+                    autoSize={autoSize}
+                    onFocus={() => setUnFrozenElementId(-1)}
+                    onKeyDown={(e) => {
+                      if (e.key == 'Enter') {
+                        setContentElements((prevState) => {
+                          return [...prevState, { id: contentElement.id + 1, partialContent: '' }];
+                        });
+                      }
+                    }}
+                    ref={unFrozenTextAreaRef}
+                  />
+                )}
               </div>
             );
           } else {
             // frozen(편집 제한)
             return (
               <div className={'per_content_element'} key={contentElement.id}>
-                <BaseTextAreaAtom value={contentElement.partialContent} type={'text'} readOnly={true} onFocus={() => setUnFrozenElementId(contentElement.id)} />
+                {contentElement.fileSrcUrl != undefined ? (
+                  <img src={contentElement.fileSrcUrl} />
+                ) : (
+                  <BaseTextAreaAtom
+                    value={contentElement.partialContent}
+                    type={'text'}
+                    readOnly={true}
+                    onFocus={() => setUnFrozenElementId(contentElement.id)}
+                  />
+                )}
               </div>
             );
           }
