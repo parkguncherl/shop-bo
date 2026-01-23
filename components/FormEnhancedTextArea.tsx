@@ -1,8 +1,7 @@
 import { BaseTextAreaAtom, BaseTextAreaAtomProps } from './atom/BaseTextAreaAtom';
 import { FieldValues, useController } from 'react-hook-form';
 import { TControl } from '../types/Control';
-import React, { useEffect, useRef, useState } from 'react';
-import { usePausedEventQueue } from '../customFn/pausedEventsQueue';
+import React, { useEffect, useState } from 'react';
 
 export interface UploadRequestInterruptEvent {
   files: File[];
@@ -37,13 +36,12 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   ]);
   const [unFrozenElementId, setUnFrozenElementId] = useState<number>(-1);
 
+  useEffect(() => {
+    console.log('unFrozenElementId: ', unFrozenElementId);
+  }, [unFrozenElementId]);
+
   /** 기타 state */
   const [enableCompletionInterruptCallback, setEnableCompletionInterruptCallback] = useState(true); // 작성 완료 콜백의 무분별한 호출을 제한하는 상태
-
-  useEffect(() => {
-    // contentElements 상태에 따라 frozen 대상 요소의 id 동기화
-    setUnFrozenElementId(contentElements[contentElements.length - 1] ? contentElements[contentElements.length - 1].id : 1);
-  }, [contentElements]);
 
   // 업로드(파일, 이미지) 요청 동작 핸들링
   const attachRequestInterruptCallBack = (files: File[], contentElementOnTriggeredArea: ContentElement) => {
@@ -139,7 +137,9 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                     onDrop={(e) => onDropEventHandler(e, contentElement)}
                     onPaste={(e) => onPasteEventHandler(e, contentElement)}
                     autoSize={autoSize}
-                    onFocus={() => setUnFrozenElementId(-1)}
+                    onFocus={() => {
+                      setUnFrozenElementId(-1);
+                    }}
                     onKeyDown={(e) => {
                       if (e.key == 'Enter' && !e.shiftKey) {
                         e.preventDefault();
@@ -152,8 +152,8 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                       }
                     }}
                     ref={(node) => {
-                      if (contentElements.length == index + 1) {
-                        // 최하단 영역 마운트 한정 포커싱
+                      if (contentElements.length == index + 1 && unFrozenElementId == -1) {
+                        // 최하단 영역 마운트 한정 포커싱, 단 이 경우 해당 영역 이외 활성화된 요소가 부재하여야
                         node?.focus();
                       }
                     }}
@@ -172,7 +172,9 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                     value={contentElement.partialContent}
                     type={'text'}
                     readOnly={true}
-                    onFocus={() => setUnFrozenElementId(contentElement.id)}
+                    onFocus={() => {
+                      setUnFrozenElementId(contentElement.id);
+                    }}
                   />
                 )}
               </div>
