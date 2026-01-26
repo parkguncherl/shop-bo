@@ -1,12 +1,14 @@
 import { BaseTextAreaAtom, BaseTextAreaAtomProps } from './atom/BaseTextAreaAtom';
 import { FieldValues, useController } from 'react-hook-form';
 import { TControl } from '../types/Control';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
+export type EnhancedTextAreasMode = 'edit' | 'preview';
 type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
   TControl<T> & {
     //ref?: React.Ref<HTMLTextAreaElement>;
     //onUploadRequestInterruptOccurred?: (event: UploadRequestInterruptEvent) => Promise<void> | undefined;
+    mode?: EnhancedTextAreasMode;
   };
 interface ContentElement {
   id: number; // 기본 1부터 시작, 순차적일 필요는 없으나 후행하는 요소의 id는 선행 요소의 id보다 커야 함
@@ -26,19 +28,37 @@ interface ContentElementInfo extends ContentElement {
  * stateFul 컴포넌트
  * 기존 textArea 와 달리 이미지 삽입 및 이에 따라 필요한 동작 지원
  * */
-const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, autoSize }: FormEnhancedTextAreaProps<T>) => {
+const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, autoSize, mode }: FormEnhancedTextAreaProps<T>) => {
   /** react hook form 의 controller 는 현재 영역에서는 수정 대상 영역의 값(contentElement)에 한정되어 적용함(전역 적용하지 아니함) */
   const {
     field: { value, onChange: controlChange, ref: refForUseController },
     fieldState: { isDirty, isTouched, error },
   } = useController({ name, rules, control });
 
+  const boxRef = useRef<HTMLDivElement>(null);
+
   /** 해당 지역 상태는 반드시 배열의 불변성을 유지할 것 */
   const [contentElements, setContentElements] = useState<ContentElementInfo[]>([{ id: 1, partialContent: '', init: true }]);
   const [unFrozenElementId, setUnFrozenElementId] = useState<number>(-1);
+  const [boxHeight, setBoxHeight] = useState(0);
 
   useEffect(() => {
-    console.log('unFrozenElementId: ', unFrozenElementId);
+    console.log('mounted');
+  }, []);
+
+  useEffect(() => {
+    if (!boxRef.current) return;
+
+    const observer = new ResizeObserver(([entry]) => {
+      setBoxHeight(entry.contentRect.height);
+    });
+
+    observer.observe(boxRef.current);
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     setContentElements((prevContentElements) => {
       return prevContentElements.map((prevContentElement) => {
         if (prevContentElement.id == unFrozenElementId && prevContentElement.init) {
@@ -52,10 +72,6 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
       });
     });
   }, [unFrozenElementId]);
-
-  useEffect(() => {
-    console.log('contentElements: ', contentElements);
-  }, [contentElements]);
 
   /** contentElement 정의(구성) 시점에서 필요한 기본값을 설정한 contentElementInfo 타입의 객체 반환  */
   const configAsRefreshedContent = (addedContentElement: ContentElement) => {
@@ -141,97 +157,106 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
    * */
   return (
     <div className={'enhanced_textArea'}>
-      <div className={'formBox'}>
-        {contentElements.map((contentElement, index) => {
-          if (contentElements.length == index + 1 || contentElement.id == unFrozenElementId) {
-            // 최하단 영역, 혹은 상태로 관리되는 element id와 해당 content 의 id가 일치하는 경우
-            return (
-              <div className={'per_content_element'} key={contentElement.id}>
-                {contentElement.fileInfo != undefined ? (
-                  <div className={'img_wrapper unFrozen'}>
-                    <img src={contentElement.fileInfo.fileSrcUrl} />
-                  </div>
-                ) : (
-                  <BaseTextAreaAtom
-                    value={contentElement.partialContent}
-                    type={'text'}
-                    onChange={(e) => {
-                      setContentElements((prevState) => {
-                        return prevState.map((prev) => {
-                          if (prev.id == contentElement.id) {
-                            return {
-                              ...prev,
-                              partialContent: e.target.value,
-                              init: prev.init ? false : prev.init, // 최초 상호작용이 발생한 경우 init 속성 무효화
-                            };
-                          } else {
-                            return prev;
-                          }
-                        });
-                      });
-                    }}
-                    onDrop={(e) => onDropEventHandler(e, contentElement)}
-                    onPaste={(e) => onPasteEventHandler(e, contentElement)}
-                    autoSize={autoSize}
-                    onFocus={() => {
-                      setUnFrozenElementId(-1);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key == 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        if (contentElement.partialContent != undefined && contentElement.partialContent != '') {
-                          // 값이 유효한 경우 한정으로만 정의된 동작 실행
-                          setContentElements((prevState) => {
-                            return [...prevState, configAsRefreshedContent({ id: contentElement.id + 1, partialContent: '' })];
+      <div className={'enhanced_textArea_box'} ref={boxRef}>
+        {!mode || mode == 'edit' ? (
+          contentElements.map((contentElement, index) => {
+            if (contentElements.length == index + 1 || contentElement.id == unFrozenElementId) {
+              // 최하단 영역, 혹은 상태로 관리되는 element id와 해당 content 의 id가 일치하는 경우
+              return (
+                <div className={'per_content_element'} key={contentElement.id}>
+                  {contentElement.fileInfo != undefined ? (
+                    <div className={'img_wrapper unFrozen'}>
+                      <img src={contentElement.fileInfo.fileSrcUrl} />
+                    </div>
+                  ) : (
+                    <BaseTextAreaAtom
+                      value={contentElement.partialContent}
+                      type={'text'}
+                      onChange={(e) => {
+                        setContentElements((prevState) => {
+                          return prevState.map((prev) => {
+                            if (prev.id == contentElement.id) {
+                              return {
+                                ...prev,
+                                partialContent: e.target.value,
+                                init: prev.init ? false : prev.init, // 최초 상호작용이 발생한 경우 init 속성 무효화
+                              };
+                            } else {
+                              return prev;
+                            }
                           });
+                        });
+                      }}
+                      onDrop={(e) => onDropEventHandler(e, contentElement)}
+                      onPaste={(e) => onPasteEventHandler(e, contentElement)}
+                      autoSize={autoSize}
+                      onFocus={() => {
+                        setUnFrozenElementId(-1);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key == 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          if (contentElement.partialContent != undefined && contentElement.partialContent != '') {
+                            // 값이 유효한 경우 한정으로만 정의된 동작 실행
+                            setContentElements((prevState) => {
+                              return [...prevState, configAsRefreshedContent({ id: contentElement.id + 1, partialContent: '' })];
+                            });
+                          }
                         }
-                      }
-                    }}
-                    ref={(node) => {
-                      if (contentElements.length == index + 1 && unFrozenElementId == -1) {
-                        // 최하단 영역 마운트 한정 포커싱, 단 이 경우 해당 영역 이외 활성화된 요소가 부재하여야
-                        node?.focus();
-                      }
-                    }}
-                  />
-                )}
-              </div>
-            );
-          } else {
-            // 편집 제한
-            return (
-              <div className={'per_content_element'} key={contentElement.id}>
-                {contentElement.fileInfo != undefined ? (
-                  <div
-                    className={`img_wrapper ${contentElement.init ? '' : 'frozen'}`}
-                    onClick={() => {
-                      setUnFrozenElementId(contentElement.id);
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.classList.add('hovered');
-                      e.currentTarget.classList.remove('leaved');
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.classList.remove('hovered');
-                      e.currentTarget.classList.add('leaved');
-                    }}
-                  >
-                    <img src={contentElement.fileInfo.fileSrcUrl} />
-                  </div>
-                ) : (
-                  <BaseTextAreaAtom
-                    value={contentElement.partialContent}
-                    type={'text'}
-                    readOnly={true}
-                    onFocus={() => {
-                      setUnFrozenElementId(contentElement.id);
-                    }}
-                  />
-                )}
-              </div>
-            );
-          }
-        })}
+                      }}
+                      ref={(node) => {
+                        if (contentElements.length == index + 1 && unFrozenElementId == -1) {
+                          // 최하단 영역 마운트 한정 포커싱, 단 이 경우 해당 영역 이외 활성화된 요소가 부재하여야
+                          node?.focus();
+                        }
+                      }}
+                    />
+                  )}
+                </div>
+              );
+            } else {
+              // 편집 제한
+              return (
+                <div className={'per_content_element'} key={contentElement.id}>
+                  {contentElement.fileInfo != undefined ? (
+                    <div
+                      className={`img_wrapper ${contentElement.init ? '' : 'frozen'}`}
+                      onClick={() => {
+                        setUnFrozenElementId(contentElement.id);
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.classList.add('hovered');
+                        e.currentTarget.classList.remove('leaved');
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.classList.remove('hovered');
+                        e.currentTarget.classList.add('leaved');
+                      }}
+                    >
+                      <img src={contentElement.fileInfo.fileSrcUrl} />
+                    </div>
+                  ) : (
+                    <BaseTextAreaAtom
+                      value={contentElement.partialContent}
+                      type={'text'}
+                      readOnly={true}
+                      onFocus={() => {
+                        setUnFrozenElementId(contentElement.id);
+                      }}
+                    />
+                  )}
+                </div>
+              );
+            }
+          })
+        ) : (
+          <div
+            className={'flex-preview-area'}
+            style={{
+              height: boxHeight,
+            }}
+          ></div>
+        )}
       </div>
     </div>
   );

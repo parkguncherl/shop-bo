@@ -67,10 +67,12 @@
     height: 100%; // formBox 추종
   }
 
-  .formBox {
+  .enhanced_textArea_box {
     display: flex;
     flex-direction: column;
+
     .per_content_element {
+      // editing 모드에서 각 문단, 이미지 영역의 최상단 wrapper 영역
       width: 100%;
 
       & > .ant-input {
@@ -116,5 +118,11 @@
         }
       }
     }
+
+    //.flex-preview-area {
+    //  // editing 모드에서 지정된 높이에 따라 column directed flex 처리
+    //  display: flex;
+    //  flex-direction: column;
+    //}
   }
 }

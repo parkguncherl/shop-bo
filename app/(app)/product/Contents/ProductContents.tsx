@@ -1,12 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Title } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '../../../../libs';
-import FormEnhancedTextArea from '../../../../components/FormEnhancedTextArea';
+import FormEnhancedTextArea, { EnhancedTextAreasMode } from '../../../../components/FormEnhancedTextArea';
 import FormInput from '../../../../components/FormInput';
 
 export interface ProductContentsFields {
@@ -18,6 +18,9 @@ export interface ProductContentsFields {
 const ProductContents = () => {
   /** 공통 스토어 - State */
   const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
+
+  /** 로컬 스토어 */
+  const [displayMode, setDisplayMode] = useState<EnhancedTextAreasMode>('edit');
 
   /** 초기화 버튼 클릭 시 */
   const reset = async () => {
@@ -55,7 +58,7 @@ const ProductContents = () => {
             </div>
             <div className={'content'}>
               <div className={'content_boxing'}>
-                <FormEnhancedTextArea<ProductContentsFields> control={control} name={'content'} autoSize={{ minRows: 7, maxRows: 40 }} />
+                <FormEnhancedTextArea<ProductContentsFields> control={control} name={'content'} autoSize={{ minRows: 7, maxRows: 40 }} mode={displayMode} />
               </div>
             </div>
             <div className={'bottom'}>
@@ -68,7 +71,7 @@ const ProductContents = () => {
                     <button
                       className={'btn'}
                       onClick={() => {
-                        // todo
+                        setDisplayMode('preview');
                       }}
                     >
                       미리보기
