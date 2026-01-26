@@ -4,6 +4,61 @@
   enhancedTextArea css
 ********************************/
 
+@mixin wrapper-prev {
+  border: solid #ffffff 2px;
+  border-radius: 3px;
+}
+
+@mixin wrapper-unfrozen {
+  border: solid #db5cf8 2px;
+  border-radius: 3px;
+}
+
+@mixin wrapper-idle {
+  border: solid #f1bc0f 2px;
+  border-radius: 3px;
+}
+
+@keyframes unFrozen-gradually-on-img {
+  from {
+    @include wrapper-idle
+  }
+
+  to {
+    @include wrapper-unfrozen
+  }
+}
+
+@keyframes frozen-gradually-on-img {
+  from {
+    @include wrapper-unfrozen
+  }
+
+  to {
+    @include wrapper-prev
+  }
+}
+
+@keyframes idled-gradually-on-img {
+  from {
+    @include wrapper-prev
+  }
+
+  to {
+    @include wrapper-idle
+  }
+}
+
+@keyframes deIdled-gradually-on-img {
+  from {
+    @include wrapper-idle
+  }
+
+  to {
+    @include wrapper-prev
+  }
+}
+
 .enhanced_textArea {
   width: 100%;
   height: 100%;
@@ -22,67 +77,11 @@
         font-size: medium;
       }
 
-      @mixin wrapper-prev {
-        border: solid #ffffff 2px;
-        border-radius: 3px;
-      }
-
-      @mixin wrapper-unfrozen {
-        border: solid #db5cf8 2px;
-        border-radius: 3px;
-      }
-
-      @mixin wrapper-idle {
-        border: solid #f1bc0f 2px;
-        border-radius: 3px;
-      }
-
       .img_wrapper {
         height: 400px;
         display: flex;
         padding: 5px;
-
         @include wrapper-prev;
-
-        @keyframes unFrozen-gradually-on-img {
-          from {
-            @include wrapper-idle
-          }
-
-          to {
-            @include wrapper-unfrozen
-          }
-        }
-
-        @keyframes frozen-gradually-on-img {
-          from {
-            @include wrapper-unfrozen
-          }
-
-          to {
-            @include wrapper-prev
-          }
-        }
-
-        @keyframes idled-gradually-on-img {
-          from {
-            @include wrapper-prev
-          }
-
-          to {
-            @include wrapper-idle
-          }
-        }
-
-        @keyframes deIdled-gradually-on-img {
-          from {
-            @include wrapper-idle
-          }
-
-          to {
-            @include wrapper-prev
-          }
-        }
 
         img {
           max-height: 100%;
@@ -92,6 +91,7 @@
           display: block;
         }
 
+        /** 이하 img_wrapper 에 적용되어지는 animation */
         &.unFrozen {
           animation-duration: 0.3s;
           animation-name: unFrozen-gradually-on-img;

@@ -58,7 +58,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
               splicedContentElements.splice(i + index, 0, {
                 id: contentElementOnTriggeredArea.id + (index + 1),
                 fileInfo: {
-                  fileTitle: `미정 ${contentElementOnTriggeredArea.id + (index + 1)}`,
+                  fileTitle: file.name, // 최초로 할당되어지는 제목
                   fileSrcUrl: URL.createObjectURL(file),
                 },
               });
@@ -161,7 +161,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
               </div>
             );
           } else {
-            // frozen(편집 제한)
+            // 편집 제한
             return (
               <div className={'per_content_element'} key={contentElement.id}>
                 {contentElement.fileInfo != undefined ? (
@@ -177,9 +177,6 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                     onMouseLeave={(e) => {
                       e.currentTarget.classList.remove('hovered');
                       e.currentTarget.classList.add('leaved');
-                    }}
-                    onAnimationEnd={(e) => {
-                      console.log('onAnimationEnd');
                     }}
                   >
                     <img src={contentElement.fileInfo.fileSrcUrl} />
