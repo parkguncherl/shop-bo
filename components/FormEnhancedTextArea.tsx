@@ -162,6 +162,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                             return {
                               ...prev,
                               partialContent: e.target.value,
+                              init: prev.init ? false : prev.init, // 최초 상호작용이 발생한 경우 init 속성 무효화
                             };
                           } else {
                             return prev;
