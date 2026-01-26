@@ -43,10 +43,6 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   const [boxHeight, setBoxHeight] = useState(0);
 
   useEffect(() => {
-    console.log('mounted');
-  }, []);
-
-  useEffect(() => {
     if (!boxRef.current) return;
 
     const observer = new ResizeObserver(([entry]) => {
@@ -161,7 +157,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
         {!mode || mode == 'edit' ? (
           contentElements.map((contentElement, index) => {
             if (contentElements.length == index + 1 || contentElement.id == unFrozenElementId) {
-              // 최하단 영역, 혹은 상태로 관리되는 element id와 해당 content 의 id가 일치하는 경우
+              // 편집 가능 영역(최하단 영역, 혹은 상태로 관리되는 element id와 해당 content 의 id가 일치하는 경우)
               return (
                 <div className={'per_content_element'} key={contentElement.id}>
                   {contentElement.fileInfo != undefined ? (
@@ -198,9 +194,15 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                           e.preventDefault();
                           if (contentElement.partialContent != undefined && contentElement.partialContent != '') {
                             // 값이 유효한 경우 한정으로만 정의된 동작 실행
-                            setContentElements((prevState) => {
-                              return [...prevState, configAsRefreshedContent({ id: contentElement.id + 1, partialContent: '' })];
-                            });
+                            if (contentElements.length == index + 1) {
+                              // 최하단 영역의 경우 입력을 위한 신규 기본 요소 추가
+                              setContentElements((prevState) => {
+                                return [...prevState, configAsRefreshedContent({ id: contentElement.id + 1, partialContent: '' })];
+                              });
+                            } else {
+                              // 그 외에는 최하단 영역으로 포커싱
+                              // todo
+                            }
                           }
                         }
                       }}
