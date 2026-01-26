@@ -102,17 +102,17 @@
           animation-duration: 0.2s;
           animation-name: frozen-gradually-on-img;
           @include wrapper-prev;
+        }
 
-          &.hovered {
-            animation-duration: 0.2s;
-            animation-name: idled-gradually-on-img;
-            @include wrapper-idle;
-          }
-          &.leaved {
-            animation-duration: 0.2s;
-            animation-name: deIdled-gradually-on-img;
-            @include wrapper-prev;
-          }
+        &.hovered {
+          animation-duration: 0.2s;
+          animation-name: idled-gradually-on-img;
+          @include wrapper-idle;
+        }
+        &.leaved {
+          animation-duration: 0.2s;
+          animation-name: deIdled-gradually-on-img;
+          @include wrapper-prev;
         }
       }
     }

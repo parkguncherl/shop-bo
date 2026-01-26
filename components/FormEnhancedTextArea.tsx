@@ -57,10 +57,11 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
     console.log('contentElements: ', contentElements);
   }, [contentElements]);
 
-  const addContentAtInit = (addedContentElement: ContentElement) => {
+  /** contentElement 정의(구성) 시점에서 필요한 기본값을 설정한 contentElementInfo 타입의 객체 반환  */
+  const configAsRefreshedContent = (addedContentElement: ContentElement) => {
     return {
       ...addedContentElement,
-      init: true,
+      init: true, // 최초 정의 시 init true
     };
   };
 
@@ -70,7 +71,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
         // 가장 마지막 입력 영역에서 첨부 동작 발생할 시
         const pushedContentElements = [...prevState];
         files.forEach((file, index) => {
-          pushedContentElements[pushedContentElements.length - 1 + index] = addContentAtInit({
+          pushedContentElements[pushedContentElements.length - 1 + index] = configAsRefreshedContent({
             id: pushedContentElements[pushedContentElements.length - 1].id + index, // 최초 파일 한정 id 보존, 이후 순차 증가된 값 할당
             fileInfo: {
               fileTitle: file.name, // 최초로 할당되어지는 제목
@@ -78,7 +79,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
             },
           });
         });
-        return [...pushedContentElements, addContentAtInit({ id: pushedContentElements[pushedContentElements.length - 1].id + 1, partialContent: '' })];
+        return [...pushedContentElements, configAsRefreshedContent({ id: pushedContentElements[pushedContentElements.length - 1].id + 1, partialContent: '' })];
       } else {
         // 중간 영역에서 첨부 동작 발생한 경우
         const splicedContentElements = [...prevState];
@@ -89,7 +90,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
               splicedContentElements.splice(
                 i + index,
                 0,
-                addContentAtInit({
+                configAsRefreshedContent({
                   id: contentElementOnTriggeredArea.id + (index + 1),
                   fileInfo: {
                     fileTitle: file.name, // 최초로 할당되어지는 제목
@@ -100,7 +101,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
             });
           } else if (prevState[i].id > contentElementOnTriggeredArea.id) {
             // 대상 영역 이후
-            splicedContentElements[i + files.length] = addContentAtInit({
+            splicedContentElements[i + files.length] = configAsRefreshedContent({
               ...splicedContentElements[i + files.length],
               id: prevState[i].id + files.length,
             });
@@ -180,7 +181,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                         if (contentElement.partialContent != undefined && contentElement.partialContent != '') {
                           // 값이 유효한 경우 한정으로만 정의된 동작 실행
                           setContentElements((prevState) => {
-                            return [...prevState, addContentAtInit({ id: contentElement.id + 1, partialContent: '' })];
+                            return [...prevState, configAsRefreshedContent({ id: contentElement.id + 1, partialContent: '' })];
                           });
                         }
                       }
