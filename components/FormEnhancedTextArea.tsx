@@ -18,6 +18,14 @@ interface ContentElement {
   };
 }
 
+interface ContentElementInfo extends ContentElement {
+  mounted?: boolean; // 스타일, 특히나 마운팅 시점의 애니메이션 동작 통제를 위한 속성
+}
+
+interface ToNextParagraphReq {
+  currentElementInfo: ContentElementInfo;
+}
+
 /**
  * stateFul 컴포넌트
  * 기존 textArea 와 달리 이미지 삽입 및 이에 따라 필요한 동작 지원
@@ -30,8 +38,14 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   } = useController({ name, rules, control });
 
   /** 해당 지역 상태는 반드시 배열의 불변성을 유지할 것 */
-  const [contentElements, setContentElements] = useState<ContentElement[]>([{ id: 1, partialContent: '' }]);
+  const [contentElements, setContentElements] = useState<ContentElementInfo[]>([{ id: 1, partialContent: '' }]);
   const [unFrozenElementId, setUnFrozenElementId] = useState<number>(-1);
+
+  const moveToNextParagraphReqCallback = (request: ToNextParagraphReq) => {
+    setContentElements((prevState) => {
+      return [...prevState, { id: request.currentElementInfo.id + 1, partialContent: '' }];
+    });
+  };
 
   const attachRequestInterruptCallBack = (files: File[], contentElementOnTriggeredArea: ContentElement) => {
     setContentElements((prevState) => {
@@ -42,7 +56,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
           pushedContentElements[pushedContentElements.length - 1 + index] = {
             id: pushedContentElements[pushedContentElements.length - 1].id + index, // 최초 파일 한정 id 보존, 이후 순차 증가된 값 할당
             fileInfo: {
-              fileTitle: `미정 ${pushedContentElements[pushedContentElements.length - 1].id + index}`,
+              fileTitle: file.name, // 최초로 할당되어지는 제목
               fileSrcUrl: URL.createObjectURL(file),
             },
           };
