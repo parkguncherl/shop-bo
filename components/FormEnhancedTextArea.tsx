@@ -2,6 +2,8 @@ import { BaseTextAreaAtom, BaseTextAreaAtomProps } from './atom/BaseTextAreaAtom
 import { FieldValues, useController } from 'react-hook-form';
 import { TControl } from '../types/Control';
 import React, { useEffect, useRef, useState } from 'react';
+import { BaseInputAtom } from './atom/BaseInputAtom';
+import NativeInputAtom from './atom/NativeInputAtom';
 
 export type EnhancedTextAreasMode = 'edit' | 'preview';
 type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
@@ -214,7 +216,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                         <img src={contentElement.fileInfo.fileSrcUrl} />
                       </div>
                       <div className={'img_title_wrapper'}>
-                        <p>{contentElement.fileInfo.fileTitle}</p>
+                        <NativeInputAtom value={contentElement.fileInfo.fileTitle} onChange={() => {}} />
                       </div>
                     </div>
                   ) : (

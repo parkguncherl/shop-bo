@@ -96,7 +96,6 @@
       .per_img_element {
         display: grid;
         grid-template-rows: auto 25px;
-        padding: 5px 0 5px 0;
 
         .img_wrapper {
           @include wrapper-img;
@@ -105,10 +104,13 @@
         .img_title_wrapper {
           display: flex;
           flex-direction: row;
+          padding: 2px;
+
           p {
             padding: 2px;
             font-size: small;
           }
+
         }
 
         &.unFrozen {
