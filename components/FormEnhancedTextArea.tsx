@@ -277,7 +277,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                         <img src={contentElement.fileInfo.fileSrcUrl} />
                       </div>
                       <div className={'img_title_wrapper'}>
-                        <p>{contentElement.fileInfo.fileTitle}</p>
+                        <NativeInputAtom value={contentElement.fileInfo.fileTitle} disabled={true} />
                       </div>
                     </div>
                   ) : (
