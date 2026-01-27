@@ -44,6 +44,10 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   const [boxHeight, setBoxHeight] = useState(0);
 
   useEffect(() => {
+    console.log('unFrozenElementId: ', unFrozenElementId);
+  }, [unFrozenElementId]);
+
+  useEffect(() => {
     // 컨텐츠 박스 높이에 따른 state 동기화를 위한 ResizeObserver 인스턴스 생성 및 등록, 추후 반환까지 생명주기 지정
     if (!boxRef.current) return;
 
@@ -133,6 +137,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   // 드롭 이벤트
   const onDropEventHandler = (e: React.DragEvent<HTMLTextAreaElement>, contentElementOnTriggeredArea: ContentElement) => {
     if (e.dataTransfer.files && e.dataTransfer.files.length != 0) {
+      // 파일을 드롭한 경우 별도 콜백으로 처리하여 동작의 일관성 및 상태의 오염 방지
       e.preventDefault();
       e.stopPropagation();
       const droppedFiles = Array.from(e.dataTransfer.files);
@@ -145,6 +150,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   // 붙여넣기 이벤트
   const onPasteEventHandler = (e: React.ClipboardEvent<HTMLTextAreaElement>, contentElementOnTriggeredArea: ContentElement) => {
     if (e.clipboardData.files && e.clipboardData.files.length != 0) {
+      // 파일을 붙여넣기한 경우 별도 콜백으로 처리하여 동작의 일관성 및 상태의 오염 방지
       e.preventDefault();
       e.stopPropagation();
       const pastedFiles = Array.from(e.clipboardData.files);
@@ -202,7 +208,10 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                       }
                     }}
                     ref={(node) => {
-                      //node?.focus();
+                      if (unFrozenElementId == -1) {
+                        // 최하단 영역 이외에 별도로 편집 가능 상태인 구획이 부재한 경우 한정 트리거
+                        node?.focus();
+                      }
                     }}
                   />
                 </div>
@@ -277,7 +286,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                       type={'text'}
                       readOnly={true}
                       onFocus={() => {
-                        setUnFrozenElementId(contentElement.id);
+                        setUnFrozenElementId(contentElement.id); // 해당 영역 unFrozen(편집 가능)
                       }}
                     />
                   )}
