@@ -43,10 +43,6 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   const [boxHeight, setBoxHeight] = useState(0);
 
   useEffect(() => {
-    console.log('contentElements: ', contentElements);
-  }, [contentElements]);
-
-  useEffect(() => {
     // 컨텐츠 박스 높이에 따른 state 동기화를 위한 ResizeObserver 인스턴스 생성 및 등록, 추후 반환까지 생명주기 지정
     if (!boxRef.current) return;
 
@@ -213,8 +209,13 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
               return (
                 <div className={'per_content_element'} key={contentElement.id}>
                   {contentElement.fileInfo != undefined ? (
-                    <div className={'img_wrapper unFrozen'}>
-                      <img src={contentElement.fileInfo.fileSrcUrl} />
+                    <div className={'per_img_element unFrozen'}>
+                      <div className={'img_wrapper'}>
+                        <img src={contentElement.fileInfo.fileSrcUrl} />
+                      </div>
+                      <div className={'img_title_wrapper'}>
+                        <p>{contentElement.fileInfo.fileTitle}</p>
+                      </div>
                     </div>
                   ) : (
                     <BaseTextAreaAtom
@@ -257,7 +258,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                 <div className={'per_content_element'} key={contentElement.id}>
                   {contentElement.fileInfo != undefined ? (
                     <div
-                      className={`img_wrapper ${contentElement.init ? '' : 'frozen'}`}
+                      className={`per_img_element ${contentElement.init ? '' : 'frozen'}`}
                       onClick={() => {
                         setUnFrozenElementId(contentElement.id);
                       }}
@@ -270,7 +271,12 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                         e.currentTarget.classList.add('leaved');
                       }}
                     >
-                      <img src={contentElement.fileInfo.fileSrcUrl} />
+                      <div className={'img_wrapper'}>
+                        <img src={contentElement.fileInfo.fileSrcUrl} />
+                      </div>
+                      <div className={'img_title_wrapper'}>
+                        <p>{contentElement.fileInfo.fileTitle}</p>
+                      </div>
                     </div>
                   ) : (
                     <BaseTextAreaAtom

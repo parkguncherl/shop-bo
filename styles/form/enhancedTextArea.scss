@@ -7,7 +7,6 @@
 @mixin wrapper-img($height: 400px) {
   height: $height;
   display: flex;
-  padding: 5px;
 
   img {
     max-height: 100%;
@@ -94,10 +93,24 @@
         font-size: medium;
       }
 
-      .img_wrapper {
-        @include wrapper-img;
+      .per_img_element {
+        display: grid;
+        grid-template-rows: auto 25px;
+        padding: 5px 0 5px 0;
 
-        /** 이하 img_wrapper 에 적용되어지는 animation */
+        .img_wrapper {
+          @include wrapper-img;
+        }
+
+        .img_title_wrapper {
+          display: flex;
+          flex-direction: row;
+          p {
+            padding: 2px;
+            font-size: small;
+          }
+        }
+
         &.unFrozen {
           animation-duration: 0.3s;
           animation-name: unFrozen-gradually-on-img;
