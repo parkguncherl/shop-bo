@@ -43,6 +43,10 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   const [boxHeight, setBoxHeight] = useState(0);
 
   useEffect(() => {
+    console.log('contentElements: ', contentElements);
+  }, [contentElements]);
+
+  useEffect(() => {
     // 컨텐츠 박스 높이에 따른 state 동기화를 위한 ResizeObserver 인스턴스 생성 및 등록, 추후 반환까지 생명주기 지정
     if (!boxRef.current) return;
 
@@ -276,6 +280,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                       onFocus={() => {
                         setUnFrozenElementId(contentElement.id); // 해당 영역 unFrozen(편집 가능)
                       }}
+                      autoSize={autoSize}
                     />
                   )}
                 </div>
@@ -288,7 +293,23 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
             style={{
               height: boxHeight,
             }}
-          ></div>
+          >
+            {contentElements.map((contentElement, index) => {
+              return (
+                <div className={'per_preview_element'} key={contentElement.id}>
+                  {contentElement.fileInfo != undefined ? (
+                    <div className={'img_wrapper'}>
+                      <img src={contentElement.fileInfo.fileSrcUrl} />
+                    </div>
+                  ) : (
+                    <div className={'text_wrapper'}>
+                      <p>{contentElement.partialContent}</p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>

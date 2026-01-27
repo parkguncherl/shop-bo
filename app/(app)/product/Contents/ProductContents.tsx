@@ -72,10 +72,14 @@ const ProductContents = () => {
                       type={'button'}
                       className={'btn'}
                       onClick={() => {
-                        setDisplayMode('preview');
+                        if (displayMode != 'preview') {
+                          setDisplayMode('preview');
+                        } else {
+                          setDisplayMode('edit');
+                        }
                       }}
                     >
-                      미리보기
+                      {displayMode == 'edit' ? '미리보기' : '편집'}
                     </button>
                   </div>
                 </div>
