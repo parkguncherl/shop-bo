@@ -36,11 +36,10 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   } = useController({ name, rules, control });
 
   const boxRef = useRef<HTMLDivElement>(null);
-  const bottomTextArea = useRef<HTMLTextAreaElement | null>(null);
 
   /** 해당 지역 상태는 반드시 배열의 불변성을 유지할 것 */
   const [contentElements, setContentElements] = useState<ContentElementInfo[]>([{ id: 1, partialContent: '', init: true }]);
-  const [unFrozenElementId, setUnFrozenElementId] = useState<number>(-1); // -1인 경우 최하단 영역 이외 frozen(편집 가능 속성을 회수)
+  const [unFrozenElementId, setUnFrozenElementId] = useState<number>(-1); // 최하단 영역 이외 편집 가능한 영역 지정(by Id), -1인 경우 최하단 영역 이외 frozen(편집 가능 속성을 회수)
   const [boxHeight, setBoxHeight] = useState(0);
 
   useEffect(() => {
@@ -53,11 +52,6 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
     observer.observe(boxRef.current);
 
     return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    // 최초 마운트 시점 동작 정의
-    bottomTextArea.current?.focus();
   }, []);
 
   useEffect(() => {
@@ -85,48 +79,43 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
 
   const attachRequestInterruptCallBack = (files: File[], contentElementOnTriggeredArea: ContentElement) => {
     setContentElements((prevState) => {
-      if (prevState[prevState.length - 1].id == contentElementOnTriggeredArea.id) {
-        // 가장 마지막 입력 영역에서 첨부 동작 발생할 시
-        const pushedContentElements = [...prevState];
-        files.forEach((file, index) => {
-          pushedContentElements[pushedContentElements.length - 1 + index] = configAsRefreshedContent({
-            id: pushedContentElements[pushedContentElements.length - 1].id + index, // 최초 파일 한정 id 보존, 이후 순차 증가된 값 할당
-            fileInfo: {
-              fileTitle: file.name, // 최초로 할당되어지는 제목
-              fileSrcUrl: URL.createObjectURL(file),
-            },
+      const modifiedContentElements: ContentElementInfo[] = [];
+      for (let i = 0; i < prevState.length; i++) {
+        if (contentElementOnTriggeredArea.id == prevState[i].id) {
+          // 대상 영역
+          files.forEach((file, fileIndex) => {
+            if (fileIndex + 1 == files.length) {
+              setUnFrozenElementId(modifiedContentElements.length + 1); // 첨부된 이미지 중 마지막 이미지 unFrozen
+            }
+            modifiedContentElements.push(
+              configAsRefreshedContent({
+                id: modifiedContentElements.length + 1,
+                fileInfo: {
+                  fileTitle: file.name, // 최초로 할당되어지는 제목
+                  fileSrcUrl: URL.createObjectURL(file),
+                },
+              }),
+            );
           });
-        });
-        return [...pushedContentElements, configAsRefreshedContent({ id: pushedContentElements[pushedContentElements.length - 1].id + 1, partialContent: '' })];
-      } else {
-        // 중간 영역에서 첨부 동작 발생한 경우
-        const splicedContentElements = [...prevState];
-        for (let i = 0; i < prevState.length; i++) {
-          if (contentElementOnTriggeredArea.id == prevState[i].id) {
-            // 대상 영역
-            files.forEach((file, index) => {
-              splicedContentElements.splice(
-                i + index,
-                0,
-                configAsRefreshedContent({
-                  id: contentElementOnTriggeredArea.id + (index + 1),
-                  fileInfo: {
-                    fileTitle: file.name, // 최초로 할당되어지는 제목
-                    fileSrcUrl: URL.createObjectURL(file),
-                  },
-                }),
-              );
-            });
-          } else if (prevState[i].id > contentElementOnTriggeredArea.id) {
-            // 대상 영역 이후
-            splicedContentElements[i + files.length] = configAsRefreshedContent({
-              ...splicedContentElements[i + files.length],
-              id: prevState[i].id + files.length,
-            });
-          }
+
+          // 기존 상태 영속을 위한 추가 동작
+          modifiedContentElements.push(
+            configAsRefreshedContent({
+              ...prevState[i],
+              id: modifiedContentElements.length + 1,
+            }),
+          );
+        } else {
+          // 이외의 경우에는 id 동기화
+          modifiedContentElements.push(
+            configAsRefreshedContent({
+              ...prevState[i],
+              id: modifiedContentElements.length + 1,
+            }),
+          );
         }
-        return splicedContentElements;
       }
+      return modifiedContentElements;
     });
   };
 
@@ -166,6 +155,9 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
           contentElements.map((contentElement, index) => {
             if (contentElements.length == index + 1) {
               // 편집 가능(최하단 영역, 이 경우는 입력 영역만이 존재할수 있음, 파일 정보는 존재할수 없음)
+              if (contentElement.fileInfo != undefined) {
+                console.error('최하단 요소에는 파일 정보가 존재할수 없음, 상태 오염 정정!');
+              }
               return (
                 <div className={'per_content_element'} key={contentElement.id}>
                   <BaseTextAreaAtom
