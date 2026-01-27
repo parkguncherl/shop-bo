@@ -40,7 +40,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
 
   /** 해당 지역 상태는 반드시 배열의 불변성을 유지할 것 */
   const [contentElements, setContentElements] = useState<ContentElementInfo[]>([{ id: 1, partialContent: '', init: true }]);
-  const [unFrozenElementId, setUnFrozenElementId] = useState<number>(-1);
+  const [unFrozenElementId, setUnFrozenElementId] = useState<number>(-1); // -1인 경우 최하단 영역 이외 frozen(편집 가능 속성을 회수)
   const [boxHeight, setBoxHeight] = useState(0);
 
   useEffect(() => {
@@ -201,7 +201,9 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                         }
                       }
                     }}
-                    ref={bottomTextArea}
+                    ref={(node) => {
+                      //node?.focus();
+                    }}
                   />
                 </div>
               );
@@ -235,15 +237,12 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                       onDrop={(e) => onDropEventHandler(e, contentElement)}
                       onPaste={(e) => onPasteEventHandler(e, contentElement)}
                       autoSize={autoSize}
-                      onFocus={() => {
-                        setUnFrozenElementId(-1);
-                      }}
                       onKeyDown={(e) => {
                         if (e.key == 'Enter' && e.shiftKey) {
                           e.preventDefault();
                           if (contentElement.partialContent != undefined && contentElement.partialContent != '') {
                             // 값이 유효한 경우 한정으로만 정의된 동작 실행
-                            bottomTextArea.current?.focus(); // 최하단 영역으로 포커싱
+                            // todo bottomTextArea.current?.focus(); // 최하단 영역으로 포커싱
                           }
                         }
                       }}

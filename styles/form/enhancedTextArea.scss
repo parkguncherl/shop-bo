@@ -74,6 +74,7 @@
     .per_content_element {
       // editing 모드에서 각 문단, 이미지 영역의 최상단 wrapper 영역
       width: 100%;
+      padding: 2px 0 2px 0;
 
       & > .ant-input {
         font-size: medium;
