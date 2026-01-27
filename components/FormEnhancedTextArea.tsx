@@ -2,7 +2,6 @@ import { BaseTextAreaAtom, BaseTextAreaAtomProps } from './atom/BaseTextAreaAtom
 import { FieldValues, useController } from 'react-hook-form';
 import { TControl } from '../types/Control';
 import React, { useEffect, useRef, useState } from 'react';
-import { BaseInputAtom } from './atom/BaseInputAtom';
 import NativeInputAtom from './atom/NativeInputAtom';
 
 export type EnhancedTextAreasMode = 'edit' | 'preview';
@@ -12,14 +11,15 @@ type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
     //onUploadRequestInterruptOccurred?: (event: UploadRequestInterruptEvent) => Promise<void> | undefined;
     mode?: EnhancedTextAreasMode;
   };
+interface FileInfo {
+  // 이미지(혹은 파일) 한정으로 정의함, 현재는 실 동작 영역에서 이미지 이외 파일에 대하여는 첨부를 제한하는 중
+  fileTitle: string;
+  fileSrcUrl: string;
+}
 interface ContentElement {
   id: number; // 기본 1부터 시작, 순차적일 필요는 없으나 후행하는 요소의 id는 선행 요소의 id보다 커야 함
   partialContent?: string; // 이미지인 경우 undefined
-  fileInfo?: {
-    // 이미지(혹은 파일) 한정으로 정의함, 현재는 실 동작 영역에서 이미지 이외 파일에 대하여는 첨부를 제한하는 중
-    fileTitle: string;
-    fileSrcUrl: string;
-  };
+  fileInfo?: FileInfo;
 }
 
 interface ContentElementInfo extends ContentElement {
@@ -216,7 +216,30 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                         <img src={contentElement.fileInfo.fileSrcUrl} />
                       </div>
                       <div className={'img_title_wrapper'}>
-                        <NativeInputAtom value={contentElement.fileInfo.fileTitle} onChange={() => {}} />
+                        <NativeInputAtom
+                          value={contentElement.fileInfo.fileTitle}
+                          onChange={(event) => {
+                            setContentElements((contentElements) => {
+                              const modifiedContentElements: ContentElementInfo[] = []; // 배열 불변성 유지
+                              for (let i = 0; i < contentElements.length; i++) {
+                                if (contentElements[i].id == contentElement.id) {
+                                  modifiedContentElements.push({
+                                    ...contentElements[i],
+                                    fileInfo: contentElements[i].fileInfo
+                                      ? {
+                                          ...(contentElements[i].fileInfo as FileInfo),
+                                          fileTitle: event.target.value || '', // fileTitle 동기화
+                                        }
+                                      : undefined,
+                                  });
+                                } else {
+                                  modifiedContentElements.push(contentElements[i]);
+                                }
+                              }
+                              return modifiedContentElements;
+                            });
+                          }}
+                        />
                       </div>
                     </div>
                   ) : (
