@@ -156,8 +156,54 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
       <div className={'enhanced_textArea_box'} ref={boxRef}>
         {!mode || mode == 'edit' ? (
           contentElements.map((contentElement, index) => {
-            if (contentElements.length == index + 1 || contentElement.id == unFrozenElementId) {
-              // 편집 가능 영역(최하단 영역, 혹은 상태로 관리되는 element id와 해당 content 의 id가 일치하는 경우)
+            if (contentElements.length == index + 1) {
+              // 편집 가능(최하단 영역, 이 경우는 입력 영역만이 존재할수 있음, 파일 정보는 존재할수 없음)
+              return (
+                <div className={'per_content_element'} key={contentElement.id}>
+                  <BaseTextAreaAtom
+                    value={contentElement.partialContent}
+                    type={'text'}
+                    onChange={(e) => {
+                      setContentElements((prevState) => {
+                        return prevState.map((prev) => {
+                          if (prev.id == contentElement.id) {
+                            return {
+                              ...prev,
+                              partialContent: e.target.value,
+                              init: prev.init ? false : prev.init, // 최초 상호작용이 발생한 경우 init 속성 무효화
+                            };
+                          } else {
+                            return prev;
+                          }
+                        });
+                      });
+                    }}
+                    onDrop={(e) => onDropEventHandler(e, contentElement)}
+                    onPaste={(e) => onPasteEventHandler(e, contentElement)}
+                    autoSize={autoSize}
+                    onFocus={() => {
+                      setUnFrozenElementId(-1);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key == 'Enter' && e.shiftKey) {
+                        e.preventDefault();
+                        if (contentElement.partialContent != undefined && contentElement.partialContent != '') {
+                          // 값이 유효한 경우 한정으로만 정의된 동작 실행
+                          setContentElements((prevState) => {
+                            return [...prevState, configAsRefreshedContent({ id: contentElement.id + 1, partialContent: '' })];
+                          });
+                        }
+                      }
+                    }}
+                    ref={(node) => {
+                      // 최하단 영역 마운트 한정 포커싱, 단 이 경우 해당 영역 이외 활성화된 요소가 부재하여야
+                      node?.focus();
+                    }}
+                  />
+                </div>
+              );
+            } else if (contentElement.id == unFrozenElementId) {
+              // 편집 가능 영역(상태로 관리되는 element id와 해당 content 의 id가 일치하는 경우)
               return (
                 <div className={'per_content_element'} key={contentElement.id}>
                   {contentElement.fileInfo != undefined ? (
@@ -190,26 +236,12 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                         setUnFrozenElementId(-1);
                       }}
                       onKeyDown={(e) => {
-                        if (e.key == 'Enter' && !e.shiftKey) {
+                        if (e.key == 'Enter' && e.shiftKey) {
                           e.preventDefault();
                           if (contentElement.partialContent != undefined && contentElement.partialContent != '') {
                             // 값이 유효한 경우 한정으로만 정의된 동작 실행
-                            if (contentElements.length == index + 1) {
-                              // 최하단 영역의 경우 입력을 위한 신규 기본 요소 추가
-                              setContentElements((prevState) => {
-                                return [...prevState, configAsRefreshedContent({ id: contentElement.id + 1, partialContent: '' })];
-                              });
-                            } else {
-                              // 그 외에는 최하단 영역으로 포커싱
-                              // todo
-                            }
+                            // todo 최하단 영역으로 포커싱
                           }
-                        }
-                      }}
-                      ref={(node) => {
-                        if (contentElements.length == index + 1 && unFrozenElementId == -1) {
-                          // 최하단 영역 마운트 한정 포커싱, 단 이 경우 해당 영역 이외 활성화된 요소가 부재하여야
-                          node?.focus();
                         }
                       }}
                     />
