@@ -36,6 +36,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   } = useController({ name, rules, control });
 
   const boxRef = useRef<HTMLDivElement>(null);
+  const bottomTextArea = useRef<HTMLTextAreaElement | null>(null);
 
   /** 해당 지역 상태는 반드시 배열의 불변성을 유지할 것 */
   const [contentElements, setContentElements] = useState<ContentElementInfo[]>([{ id: 1, partialContent: '', init: true }]);
@@ -43,15 +44,20 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   const [boxHeight, setBoxHeight] = useState(0);
 
   useEffect(() => {
+    // 컨텐츠 박스 높이에 따른 state 동기화를 위한 ResizeObserver 인스턴스 생성 및 등록, 추후 반환까지 생명주기 지정
     if (!boxRef.current) return;
 
     const observer = new ResizeObserver(([entry]) => {
       setBoxHeight(entry.contentRect.height);
     });
-
     observer.observe(boxRef.current);
 
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    // 최초 마운트 시점 동작 정의
+    bottomTextArea.current?.focus();
   }, []);
 
   useEffect(() => {
@@ -195,10 +201,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                         }
                       }
                     }}
-                    ref={(node) => {
-                      // 최하단 영역 마운트 한정 포커싱, 단 이 경우 해당 영역 이외 활성화된 요소가 부재하여야
-                      node?.focus();
-                    }}
+                    ref={bottomTextArea}
                   />
                 </div>
               );
@@ -240,7 +243,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                           e.preventDefault();
                           if (contentElement.partialContent != undefined && contentElement.partialContent != '') {
                             // 값이 유효한 경우 한정으로만 정의된 동작 실행
-                            // todo 최하단 영역으로 포커싱
+                            bottomTextArea.current?.focus(); // 최하단 영역으로 포커싱
                           }
                         }
                       }}
