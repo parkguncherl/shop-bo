@@ -17,7 +17,7 @@ export interface Props {
   onBlur?: () => void;
   inputType?: string;
   allowClear?: boolean;
-  ref: React.Ref<InputRef>;
+  ref?: React.Ref<InputRef>;
 }
 
 export const BaseInputAtom = function BaseInputAtom({
