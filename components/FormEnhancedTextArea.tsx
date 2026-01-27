@@ -44,10 +44,6 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   const [boxHeight, setBoxHeight] = useState(0);
 
   useEffect(() => {
-    console.log('unFrozenElementId: ', unFrozenElementId);
-  }, [unFrozenElementId]);
-
-  useEffect(() => {
     // 컨텐츠 박스 높이에 따른 state 동기화를 위한 ResizeObserver 인스턴스 생성 및 등록, 추후 반환까지 생명주기 지정
     if (!boxRef.current) return;
 

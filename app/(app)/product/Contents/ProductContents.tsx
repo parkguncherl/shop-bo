@@ -69,6 +69,7 @@ const ProductContents = () => {
                   </div>
                   <div className={'btn-per-wrapper'}>
                     <button
+                      type={'button'}
                       className={'btn'}
                       onClick={() => {
                         setDisplayMode('preview');
