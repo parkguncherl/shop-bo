@@ -38,6 +38,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   } = useController({ name, rules, control });
 
   const boxRef = useRef<HTMLDivElement>(null);
+  const bottomTextArea = useRef<HTMLTextAreaElement | null>(null);
 
   /** 해당 지역 상태는 반드시 배열의 불변성을 유지할 것 */
   const [contentElements, setContentElements] = useState<ContentElementInfo[]>([{ id: 1, partialContent: '', init: true }]);
@@ -71,8 +72,8 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
     });
   }, [unFrozenElementId]);
 
-  /** contentElement 정의(구성) 시점에서 필요한 기본값을 설정한 contentElementInfo 타입의 객체 반환  */
-  const configAsRefreshedContent = (addedContentElement: ContentElement) => {
+  /** contentElement 정의(구성) 시점에서 필요한 기본값을 설정한 contentElementInfo 타입의 객체 반환, */
+  const configForInitContent = (addedContentElement: ContentElement) => {
     return {
       ...addedContentElement,
       init: true, // 최초 정의 시 init true
@@ -85,12 +86,9 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
       for (let i = 0; i < prevState.length; i++) {
         if (contentElementOnTriggeredArea.id == prevState[i].id) {
           // 대상 영역
-          files.forEach((file, fileIndex) => {
-            if (fileIndex + 1 == files.length) {
-              setUnFrozenElementId(modifiedContentElements.length + 1); // 첨부된 이미지 중 마지막 이미지 unFrozen
-            }
+          files.forEach((file) => {
             modifiedContentElements.push(
-              configAsRefreshedContent({
+              configForInitContent({
                 id: modifiedContentElements.length + 1,
                 fileInfo: {
                   fileTitle: file.name, // 최초로 할당되어지는 제목
@@ -101,20 +99,17 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
           });
 
           // 기존 상태 영속을 위한 추가 동작
-          modifiedContentElements.push(
-            configAsRefreshedContent({
-              ...prevState[i],
-              id: modifiedContentElements.length + 1,
-            }),
-          );
+          modifiedContentElements.push({
+            ...prevState[i],
+            id: modifiedContentElements.length + 1,
+          });
+          setUnFrozenElementId(i == prevState.length - 1 ? -1 : modifiedContentElements.length); // 최하단 영역에서의 이벤트인 경우(i == prevState.length - 1 이 true) -1, 이외 id에 해당하는 값(바로 위에서 push 동작이 이루어진 관계로 modifiedContentElements.length) 할당
         } else {
           // 이외의 경우에는 id 동기화
-          modifiedContentElements.push(
-            configAsRefreshedContent({
-              ...prevState[i],
-              id: modifiedContentElements.length + 1,
-            }),
-          );
+          modifiedContentElements.push({
+            ...prevState[i],
+            id: modifiedContentElements.length + 1,
+          });
         }
       }
       return modifiedContentElements;
@@ -189,10 +184,10 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                     onKeyDown={(e) => {
                       if (e.key == 'Enter' && e.shiftKey) {
                         e.preventDefault();
-                        if (contentElement.partialContent != undefined && contentElement.partialContent != '') {
+                        if (contentElement.partialContent != undefined && contentElement.partialContent.trim() != '') {
                           // 값이 유효한 경우 한정으로만 정의된 동작 실행
                           setContentElements((prevState) => {
-                            return [...prevState, configAsRefreshedContent({ id: contentElement.id + 1, partialContent: '' })];
+                            return [...prevState, configForInitContent({ id: contentElement.id + 1, partialContent: '' })];
                           });
                         }
                       }
@@ -202,6 +197,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                         // 최하단 영역 이외에 별도로 편집 가능 상태인 구획이 부재한 경우 한정 트리거
                         node?.focus();
                       }
+                      bottomTextArea.current = node; // 리 랜더링(재 마운트) 시점에 최신화된 참조를 사용 가능토록 이와 같이 처리함
                     }}
                   />
                 </div>
@@ -247,19 +243,27 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                       value={contentElement.partialContent}
                       type={'text'}
                       onChange={(e) => {
-                        setContentElements((prevState) => {
-                          return prevState.map((prev) => {
-                            if (prev.id == contentElement.id) {
-                              return {
-                                ...prev,
-                                partialContent: e.target.value,
-                                init: prev.init ? false : prev.init, // 최초 상호작용이 발생한 경우 init 속성 무효화
-                              };
-                            } else {
-                              return prev;
-                            }
+                        if (e.target.value.trim() == '') {
+                          // 이 경우 해당 요소 del
+                          setContentElements((prevState) => {
+                            return [...prevState.filter((prev) => prev.id != contentElement.id)];
                           });
-                        });
+                          bottomTextArea.current?.focus(); // 최하단 영역으로 포커싱
+                        } else {
+                          setContentElements((prevState) => {
+                            return prevState.map((prev) => {
+                              if (prev.id == contentElement.id) {
+                                return {
+                                  ...prev,
+                                  partialContent: e.target.value,
+                                  init: prev.init ? false : prev.init, // 최초 상호작용이 발생한 경우 init 속성 무효화
+                                };
+                              } else {
+                                return prev;
+                              }
+                            });
+                          });
+                        }
                       }}
                       onDrop={(e) => onDropEventHandler(e, contentElement)}
                       onPaste={(e) => onPasteEventHandler(e, contentElement)}
@@ -269,9 +273,12 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                           e.preventDefault();
                           if (contentElement.partialContent != undefined && contentElement.partialContent != '') {
                             // 값이 유효한 경우 한정으로만 정의된 동작 실행
-                            // todo bottomTextArea.current?.focus(); // 최하단 영역으로 포커싱
+                            bottomTextArea.current?.focus(); // 최하단 영역으로 포커싱
                           }
                         }
+                      }}
+                      ref={(node) => {
+                        node?.focus(); // unFrozenElementId 의 변경으로 인한 랜더링으로 간주함이 마땅하므로 focus
                       }}
                     />
                   )}
