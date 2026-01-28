@@ -285,7 +285,6 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                     <div
                       className={`per_img_element ${contentElement.init ? '' : 'frozen'}`}
                       onClick={() => {
-                        console.log('setUnFrozenElementIdsetUnFrozenElementId');
                         setUnFrozenElementId(contentElement.id);
                       }}
                       onMouseEnter={(e) => {

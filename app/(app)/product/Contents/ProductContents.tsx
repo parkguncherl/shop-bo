@@ -43,7 +43,7 @@ const ProductContents = () => {
       <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} reset={reset}></Title>
       <div className={'product_contents'}>
         <div className={'left_side'}>
-          <form>
+          <div className={'form_boxing'}>
             <div className={'headed'}>
               <div className={'title_boxing'}>
                 <FormInput<ProductContentsFields> control={control} name={'title'} inputType={'single'} />
@@ -78,7 +78,7 @@ const ProductContents = () => {
                 </div>
               </div>
             </div>
-          </form>
+          </div>
         </div>
         <div className={'right_side'}></div>
       </div>

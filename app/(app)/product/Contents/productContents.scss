@@ -18,8 +18,9 @@
   .left_side {
     padding: 5px 5px 0 0;
 
-    & > form {
-      height: 100%;
+    & > .form_boxing {
+      display: flex;
+      flex-direction: column;
 
       .headed {
         width: 100%;
