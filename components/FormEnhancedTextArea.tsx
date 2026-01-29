@@ -332,12 +332,17 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
               height: boxHeight,
             }}
           >
-            {contentElements.map((contentElement, index) => {
+            {contentElements.map((contentElement) => {
               return (
                 <div className={'per_preview_element'} key={contentElement.id}>
                   {contentElement.fileInfo != undefined ? (
-                    <div className={'img_wrapper'}>
-                      <img src={contentElement.fileInfo.fileSrcUrl} />
+                    <div className={'per_img_element'}>
+                      <div className={'img_wrapper'}>
+                        <img src={contentElement.fileInfo.fileSrcUrl} />
+                      </div>
+                      <div className={'img_title_wrapper'}>
+                        <p>{contentElement.fileInfo.fileTitle}</p>
+                      </div>
                     </div>
                   ) : (
                     <div className={'text_wrapper'}>
