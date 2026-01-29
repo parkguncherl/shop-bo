@@ -138,13 +138,6 @@ const ChildLevel = ({ item }: { item: IMenu }) => {
     }
   }
 
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    // const openHeader = document.getElementsByClassName(`${headerStyles.menu_slide_btn} ${headerStyles.on}`);
-
-    const aSide: HTMLAnchorElement = e.currentTarget;
-    //aSide.parentNode?.parentNode?.classList.remove('on');
-  };
-
   useEffect(() => {
     closeSideMenu();
 
@@ -163,7 +156,7 @@ const ChildLevel = ({ item }: { item: IMenu }) => {
   return (
     <li>
       <Link
-        className={`${isSelected ? 'on' : ''} ${lastUri.split('/')[2]}`}
+        className={`${isSelected ? lastUri.split('/')[2] : ''}`}
         href={pathname === lastUri ? '#' : lastUri}
         onClick={(e) => {
           if (pathname === lastUri) {
