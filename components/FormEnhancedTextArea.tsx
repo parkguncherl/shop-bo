@@ -1,5 +1,5 @@
 import { BaseTextAreaAtom, BaseTextAreaAtomProps } from './atom/BaseTextAreaAtom';
-import { FieldValues, useController } from 'react-hook-form';
+import { FieldError, FieldValues, useController } from 'react-hook-form';
 import { TControl } from '../types/Control';
 import React, { useEffect, useRef, useState } from 'react';
 import NativeInputAtom from './atom/NativeInputAtom';
@@ -16,7 +16,7 @@ interface FileInfo {
   fileTitle: string;
   fileSrcUrl: string;
 }
-interface ContentElement {
+export interface ContentElement {
   id: number; // 기본 1부터 시작, 순차적일 필요는 없으나 후행하는 요소의 id는 선행 요소의 id보다 커야 함
   partialContent?: string; // 이미지인 경우 undefined
   fileInfo?: FileInfo;
@@ -26,6 +26,17 @@ interface ContentElementInfo extends ContentElement {
   init: boolean; // 추가(마운트) 이후 별도의 편집을 위한 상호작용이 부재한 경우 true
 }
 
+// react hook form 관련 커스텀 인터페이스
+interface FieldErrorForContentElement {
+  id?: FieldError | undefined;
+  partialContent?: FieldError | undefined;
+  fileInfo?: FieldErrorForFileInfo;
+}
+interface FieldErrorForFileInfo {
+  fileTitle: FieldError | undefined;
+  fileSrcUrl: FieldError | undefined;
+}
+
 /**
  * stateFul 컴포넌트
  * 기존 textArea 와 달리 이미지 삽입 및 이에 따라 필요한 동작 지원
@@ -33,9 +44,9 @@ interface ContentElementInfo extends ContentElement {
 const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, autoSize, mode }: FormEnhancedTextAreaProps<T>) => {
   /** react hook form 의 controller 는 현재 영역에서는 수정 대상 영역의 값(contentElement)에 한정되어 적용함(전역 적용하지 아니함) */
   const {
-    field: { value, onChange: controlChange, ref: refForUseController },
+    field: { onChange: controlChange },
     fieldState: { isDirty, isTouched, error },
-  } = useController({ name, rules, control });
+  } = useController<T>({ name, rules, control });
 
   const boxRef = useRef<HTMLDivElement>(null);
   const bottomTextArea = useRef<HTMLTextAreaElement | null>(null);
@@ -73,12 +84,12 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   }, [unFrozenElementId]);
 
   useEffect(() => {
-    console.log('contentElements: ', contentElements);
     controlChange(contentElements); // react hook form 과 동기화
   }, [contentElements]);
 
   useEffect(() => {
-    console.log('error: 000', error);
+    const errorStat = (error || []) as FieldErrorForContentElement[];
+    console.log('error: 000', errorStat[1].fileInfo?.fileTitle);
   }, [error]);
 
   /** contentElement 정의(구성) 시점에서 필요한 기본값을 설정한 contentElementInfo 타입의 객체 반환, */
