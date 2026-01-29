@@ -185,51 +185,57 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
               if (contentElement.fileInfo != undefined) {
                 console.error('최하단 요소에는 파일 정보가 존재할수 없음, 상태 오염 정정!');
               }
+              const errorExist = innerErrorState[index]?.partialContent != undefined;
               return (
                 <div className={'per_content_element'} key={contentElement.id}>
-                  <BaseTextAreaAtom
-                    value={contentElement.partialContent}
-                    type={'text'}
-                    onChange={(e) => {
-                      setContentElements((prevState) => {
-                        return prevState.map((prev) => {
-                          if (prev.id == contentElement.id) {
-                            return {
-                              ...prev,
-                              partialContent: e.target.value,
-                              init: prev.init ? false : prev.init, // 최초 상호작용이 발생한 경우 init 속성 무효화
-                            };
-                          } else {
-                            return prev;
-                          }
-                        });
-                      });
-                    }}
-                    onDrop={(e) => onDropEventHandler(e, contentElement)}
-                    onPaste={(e) => onPasteEventHandler(e, contentElement)}
-                    autoSize={autoSize}
-                    onFocus={() => {
-                      setUnFrozenElementId(-1);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key == 'Enter' && e.shiftKey) {
-                        e.preventDefault();
-                        if (contentElement.partialContent != undefined && contentElement.partialContent.trim() != '') {
-                          // 값이 유효한 경우 한정으로만 정의된 동작 실행
+                  <div className={'per_textArea_element'}>
+                    <div className={'textArea_wrapper'}>
+                      <BaseTextAreaAtom
+                        value={contentElement.partialContent}
+                        type={'text'}
+                        onChange={(e) => {
                           setContentElements((prevState) => {
-                            return [...prevState, configForInitContent({ id: contentElement.id + 1, partialContent: '' })];
+                            return prevState.map((prev) => {
+                              if (prev.id == contentElement.id) {
+                                return {
+                                  ...prev,
+                                  partialContent: e.target.value,
+                                  init: prev.init ? false : prev.init, // 최초 상호작용이 발생한 경우 init 속성 무효화
+                                };
+                              } else {
+                                return prev;
+                              }
+                            });
                           });
-                        }
-                      }
-                    }}
-                    ref={(node) => {
-                      if (unFrozenElementId == -1) {
-                        // 최하단 영역 이외에 별도로 편집 가능 상태인 구획이 부재한 경우 한정 트리거
-                        node?.focus();
-                      }
-                      bottomTextArea.current = node; // 리 랜더링(재 마운트) 시점에 최신화된 참조를 사용 가능토록 이와 같이 처리함
-                    }}
-                  />
+                        }}
+                        onDrop={(e) => onDropEventHandler(e, contentElement)}
+                        onPaste={(e) => onPasteEventHandler(e, contentElement)}
+                        autoSize={autoSize}
+                        onFocus={() => {
+                          setUnFrozenElementId(-1);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key == 'Enter' && e.shiftKey) {
+                            e.preventDefault();
+                            if (contentElement.partialContent != undefined && contentElement.partialContent.trim() != '') {
+                              // 값이 유효한 경우 한정으로만 정의된 동작 실행
+                              setContentElements((prevState) => {
+                                return [...prevState, configForInitContent({ id: contentElement.id + 1, partialContent: '' })];
+                              });
+                            }
+                          }
+                        }}
+                        ref={(node) => {
+                          if (unFrozenElementId == -1) {
+                            // 최하단 영역 이외에 별도로 편집 가능 상태인 구획이 부재한 경우 한정 트리거
+                            node?.focus();
+                          }
+                          bottomTextArea.current = node; // 리 랜더링(재 마운트) 시점에 최신화된 참조를 사용 가능토록 이와 같이 처리함
+                        }}
+                      />
+                    </div>
+                    {errorExist && <div className={'err_msg_wrapper'}>{innerErrorState[index]?.partialContent?.message}</div>}
+                  </div>
                 </div>
               );
             } else if (contentElement.id == unFrozenElementId) {

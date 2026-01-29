@@ -33,6 +33,12 @@
   border-radius: 3px;
 }
 
+@mixin wrapper-err {
+  border: solid #f80e0e 2px;
+  border-radius: 3px;
+}
+
+// 상호작용 animation's keyframes
 @keyframes unFrozen-gradually-on-img {
   from {
     @include wrapper-idle
@@ -66,6 +72,27 @@
 @keyframes deIdled-gradually-on-img {
   from {
     @include wrapper-idle
+  }
+
+  to {
+    @include wrapper-prev
+  }
+}
+
+// 에러 발생 시
+@keyframes err-alert-gradually {
+  from {
+    @include wrapper-prev
+  }
+
+  to {
+    @include wrapper-err
+  }
+}
+
+@keyframes non-alert-gradually {
+  from {
+    @include wrapper-err
   }
 
   to {
@@ -125,6 +152,7 @@
           }
         }
 
+        // 상호작용 관련 애니메이션
         &.unFrozen {
           animation-duration: 0.3s;
           animation-name: unFrozen-gradually-on-img;
@@ -146,6 +174,27 @@
           animation-duration: 0.2s;
           animation-name: deIdled-gradually-on-img;
           //@include wrapper-prev;
+        }
+      }
+
+      .per_textArea_element {
+        padding: 2px;
+
+        .textArea_wrapper {
+
+        }
+
+        .err_msg_wrapper {
+          // 에러 발생 시, 정정 시 애니메이션 todo 영역이 생성되고, 텍스트가 순차적으로 그려지는 애니메이션으로
+          &.error {
+            animation-duration: 0.2s;
+            animation-name: err-alert-gradually;
+            @include wrapper-err;
+          }
+          &.non {
+            animation-duration: 0.2s;
+            animation-name: non-alert-gradually;
+          }
         }
       }
     }
