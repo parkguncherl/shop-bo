@@ -56,6 +56,8 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   const [unFrozenElementId, setUnFrozenElementId] = useState<number>(-1); // 최하단 영역 이외 편집 가능한 영역 지정(by Id), -1인 경우 최하단 영역 이외 frozen(편집 가능 속성을 회수)
   const [boxHeight, setBoxHeight] = useState(0);
 
+  const [innerErrorState, setInnerErrorState] = useState<FieldErrorForContentElement[]>([]); // contentElements 의 순서와 대응되므로, 배열 index 기준으로 error가 발생한 contentElement 를 찾을 수 있음
+
   useEffect(() => {
     // 컨텐츠 박스 높이에 따른 state 동기화를 위한 ResizeObserver 인스턴스 생성 및 등록, 추후 반환까지 생명주기 지정
     if (!boxRef.current) return;
@@ -89,7 +91,15 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
 
   useEffect(() => {
     const errorStat = (error || []) as FieldErrorForContentElement[];
-    console.log('error: 000', errorStat[1].fileInfo?.fileTitle);
+    const availableErrStat = [];
+    for (let i = 0; i < errorStat.length; i++) {
+      if (!(i in errorStat)) {
+        availableErrStat.push({});
+      } else {
+        availableErrStat.push(errorStat[i]);
+      }
+    }
+    setInnerErrorState(availableErrStat);
   }, [error]);
 
   /** contentElement 정의(구성) 시점에서 필요한 기본값을 설정한 contentElementInfo 타입의 객체 반환, */
