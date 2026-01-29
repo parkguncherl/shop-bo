@@ -72,6 +72,15 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
     });
   }, [unFrozenElementId]);
 
+  useEffect(() => {
+    console.log('contentElements: ', contentElements);
+    controlChange(contentElements); // react hook form 과 동기화
+  }, [contentElements]);
+
+  useEffect(() => {
+    console.log('error: 000', error);
+  }, [error]);
+
   /** contentElement 정의(구성) 시점에서 필요한 기본값을 설정한 contentElementInfo 타입의 객체 반환, */
   const configForInitContent = (addedContentElement: ContentElement) => {
     return {

@@ -6,12 +6,12 @@ import { useCommonStore } from '../../../../stores';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '../../../../libs';
-import FormEnhancedTextArea, { EnhancedTextAreasMode } from '../../../../components/FormEnhancedTextArea';
+import FormEnhancedTextArea, { ContentElement, EnhancedTextAreasMode } from '../../../../components/FormEnhancedTextArea';
 import FormInput from '../../../../components/FormInput';
 
 export interface ProductContentsFields {
   title: string;
-  content: string;
+  content: ContentElement[];
 }
 
 /** 상품관리 - 상품컨텐츠 페이지 */
@@ -35,7 +35,7 @@ const ProductContents = () => {
     formState: { errors, isValid },
   } = useForm<ProductContentsFields>({
     resolver: yupResolver(YupSchema.ProductContentsRequest()),
-    mode: 'onSubmit',
+    mode: 'onChange',
   });
 
   return (

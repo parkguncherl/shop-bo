@@ -235,12 +235,16 @@ export const YupSchema = {
           .object({
             id: yup.number().required(),
             partialContent: yup.string().notRequired(),
-            fileInfo: yup
-              .object({
+            fileInfo: yup.lazy((value) => {
+              // 스키마 생성 시점에 optional 속성이 반영되지 못하여 에러가 출력되는 현상을 정정하고자 lazy 사용
+              if (!value || Object.keys(value).length === 0) {
+                return yup.mixed().notRequired();
+              }
+              return yup.object({
                 fileTitle: yup.string().required('파일(이미지) 제목은 필수값입니다.'),
                 fileSrcUrl: yup.string().required('파일 리소스를 찾을 수 없습니다.'),
-              })
-              .notRequired(),
+              });
+            }),
           })
           .required(),
       ),
