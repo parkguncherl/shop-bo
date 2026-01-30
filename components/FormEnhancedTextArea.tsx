@@ -59,6 +59,10 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   const [innerErrorState, setInnerErrorState] = useState<FieldErrorForContentElement[]>([]); // contentElements 의 순서와 대응되므로, 배열 index 기준으로 error가 발생한 contentElement 를 찾을 수 있음
 
   useEffect(() => {
+    console.log('innerErrorState: ', innerErrorState);
+  }, [innerErrorState]);
+
+  useEffect(() => {
     // 컨텐츠 박스 높이에 따른 state 동기화를 위한 ResizeObserver 인스턴스 생성 및 등록, 추후 반환까지 생명주기 지정
     if (!boxRef.current) return;
 
@@ -185,7 +189,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
               if (contentElement.fileInfo != undefined) {
                 console.error('최하단 요소에는 파일 정보가 존재할수 없음, 상태 오염 정정!');
               }
-              const errorExist = innerErrorState[index]?.partialContent != undefined;
+              const partialContentErrorExist = innerErrorState[index]?.partialContent != undefined;
               return (
                 <div className={'per_content_element'} key={contentElement.id}>
                   <div className={'per_textArea_element'}>
@@ -234,7 +238,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                         }}
                       />
                     </div>
-                    <div className={`err_msg_wrapper ${errorExist ? 'error' : 'non'}`}>
+                    <div className={`err_msg_wrapper ${partialContentErrorExist ? 'error' : 'non'}`}>
                       <p>{innerErrorState[index]?.partialContent?.message}</p>
                     </div>
                   </div>
@@ -242,12 +246,18 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
               );
             } else if (contentElement.id == unFrozenElementId) {
               // 편집 가능 영역(상태로 관리되는 element id와 해당 content 의 id가 일치하는 경우)
+              const partialContentErrorExist = innerErrorState[index]?.partialContent != undefined;
+              const fileErrorExist = innerErrorState[index]?.fileInfo != undefined;
               return (
                 <div className={'per_content_element'} key={contentElement.id}>
                   {contentElement.fileInfo != undefined ? (
                     <div className={'per_img_element unFrozen'}>
                       <div className={'img_wrapper'}>
-                        <img src={contentElement.fileInfo.fileSrcUrl} />
+                        {fileErrorExist && innerErrorState[index]?.fileInfo?.fileSrcUrl?.message ? (
+                          <p>{innerErrorState[index]?.fileInfo?.fileSrcUrl?.message}</p>
+                        ) : (
+                          <img src={contentElement.fileInfo.fileSrcUrl} />
+                        )}
                       </div>
                       <div className={'img_title_wrapper'}>
                         <NativeInputAtom
@@ -273,52 +283,60 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                               return modifiedContentElements;
                             });
                           }}
+                          placeholder={fileErrorExist ? innerErrorState[index]?.fileInfo?.fileTitle?.message : undefined}
                         />
                       </div>
                     </div>
                   ) : (
-                    <BaseTextAreaAtom
-                      value={contentElement.partialContent}
-                      type={'text'}
-                      onChange={(e) => {
-                        if (e.target.value.trim() == '') {
-                          // 이 경우 해당 요소 del
-                          setContentElements((prevState) => {
-                            return [...prevState.filter((prev) => prev.id != contentElement.id)];
-                          });
-                          bottomTextArea.current?.focus(); // 최하단 영역으로 포커싱
-                        } else {
-                          setContentElements((prevState) => {
-                            return prevState.map((prev) => {
-                              if (prev.id == contentElement.id) {
-                                return {
-                                  ...prev,
-                                  partialContent: e.target.value,
-                                  init: prev.init ? false : prev.init, // 최초 상호작용이 발생한 경우 init 속성 무효화
-                                };
-                              } else {
-                                return prev;
+                    <div className={'per_textArea_element'}>
+                      <div className={'textArea_wrapper'}>
+                        <BaseTextAreaAtom
+                          value={contentElement.partialContent}
+                          type={'text'}
+                          onChange={(e) => {
+                            if (e.target.value.trim() == '') {
+                              // 이 경우 해당 요소 del
+                              setContentElements((prevState) => {
+                                return [...prevState.filter((prev) => prev.id != contentElement.id)];
+                              });
+                              bottomTextArea.current?.focus(); // 최하단 영역으로 포커싱
+                            } else {
+                              setContentElements((prevState) => {
+                                return prevState.map((prev) => {
+                                  if (prev.id == contentElement.id) {
+                                    return {
+                                      ...prev,
+                                      partialContent: e.target.value,
+                                      init: prev.init ? false : prev.init, // 최초 상호작용이 발생한 경우 init 속성 무효화
+                                    };
+                                  } else {
+                                    return prev;
+                                  }
+                                });
+                              });
+                            }
+                          }}
+                          onDrop={(e) => onDropEventHandler(e, contentElement)}
+                          onPaste={(e) => onPasteEventHandler(e, contentElement)}
+                          autoSize={autoSize}
+                          onKeyDown={(e) => {
+                            if (e.key == 'Enter' && e.shiftKey) {
+                              e.preventDefault();
+                              if (contentElement.partialContent != undefined && contentElement.partialContent != '') {
+                                // 값이 유효한 경우 한정으로만 정의된 동작 실행
+                                bottomTextArea.current?.focus(); // 최하단 영역으로 포커싱
                               }
-                            });
-                          });
-                        }
-                      }}
-                      onDrop={(e) => onDropEventHandler(e, contentElement)}
-                      onPaste={(e) => onPasteEventHandler(e, contentElement)}
-                      autoSize={autoSize}
-                      onKeyDown={(e) => {
-                        if (e.key == 'Enter' && e.shiftKey) {
-                          e.preventDefault();
-                          if (contentElement.partialContent != undefined && contentElement.partialContent != '') {
-                            // 값이 유효한 경우 한정으로만 정의된 동작 실행
-                            bottomTextArea.current?.focus(); // 최하단 영역으로 포커싱
-                          }
-                        }
-                      }}
-                      ref={(node) => {
-                        node?.focus(); // unFrozenElementId 의 변경으로 인한 랜더링으로 간주함이 마땅하므로 focus
-                      }}
-                    />
+                            }
+                          }}
+                          ref={(node) => {
+                            node?.focus(); // unFrozenElementId 의 변경으로 인한 랜더링으로 간주함이 마땅하므로 focus
+                          }}
+                        />
+                      </div>
+                      <div className={`err_msg_wrapper ${partialContentErrorExist ? 'error' : 'non'}`}>
+                        <p>{innerErrorState[index]?.partialContent?.message}</p>
+                      </div>
+                    </div>
                   )}
                 </div>
               );

@@ -234,7 +234,7 @@ export const YupSchema = {
         yup
           .object({
             id: yup.number().required(),
-            partialContent: yup.number().notRequired(), // todo 에러 메세지 스타일링을 위해 임시로 변경, 추후 string 으로 복구
+            partialContent: yup.string().notRequired(),
             fileInfo: yup.lazy((value) => {
               // 스키마 생성 시점에 optional 속성이 반영되지 못하여 에러가 출력되는 현상을 정정하고자 lazy 사용
               if (!value || Object.keys(value).length === 0) {
