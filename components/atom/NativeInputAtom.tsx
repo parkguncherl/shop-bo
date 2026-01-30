@@ -14,17 +14,15 @@ const NativeInputAtom = ({ ref, value, onChange, placeholder, ...props }: Native
 
   const resolvedInputRef: React.RefObject<HTMLInputElement> = ref ?? inputRef; // ref undefined 일 시 정의된 기본 참조 사용
 
-  const syncWidth = (value: string) => {
+  const syncWidth = (value: string | undefined, placeholder: string | undefined) => {
     if (!resolvedInputRef.current || !mirrorRef.current) return;
-    mirrorRef.current.textContent = value || ' '; // 비어있을 때 대비
+    mirrorRef.current.textContent = value || placeholder || ' '; // 비어있을 때 대비
     resolvedInputRef.current.style.width = `${mirrorRef.current.offsetWidth}px`;
   };
 
   useEffect(() => {
-    if (value) {
-      syncWidth(value.toString());
-    }
-  }, [value]);
+    syncWidth(value?.toString(), placeholder);
+  }, [value, placeholder]);
 
   return (
     <>
@@ -32,7 +30,7 @@ const NativeInputAtom = ({ ref, value, onChange, placeholder, ...props }: Native
         {...props}
         ref={resolvedInputRef}
         onChange={(e) => {
-          syncWidth(e.target.value.toString());
+          syncWidth(e.target.value.toString(), placeholder);
           if (onChange) {
             onChange(e);
           }
