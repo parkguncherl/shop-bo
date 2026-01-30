@@ -1,7 +1,7 @@
 import ProductMng from './ProductMng';
 
 /**
- * (server side)Contents page
+ * (server side)ProductMng page
  * */
 const page = () => {
   return <ProductMng />;
