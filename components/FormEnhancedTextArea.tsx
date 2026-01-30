@@ -234,7 +234,9 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                         }}
                       />
                     </div>
-                    {errorExist && <div className={'err_msg_wrapper'}>{innerErrorState[index]?.partialContent?.message}</div>}
+                    <div className={`err_msg_wrapper ${errorExist ? 'error' : 'non'}`}>
+                      <p>{innerErrorState[index]?.partialContent?.message}</p>
+                    </div>
                   </div>
                 </div>
               );

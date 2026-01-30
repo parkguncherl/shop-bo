@@ -33,11 +33,6 @@
   border-radius: 3px;
 }
 
-@mixin wrapper-err {
-  border: solid #f80e0e 2px;
-  border-radius: 3px;
-}
-
 // 상호작용 animation's keyframes
 @keyframes unFrozen-gradually-on-img {
   from {
@@ -82,21 +77,21 @@
 // 에러 발생 시
 @keyframes err-alert-gradually {
   from {
-    @include wrapper-prev
+    width: 0;
   }
 
   to {
-    @include wrapper-err
+    width: 100%;
   }
 }
 
-@keyframes non-alert-gradually {
+@keyframes error-alert-removal-gradually {
   from {
-    @include wrapper-err
+    width: 100%;
   }
 
   to {
-    @include wrapper-prev
+    width: 0;
   }
 }
 
@@ -186,14 +181,28 @@
 
         .err_msg_wrapper {
           // 에러 발생 시, 정정 시 애니메이션 todo 영역이 생성되고, 텍스트가 순차적으로 그려지는 애니메이션으로
+          display: flex;
+          flex-direction: row;
+          overflow: hidden;
+          height: 20px;
+
+          padding: 2px;
+
           &.error {
-            animation-duration: 0.2s;
+            animation-duration: 2s;
             animation-name: err-alert-gradually;
-            @include wrapper-err;
+
+            width: 100%;
           }
           &.non {
             animation-duration: 0.2s;
-            animation-name: non-alert-gradually;
+            animation-name: error-alert-removal-gradually;
+
+            width: 0;
+          }
+
+          p {
+            font-size: small;
           }
         }
       }
