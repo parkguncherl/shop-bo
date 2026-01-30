@@ -147,6 +147,12 @@
           }
         }
 
+        .err_msg_wrapper {
+          @include wrapper-img;
+          align-items: center;
+          justify-content: center;
+        }
+
         // 상호작용 관련 애니메이션
         &.unFrozen {
           animation-duration: 0.3s;

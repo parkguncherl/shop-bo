@@ -13,8 +13,8 @@ type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
   };
 interface FileInfo {
   // 이미지(혹은 파일) 한정으로 정의함, 현재는 실 동작 영역에서 이미지 이외 파일에 대하여는 첨부를 제한하는 중
-  fileTitle: string;
-  fileSrcUrl: string;
+  fileTitle?: string;
+  fileSrcUrl?: string;
 }
 export interface ContentElement {
   id: number; // 기본 1부터 시작, 순차적일 필요는 없으나 후행하는 요소의 id는 선행 요소의 id보다 커야 함
@@ -57,10 +57,6 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   const [boxHeight, setBoxHeight] = useState(0);
 
   const [innerErrorState, setInnerErrorState] = useState<FieldErrorForContentElement[]>([]); // contentElements 의 순서와 대응되므로, 배열 index 기준으로 error가 발생한 contentElement 를 찾을 수 있음
-
-  useEffect(() => {
-    console.log('innerErrorState: ', innerErrorState);
-  }, [innerErrorState]);
 
   useEffect(() => {
     // 컨텐츠 박스 높이에 따른 state 동기화를 위한 ResizeObserver 인스턴스 생성 및 등록, 추후 반환까지 생명주기 지정
@@ -126,7 +122,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                 id: modifiedContentElements.length + 1,
                 fileInfo: {
                   fileTitle: file.name, // 최초로 할당되어지는 제목
-                  fileSrcUrl: URL.createObjectURL(file),
+                  //fileSrcUrl: URL.createObjectURL(file),
                 },
               }),
             );
@@ -183,7 +179,10 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
     <div className={'enhanced_textArea'}>
       <div className={'enhanced_textArea_box'} ref={boxRef}>
         {!mode || mode == 'edit' ? (
+          // 편집 모드
           contentElements.map((contentElement, index) => {
+            const partialContentErrorExist = innerErrorState[index]?.partialContent != undefined;
+            const fileErrorExist = innerErrorState[index]?.fileInfo != undefined;
             if (contentElements.length == index + 1) {
               // 편집 가능(최하단 영역, 이 경우는 입력 영역만이 존재할수 있음, 파일 정보는 존재할수 없음)
               if (contentElement.fileInfo != undefined) {
@@ -246,19 +245,19 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
               );
             } else if (contentElement.id == unFrozenElementId) {
               // 편집 가능 영역(상태로 관리되는 element id와 해당 content 의 id가 일치하는 경우)
-              const partialContentErrorExist = innerErrorState[index]?.partialContent != undefined;
-              const fileErrorExist = innerErrorState[index]?.fileInfo != undefined;
               return (
                 <div className={'per_content_element'} key={contentElement.id}>
                   {contentElement.fileInfo != undefined ? (
                     <div className={'per_img_element unFrozen'}>
-                      <div className={'img_wrapper'}>
-                        {fileErrorExist && innerErrorState[index]?.fileInfo?.fileSrcUrl?.message ? (
+                      {fileErrorExist && innerErrorState[index]?.fileInfo?.fileSrcUrl?.message ? (
+                        <div className={'err_msg_wrapper'}>
                           <p>{innerErrorState[index]?.fileInfo?.fileSrcUrl?.message}</p>
-                        ) : (
+                        </div>
+                      ) : (
+                        <div className={'img_wrapper'}>
                           <img src={contentElement.fileInfo.fileSrcUrl} />
-                        )}
-                      </div>
+                        </div>
+                      )}
                       <div className={'img_title_wrapper'}>
                         <NativeInputAtom
                           value={contentElement.fileInfo.fileTitle}
@@ -359,9 +358,15 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                         e.currentTarget.classList.add('leaved');
                       }}
                     >
-                      <div className={'img_wrapper'}>
-                        <img src={contentElement.fileInfo.fileSrcUrl} />
-                      </div>
+                      {fileErrorExist && innerErrorState[index]?.fileInfo?.fileSrcUrl?.message ? (
+                        <div className={'err_msg_wrapper'}>
+                          <p>{innerErrorState[index]?.fileInfo?.fileSrcUrl?.message}</p>
+                        </div>
+                      ) : (
+                        <div className={'img_wrapper'}>
+                          <img src={contentElement.fileInfo.fileSrcUrl} />
+                        </div>
+                      )}
                       <div className={'img_title_wrapper'}>
                         <NativeInputAtom value={contentElement.fileInfo.fileTitle} readOnly={true} />
                       </div>
@@ -382,6 +387,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
             }
           })
         ) : (
+          // 미리보기
           <div
             className={'flex-preview-area'}
             style={{
