@@ -136,7 +136,7 @@ export const PopupLayout = ({
           right: 0,
         }),
       }}
-      destroyOnClose
+      destroyOnHidden
       closable={true}
       keyboard={false}
       open={open}

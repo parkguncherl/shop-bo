@@ -46,9 +46,9 @@ const MenuMng = () => {
     isSuccess: isMenuListSuccess,
     isLoading,
     refetch: MenuRefetch,
-  } = useQuery(
-    ['/menu/paging', paging.curPage, filter],
-    () =>
+  } = useQuery({
+    queryKey: ['/menu/paging', paging.curPage, filter],
+    queryFn: () =>
       authApi.get('/menu/paging', {
         params: {
           curPage: paging.curPage,
@@ -56,10 +56,8 @@ const MenuMng = () => {
           ...filter,
         },
       }),
-    {
-      refetchOnMount: 'always',
-    },
-  );
+    refetchOnMount: 'always',
+  });
 
   useEffect(() => {
     if (isMenuListSuccess) {
@@ -70,10 +68,12 @@ const MenuMng = () => {
         toastError(resultMessage);
       }
     }
-  }, [menu, isMenuListSuccess, setPaging]);
+  }, [menu, isMenuListSuccess]);
 
   /** 드롭다운 옵션 */
-  const { data: dropdownOptions } = useQuery(['/menu/top'], () => authApi.get<ApiResponseListMenu>('/menu/top'), {
+  const { data: dropdownOptions } = useQuery({
+    queryKey: ['/menu/top'],
+    queryFn: () => authApi.get<ApiResponseListMenu>('/menu/top'),
     select: (e) => {
       const { body, resultCode } = e.data;
       if (resultCode === 200) {
@@ -192,7 +192,10 @@ const MenuMng = () => {
           columnDefs={['TOP', undefined, '', null].includes(filter.upMenuCd) || !menuUpdYn ? excludedAuthsColumnDefs : columnDefs}
           defaultColDef={defaultColDef}
           paginationPageSize={paging.pageRowCount}
-          rowSelection={'single'}
+          rowSelection={{
+            mode: 'singleRow',
+            enableClickSelection: false,
+          }}
           onRowDoubleClicked={onRowClicked}
           className={'wmsDefault'}
         />
