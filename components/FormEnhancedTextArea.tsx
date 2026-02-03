@@ -8,7 +8,6 @@ export type EnhancedTextAreasMode = 'edit' | 'preview';
 type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
   TControl<T> & {
     //ref?: React.Ref<HTMLTextAreaElement>;
-    //onUploadRequestInterruptOccurred?: (event: UploadRequestInterruptEvent) => Promise<void> | undefined;
     mode?: EnhancedTextAreasMode;
   };
 interface FileInfo {
@@ -44,9 +43,15 @@ interface FieldErrorForFileInfo {
 const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, autoSize, mode }: FormEnhancedTextAreaProps<T>) => {
   /** react hook form 의 controller 는 현재 영역에서는 수정 대상 영역의 값(contentElement)에 한정되어 적용함(전역 적용하지 아니함) */
   const {
-    field: { onChange: controlChange },
+    field: { value: value, onChange: controlChange },
     fieldState: { isDirty, isTouched, error },
   } = useController<T>({ name, rules, control });
+
+  useEffect(() => {
+    if (value == undefined) {
+      setContentElements([{ id: 1, partialContent: '', init: true }]); // 외부 컨트롤 영역 초기화 동작에 대응
+    }
+  }, [value]);
 
   const boxRef = useRef<HTMLDivElement>(null);
   const bottomTextArea = useRef<HTMLTextAreaElement | null>(null);

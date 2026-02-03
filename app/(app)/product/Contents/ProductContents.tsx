@@ -1,13 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Title } from '../../../../components';
+import { Title, toastError } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
-import { useForm } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '../../../../libs';
 import FormEnhancedTextArea, { ContentElement, EnhancedTextAreasMode } from '../../../../components/FormEnhancedTextArea';
 import FormInput from '../../../../components/FormInput';
+import { ConfirmModal } from '../../../../components/ConfirmModal';
+import { SubmitErrorHandler } from 'react-hook-form/dist/types/form';
 
 export interface ProductContentsFields {
   title: string;
@@ -21,10 +23,25 @@ const ProductContents = () => {
 
   /** 로컬 스토어 */
   const [displayMode, setDisplayMode] = useState<EnhancedTextAreasMode>('edit');
+  const [openedModalType, setOpenedModalType] = useState<'SUBMIT' | null>(null);
 
   /** 초기화 버튼 클릭 시 */
   const reset = async () => {
-    // todo
+    control._reset();
+  };
+
+  // 입력이 유효한 경우
+  const onValid: SubmitHandler<ProductContentsFields> = (data, event) => {
+    console.log('data: ', data);
+  };
+
+  // 유효하지 않은 경우
+  const onInvalid: SubmitErrorHandler<ProductContentsFields> = (errors, event) => {
+    if (errors.title) {
+      toastError(errors.title.message);
+    } else {
+      toastError('본문에서 문제가 되는 영역을 수정한 후 재시도하십시요.');
+    }
   };
 
   /** 상품 내용 입력 서식 */
@@ -46,7 +63,7 @@ const ProductContents = () => {
           <div className={'form_boxing'}>
             <div className={'headed'}>
               <div className={'title_boxing'}>
-                <FormInput<ProductContentsFields> control={control} name={'title'} inputType={'single'} />
+                <FormInput<ProductContentsFields> control={control} name={'title'} inputType={'label'} placeholder={'제목'} />
               </div>
             </div>
             <div className={'content'}>
@@ -58,7 +75,18 @@ const ProductContents = () => {
               <div className={'bottom_boxing'}>
                 <div className={'btn-wrapper'}>
                   <div className={'btn-per-wrapper'}>
-                    <button className={'btn btn_blue'}>저장</button>
+                    <button
+                      className={'btn btn_blue'}
+                      onClick={() => {
+                        if (errors.content == undefined) {
+                          setOpenedModalType('SUBMIT');
+                        } else {
+                          toastError('본문에서 문제가 되는 영역을 수정한 후 재시도하십시요.');
+                        }
+                      }}
+                    >
+                      저장
+                    </button>
                   </div>
                   <div className={'btn-per-wrapper'}>
                     <button
@@ -82,6 +110,18 @@ const ProductContents = () => {
         </div>
         <div className={'right_side'}></div>
       </div>
+
+      <ConfirmModal
+        open={openedModalType == 'SUBMIT'}
+        title={'저장 하시겠습니까?'}
+        confirmText={'저장'}
+        onConfirm={() => {
+          handleSubmit(onValid, onInvalid)(); // 함수를 반환하므로 다음과 같이, 호출하여야
+        }}
+        onClose={() => {
+          setOpenedModalType(null);
+        }}
+      />
     </div>
   );
 };
