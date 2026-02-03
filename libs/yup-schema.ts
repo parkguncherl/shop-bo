@@ -230,27 +230,41 @@ export const YupSchema = {
   ProductContentsRequest: (): yup.ObjectSchema<ProductContentsFields> =>
     yup.object({
       title: yup.string().required('제목은 반드시 입력하셔야 합니다.'),
-      content: yup.array().of(
-        yup
-          .object({
-            id: yup.number().required(),
-            partialContent: yup.string().notRequired(),
-            fileInfo: yup.lazy((value) => {
-              // 스키마 생성 시점에 optional 속성이 반영되지 못하여 에러가 출력되는 현상을 정정하고자 lazy 사용
-              if (!value || Object.keys(value).length === 0) {
-                return yup.mixed().notRequired();
-              }
-              return yup.object({
-                fileTitle: yup
-                  .string()
-                  .required('파일(이미지) 제목은 필수값입니다.')
-                  .matches(new RegExp('[A-Za-z0-9._-]+'))
-                  .required('영문 숫자 및 최소한의 기호(점 혹은 언더바)만 허용됩니다.'),
-                fileSrcUrl: yup.string().required('파일 리소스를 찾을 수 없습니다.'),
-              });
-            }),
-          })
-          .required(),
-      ),
+      content: yup
+        .array()
+        .of(
+          yup
+            .object({
+              id: yup.number().required(),
+              partialContent: yup.string().notRequired(),
+              fileInfo: yup.lazy((value) => {
+                // 스키마 생성 시점에 optional 속성이 반영되지 못하여 에러가 출력되는 현상을 정정하고자 lazy 사용
+                if (!value || Object.keys(value).length === 0) {
+                  return yup.mixed().notRequired();
+                }
+                return yup.object({
+                  fileTitle: yup
+                    .string()
+                    .required('파일(이미지) 제목은 필수값입니다.')
+                    .matches(new RegExp('[A-Za-z0-9._-]+'))
+                    .required('영문 숫자 및 최소한의 기호(점 혹은 언더바)만 허용됩니다.'),
+                  fileSrcUrl: yup.string().required('파일 리소스를 찾을 수 없습니다.'),
+                });
+              }),
+            })
+            .required(),
+        )
+        .test('unique-fileTitle', '파일(이미지) 제목은 중복될 수 없습니다.', (items) => {
+          if (!items) return true;
+
+          const fileTitles = items
+            .map((item) =>
+              (item.fileInfo as { fileTitle: string; fileSrcUrl: string })?.fileTitle
+                ? (item.fileInfo as { fileTitle: string; fileSrcUrl: string }).fileTitle
+                : null,
+            )
+            .filter((item) => item != null);
+          return fileTitles.length === new Set(fileTitles).size;
+        }),
     }) as yup.ObjectSchema<ProductContentsFields>,
 };

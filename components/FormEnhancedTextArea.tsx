@@ -98,16 +98,22 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   }, [contentElements]);
 
   useEffect(() => {
-    const errorStat = (error || []) as FieldErrorForContentElement[];
-    const availableErrStat = [];
-    for (let i = 0; i < errorStat.length; i++) {
-      if (!(i in errorStat)) {
-        availableErrStat.push({});
-      } else {
-        availableErrStat.push(errorStat[i]);
+    if (Array.isArray(error)) {
+      const errorStat = (error || []) as FieldErrorForContentElement[];
+      const availableErrStat = [];
+      for (let i = 0; i < errorStat.length; i++) {
+        if (!(i in errorStat)) {
+          availableErrStat.push({});
+        } else {
+          availableErrStat.push(errorStat[i]);
+        }
+      }
+      setInnerErrorState(availableErrStat);
+    } else {
+      if (error?.message) {
+        toastError(error?.message); // 주로 이미지명 중복 상황에서 트리거되리라 기대
       }
     }
-    setInnerErrorState(availableErrStat);
   }, [error]);
 
   /** contentElement 정의(구성) 시점에서 필요한 기본값을 설정한 contentElementInfo 타입의 객체 반환, */
@@ -381,7 +387,11 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                         </div>
                       )}
                       <div className={'img_title_wrapper'}>
-                        <NativeInputAtom value={contentElement.fileInfo.fileTitle} readOnly={true} />
+                        <NativeInputAtom
+                          value={contentElement.fileInfo.fileTitle}
+                          readOnly={true}
+                          placeholder={fileErrorExist ? innerErrorState[index]?.fileInfo?.fileTitle?.message : undefined}
+                        />
                       </div>
                     </div>
                   ) : (
