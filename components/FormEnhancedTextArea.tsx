@@ -3,15 +3,18 @@ import { FieldError, FieldValues, useController } from 'react-hook-form';
 import { TControl } from '../types/Control';
 import React, { useEffect, useRef, useState } from 'react';
 import NativeInputAtom from './atom/NativeInputAtom';
+import { toastError } from './ToastMessage';
 
 export type EnhancedTextAreasMode = 'edit' | 'preview';
 type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
   TControl<T> & {
     //ref?: React.Ref<HTMLTextAreaElement>;
     mode?: EnhancedTextAreasMode;
+    attachOnlyImg?: boolean;
   };
-interface FileInfo {
+export interface FileInfo {
   // 이미지(혹은 파일) 한정으로 정의함, 현재는 실 동작 영역에서 이미지 이외 파일에 대하여는 첨부를 제한하는 중
+  // todo 추후 요청에서 더 필요한 정보가 있을 경우 확장할 것
   fileTitle?: string;
   fileSrcUrl?: string;
 }
@@ -40,7 +43,7 @@ interface FieldErrorForFileInfo {
  * stateFul 컴포넌트
  * 기존 textArea 와 달리 이미지 삽입 및 이에 따라 필요한 동작 지원
  * */
-const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, autoSize, mode }: FormEnhancedTextAreaProps<T>) => {
+const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, autoSize, mode, attachOnlyImg = true }: FormEnhancedTextAreaProps<T>) => {
   /** react hook form 의 controller 는 현재 영역에서는 수정 대상 영역의 값(contentElement)에 한정되어 적용함(전역 적용하지 아니함) */
   const {
     field: { value: value, onChange: controlChange },
@@ -116,39 +119,44 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   };
 
   const attachRequestInterruptCallBack = (files: File[], contentElementOnTriggeredArea: ContentElement) => {
-    setContentElements((prevState) => {
-      const modifiedContentElements: ContentElementInfo[] = [];
-      for (let i = 0; i < prevState.length; i++) {
-        if (contentElementOnTriggeredArea.id == prevState[i].id) {
-          // 대상 영역
-          files.forEach((file) => {
-            modifiedContentElements.push(
-              configForInitContent({
-                id: modifiedContentElements.length + 1,
-                fileInfo: {
-                  fileTitle: file.name, // 최초로 할당되어지는 제목
-                  fileSrcUrl: URL.createObjectURL(file),
-                },
-              }),
-            );
-          });
+    if (attachOnlyImg && files.filter((file) => !file.type.startsWith('image/')).length > 0) {
+      toastError('이미지 파일이 아닌 경우 첨부할수 없습니다.');
+      return;
+    } else {
+      setContentElements((prevState) => {
+        const modifiedContentElements: ContentElementInfo[] = [];
+        for (let i = 0; i < prevState.length; i++) {
+          if (contentElementOnTriggeredArea.id == prevState[i].id) {
+            // 대상 영역
+            files.forEach((file) => {
+              modifiedContentElements.push(
+                configForInitContent({
+                  id: modifiedContentElements.length + 1,
+                  fileInfo: {
+                    fileTitle: file.name, // 최초로 할당되어지는 제목
+                    fileSrcUrl: URL.createObjectURL(file),
+                  },
+                }),
+              );
+            });
 
-          // 기존 상태 영속을 위한 추가 동작
-          modifiedContentElements.push({
-            ...prevState[i],
-            id: modifiedContentElements.length + 1,
-          });
-          setUnFrozenElementId(i == prevState.length - 1 ? -1 : modifiedContentElements.length); // 최하단 영역에서의 이벤트인 경우(i == prevState.length - 1 이 true) -1, 이외 id에 해당하는 값(바로 위에서 push 동작이 이루어진 관계로 modifiedContentElements.length) 할당
-        } else {
-          // 이외의 경우에는 id 동기화
-          modifiedContentElements.push({
-            ...prevState[i],
-            id: modifiedContentElements.length + 1,
-          });
+            // 기존 상태 영속을 위한 추가 동작
+            modifiedContentElements.push({
+              ...prevState[i],
+              id: modifiedContentElements.length + 1,
+            });
+            setUnFrozenElementId(i == prevState.length - 1 ? -1 : modifiedContentElements.length); // 최하단 영역에서의 이벤트인 경우(i == prevState.length - 1 이 true) -1, 이외 id에 해당하는 값(바로 위에서 push 동작이 이루어진 관계로 modifiedContentElements.length) 할당
+          } else {
+            // 이외의 경우에는 id 동기화
+            modifiedContentElements.push({
+              ...prevState[i],
+              id: modifiedContentElements.length + 1,
+            });
+          }
         }
-      }
-      return modifiedContentElements;
-    });
+        return modifiedContentElements;
+      });
+    }
   };
 
   // 드롭 이벤트

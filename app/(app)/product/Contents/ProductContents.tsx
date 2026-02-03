@@ -6,7 +6,7 @@ import { useCommonStore } from '../../../../stores';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '../../../../libs';
-import FormEnhancedTextArea, { ContentElement, EnhancedTextAreasMode } from '../../../../components/FormEnhancedTextArea';
+import FormEnhancedTextArea, { ContentElement, EnhancedTextAreasMode, FileInfo } from '../../../../components/FormEnhancedTextArea';
 import FormInput from '../../../../components/FormInput';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import { SubmitErrorHandler } from 'react-hook-form/dist/types/form';
@@ -31,8 +31,23 @@ const ProductContents = () => {
   };
 
   // 입력이 유효한 경우
+  // 컨텐츠로서 저장하는 내용은 내용 영역에서 파일 제목, 문단 단위 절삭을 위한 정보를 포함하도록 한다.
+  // 줄바꿈: \n, 파일(이미지)명: <<IMG|image_title>> --> 둘중 하나를 기준으로 문단 나눔
   const onValid: SubmitHandler<ProductContentsFields> = (data, event) => {
-    console.log('data: ', data);
+    const fileInfoLists: FileInfo[] = data.content.filter((content) => content.fileInfo != undefined).map((content) => content.fileInfo as FileInfo);
+    //        const jsonMime: RegExp = new RegExp('^(application\/json|[^;/ \t]+\/[^;/ \t]+[+]json)[ \t]*(;.*)?$', 'i');
+    //
+    const fileInfoIncludedContent = data.content
+      .map((content) => {
+        //(content.fileInfo ? content.fileInfo.fileTitle : content.partialContent
+        if (content.fileInfo && content.fileInfo.fileTitle) {
+          return `<<IMG|${content.fileInfo.fileTitle}>>`; // <<IMG|image_title>>
+        } else {
+          return content.partialContent + '\n'; // 문단 구분을 위한 구분자 추가
+        }
+      })
+      .join();
+    console.log(fileInfoIncludedContent);
   };
 
   // 유효하지 않은 경우
@@ -68,7 +83,13 @@ const ProductContents = () => {
             </div>
             <div className={'content'}>
               <div className={'content_boxing'}>
-                <FormEnhancedTextArea<ProductContentsFields> control={control} name={'content'} autoSize={{ minRows: 7, maxRows: 40 }} mode={displayMode} />
+                <FormEnhancedTextArea<ProductContentsFields>
+                  control={control}
+                  name={'content'}
+                  autoSize={{ minRows: 7, maxRows: 40 }}
+                  mode={displayMode}
+                  attachOnlyImg={true}
+                />
               </div>
             </div>
             <div className={'bottom'}>
