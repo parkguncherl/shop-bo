@@ -34,20 +34,22 @@ const ProductContents = () => {
   // 컨텐츠로서 저장하는 내용은 내용 영역에서 파일 제목, 문단 단위 절삭을 위한 정보를 포함하도록 한다.
   // 줄바꿈: \n, 파일(이미지)명: <<IMG|image_title>> --> 둘중 하나를 기준으로 문단 나눔
   const onValid: SubmitHandler<ProductContentsFields> = (data, event) => {
-    const fileInfoLists: FileInfo[] = data.content.filter((content) => content.fileInfo != undefined).map((content) => content.fileInfo as FileInfo);
-    //        const jsonMime: RegExp = new RegExp('^(application\/json|[^;/ \t]+\/[^;/ \t]+[+]json)[ \t]*(;.*)?$', 'i');
-    //
+    const fileInfoLists: FileInfo[] = data.content
+      .filter((content) => content.fileInfo && content.fileInfo.fileTitle)
+      .map((content) => content.fileInfo as FileInfo);
     const fileInfoIncludedContent = data.content
       .map((content) => {
-        //(content.fileInfo ? content.fileInfo.fileTitle : content.partialContent
         if (content.fileInfo && content.fileInfo.fileTitle) {
-          return `<<IMG|${content.fileInfo.fileTitle}>>`; // <<IMG|image_title>>
+          return `<<IMG|${content.fileInfo.fileTitle}>>` + '\\n'; // <<IMG|image_title>>, 문단 구분을 위한 구분자 추가 ('\\n' → 문자열 \n);
         } else {
-          return content.partialContent + '\n'; // 문단 구분을 위한 구분자 추가
+          return content.partialContent + '\\n'; // 문단 구분을 위한 구분자 추가 ('\\n' → 문자열 \n)
         }
       })
       .join();
-    console.log(fileInfoIncludedContent);
+    // todo 인서트 요청
+    // console.log(fileInfoIncludedContent);
+    // console.log(fileInfoIncludedContent.replace(/\\n/g, '\n'));
+    // console.log('fileInfoLists: ', fileInfoLists);
   };
 
   // 유효하지 않은 경우
