@@ -124,6 +124,23 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
     };
   };
 
+  // 이미지 제목의 고유성을 보장하는 함수
+  const uniquenessEnsuredTitle = (passedTitle: string): string | undefined => {
+    const duplicatedTitleExist = contentElements.filter((element) => element.fileInfo && element.fileInfo.fileTitle == passedTitle).length > 0;
+    if (duplicatedTitleExist) {
+      for (let i = 0; i < 100; i++) {
+        const candidateTitle = `${passedTitle} (${i})`;
+        const duplicatedTitleWithCandidateExist =
+          contentElements.filter((element) => element.fileInfo && element.fileInfo.fileTitle == candidateTitle).length > 0;
+        if (!duplicatedTitleWithCandidateExist) {
+          return candidateTitle;
+        }
+      }
+    } else {
+      return passedTitle;
+    }
+  };
+
   const attachRequestInterruptCallBack = (files: File[], contentElementOnTriggeredArea: ContentElement) => {
     if (attachOnlyImg && files.filter((file) => !file.type.startsWith('image/')).length > 0) {
       toastError('이미지 파일이 아닌 경우 첨부할수 없습니다.');
@@ -139,7 +156,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                 configForInitContent({
                   id: modifiedContentElements.length + 1,
                   fileInfo: {
-                    fileTitle: file.name, // 최초로 할당되어지는 제목
+                    fileTitle: uniquenessEnsuredTitle(file.name), // 최초로 할당되어지는 제목
                     fileSrcUrl: URL.createObjectURL(file),
                   },
                 }),
