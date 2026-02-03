@@ -122,7 +122,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                 id: modifiedContentElements.length + 1,
                 fileInfo: {
                   fileTitle: file.name, // 최초로 할당되어지는 제목
-                  //fileSrcUrl: URL.createObjectURL(file),
+                  fileSrcUrl: URL.createObjectURL(file),
                 },
               }),
             );
