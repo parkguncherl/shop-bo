@@ -6,21 +6,10 @@ const withAntdLess = require('next-plugin-antd-less');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  env: {
-    NEXT_PUBLIC_AWS_ACCESS_KEY_ID: process.env.NEXT_AWS_ACCESS_KEY_ID,
-    NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY: process.env.NEXT_AWS_SECRET_ACCESS_KEY,
-    NEXT_PUBLIC_AWS_REGION: process.env.NEXT_AWS_REGION,
-  },
   reactStrictMode: false,
   //swcMinify: true,
   compiler: {
     styledComponents: true,
-  },
-  publicRuntimeConfig: {
-    endpointURL: process.env.NEXT_PUBLIC_SMART_API_ENDPOINT,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
   },
   typescript: {
     ignoreBuildErrors: true,
