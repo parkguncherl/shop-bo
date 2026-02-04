@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Title, toastError } from '../../../../components';
+import { Title, toastError, toastSuccess } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -10,6 +10,8 @@ import FormEnhancedTextArea, { ContentElement, EnhancedTextAreasMode, FileInfo }
 import FormInput from '../../../../components/FormInput';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import { SubmitErrorHandler } from 'react-hook-form/dist/types/form';
+import { useProductContentsStore } from '../../../../stores/product/useProductContentsStore';
+import { useMutation } from '@tanstack/react-query';
 
 export interface ProductContentsFields {
   title: string;
@@ -20,15 +22,43 @@ export interface ProductContentsFields {
 const ProductContents = () => {
   /** 공통 스토어 - State */
   const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
+  const [modals, openModal, closeModal, insertProductContents] = useProductContentsStore((s) => [s.modals, s.openModal, s.closeModal, s.insertProductContents]);
 
   /** 로컬 스토어 */
   const [displayMode, setDisplayMode] = useState<EnhancedTextAreasMode>('edit');
-  const [openedModalType, setOpenedModalType] = useState<'SUBMIT' | null>(null);
+  //const [openedModalType, setOpenedModalType] = useState<'SUBMIT' | null>(null);
 
   /** 초기화 버튼 클릭 시 */
   const reset = async () => {
     control._reset();
   };
+
+  /** 상품 내용 입력 서식 */
+  const {
+    handleSubmit,
+    control,
+    getValues,
+    formState: { errors, isValid },
+  } = useForm<ProductContentsFields>({
+    resolver: yupResolver(YupSchema.ProductContentsRequest()),
+    mode: 'onChange',
+  });
+
+  /** 상품컨텐츠 추가 요청 처리 동작 캐싱 */
+  const { mutate: insertProductContentsMutate } = useMutation(insertProductContents, {
+    onSuccess: async (e) => {
+      try {
+        if (e.data.resultCode === 200) {
+          toastSuccess('저장되었습니다.');
+          // todo 이후 필요한 동작 정의
+        } else {
+          toastError(e.data.resultMessage);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+  });
 
   // 입력이 유효한 경우
   // 컨텐츠로서 저장하는 내용은 내용 영역에서 파일 제목, 문단 단위 절삭을 위한 정보를 포함하도록 한다.
@@ -61,17 +91,6 @@ const ProductContents = () => {
     }
   };
 
-  /** 상품 내용 입력 서식 */
-  const {
-    handleSubmit,
-    control,
-    getValues,
-    formState: { errors, isValid },
-  } = useForm<ProductContentsFields>({
-    resolver: yupResolver(YupSchema.ProductContentsRequest()),
-    mode: 'onChange',
-  });
-
   return (
     <div className={'product_contents_root'}>
       <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} reset={reset}></Title>
@@ -102,7 +121,7 @@ const ProductContents = () => {
                       className={'btn btn_blue'}
                       onClick={() => {
                         if (errors.content == undefined) {
-                          setOpenedModalType('SUBMIT');
+                          openModal('ADD_CONF');
                         } else {
                           toastError('본문에서 문제가 되는 영역을 수정한 후 재시도하십시요.');
                         }
@@ -135,14 +154,14 @@ const ProductContents = () => {
       </div>
 
       <ConfirmModal
-        open={openedModalType == 'SUBMIT'}
+        open={modals.type == 'ADD_CONF' && modals.active}
         title={'저장 하시겠습니까?'}
         confirmText={'저장'}
         onConfirm={() => {
           handleSubmit(onValid, onInvalid)(); // 함수를 반환하므로 다음과 같이, 호출하여야
         }}
         onClose={() => {
-          setOpenedModalType(null);
+          closeModal('ADD_CONF');
         }}
       />
     </div>
