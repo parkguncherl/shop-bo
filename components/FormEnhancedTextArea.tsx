@@ -42,6 +42,7 @@ interface FieldErrorForFileInfo {
 /**
  * stateFul 컴포넌트
  * 기존 textArea 와 달리 이미지 삽입 및 이에 따라 필요한 동작 지원
+ * RHF 구독 하에서의 함수 컴포넌트 재평가에 따른 부수 효과 방지하도록 랜더링이 아닌 state, 이에 따른 hook trigger 에 의존토록 함
  * */
 const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, autoSize, mode, attachOnlyImg = true }: FormEnhancedTextAreaProps<T>) => {
   /** react hook form 의 controller 는 현재 영역에서는 수정 대상 영역의 값(contentElement)에 한정되어 적용함(전역 적용하지 아니함) */
@@ -49,12 +50,6 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
     field: { value: value, onChange: controlChange },
     fieldState: { isDirty, isTouched, error },
   } = useController<T>({ name, rules, control });
-
-  useEffect(() => {
-    if (value == undefined) {
-      setContentElements([{ id: 1, partialContent: '', init: true }]); // 외부 컨트롤 영역 초기화 동작에 대응
-    }
-  }, [value]);
 
   const boxRef = useRef<HTMLDivElement>(null);
   const bottomTextArea = useRef<HTMLTextAreaElement | null>(null);
@@ -77,6 +72,19 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
 
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (value == undefined) {
+      setContentElements([{ id: 1, partialContent: '', init: true }]); // 외부 컨트롤 영역 초기화 동작에 대응
+    }
+  }, [value]);
+
+  useEffect(() => {
+    if (unFrozenElementId == -1) {
+      // 최하단 영역 이외에 별도로 편집 가능 상태인 구획이 부재한 경우 한정 트리거
+      bottomTextArea.current?.focus();
+    }
+  }, [unFrozenElementId, contentElements]);
 
   useEffect(() => {
     setContentElements((prevContentElements) => {
@@ -264,13 +272,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                             }
                           }
                         }}
-                        ref={(node) => {
-                          if (unFrozenElementId == -1) {
-                            // 최하단 영역 이외에 별도로 편집 가능 상태인 구획이 부재한 경우 한정 트리거
-                            node?.focus();
-                          }
-                          bottomTextArea.current = node; // 리 랜더링(재 마운트) 시점에 최신화된 참조를 사용 가능토록 이와 같이 처리함
-                        }}
+                        ref={bottomTextArea}
                       />
                     </div>
                     <div className={`err_msg_wrapper ${partialContentErrorExist ? 'error' : 'non'}`}>
