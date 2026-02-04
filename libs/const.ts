@@ -41,7 +41,6 @@ export const AsnStatCd = {
 };
 
 export const AlertMessage = { RequiredParams: '검색조건을 1개 이상 입력하세요.' };
-export const DomainKeyWord = { main: 'evblueplug', local: 'localhost' };
 
 /** 인증번호 입력 대기 시간 (ms) */
 export const Otp = { duration: 180000 };
