@@ -12,10 +12,9 @@ type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
     mode?: EnhancedTextAreasMode;
     attachOnlyImg?: boolean;
   };
-export interface FileInfo {
+export interface FileInfo extends File {
   // 이미지(혹은 파일) 한정으로 정의함, 현재는 실 동작 영역에서 이미지 이외 파일에 대하여는 첨부를 제한하는 중
   // todo 추후 요청에서 더 필요한 정보가 있을 경우 확장할 것
-  fileTitle?: string;
   fileSrcUrl?: string;
 }
 export interface ContentElement {
@@ -35,7 +34,7 @@ interface FieldErrorForContentElement {
   fileInfo?: FieldErrorForFileInfo;
 }
 interface FieldErrorForFileInfo {
-  fileTitle: FieldError | undefined;
+  name: FieldError | undefined;
   fileSrcUrl: FieldError | undefined;
 }
 
@@ -48,7 +47,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   /** react hook form 의 controller 는 현재 영역에서는 수정 대상 영역의 값(contentElement)에 한정되어 적용함(전역 적용하지 아니함) */
   const {
     field: { value: value, onChange: controlChange },
-    fieldState: { isDirty, isTouched, error },
+    fieldState: { error },
   } = useController<T>({ name, rules, control });
 
   const boxRef = useRef<HTMLDivElement>(null);
@@ -133,17 +132,17 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   };
 
   // 이미지 제목의 고유성을 보장하는 함수
-  const uniquenessEnsuredTitle = (passedTitle: string): string | undefined => {
-    const duplicatedTitleExist = contentElements.filter((element) => element.fileInfo && element.fileInfo.fileTitle == passedTitle).length > 0;
+  const uniquenessEnsuredTitle = (passedTitle: string): string => {
+    const duplicatedTitleExist = contentElements.filter((element) => element.fileInfo && element.fileInfo.name == passedTitle).length > 0;
     if (duplicatedTitleExist) {
       for (let i = 0; i < 100; i++) {
         const candidateTitle = `${passedTitle} (${i})`;
-        const duplicatedTitleWithCandidateExist =
-          contentElements.filter((element) => element.fileInfo && element.fileInfo.fileTitle == candidateTitle).length > 0;
+        const duplicatedTitleWithCandidateExist = contentElements.filter((element) => element.fileInfo && element.fileInfo.name == candidateTitle).length > 0;
         if (!duplicatedTitleWithCandidateExist) {
           return candidateTitle;
         }
       }
+      return ''; // 비정상 상황
     } else {
       return passedTitle;
     }
@@ -164,9 +163,10 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                 configForInitContent({
                   id: modifiedContentElements.length + 1,
                   fileInfo: {
-                    fileTitle: uniquenessEnsuredTitle(file.name), // 최초로 할당되어지는 제목
+                    ...file,
+                    name: uniquenessEnsuredTitle(file.name), // 최초로 할당되어지는 제목
                     fileSrcUrl: URL.createObjectURL(file),
-                  },
+                  } as FileInfo,
                 }),
               );
             });
@@ -298,7 +298,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                       )}
                       <div className={'img_title_wrapper'}>
                         <NativeInputAtom
-                          value={contentElement.fileInfo.fileTitle}
+                          value={contentElement.fileInfo.name}
                           onChange={(event) => {
                             setContentElements((contentElements) => {
                               const modifiedContentElements: ContentElementInfo[] = []; // 배열 불변성 유지
@@ -307,10 +307,10 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                                   modifiedContentElements.push({
                                     ...contentElements[i],
                                     fileInfo: contentElements[i].fileInfo
-                                      ? {
+                                      ? ({
                                           ...(contentElements[i].fileInfo as FileInfo),
-                                          fileTitle: event.target.value || '', // fileTitle 동기화
-                                        }
+                                          name: event.target.value || '', // fileTitle 동기화
+                                        } as FileInfo)
                                       : undefined,
                                   });
                                 } else {
@@ -320,7 +320,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                               return modifiedContentElements;
                             });
                           }}
-                          placeholder={fileErrorExist ? innerErrorState[index]?.fileInfo?.fileTitle?.message : undefined}
+                          placeholder={fileErrorExist ? innerErrorState[index]?.fileInfo?.name?.message : undefined}
                         />
                       </div>
                     </div>
@@ -407,9 +407,9 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                       )}
                       <div className={'img_title_wrapper'}>
                         <NativeInputAtom
-                          value={contentElement.fileInfo.fileTitle}
+                          value={contentElement.fileInfo.name}
                           readOnly={true}
-                          placeholder={fileErrorExist ? innerErrorState[index]?.fileInfo?.fileTitle?.message : undefined}
+                          placeholder={fileErrorExist ? innerErrorState[index]?.fileInfo?.name?.message : undefined}
                         />
                       </div>
                     </div>
@@ -445,7 +445,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                         <img src={contentElement.fileInfo.fileSrcUrl} />
                       </div>
                       <div className={'img_title_wrapper'}>
-                        <p>{contentElement.fileInfo.fileTitle}</p>
+                        <p>{contentElement.fileInfo.name}</p>
                       </div>
                     </div>
                   ) : (

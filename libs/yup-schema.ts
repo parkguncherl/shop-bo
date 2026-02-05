@@ -243,7 +243,7 @@ export const YupSchema = {
                   return yup.mixed().notRequired();
                 }
                 return yup.object({
-                  fileTitle: yup
+                  name: yup
                     .string()
                     .required('파일(이미지) 제목은 필수값입니다.')
                     .matches(new RegExp('[A-Za-z0-9._-]+'))
