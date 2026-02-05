@@ -14,7 +14,7 @@ type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
   };
 export interface FileInfo {
   file: File;
-  fileTitle?: string;
+  fileTitle: string;
   fileSrcUrl?: string;
 }
 export interface ContentElement {

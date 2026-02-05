@@ -12,6 +12,7 @@ import { ConfirmModal } from '../../../../components/ConfirmModal';
 import { SubmitErrorHandler } from 'react-hook-form/dist/types/form';
 import { useProductContentsStore } from '../../../../stores/product/useProductContentsStore';
 import { useMutation } from '@tanstack/react-query';
+import { CommonRequestFileUploads } from '../../../../generated';
 
 export interface ProductContentsFields {
   title: string;
@@ -76,6 +77,16 @@ const ProductContents = () => {
         }
       })
       .join();
+    console.log(
+      fileInfoLists.map((fileInfo) => {
+        fileInfo.file.name = 'dd';
+      }),
+    );
+    // insertProductContentsMutate({
+    //   commonRequestFileUploads: {
+    //     uploadFiles: fileInfoLists.map((fileInfo) => fileInfo.file),
+    //   },
+    // });
     // todo 인서트 요청
     // console.log(fileInfoIncludedContent);
     // console.log(fileInfoIncludedContent.replace(/\\n/g, '\n'));
