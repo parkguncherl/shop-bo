@@ -14,8 +14,8 @@ type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
   };
 export interface FileInfo {
   file: File;
-  fileTitle: string;
   fileSrcUrl?: string;
+  //fileTitle: string;
 }
 export interface ContentElement {
   id: number; // 기본 1부터 시작, 순차적일 필요는 없으나 후행하는 요소의 id는 선행 요소의 id보다 커야 함
@@ -34,7 +34,7 @@ interface FieldErrorForContentElement {
   fileInfo?: FieldErrorForFileInfo;
 }
 interface FieldErrorForFileInfo {
-  fileTitle: FieldError | undefined;
+  //fileTitle: FieldError | undefined;
   fileSrcUrl: FieldError | undefined;
 }
 
@@ -132,22 +132,22 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
   };
 
   // 이미지 제목의 고유성을 보장하는 함수
-  const uniquenessEnsuredTitle = (passedTitle: string): string => {
-    const duplicatedTitleExist = contentElements.filter((element) => element.fileInfo && element.fileInfo.fileTitle == passedTitle).length > 0;
-    if (duplicatedTitleExist) {
-      for (let i = 0; i < 100; i++) {
-        const candidateTitle = `${passedTitle} (${i})`;
-        const duplicatedTitleWithCandidateExist =
-          contentElements.filter((element) => element.fileInfo && element.fileInfo.fileTitle == candidateTitle).length > 0;
-        if (!duplicatedTitleWithCandidateExist) {
-          return candidateTitle;
-        }
-      }
-      return ''; // 비정상 상황
-    } else {
-      return passedTitle;
-    }
-  };
+  // const uniquenessEnsuredTitle = (passedTitle: string): string => {
+  //   const duplicatedTitleExist = contentElements.filter((element) => element.fileInfo && element.fileInfo.fileTitle == passedTitle).length > 0;
+  //   if (duplicatedTitleExist) {
+  //     for (let i = 0; i < 100; i++) {
+  //       const candidateTitle = `${passedTitle} (${i})`;
+  //       const duplicatedTitleWithCandidateExist =
+  //         contentElements.filter((element) => element.fileInfo && element.fileInfo.fileTitle == candidateTitle).length > 0;
+  //       if (!duplicatedTitleWithCandidateExist) {
+  //         return candidateTitle;
+  //       }
+  //     }
+  //     return ''; // 비정상 상황
+  //   } else {
+  //     return passedTitle;
+  //   }
+  // };
 
   const attachRequestInterruptCallBack = (files: File[], contentElementOnTriggeredArea: ContentElement) => {
     if (attachOnlyImg && files.filter((file) => !file.type.startsWith('image/')).length > 0) {
@@ -165,7 +165,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                   id: modifiedContentElements.length + 1,
                   fileInfo: {
                     file: file,
-                    fileTitle: uniquenessEnsuredTitle(file.name), // 최초로 할당되어지는 제목
+                    //fileTitle: uniquenessEnsuredTitle(file.name), // 최초로 할당되어지는 제목
                     fileSrcUrl: URL.createObjectURL(file),
                   } as FileInfo,
                 }),
@@ -299,29 +299,30 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                       )}
                       <div className={'img_title_wrapper'}>
                         <NativeInputAtom
-                          value={contentElement.fileInfo.fileTitle}
-                          onChange={(event) => {
-                            setContentElements((contentElements) => {
-                              const modifiedContentElements: ContentElementInfo[] = []; // 배열 불변성 유지
-                              for (let i = 0; i < contentElements.length; i++) {
-                                if (contentElements[i].id == contentElement.id) {
-                                  modifiedContentElements.push({
-                                    ...contentElements[i],
-                                    fileInfo: contentElements[i].fileInfo
-                                      ? ({
-                                          ...(contentElements[i].fileInfo as FileInfo),
-                                          fileTitle: event.target.value || '', // fileTitle 동기화
-                                        } as FileInfo)
-                                      : undefined,
-                                  });
-                                } else {
-                                  modifiedContentElements.push(contentElements[i]);
-                                }
-                              }
-                              return modifiedContentElements;
-                            });
-                          }}
-                          placeholder={fileErrorExist ? innerErrorState[index]?.fileInfo?.fileTitle?.message : undefined}
+                          value={contentElement.fileInfo.file.name}
+                          readOnly={true}
+                          // onChange={(event) => {
+                          //   setContentElements((contentElements) => {
+                          //     const modifiedContentElements: ContentElementInfo[] = []; // 배열 불변성 유지
+                          //     for (let i = 0; i < contentElements.length; i++) {
+                          //       if (contentElements[i].id == contentElement.id) {
+                          //         modifiedContentElements.push({
+                          //           ...contentElements[i],
+                          //           fileInfo: contentElements[i].fileInfo
+                          //             ? ({
+                          //                 ...(contentElements[i].fileInfo as FileInfo),
+                          //                 fileTitle: event.target.value || '', // fileTitle 동기화
+                          //               } as FileInfo)
+                          //             : undefined,
+                          //         });
+                          //       } else {
+                          //         modifiedContentElements.push(contentElements[i]);
+                          //       }
+                          //     }
+                          //     return modifiedContentElements;
+                          //   });
+                          // }}
+                          // placeholder={fileErrorExist ? innerErrorState[index]?.fileInfo?.fileTitle?.message : undefined}
                         />
                       </div>
                     </div>
@@ -408,9 +409,9 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                       )}
                       <div className={'img_title_wrapper'}>
                         <NativeInputAtom
-                          value={contentElement.fileInfo.fileTitle}
+                          value={contentElement.fileInfo.file.name}
                           readOnly={true}
-                          placeholder={fileErrorExist ? innerErrorState[index]?.fileInfo?.fileTitle?.message : undefined}
+                          //placeholder={fileErrorExist ? innerErrorState[index]?.fileInfo?.fileTitle?.message : undefined}
                         />
                       </div>
                     </div>
@@ -446,7 +447,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                         <img src={contentElement.fileInfo.fileSrcUrl} />
                       </div>
                       <div className={'img_title_wrapper'}>
-                        <p>{contentElement.fileInfo.fileTitle}</p>
+                        <p>{contentElement.fileInfo.file.name}</p>
                       </div>
                     </div>
                   ) : (
