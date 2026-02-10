@@ -243,11 +243,11 @@ export const YupSchema = {
                   return yup.mixed().notRequired();
                 }
                 return yup.object({
-                  fileTitle: yup
-                    .string()
-                    .required('파일(이미지) 제목은 필수값입니다.')
-                    .matches(new RegExp('[A-Za-z0-9._-]+'))
-                    .required('영문 숫자 및 최소한의 기호(점 혹은 언더바)만 허용됩니다.'),
+                  // fileTitle: yup
+                  //   .string()
+                  //   .required('파일(이미지) 제목은 필수값입니다.')
+                  //   .matches(new RegExp('[A-Za-z0-9._-]+'))
+                  //   .required('영문 숫자 및 최소한의 기호(점 혹은 언더바)만 허용됩니다.'),
                   fileSrcUrl: yup.string().required('파일 리소스를 찾을 수 없습니다.'),
                 });
               }),

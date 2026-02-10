@@ -14,7 +14,7 @@ type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
   };
 export interface FileInfo {
   file: File;
-  fileSrcUrl?: string;
+  fileSrcUrl?: string; // 이미지 파일 출력을 위하여 브라우저에서 인스턴스화를 통해 생성한 url
   //fileTitle: string;
 }
 export interface ContentElement {
