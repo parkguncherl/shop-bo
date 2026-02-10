@@ -65,23 +65,20 @@ const ProductContents = () => {
   // 컨텐츠로서 저장하는 내용은 내용 영역에서 파일 제목, 문단 단위 절삭을 위한 정보를 포함하도록 한다.
   // 줄바꿈: \n, 파일(이미지)명: <<IMG|image_title>> --> 둘중 하나를 기준으로 문단 나눔
   const onValid: SubmitHandler<ProductContentsFields> = (data, event) => {
-    const fileInfoLists: FileInfo[] = data.content
-      .filter((content) => content.fileInfo && content.fileInfo.fileTitle)
-      .map((content) => content.fileInfo as FileInfo);
+    const fileInfoList: FileInfo[] = [
+      ...data.content.filter((content, index, array) => content.fileInfo && content.fileInfo.file).map((content) => content.fileInfo as FileInfo),
+    ];
+    const uniqueFileList: File[] = Array.from(new Map(fileInfoList.map((fileInfo) => [fileInfo.file.name, fileInfo.file])).values());
     const fileInfoIncludedContent = data.content
       .map((content) => {
-        if (content.fileInfo && content.fileInfo.fileTitle) {
-          return `<<IMG|${content.fileInfo.fileTitle}>>` + '\\n'; // <<IMG|image_title>>, 문단 구분을 위한 구분자 추가 ('\\n' → 문자열 \n);
+        if (content.fileInfo && content.fileInfo.file.name) {
+          return `<<IMG|${content.fileInfo.file.name}>>` + '\\n'; // <<IMG|image_title>>, 문단 구분을 위한 구분자 추가 ('\\n' → 문자열 \n);
         } else {
           return content.partialContent + '\\n'; // 문단 구분을 위한 구분자 추가 ('\\n' → 문자열 \n)
         }
       })
       .join();
-    console.log(
-      fileInfoLists.map((fileInfo) => {
-        fileInfo.file.name = 'dd';
-      }),
-    );
+    console.log('uniqueFileList: ', uniqueFileList);
     // insertProductContentsMutate({
     //   commonRequestFileUploads: {
     //     uploadFiles: fileInfoLists.map((fileInfo) => fileInfo.file),
