@@ -12,7 +12,6 @@ import { ConfirmModal } from '../../../../components/ConfirmModal';
 import { SubmitErrorHandler } from 'react-hook-form/dist/types/form';
 import { useProductContentsStore } from '../../../../stores/product/useProductContentsStore';
 import { useMutation } from '@tanstack/react-query';
-import { CommonRequestFileUploads } from '../../../../generated';
 
 export interface ProductContentsFields {
   title: string;
@@ -53,7 +52,7 @@ const ProductContents = () => {
           toastSuccess('저장되었습니다.');
           // todo 이후 필요한 동작 정의
         } else {
-          toastError(e.data.resultMessage);
+          toastError(`컨텐츠 저장 도중 문제 발생 (${e.data.resultMessage})`);
         }
       } catch (e) {
         console.log(e);
@@ -66,25 +65,28 @@ const ProductContents = () => {
   // 줄바꿈: \n, 파일(이미지)명: <<IMG|image_title>> --> 둘중 하나를 기준으로 문단 나눔
   const onValid: SubmitHandler<ProductContentsFields> = (data, event) => {
     const fileInfoList: FileInfo[] = [
-      ...data.content.filter((content, index, array) => content.fileInfo && content.fileInfo.file).map((content) => content.fileInfo as FileInfo),
+      ...data.content.filter((content) => content.fileInfo && content.fileInfo.file).map((content) => content.fileInfo as FileInfo),
     ];
     const uniqueFileList: File[] = Array.from(new Map(fileInfoList.map((fileInfo) => [fileInfo.file.name, fileInfo.file])).values());
     const fileInfoIncludedContent = data.content
       .map((content) => {
         if (content.fileInfo && content.fileInfo.file.name) {
+          // regex = /<<IMG\|([^>]+)>>/g;
           return `<<IMG|${content.fileInfo.file.name}>>` + '\\n'; // <<IMG|image_title>>, 문단 구분을 위한 구분자 추가 ('\\n' → 문자열 \n);
         } else {
           return content.partialContent + '\\n'; // 문단 구분을 위한 구분자 추가 ('\\n' → 문자열 \n)
         }
       })
       .join();
-    console.log('uniqueFileList: ', uniqueFileList);
-    // insertProductContentsMutate({
-    //   commonRequestFileUploads: {
-    //     uploadFiles: fileInfoLists.map((fileInfo) => fileInfo.file),
-    //   },
-    // });
-    // todo 인서트 요청
+    insertProductContentsMutate({
+      newsType: '100', // todo
+      newsTitle: data.title,
+      newsSubTitle: data.title, // todo
+      newsContents: fileInfoIncludedContent,
+      commonRequestFileUploads: {
+        uploadFiles: uniqueFileList,
+      },
+    });
     // console.log(fileInfoIncludedContent);
     // console.log(fileInfoIncludedContent.replace(/\\n/g, '\n'));
     // console.log('fileInfoLists: ', fileInfoLists);
