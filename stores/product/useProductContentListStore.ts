@@ -2,20 +2,21 @@ import { StateCreator } from 'zustand/esm';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { PageObject } from '../../generated';
+import { PageObject, ProductContentListResponseProductContent } from '../../generated';
 
-type ModalType = 'ADD_CONF';
+type ModalType = 'SHOW';
 
 interface ModalState {
   type: ModalType;
   active: boolean;
+  stored_temporary?: Partial<ProductContentListResponseProductContent>;
 }
 
 interface ProductContentListState {
   paging: PageObject;
   setPaging: (pagingInfo: PageObject | undefined) => void;
   modals: ModalState;
-  openModal: (type: ModalType) => void;
+  openModal: (type: ModalType, stored_temp?: Partial<ProductContentListResponseProductContent>) => void;
   closeModal: (type: ModalType) => void;
 }
 
@@ -37,12 +38,13 @@ const initialStateCreator: StateCreator<ProductContentListStateOfAll> = (set, ge
         },
       }));
     },
-    modals: { type: 'ADD_CONF', active: false },
-    openModal: (type) => {
+    modals: { type: 'SHOW', active: false, stored_temporary: undefined },
+    openModal: (type, stored_temp) => {
       set((state) => ({
         modals: {
           type,
           active: true,
+          stored_temporary: stored_temp,
         },
       }));
     },

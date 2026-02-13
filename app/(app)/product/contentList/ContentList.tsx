@@ -15,6 +15,7 @@ import { useProductContentListStore } from '../../../../stores/product/useProduc
 import useFilters from '../../../../hooks/useFilters';
 import useDebounce from '../../../../hooks/useDebounce';
 import { AlertMessage, Placeholder, RegExpression } from '../../../../libs/const';
+import ProductContentShowPop from '../../../../components/popup/product/contentList/ProductContentShowPop';
 
 /** 상품관리 - 상품컨텐츠 목록 페이지 */
 const ContentList = () => {
@@ -25,7 +26,7 @@ const ContentList = () => {
   const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
 
   /** 코드관리 스토어 - State */
-  const [paging, setPaging, modals, openModal] = useProductContentListStore((s) => [s.paging, s.setPaging, s.modals, s.openModal]);
+  const [paging, setPaging, modals, openModal, closeModal] = useProductContentListStore((s) => [s.paging, s.setPaging, s.modals, s.openModal, s.closeModal]);
 
   const gridRef = useRef<TunedGridRef<ProductContentListResponseProductContent>>(null);
 
@@ -166,6 +167,7 @@ const ContentList = () => {
             mode: 'singleRow',
             enableClickSelection: false,
           }}
+          onRowDoubleClicked={(e) => openModal('SHOW', e.data)}
           pagingOptions={pagingOption}
           onTouchedByBottom={() => {
             if (pagingOption) {
@@ -218,6 +220,7 @@ const ContentList = () => {
           </div>
         </div>
       </Table>
+      <ProductContentShowPop open={modals.type == 'SHOW' && modals.active} data={modals.stored_temporary} onClose={() => closeModal('SHOW')} />
     </div>
   );
 };
