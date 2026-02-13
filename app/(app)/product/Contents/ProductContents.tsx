@@ -12,6 +12,7 @@ import { ConfirmModal } from '../../../../components/ConfirmModal';
 import { SubmitErrorHandler } from 'react-hook-form/dist/types/form';
 import { useProductContentsStore } from '../../../../stores/product/useProductContentsStore';
 import { useMutation } from '@tanstack/react-query';
+import { ImgToken } from '../../../../libs/const';
 
 export interface ProductContentsFields {
   title: string;
@@ -72,14 +73,14 @@ const ProductContents = () => {
       .map((content) => {
         if (content.fileInfo && content.fileInfo.file.name) {
           // regex = /<<IMG\|([^>]+)>>/g;
-          return `<<IMG|${content.fileInfo.file.name}>>` + '\\n'; // <<IMG|image_title>>, 문단 구분을 위한 구분자 추가 ('\\n' → 문자열 \n);
+          //return `<<IMG|${content.fileInfo.file.name}>>`; // <<IMG|image_title>>
+          return ImgToken(content.fileInfo.file.name);
         } else {
           return content.partialContent + '\\n'; // 문단 구분을 위한 구분자 추가 ('\\n' → 문자열 \n)
         }
       })
-      .join();
+      .join('');
     insertProductContentsMutate({
-      newsType: '100', // todo
       newsTitle: data.title,
       newsSubTitle: data.title, // todo
       newsContents: fileInfoIncludedContent,
@@ -87,9 +88,9 @@ const ProductContents = () => {
         uploadFiles: uniqueFileList,
       },
     });
-    // console.log(fileInfoIncludedContent);
-    // console.log(fileInfoIncludedContent.replace(/\\n/g, '\n'));
-    // console.log('fileInfoLists: ', fileInfoLists);
+    console.log(fileInfoIncludedContent);
+    console.log(fileInfoIncludedContent.replace(/<<IMG\|[^>]+>>/g, '').replace(/\\n/g, '\n'));
+    //console.log('fileInfoLists: ', uniqueFileList);
   };
 
   // 유효하지 않은 경우

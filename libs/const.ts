@@ -40,7 +40,16 @@ export const AsnStatCd = {
   입하완료: '9',
 };
 
-export const AlertMessage = { RequiredParams: '검색조건을 1개 이상 입력하세요.' };
+// 정규표현식 모음
+export const RegExpression = {
+  removeImgToken: /<<IMG\|[^>]+>>/g, // <<IMG|image_title>>
+  removeCarriageReturn: /\\n/g, // '\\n' → 문자열 \n
+};
+
+// 텍스트 데이터에 사용되는 표준 이미지 토큰
+export const ImgToken = (fileName: string) => `<<IMG|${fileName}>>`;
+
+export const AlertMessage = { RequiredParams: '검색조건을 1개 이상 입력하세요.', LastDataHasBeenReached: '더 이상 데이터가 존재하지 않습니다.' };
 
 /** 인증번호 입력 대기 시간 (ms) */
 export const Otp = { duration: 180000 };
