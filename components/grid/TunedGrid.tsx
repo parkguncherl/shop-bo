@@ -1,5 +1,5 @@
 import { AgGridReact, AgGridReactProps } from 'ag-grid-react';
-import React, { RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import {
   CellClickedEvent,
   CellKeyDownEvent,
@@ -16,38 +16,51 @@ import {
   MenuItemDef,
   RowSelectionOptions,
   SortChangedEvent,
+  ViewportChangedEvent,
 } from 'ag-grid-community';
 import { AG_GRID_LOCALE_KO, GridSetting, withCommonKeyboardSuppress } from '../../libs/ag-grid';
 import { useCommonStore } from '../../stores';
 import { GridResponse } from '../../generated';
 
-export interface selectedRowCopiedEvent<P> {
-  copiedRowNodes: IRowNode<P>[];
-}
-
-export interface copiedRowPastedEvent<P> {
-  eventTriggeredRowIndex: number | null;
-  pastedRowNodes: IRowNode<P>[];
-}
-
-export type clickSelectionConfig = {
+type clickSelectionConfig = {
   colField: string; // 적용 대상 컬럼
   withoutDeselection: boolean; // 타 행 선택해제 없이 선택될지 여부
   selectAllByHeaderClick?: boolean; // 헤더 클릭할 경우 전체선택할지 여부
 };
-export type extendedRowSelectionOptions<P> = RowSelectionOptions<P> & {
+type extendedRowSelectionOptions<P> = RowSelectionOptions<P> & {
   // 기본 설정과 겹치는 영역이 존재할 시 이하 정의된 확장 설정이 우선
   clickSelectionConfigByPerCol?: clickSelectionConfig[]; // 유효한 값이 주어질 시 rowSelection 일부 속성 잠금, selection 동작은 api를 통해 명시적으로 통제함
 };
+type pagingStrategies = 'add';
 
+interface defaultPagingOptions {
+  pagingStrategy: pagingStrategies;
+}
+
+export interface addPagingOptions extends defaultPagingOptions {}
+
+export interface otherPagingOptions extends defaultPagingOptions {
+  // todo 추후 이러한 식의 뼈대 기반 확장 가능
+}
+
+export interface selectedRowCopiedEvent<P> {
+  copiedRowNodes: IRowNode<P>[];
+}
+export interface copiedRowPastedEvent<P> {
+  eventTriggeredRowIndex: number | null;
+  pastedRowNodes: IRowNode<P>[];
+}
 export interface TunedGridApi<P> {
-  onReachEachSide?: (event: 'T' | 'B') => void;
+  // onReachEachSide?: (event: 'T' | 'B') => void; todo deprecated
+  onTouchedByBottom?: () =>
+    | Promise<void>
+    | {
+        pausedMilliseconds: number; //onTouchedByBottom 재 트리거가 허용되기까지의 중간 텀
+      };
   onSelectedRowCopied?: (event: selectedRowCopiedEvent<P>) => void;
   onCopiedRowNodePasted?: (event: copiedRowPastedEvent<P>) => void;
-  onWheel?: (event: any) => void;
-  ref?: React.Ref<AgGridReact>;
+  onWheel?: (event: React.WheelEvent<HTMLDivElement>) => void;
 }
-//GridOptions<TData>.rowSelection
 export interface TunedGridOptions<P> extends GridOptions<P> {
   columnDefs: ColDef<P>[]; // 컬럼 정의 제공을 의무화하는 차원에서 재정의
   colIndexForSuppressKeyEvent?: number; // 인자 제공할 경우 다중 선택 사용 시 해당 인덱스의 컬럼으로 포커싱 후 이후 동작을 진행함
@@ -59,12 +72,28 @@ export interface TunedGridOptions<P> extends GridOptions<P> {
   savedPrevClickedNodeCnt?: number; // 이전에 클릭된 행(node)들 중 저장될 행의 개수(2 이상의 값을 할당하여야)
   enableBrowserTooltips?: boolean;
   rowSelection?: extendedRowSelectionOptions<P>;
+  pagingOptions?: addPagingOptions | otherPagingOptions; // 본 인자 주어질 경우 상태 제어권 일부는 컴포넌트에 위임되어 외부 상태에 대응하여 요구되는 동작을 작동시킴, 상태로서 관리하여 적절한 시점에 페이징 동작을 비활성화, 재활성화 가능
+}
+
+// TunedGrid 참조 인터페이스
+export interface TunedGridRef<P> extends AgGridReact<P> {
+  initializePagingStatus: () => void | Promise<any>; // todo 추후 비동기 처리 필요할 시 Promise 이하 제네릭도 유효한 값으로 지정하기
 }
 
 type excludedTypes = 'columnDefs';
-type TunedGridProps<P> = Omit<AgGridReactProps<P>, excludedTypes> & TunedGridOptions<P> & TunedGridApi<P>; // 추후 일부 api를 노출하지 않고자 할 때 Omit key에 해당 타입 지정
+type TunedGridProps<P> =
+  // 추후 일부 api를 노출하지 않고자 할 때 Omit key에 해당 타입 지정
+  Omit<AgGridReactProps<P>, excludedTypes> &
+    TunedGridOptions<P> &
+    TunedGridApi<P> & {
+      ref?: React.Ref<TunedGridRef<P>>;
+    };
 
 /**
+ * components/grid/TunedGrid.tsx
+ * desc: 기존 Ag grid react 에 해당 애플리케이션에서 요구하는 사항을 추가한 공통 컴포넌트
+ *
+ * 이하 사용시 유의사항
  * keyForBeingPressed 인자로 들어온 키에 해당하는 키가 눌린 상태로 화살표 이동할 시 다중 행 선택이 이루어짐
  * ArrowDown, ArrowUp 키는 본 요소 내부에서 사용되므로 외부에서 이벤트 리스너를 던질 시 유의하여야 함
  * */
@@ -75,11 +104,25 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
     s.initGridColumnState,
   ]);
 
-  /** 최초에는 ref 훅을 할당받으나 forward 형식으로 주어진 ref 가 존재할 시 해당 ref 를 할당한다. */
-  let innerRef = useRef<AgGridReact>(null);
-  if (ref != null) {
-    innerRef = ref as RefObject<AgGridReact>; // 외부에서 전달된 ref 를 사용하기 위해 타입 단언
-  }
+  /** 참조 및 외부 노출 ref 속성 실 구현 */
+  const gridRef = useRef<AgGridReact>(null);
+  useImperativeHandle(ref, () => {
+    const grid = gridRef.current as AgGridReact<P>;
+
+    return Object.assign(grid ?? {}, {
+      // 이하 TunedGrid 에서 노출코자 하는 기타 속성 및 api 목록
+      initializePagingStatus: () => {
+        // 현재 진행 중인 페이징 동작을 TunedGrid 하에서 초기화(비활성화와 유사한 부분이 다수 존재하나 이는 페이징 동작을 계속하리라 여기어 작성되었다는 점을 유념하여야 한다)
+        if (props.pagingOptions) {
+          // 각 전략별로 컴포넌트 수준에서 적절한 초기화 동작 수행
+          if (props.pagingOptions.pagingStrategy == 'add') {
+            setControlledRowData([]);
+          }
+        }
+      },
+    });
+  });
+
   /** 컬럼 정의는 상태로서 관리됨 */
   const [columnDefs, setColumnDefs] = useState<ColDef<P>[]>(props.columnDefs || []);
 
@@ -91,65 +134,64 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
   //const [prevClickedNodeList, setPrevClickedNodeList] = useState<IRowNode[]>([]);
 
   /** 본 페이지에서 사용되는 클립보드(복사 이후 사용하기 위해 임시 저장되는 값) 상태 관리 */
-  const [copiedRowNode, setCopiedRowNode] = useState<IRowNode[]>([]);
+  const [copiedRowNode, setCopiedRowNode] = useState<IRowNode<P>[]>([]);
+
+  /** 컴포넌트의 의도된 동작(페이징)을 위하여 외부 상태와 적절히 동기화되어 관리되어지는 상태 */
+  const [controlledRowData, setControlledRowData] = useState<P[]>([]);
+
+  const isReachedEventTriggerAllowed = useRef(true);
 
   //props.rowSelection.clickSelectionConfigByPerCol
   /** cell click 이벤트를 외부 값과 동기화 */
-  const onCellClicked = useCallback(
-    (event: CellClickedEvent<P>) => {
-      if (props.onCellClicked) {
-        props.onCellClicked(event);
-      }
+  const onCellClicked = (event: CellClickedEvent<P>) => {
+    if (props.onCellClicked) {
+      props.onCellClicked(event);
+    }
+    if (
+      props.rowSelection?.mode == 'multiRow' && // 다중선택 옵션이 주어지지 않을 경우 이하 동작 미시행
+      props.rowSelection?.clickSelectionConfigByPerCol &&
+      props.rowSelection?.clickSelectionConfigByPerCol.length > 0
+    ) {
+      // clickSelectionConfigByPerCol 이 유효하게 주어진 경우 이하 동작 수행
+      const clickSelectionConfigList = props.rowSelection?.clickSelectionConfigByPerCol as clickSelectionConfig[];
       if (
-        props.rowSelection?.mode == 'multiRow' && // 다중선택 옵션이 주어지지 않을 경우 이하 동작 미시행
-        props.rowSelection?.clickSelectionConfigByPerCol &&
-        props.rowSelection?.clickSelectionConfigByPerCol.length > 0
+        clickSelectionConfigList.filter((value) => value.colField == event.column.getColDef().field).length > 0 &&
+        clickSelectionConfigList.filter((value) => value.colField == event.column.getColDef().field)[0].withoutDeselection
       ) {
-        // clickSelectionConfigByPerCol 이 유효하게 주어진 경우 이하 동작 수행
-        const clickSelectionConfigList = props.rowSelection?.clickSelectionConfigByPerCol as clickSelectionConfig[];
-        if (
-          clickSelectionConfigList.filter((value) => value.colField == event.column.getColDef().field).length > 0 &&
-          clickSelectionConfigList.filter((value) => value.colField == event.column.getColDef().field)[0].withoutDeselection
-        ) {
-          // deselect 없이 단일 선택
-          event.node.setSelected(!event.node.isSelected());
-        } else {
-          event.api.deselectAll();
-          event.node.setSelected(!event.node.isSelected());
-        }
+        // deselect 없이 단일 선택
+        event.node.setSelected(!event.node.isSelected());
+      } else {
+        event.api.deselectAll();
+        event.node.setSelected(!event.node.isSelected());
       }
-    },
-    [props.onCellClicked, props.rowSelection],
-  );
+    }
+  };
 
-  const onColumnHeaderClicked = useCallback(
-    (event: ColumnHeaderClickedEvent<P, any>) => {
-      if (props.onColumnHeaderClicked) {
-        props.onColumnHeaderClicked(event);
-      }
+  const onColumnHeaderClicked = (event: ColumnHeaderClickedEvent<P>) => {
+    if (props.onColumnHeaderClicked) {
+      props.onColumnHeaderClicked(event);
+    }
+    if (
+      props.rowSelection?.mode == 'multiRow' && // 다중선택 옵션이 주어지지 않을 경우 이하 동작 미시행
+      props.rowSelection?.clickSelectionConfigByPerCol &&
+      props.rowSelection?.clickSelectionConfigByPerCol.length > 0
+    ) {
+      const clickSelectionConfigList = props.rowSelection?.clickSelectionConfigByPerCol as clickSelectionConfig[];
       if (
-        props.rowSelection?.mode == 'multiRow' && // 다중선택 옵션이 주어지지 않을 경우 이하 동작 미시행
-        props.rowSelection?.clickSelectionConfigByPerCol &&
-        props.rowSelection?.clickSelectionConfigByPerCol.length > 0
+        clickSelectionConfigList.filter((value) => value.colField == (event.column as Column).getColDef().field).length > 0 &&
+        clickSelectionConfigList.filter((value) => value.colField == (event.column as Column).getColDef().field)[0].withoutDeselection
       ) {
-        const clickSelectionConfigList = props.rowSelection?.clickSelectionConfigByPerCol as clickSelectionConfig[];
-        if (
-          clickSelectionConfigList.filter((value) => value.colField == (event.column as Column).getColDef().field).length > 0 &&
-          clickSelectionConfigList.filter((value) => value.colField == (event.column as Column).getColDef().field)[0].withoutDeselection
-        ) {
-          if (event.api.getSelectedNodes().length > 0) {
-            event.api.deselectAll();
-          } else {
-            event.api.selectAll();
-          }
+        if (event.api.getSelectedNodes().length > 0) {
+          event.api.deselectAll();
+        } else {
+          event.api.selectAll();
         }
-        // for (let i = 0; i < clickSelectionConfigList.length; i++) {
-        //   console.log((event.column as Column).getColDef().field);
-        // }
       }
-    },
-    [props.onColumnHeaderClicked, props.rowSelection?.clickSelectionConfigByPerCol],
-  );
+      // for (let i = 0; i < clickSelectionConfigList.length; i++) {
+      //   console.log((event.column as Column).getColDef().field);
+      // }
+    }
+  };
 
   /** coldef 상태 동기화할 시 사용할 함수를 역시 외부 값과 동기화 */
   // const synchronizedColDef = useCallback<P>(
@@ -206,6 +248,34 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
     }
   }, [props.loading]);
 
+  useEffect(() => {
+    if (props.pagingOptions != undefined) {
+      // props.rowData 상태 변경 시점에 페이징 설정 존재할 시 필요한 동작을 실행하는 영역
+      if (props.pagingOptions.pagingStrategy == 'add') {
+        if (controlledRowData.length > 0) {
+          const api = gridRef.current?.api; // (AgGridReact ref면 보통 .api)
+          if (api) {
+            api.applyTransaction({ add: props.rowData }); // ✅ 스크롤 덜 튐(거의 유지)
+          }
+        } else {
+          setControlledRowData(props.rowData || []);
+        }
+      }
+    }
+  }, [props.rowData]);
+
+  useEffect(() => {
+    if (props.pagingOptions != undefined) {
+      // 페이징 동작 활성화
+      if (props.pagingOptions.pagingStrategy == 'add') {
+        // todo
+      }
+    } else {
+      // 페이징 동작 비활성화에 필요한 동작 정의
+      setControlledRowData([]); // 이하에 주어진 조건부 인자에 따라 이 시점부터 rowData는 props에 주어진 값을 직접 추종
+    }
+  }, [props.pagingOptions]);
+
   const onGridReady = (event: GridReadyEvent) => {
     setFirstRender(false);
     if (!props.preventPersonalizedColumnSetting && props.gridId) {
@@ -233,49 +303,49 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
   };
 
   /** 컨텍스트 메뉴(팝업창) 관리 */
-  // const getContextMenuItems = (params: GetContextMenuItemsParams) => {
-  //   const customMenuItem: MenuItemDef[] = [
-  //     {
-  //       name: '그리드컬럼 설정 초기화',
-  //       action: () => {
-  //         initGridColumnState({
-  //           uri: props.gridId,
-  //           columnState: JSON.stringify(props.columnDefs),
-  //         }).then((result) => {
-  //           if (result.data.resultCode === 200) {
-  //             innerRef.current?.api.resetColumnState();
-  //           }
-  //         });
-  //       },
-  //       cssClasses: ['blue', 'bold'],
-  //       icon: '<span class="ag-icon ico_refresh"></span>',
-  //     },
-  //     {
-  //       name: '엑셀다운로드',
-  //       action: () => {
-  //         innerRef.current?.api.exportDataAsExcel();
-  //       },
-  //       cssClasses: ['blue', 'bold'],
-  //       icon: '<span class="ag-icon ico_refresh"></span>',
-  //     },
-  //   ];
-  //
-  //   // separator를 MenuItemDef로 정의 (타입 단언 사용)
-  //   const separatorItem = {
-  //     name: '',
-  //     separator: true,
-  //   } as MenuItemDef;
-  //
-  //   return [
-  //     separatorItem,
-  //     ...customMenuItem, // 전개연산자 사용하여 펼쳐줘야 함
-  //   ];
-  // };
+  const getContextMenuItems = (params: GetContextMenuItemsParams) => {
+    const customMenuItem: MenuItemDef[] = [
+      {
+        name: '그리드컬럼 설정 초기화',
+        action: () => {
+          initGridColumnState({
+            uri: props.gridId,
+            columnState: JSON.stringify(props.columnDefs),
+          }).then((result) => {
+            if (result.data.resultCode === 200) {
+              params.api.resetColumnState();
+            }
+          });
+        },
+        cssClasses: ['blue', 'bold'],
+        icon: '<span class="ag-icon ico_refresh"></span>',
+      },
+      {
+        name: '엑셀다운로드',
+        action: () => {
+          params.api.exportDataAsExcel();
+        },
+        cssClasses: ['blue', 'bold'],
+        icon: '<span class="ag-icon ico_refresh"></span>',
+      },
+    ];
+
+    // separator를 MenuItemDef로 정의 (타입 단언 사용)
+    const separatorItem = {
+      name: '',
+      separator: true,
+    } as MenuItemDef;
+
+    return [
+      separatorItem,
+      ...customMenuItem, // 전개연산자 사용하여 펼쳐줘야 함
+    ];
+  };
 
   const defaultGridOption: GridOptions = {
     rowHeight: 28,
     //localeText: AG_CHARTS_LOCALE_KO_KR,
-    //getContextMenuItems: getContextMenuItems,
+    getContextMenuItems: getContextMenuItems,
   };
 
   /** 컨트롤 키 press 가 발생할 시 일부 설정을 고정하여 연관 동작의 원할한 실행을 가능토록 하는 상수 */
@@ -334,7 +404,7 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
     });
   };
 
-  const onSortChanged = (event: SortChangedEvent<P, any>) => {
+  const onSortChanged = (event: SortChangedEvent<P>) => {
     // 정렬 발생할 시 prevClickedNodeList 초기화
 
     if (props.onSortChanged) {
@@ -414,76 +484,106 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
     }
   };
 
-  const onCellKeyDown = useCallback(
-    (
-      event: CellKeyDownEvent<P, any> | FullWidthCellKeyDownEvent<P, any>,
-      columnDefs: ColDef<P, any>[],
-      colIndexForSuppressKeyEvent: number | undefined,
-      rowData: P[] | undefined,
-    ) => {
-      // 기존 innerRef.current 사용 영역들은 전달된 keydownEvent 값으로 대체됨
-      const keyBoardEvent = event.event as KeyboardEvent;
-      const targetColId = colIndexForSuppressKeyEvent
-        ? columnDefs[colIndexForSuppressKeyEvent].colId || columnDefs[colIndexForSuppressKeyEvent].field
-        : undefined;
-      if (keyBoardEvent.key == 'ArrowDown' || keyBoardEvent.key == 'ArrowUp') {
-        /** 복수의 행 선택을 처리하는 함수 */
-        MultiChoiceFn(event, prevEventKey, targetColId);
-        if (pressedKeys.find((key) => key == 'Shift') != undefined && pressedKeys.find((key) => key == 'Control') != undefined) {
-          /** Shift, Control 키가 모두 눌린 상태에서 화살표 키를 사용한 경우 */
-          if (event.rowIndex) {
-            const rowIndex = event.rowIndex;
-            /** 필터링과 정렬(소팅)이 이루어진 노드를 순환 */
-            event.api.forEachNodeAfterFilterAndSort((rowNode, index) => {
-              if (keyBoardEvent.key == 'ArrowDown' ? index >= rowIndex : index <= rowIndex) {
-                rowNode.setSelected(true);
-              }
-            });
-          }
+  const onCellKeyDown = (
+    event: CellKeyDownEvent<P> | FullWidthCellKeyDownEvent<P>,
+    columnDefs: ColDef<P>[],
+    colIndexForSuppressKeyEvent: number | undefined,
+    rowData: P[] | undefined,
+  ) => {
+    // 기존 innerRef.current 사용 영역들은 전달된 keydownEvent 값으로 대체됨
+    const keyBoardEvent = event.event as KeyboardEvent;
+    const targetColId = colIndexForSuppressKeyEvent
+      ? columnDefs[colIndexForSuppressKeyEvent].colId || columnDefs[colIndexForSuppressKeyEvent].field
+      : undefined;
+    if (keyBoardEvent.key == 'ArrowDown' || keyBoardEvent.key == 'ArrowUp') {
+      /** 복수의 행 선택을 처리하는 함수 */
+      MultiChoiceFn(event, prevEventKey, targetColId);
+      if (pressedKeys.find((key) => key == 'Shift') != undefined && pressedKeys.find((key) => key == 'Control') != undefined) {
+        /** Shift, Control 키가 모두 눌린 상태에서 화살표 키를 사용한 경우 */
+        if (event.rowIndex) {
+          const rowIndex = event.rowIndex;
+          /** 필터링과 정렬(소팅)이 이루어진 노드를 순환 */
+          event.api.forEachNodeAfterFilterAndSort((rowNode, index) => {
+            if (keyBoardEvent.key == 'ArrowDown' ? index >= rowIndex : index <= rowIndex) {
+              rowNode.setSelected(true);
+            }
+          });
         }
-      } else {
-        if (keyBoardEvent.code == 'KeyA' && pressedKeys.find((key) => key == 'Control') != undefined) {
-          // ctrl + 'A'
-          if (rowData != undefined) {
-            // client 영역에서 전체 로드되지 않는 경우(예: dataSource 사용) 전체선택 비활성화
-            //innerRef.current?.api.selectAllFiltered(); // ctrl + a(A) => 전체선택
-            // 1. rowNode들을 가져와서 필터링된 노드만 선택
-            event.api.forEachNodeAfterFilter((node) => {
-              node.setSelected(true);
-            });
+      }
+    } else {
+      if (keyBoardEvent.code == 'KeyA' && pressedKeys.find((key) => key == 'Control') != undefined) {
+        // ctrl + 'A'
+        if (rowData != undefined) {
+          // client 영역에서 전체 로드되지 않는 경우(예: dataSource 사용) 전체선택 비활성화
+          //innerRef.current?.api.selectAllFiltered(); // ctrl + a(A) => 전체선택
+          // 1. rowNode들을 가져와서 필터링된 노드만 선택
+          event.api.forEachNodeAfterFilter((node) => {
+            node.setSelected(true);
+          });
+        }
+      } else if (keyBoardEvent.code == 'KeyD' && pressedKeys.find((key) => key == 'Control') != undefined) {
+        // ctrl + 'D'
+        if (rowData != undefined) {
+          // client 영역에서 전체 로드되지 않는 경우(예: dataSource 사용) 전체선택해제 비활성화
+          event.api.deselectAll(); // ctrl + d(D) => 전체선택해제
+        }
+      } else if (keyBoardEvent.code == 'KeyC' && pressedKeys.find((key) => key == 'Control') != undefined) {
+        // ctrl + c
+        if (event.api.getSelectedNodes().length != 0) {
+          // 본 영역은 그리드 api 와 별도로 동작한다(기존 그리드의 동작을 억제하지 않는 방식), 하나 이상의 행 선택
+          // 셀 선택은 그리드 api 를 통하여 처리
+          if (props.onSelectedRowCopied) {
+            props.onSelectedRowCopied({ copiedRowNodes: event.api.getSelectedNodes() });
           }
-        } else if (keyBoardEvent.code == 'KeyD' && pressedKeys.find((key) => key == 'Control') != undefined) {
-          // ctrl + 'D'
-          if (rowData != undefined) {
-            // client 영역에서 전체 로드되지 않는 경우(예: dataSource 사용) 전체선택해제 비활성화
-            event.api.deselectAll(); // ctrl + d(D) => 전체선택해제
+          setCopiedRowNode(event.api.getSelectedNodes());
+        }
+      } else if (keyBoardEvent.code == 'KeyV' && pressedKeys.find((key) => key == 'Control') != undefined) {
+        if (copiedRowNode.length != 0) {
+          if (props.onCopiedRowNodePasted) {
+            props.onCopiedRowNodePasted({ pastedRowNodes: copiedRowNode, eventTriggeredRowIndex: event.rowIndex });
           }
-        } else if (keyBoardEvent.code == 'KeyC' && pressedKeys.find((key) => key == 'Control') != undefined) {
-          // ctrl + c
-          if (event.api.getSelectedNodes().length != 0) {
-            // 본 영역은 그리드 api 와 별도로 동작한다(기존 그리드의 동작을 억제하지 않는 방식), 하나 이상의 행 선택
-            // 셀 선택은 그리드 api 를 통하여 처리
-            if (props.onSelectedRowCopied) {
-              props.onSelectedRowCopied({ copiedRowNodes: event.api.getSelectedNodes() });
+          setCopiedRowNode([]);
+        }
+      }
+    }
+    if (props.onCellKeyDown) {
+      /** 외부에서 할당한 리스너 */
+      props.onCellKeyDown(event);
+    }
+  };
+
+  const onViewportChanged = (event: ViewportChangedEvent<P>) => {
+    if (props.onViewportChanged) {
+      props.onViewportChanged(event);
+    }
+    // 이하 최하단 도달에 따른 콜백 트리거를 위한 동작
+    if (props.onTouchedByBottom) {
+      const api = event.api;
+      const lastDisplayedRowIndex = api.getLastDisplayedRowIndex();
+      const totalRowCount = api.getDisplayedRowCount();
+
+      // 최초 랜더링 시점 무시하도록 처리
+      if (lastDisplayedRowIndex != -1) {
+        // ✅ 마지막 row가 "보이는 순간"
+        if (lastDisplayedRowIndex === totalRowCount - 1 && isReachedEventTriggerAllowed.current) {
+          isReachedEventTriggerAllowed.current = false;
+
+          if (props.onTouchedByBottom) {
+            const returnValueOfTouchedByBottom = props.onTouchedByBottom();
+            if (returnValueOfTouchedByBottom instanceof Promise) {
+              returnValueOfTouchedByBottom.finally(() => {
+                isReachedEventTriggerAllowed.current = true;
+              });
+            } else {
+              setTimeout(() => {
+                isReachedEventTriggerAllowed.current = true;
+              }, returnValueOfTouchedByBottom.pausedMilliseconds);
             }
-            setCopiedRowNode(event.api.getSelectedNodes());
-          }
-        } else if (keyBoardEvent.code == 'KeyV' && pressedKeys.find((key) => key == 'Control') != undefined) {
-          if (copiedRowNode.length != 0) {
-            if (props.onCopiedRowNodePasted) {
-              props.onCopiedRowNodePasted({ pastedRowNodes: copiedRowNode, eventTriggeredRowIndex: event.rowIndex });
-            }
-            setCopiedRowNode([]);
           }
         }
       }
-      if (props.onCellKeyDown) {
-        /** 외부에서 할당한 리스너 */
-        props.onCellKeyDown(event);
-      }
-    },
-    [pressedKeys, props.onCellKeyDown, props.onSelectedRowCopied, props.onCopiedRowNodePasted],
-  );
+    }
+  };
 
   const gridComponents = {
     ...props.components,
@@ -498,7 +598,7 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
         columnDefs={columnDefs.map(withCommonKeyboardSuppress)} // React 상태컬럼 방향키로 헤더까지 안올라가게 수정 2025-08-27
         headerHeight={props.headerHeight ? props.headerHeight : 35}
         onGridReady={onGridReady}
-        rowData={props.rowData}
+        rowData={controlledRowData.length > 0 ? controlledRowData : props.rowData}
         gridOptions={{
           ...defaultGridOption,
           ...props.gridOptions,
@@ -509,9 +609,10 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
           onCellKeyDown(event, props.columnDefs, props.colIndexForSuppressKeyEvent, props.rowData);
         }}
         loading={isLoadingRef.current}
-        ref={ref}
+        ref={gridRef}
         onCellClicked={onCellClicked}
         onSortChanged={onSortChanged}
+        onViewportChanged={onViewportChanged}
         rowSelection={
           pressedKeys.includes('Control') // Control(컨트롤(ctrl)) 키 누른 경우 별도로 지정한 옵션값으로 변경함
             ? rowSelectionOptionInCtrlInterrupt
@@ -540,18 +641,6 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
         } // Ctrl 키를 누른 상태에서 요구되는 별도 동작에 대처하고자 다음과 같이 처리함
         onColumnMoved={onColumnMoved}
         onColumnVisible={onColumnVisible}
-        onBodyScroll={(e) => {
-          if (props.rowData && props.rowData.length > 0 && e.api.getVerticalPixelRange().bottom == (defaultGridOption.rowHeight || 24) * props.rowData.length) {
-            /** rowData 가 주어진 경우 */
-            if (props.onReachEachSide) {
-              props.onReachEachSide('B');
-            }
-          }
-          if (props.onBodyScroll) {
-            /** 최상단 도달 시의 이벤트는 현재 미지원 */
-            props.onBodyScroll(e);
-          }
-        }}
         localeText={AG_GRID_LOCALE_KO}
         autoSizeStrategy={{
           type: 'fitCellContents',
@@ -564,5 +653,4 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
     </div>
   );
 };
-
 export default TunedGrid;
