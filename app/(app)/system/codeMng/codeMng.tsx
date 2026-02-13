@@ -126,15 +126,25 @@ const CodeMng = () => {
     isLoading: isCodeListLoading,
     isSuccess: isCodeListSuccess,
     refetch: codesRefetch,
-  } = useQuery(['/code/paging', paging.curPage, filters.codeUpper], () =>
-    authApi.get('/code/paging', {
-      params: {
-        curPage: paging.curPage,
-        pageRowCount: paging.pageRowCount,
-        ...filters,
-      },
-    }),
-  );
+  } = useQuery({
+    // 1. queryKey에 페이징과 필터 정보 전체를 포함 (의존성 명시)
+    queryKey: ['/code/paging', paging.curPage, paging.pageRowCount, filters],
+
+    // 2. queryFn에서 response.data를 바로 반환하도록 수정
+    queryFn: async () => {
+      const response = await authApi.get('/code/paging', {
+        params: {
+          curPage: paging.curPage,
+          pageRowCount: paging.pageRowCount,
+          ...filters,
+        },
+      });
+      return response.data; // 보통 axios 응답 객체에서 data만 추출
+    },
+
+    // 3. 선택 사항: 이전 데이터 유지 (페이지 전환 시 깜빡임 방지)
+    // placeholderData: (previousData) => previousData,
+  });
 
   useEffect(() => {
     if (isCodeListSuccess) {
@@ -150,29 +160,27 @@ const CodeMng = () => {
   }, [codes, isCodeListSuccess, isCodeListLoading]);
 
   /** 드롭다운 옵션 */
-  const { data: dropdownOptions } = useQuery(
-    ['/code/dropdown/TOP'],
-    () =>
+  /** 드롭다운 옵션 */
+  const { data: dropdownOptions } = useQuery({
+    queryKey: ['/code/dropdown', 'TOP'],
+    queryFn: () =>
       authApi.get<ApiResponseListCodeDropDown>('/code/dropdown', {
-        params: { codeUpper: 'TOP' }, // 최상위 코드만을 호출
+        params: { codeUpper: 'TOP' },
       }),
-    {
-      select: (e) => {
-        const { body, resultCode } = e.data;
-        if (resultCode === 200) {
-          return body?.map((d) => {
-            return {
-              key: d.codeCd,
-              value: d.codeCd,
-              label: d.codeNm,
-            };
-          }) as DropDownOption[];
-          //return [{ key: 'TOP', value: 'TOP', label: '선택' } as DropDownOption].concat(fetchedOptions);
-        }
-        return undefined;
-      },
+    select: (response) => {
+      const { body, resultCode } = response.data;
+
+      if (resultCode === 200 && body) {
+        return body.map((d) => ({
+          key: d.codeCd,
+          value: d.codeCd,
+          label: d.codeNm,
+        }));
+      }
+
+      return []; // undefined 대신 빈 배열을 반환하는 것이 UI 렌더링에 안전합니다.
     },
-  );
+  });
 
   /** 코드관리, 셀 클릭 이벤트 */
   const onCellClicked = async (cellClickedEvent: CellDoubleClickedEvent) => {
@@ -290,7 +298,10 @@ const CodeMng = () => {
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
           paginationPageSize={paging.pageRowCount}
-          rowSelection={'single'}
+          rowSelection={{
+            mode: 'singleRow',
+            enableClickSelection: false,
+          }}
           onRowClicked={(e) => {
             setSelectedCode(e.data as CodeResponsePaging);
             e.api.deselectAll();
