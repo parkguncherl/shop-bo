@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { CellClickedEvent, CellDoubleClickedEvent, ColDef } from 'ag-grid-community';
+import { CellDoubleClickedEvent, ColDef } from 'ag-grid-community';
 import { Search, Table, Title } from '../../../../components';
-import { Button, Pagination, TableHeader } from '../../../../components';
+import { Pagination, TableHeader } from '../../../../components';
 import { useQuery } from '@tanstack/react-query';
 import { toastError } from '../../../../components';
 import { CodePagingFilter, useCodeStore, useCommonStore } from '../../../../stores';
@@ -48,7 +48,7 @@ const CodeMng = () => {
   const [excelDown] = useCodeStore((s) => [s.excelDown]);
 
   const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<CodePagingFilter>({
-    codeUpper: '',
+    codeUpper: 'TOP',
     codeCd: '',
     codeNm: '',
   });
@@ -123,45 +123,42 @@ const CodeMng = () => {
   /** 코드관리 페이징 목록 조회 */
   const {
     data: codes,
-    isLoading: isCodeListLoading,
     isSuccess: isCodeListSuccess,
+    isLoading: isCodeListLoading,
     refetch: codesRefetch,
   } = useQuery({
-    // 1. queryKey에 페이징과 필터 정보 전체를 포함 (의존성 명시)
     queryKey: ['/code/paging', paging.curPage, paging.pageRowCount, filters],
 
-    // 2. queryFn에서 response.data를 바로 반환하도록 수정
     queryFn: async () => {
-      const response = await authApi.get('/code/paging', {
+      const { data } = await authApi.get('/code/paging', {
         params: {
           curPage: paging.curPage,
           pageRowCount: paging.pageRowCount,
           ...filters,
         },
       });
-      return response.data; // 보통 axios 응답 객체에서 data만 추출
+      return data; // ⭐ response.data만 반환
     },
 
-    // 3. 선택 사항: 이전 데이터 유지 (페이지 전환 시 깜빡임 방지)
-    // placeholderData: (previousData) => previousData,
+    placeholderData: (prev: any) => prev,
   });
 
   useEffect(() => {
-    if (isCodeListSuccess) {
-      const { resultCode, body, resultMessage } = codes.data;
-      if (resultCode === 200) {
-        setPaging(body?.paging);
-        setRowData(body.rows || []);
-      } else {
-        toastError('코드관리 페이징 목록 조회 도중 문제가 발생하였습니다.');
-        console.error(resultMessage);
-      }
+    if (!isCodeListSuccess || !codes) return;
+
+    const { resultCode, body, resultMessage } = codes;
+
+    if (resultCode === 200) {
+      setPaging(body?.paging);
+      setRowData(body?.rows || []);
+    } else {
+      toastError('코드관리 페이징 목록 조회 도중 문제가 발생하였습니다.');
+      console.error(resultMessage);
     }
-  }, [codes, isCodeListSuccess, isCodeListLoading]);
+  }, [codes, isCodeListSuccess]);
 
   /** 드롭다운 옵션 */
-  /** 드롭다운 옵션 */
-  const { data: dropdownOptions } = useQuery({
+  const { data: dropdownOptions = [] } = useQuery({
     queryKey: ['/code/dropdown', 'TOP'],
     queryFn: () =>
       authApi.get<ApiResponseListCodeDropDown>('/code/dropdown', {
@@ -213,7 +210,7 @@ const CodeMng = () => {
 
   /** 백스페이스로 기존 옵션 삭제할 시 */
   const onOptionErased = useCallback(() => {
-    onChangeFilters('codeUpper', '');
+    onChangeFilters('codeUpper', 'TOP');
   }, [onChangeFilters]);
 
   /*const onChangeOptions = useCallback(async (name: string, value: string | number) => {
@@ -239,15 +236,6 @@ const CodeMng = () => {
     }
   };
 
-  /*useEffect(() => {
-    return () => {
-      setPaging({
-        curPage: 1,
-        totalRowCount: 0,
-      });
-    };
-  }, []);*/
-
   return (
     <div>
       <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} reset={reset} search={search}></Title>
@@ -260,15 +248,6 @@ const CodeMng = () => {
           options={dropdownOptions}
           onErased={onOptionErased}
         />
-        {/*<Search.DropDown
-          name="codeUpper"
-          title="코드대분류"
-          placeholder="코드대분류"
-          defaultOptions={dropdownOptions}
-          onChange={onChangeOptions}
-          // placement={placement}
-          // readonly={readonly}
-        />*/}
         <Search.Input
           title={'코드'}
           name={'codeCd'}
