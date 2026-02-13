@@ -220,7 +220,7 @@ const ContentList = () => {
           </div>
         </div>
       </Table>
-      <ProductContentShowPop open={modals.type == 'SHOW' && modals.active} data={modals.stored_temporary} onClose={() => closeModal('SHOW')} />
+      <ProductContentShowPop open={modals.type == 'SHOW' && modals.active} productContentData={modals.stored_temporary} onClose={() => closeModal('SHOW')} />
     </div>
   );
 };

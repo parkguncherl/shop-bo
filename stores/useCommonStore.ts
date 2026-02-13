@@ -1,7 +1,7 @@
 import { create, StateCreator } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { ApiResponse, CommonRequestFileDownload, GridRequest } from '../generated';
+import { ApiResponse, CommonRequestFileDownload, FileDet, GridRequest } from '../generated';
 import { AxiosPromise } from 'axios';
 import { authApi, authDownApi } from '../libs';
 
@@ -12,15 +12,15 @@ export interface HistoryType {
   histMenuUri: string;
 }
 
-export interface FilterData {
-  uri: string;
-  filterData: any;
-}
-
-export interface PartnerOption {
-  value: number;
-  label: string;
-}
+// export interface FilterData {
+//   uri: string;
+//   filterData: any;
+// }
+//
+// export interface PartnerOption {
+//   value: number;
+//   label: string;
+// }
 interface CommonState {
   modalType: { type: ModalType; active: boolean };
   openModal: (type: ModalType, index?: number) => void;
@@ -46,6 +46,7 @@ interface CommonState {
 }
 
 interface CommonApiState {
+  selectFileList: (fileId: number) => Promise<FileDet[]>;
   fileDownload: (commonRequest: CommonRequestFileDownload) => void;
   fileDownloadBlob: (commonRequest: CommonRequestFileDownload) => any;
   deleteFile: (commonRequest: any) => AxiosPromise<ApiResponse>;
@@ -139,6 +140,15 @@ const initialStateCreator: StateCreator<CommonState & CommonApiState, any> = (se
       set((state) => ({
         historyList: historyList,
       }));
+    },
+    selectFileList: async (fileId: number) => {
+      return authApi.get(`/file/${fileId}`).then((res): FileDet[] => {
+        if (res.data.resultCode === 200) {
+          return res.data.body;
+        } else {
+          return [];
+        }
+      });
     },
     fileDownload: async (commonRequest) => {
       const params = '?id=' + commonRequest.id + '&fileSeq=' + commonRequest.fileSeq;

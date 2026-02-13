@@ -2,12 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { PopupFooter } from '../../PopupFooter';
 import { PopupContent } from '../../PopupContent';
 import { PopupLayout } from '../../PopupLayout';
-import { ProductContentListResponseProductContent } from '../../../../generated';
+import { FileDet, ProductContentListResponseProductContent } from '../../../../generated';
+import { useCommonStore } from '../../../../stores';
 
 interface ProductContentShowPopProps {
   open: boolean;
-  data?: ProductContentListResponseProductContent;
+  productContentData?: ProductContentListResponseProductContent;
   onClose: () => void;
+}
+interface extendedFileDet extends FileDet {
+  fileUrl?: string;
 }
 
 /**
@@ -15,17 +19,37 @@ interface ProductContentShowPopProps {
  * Date: 2026/02/13
  * Author: park junsung
  * */
-const ProductContentShowPop = ({ open, data, onClose }: ProductContentShowPopProps) => {
+const ProductContentShowPop = ({ open, productContentData, onClose }: ProductContentShowPopProps) => {
+  /** 공통 스토어 - State */
+  const [getFileUrl, selectFileList] = useCommonStore((s) => [s.getFileUrl, s.selectFileList]);
+
   /** 팝업 내부 local state */
   const [managedDataState, setManagedDataState] = useState<ProductContentListResponseProductContent | undefined>(undefined);
+  const [managedFileDetState, setManagedFileDetState] = useState<extendedFileDet[]>([]);
 
   useEffect(() => {
-    setManagedDataState(data);
-  }, [data]);
+    setManagedDataState(productContentData);
+    if (productContentData) {
+      if (productContentData.fileId) {
+        selectFileList(productContentData.fileId).then((fileDetList) => {
+          // const updatedFileDetStateList = fileDetList.map(async (fileDet) => {
+          //   return {
+          //     ...fileDet,
+          //     fileUrl: fileDet.sysFileNm ? await getFileUrl(fileDet.sysFileNm) : undefined,
+          //   };
+          // });
+          // // todo 마저 진행
+          // setManagedFileDetState(updatedFileDetStateList); // 저장 시점에 이미 중복 파일은 부재하리라 기대하며 이하 작성
+        });
+      }
+    }
+  }, [productContentData]);
 
   useEffect(() => {
-    console.log('managedDataState: ', managedDataState);
-  }, [managedDataState]);
+    if (managedFileDetState.length > 0) {
+      // todo
+    }
+  }, [managedFileDetState]);
 
   return (
     <div className="imgPopBox">
