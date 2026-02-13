@@ -9,11 +9,9 @@ import {
   ColumnMovedEvent,
   ColumnVisibleEvent,
   FullWidthCellKeyDownEvent,
-  GetContextMenuItemsParams,
   type GridOptions,
   GridReadyEvent,
   IRowNode,
-  MenuItemDef,
   RowSelectionOptions,
   SortChangedEvent,
   ViewportChangedEvent,
@@ -302,50 +300,9 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
     }
   };
 
-  /** 컨텍스트 메뉴(팝업창) 관리 */
-  const getContextMenuItems = (params: GetContextMenuItemsParams) => {
-    const customMenuItem: MenuItemDef[] = [
-      {
-        name: '그리드컬럼 설정 초기화',
-        action: () => {
-          initGridColumnState({
-            uri: props.gridId,
-            columnState: JSON.stringify(props.columnDefs),
-          }).then((result) => {
-            if (result.data.resultCode === 200) {
-              params.api.resetColumnState();
-            }
-          });
-        },
-        cssClasses: ['blue', 'bold'],
-        icon: '<span class="ag-icon ico_refresh"></span>',
-      },
-      {
-        name: '엑셀다운로드',
-        action: () => {
-          params.api.exportDataAsExcel();
-        },
-        cssClasses: ['blue', 'bold'],
-        icon: '<span class="ag-icon ico_refresh"></span>',
-      },
-    ];
-
-    // separator를 MenuItemDef로 정의 (타입 단언 사용)
-    const separatorItem = {
-      name: '',
-      separator: true,
-    } as MenuItemDef;
-
-    return [
-      separatorItem,
-      ...customMenuItem, // 전개연산자 사용하여 펼쳐줘야 함
-    ];
-  };
-
   const defaultGridOption: GridOptions = {
     rowHeight: 28,
     //localeText: AG_CHARTS_LOCALE_KO_KR,
-    getContextMenuItems: getContextMenuItems,
   };
 
   /** 컨트롤 키 press 가 발생할 시 일부 설정을 고정하여 연관 동작의 원할한 실행을 가능토록 하는 상수 */
