@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { PopupFooter } from '../../PopupFooter';
 import { PopupContent } from '../../PopupContent';
 import { PopupLayout } from '../../PopupLayout';
-import { FileDet, ProductContentListResponseProductContent } from '../../../../generated';
-import { useCommonStore } from '../../../../stores';
 import PopupFormBox from '../../content/PopupFormBox';
 import PopupFormGroup from '../../content/PopupFormGroup';
 import PopupFormType from '../../content/PopupFormType';
@@ -17,13 +15,11 @@ import { YupSchema } from '../../../../libs';
 import { useProductContentsStore } from '../../../../stores/product/useProductContentsStore';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import { ImgToken } from '../../../../libs/const';
+import { ConfirmModal } from '../../../ConfirmModal';
 
 interface ProductContentShowPopProps {
   open: boolean;
   onClose: () => void;
-}
-interface extendedFileDet extends FileDet {
-  fileUrl?: string;
 }
 
 /**
@@ -38,9 +34,8 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
   const [modals, openModal, closeModal, insertProductContents] = useProductContentsStore((s) => [s.modals, s.openModal, s.closeModal, s.insertProductContents]);
 
   /** 팝업 내부 local state */
-  // const [managedDataState, setManagedDataState] = useState<ProductContentListResponseProductContent | undefined>(undefined);
-  // const [managedFileDetState, setManagedFileDetState] = useState<extendedFileDet[]>([]);
   const [displayMode, setDisplayMode] = useState<EnhancedTextAreasMode>('edit');
+  const [openAddConf, setOpenAddConf] = useState(false);
 
   /** 상품 내용 입력 서식 */
   const {
@@ -88,14 +83,14 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
         }
       })
       .join('');
-    insertProductContentsMutate({
-      newsTitle: data.title,
-      newsSubTitle: data.title, // todo
-      newsContents: fileInfoIncludedContent,
-      commonRequestFileUploads: {
-        uploadFiles: uniqueFileList,
-      },
-    });
+    // insertProductContentsMutate({
+    //   newsTitle: data.title,
+    //   newsSubTitle: data.title, // todo
+    //   newsContents: fileInfoIncludedContent,
+    //   commonRequestFileUploads: {
+    //     uploadFiles: uniqueFileList,
+    //   },
+    // });
     console.log(fileInfoIncludedContent);
     console.log(fileInfoIncludedContent.replace(/<<IMG\|[^>]+>>/g, '').replace(/\\n/g, '\n'));
     //console.log('fileInfoLists: ', uniqueFileList);
@@ -120,9 +115,30 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
         onClose={onClose}
         footer={
           <PopupFooter>
-            <button className="btn" onClick={onClose}>
-              닫기
-            </button>
+            <div className={'btn-wrapper'}>
+              <div className={'btn-per-wrapper'}>
+                <button
+                  className="btn btn_blue"
+                  onClick={() => {
+                    const title = getValues('title');
+                    const content = getValues('content');
+
+                    if (title == '' || content[0].partialContent == '') {
+                      toastError(title == '' ? '제목은 반드시 입력하셔야 합니다.' : '어떠한 내용도 없이 저장할 수 없습니다.');
+                      return;
+                    }
+                    setOpenAddConf(true);
+                  }}
+                >
+                  저장
+                </button>
+              </div>
+              <div className={'btn-per-wrapper'}>
+                <button className="btn" onClick={onClose}>
+                  닫기
+                </button>
+              </div>
+            </div>
           </PopupFooter>
         }
       >
@@ -148,6 +164,17 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
           </PopupFormBox>
         </PopupContent>
       </PopupLayout>
+      <ConfirmModal
+        open={openAddConf}
+        title={'저장 하시겠습니까?'}
+        confirmText={'저장'}
+        onConfirm={() => {
+          handleSubmit(onValid, onInvalid)(); // 함수를 반환하므로 다음과 같이, 호출하여야
+        }}
+        onClose={() => {
+          setOpenAddConf(false);
+        }}
+      />
     </div>
   );
 };
