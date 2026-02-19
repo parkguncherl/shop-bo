@@ -9,7 +9,7 @@ import { signIn } from 'next-auth/react';
 import { toastError, toastSuccess } from '../../../components';
 import styles from '../../../styles/login.module.scss';
 import { FindPassPop, FirstPassChangePop } from '../../../components/popup/system/login';
-import FormInput from '../../../components/FormInput';
+import FormInput from '../../../components/form/FormInput';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Timer, YupSchema } from '../../../libs';
 import { LoginRequest, LoginResponse } from '../../../generated';

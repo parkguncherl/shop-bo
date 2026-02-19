@@ -11,8 +11,8 @@ import { Placeholder } from '../../../../libs/const';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '../../../../libs';
-import FormInput from '../../../FormInput';
-import FormDropDown from '../../../FormDropDown';
+import FormInput from '../../../form/FormInput';
+import FormDropDown from '../../../form/FormDropDown';
 import Loading from '../../../Loading';
 import { PopupLayout } from '../../PopupLayout';
 

@@ -1,24 +1,20 @@
 import FormInput from './FormInput';
-import DropDownAtom from './atom/DropDownAtom';
-import { Input } from './Input';
+import DropDownAtom from '../atom/DropDownAtom';
+import { Input } from '../Input';
 import { BaseSelectRef } from 'rc-select';
-import { useForm } from 'react-hook-form';
-import { useEffect } from 'react';
 
-interface FormInputDropDownProps {
-  title?: string;
-  type: 'compInfo' | 'gubunInfo' | 'designCntn' | 'payEtc' | 'orderEtc';
+interface InfoInputSectionProps {
+  title: string;
+  type: 'compInfo' | 'gubunInfo';
   dropdownName: string;
-  placeholder?: string;
+  placeholder: string;
   inputValue: string;
-  textareaValue: string;
   dropdownOptions: any[];
   dropdownStatus: {
     checkedForSubmit: boolean;
     dropdownDisabled: boolean;
   };
   buttonState: boolean;
-  focusState: boolean;
   handleFocus: (type: string) => void;
   handleBlur: (type: string) => void;
   handleChange: (type: string, value: string) => void;
@@ -29,17 +25,15 @@ interface FormInputDropDownProps {
   }>;
 }
 
-export const FormInputDropDown: React.FC<FormInputDropDownProps> = ({
+const InfoInputSection: React.FC<InfoInputSectionProps> = ({
   title,
   type,
   dropdownName,
   placeholder,
   inputValue,
-  textareaValue,
   dropdownOptions,
   dropdownStatus,
   buttonState,
-  focusState,
   handleFocus,
   handleBlur,
   handleChange,
@@ -47,18 +41,12 @@ export const FormInputDropDown: React.FC<FormInputDropDownProps> = ({
   handleSave,
   inputRefs,
 }) => {
-  const { control, getValues, setValue } = useForm();
-
-  useEffect(() => {
-    setValue(type, textareaValue);
-  }, [textareaValue]);
-
   return (
     <dl>
       <dt>{title}</dt>
       <dd>
         <div className={`formBox selBtn ${!(dropdownStatus.checkedForSubmit && !dropdownStatus.dropdownDisabled) ? 'disabled' : ''}`}>
-          <div className={`${focusState ? 'focus' : ''}`}>
+          <div className={`${dropdownStatus.checkedForSubmit ? 'focus' : ''}`}>
             <Input
               withDropdown={true}
               placeholder={placeholder}
@@ -71,9 +59,7 @@ export const FormInputDropDown: React.FC<FormInputDropDownProps> = ({
                   }
                 }
               }}
-              onChange={(e) => {
-                handleChange(type, e.target.value);
-              }}
+              onChange={(e) => handleChange(type, e.target.value)}
               onFocus={() => handleFocus(type)}
               onBlur={() => handleBlur(type)}
               value={inputValue}
@@ -83,11 +69,7 @@ export const FormInputDropDown: React.FC<FormInputDropDownProps> = ({
               name={dropdownName}
               placeholder={placeholder}
               options={dropdownOptions}
-              onChangeOptions={(name, value) => {
-                handleChange(type, value.toString());
-              }}
-              onFocus={() => handleFocus(type)}
-              onBlur={() => handleBlur(type)}
+              onChangeOptions={(name, value) => handleChange(type, value.toString())}
               selectorShowAction={['focus']}
               ref={(el) => (inputRefs.current[`${type}DropDown`] = el)}
             />
@@ -97,14 +79,8 @@ export const FormInputDropDown: React.FC<FormInputDropDownProps> = ({
           </button>
         </div>
         <div className={`formBox inpBtn ${buttonState ? 'on' : ''}`}>
-          <FormInput type="text" inputType="textarea" control={control} name={type} />
-          <button
-            className="btn btnBlack"
-            onClick={() => {
-              const value = getValues(type);
-              handleSave(type, value); //
-            }}
-          >
+          <FormInput type="text" inputType="textarea" control={control} name={dropdownName} />
+          <button className="btn btnBlack" onClick={() => handleSave(type, inputValue)}>
             저장
           </button>
         </div>

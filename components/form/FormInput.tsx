@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { FieldError, FieldValues, useController } from 'react-hook-form';
-import { BaseInputAtom } from './atom/BaseInputAtom';
-import { TControl } from '../types/Control';
+import { BaseInputAtom } from '../atom/BaseInputAtom';
+import { TControl } from '../../types/Control';
 import { AutoComplete, InputRef } from 'antd';
-import { useCommonStore } from '../stores';
+import { useCommonStore } from '../../stores';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { authApi } from '../libs';
-import { toastError, toastSuccess } from './ToastMessage';
-import mergeRefs from '../customFn/ref/mergeRefs';
+import { authApi } from '../../libs';
+import { toastError, toastSuccess } from '../ToastMessage';
+import mergeRefs from '../../customFn/ref/mergeRefs';
 
 type IInputTextProps<T extends FieldValues> = TControl<T> & {
   type?: 'text' | 'number' | 'email' | 'password';

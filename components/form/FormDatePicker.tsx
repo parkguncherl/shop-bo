@@ -1,8 +1,8 @@
 import { useController, FieldValues } from 'react-hook-form';
-import { DropDownOption } from '../types/DropDownOptions';
+import { DropDownOption } from '../../types/DropDownOptions';
 import React, { useRef, useState } from 'react';
-import { TControl } from '../types/Control';
-import DatePickerAtom from './atom/DatePickerAtom';
+import { TControl } from '../../types/Control';
+import DatePickerAtom from '../atom/DatePickerAtom';
 import { DatePicker } from 'antd';
 import dayjs from 'dayjs';
 

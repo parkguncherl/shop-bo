@@ -1,9 +1,9 @@
-import { BaseTextAreaAtom, BaseTextAreaAtomProps } from './atom/BaseTextAreaAtom';
+import { BaseTextAreaAtom, BaseTextAreaAtomProps } from '../atom/BaseTextAreaAtom';
 import { FieldError, FieldValues, useController } from 'react-hook-form';
-import { TControl } from '../types/Control';
+import { TControl } from '../../types/Control';
 import React, { useEffect, useRef, useState } from 'react';
-import NativeInputAtom from './atom/NativeInputAtom';
-import { toastError } from './ToastMessage';
+import NativeInputAtom from '../atom/NativeInputAtom';
+import { toastError } from '../ToastMessage';
 
 export type EnhancedTextAreasMode = 'edit' | 'preview';
 type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &

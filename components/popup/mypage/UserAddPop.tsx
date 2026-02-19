@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toastError, toastSuccess } from '../../ToastMessage';
 import { useAccountStore, useMypageStore } from '../../../stores';
 import { YupSchema } from '../../../libs';
-import FormDropDown from '../../../components/FormDropDown';
+import FormDropDown from '../../form/FormDropDown';
 import { DefaultOptions, Placeholder } from '../../../libs/const';
 import { useForm } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
@@ -11,7 +11,7 @@ import { PopupLayout } from '../PopupLayout';
 import { PopupFooter } from '../PopupFooter';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { PopupSearchBox, PopupSearchType } from '../content';
-import FormInput from '../../FormInput';
+import FormInput from '../../form/FormInput';
 import { PopupContent } from '../PopupContent';
 
 // 새 계정 생성 시 사용할 타입 정의

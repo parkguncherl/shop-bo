@@ -8,7 +8,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '../../../../libs';
-import FormInput from '../../../FormInput';
+import FormInput from '../../../form/FormInput';
 import Loading from '../../../Loading';
 
 interface Props {

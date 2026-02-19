@@ -7,7 +7,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '../../../../libs';
 import FormEnhancedTextArea, { ContentElement, EnhancedTextAreasMode, FileInfo } from '../../../../components/form/FormEnhancedTextArea';
-import FormInput from '../../../../components/FormInput';
+import FormInput from '../../../../components/form/FormInput';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import { SubmitErrorHandler } from 'react-hook-form/dist/types/form';
 import { useProductContentsStore } from '../../../../stores/product/useProductContentsStore';
