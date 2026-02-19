@@ -263,6 +263,8 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                           setUnFrozenElementId(-1);
                         }}
                         onKeyDown={(e) => {
+                          if (e.nativeEvent.isComposing) return; // IME 조합 중인 경우 무동작 처리하여 이벤트가 제차 호출되는 걸 방지
+
                           if (e.key == 'Enter' && e.shiftKey) {
                             e.preventDefault();
                             if (contentElement.partialContent != undefined && contentElement.partialContent.trim() != '') {
