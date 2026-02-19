@@ -205,6 +205,7 @@
             animation-name: error-alert-removal-gradually;
 
             width: 0;
+            height: 0; // 만일 에러 메세지 영역의 높이를 유지하고자 할 시 본 css 속성 제거
           }
 
           p {

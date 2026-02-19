@@ -442,6 +442,9 @@ const FormEnhancedTextArea = <T extends FieldValues>({
                               autoSize={autoSize}
                             />
                           </div>
+                          <div className={`err_msg_wrapper ${partialContentErrorExist ? 'error' : 'non'}`}>
+                            <p>{innerErrorState[index]?.partialContent?.message}</p>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -693,6 +696,9 @@ const FormEnhancedTextArea = <T extends FieldValues>({
                                   }}
                                   autoSize={autoSize}
                                 />
+                              </div>
+                              <div className={`err_msg_wrapper ${partialContentErrorExist ? 'error' : 'non'}`}>
+                                <p>{innerErrorState[index]?.partialContent?.message}</p>
                               </div>
                             </div>
                           )}
