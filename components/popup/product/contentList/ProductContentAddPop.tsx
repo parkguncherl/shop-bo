@@ -1,38 +1,46 @@
-'use client';
-
-import React, { useState } from 'react';
-import { Title, toastError, toastSuccess } from '../../../../components';
+import React, { useEffect, useState } from 'react';
+import { PopupFooter } from '../../PopupFooter';
+import { PopupContent } from '../../PopupContent';
+import { PopupLayout } from '../../PopupLayout';
+import { FileDet, ProductContentListResponseProductContent } from '../../../../generated';
 import { useCommonStore } from '../../../../stores';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import PopupFormBox from '../../content/PopupFormBox';
+import PopupFormGroup from '../../content/PopupFormGroup';
+import PopupFormType from '../../content/PopupFormType';
+import FormInput from '../../../FormInput';
+import { ProductContentsFields } from '../../../../app/(app)/product/Contents/ProductContents';
+import FormEnhancedTextArea, { EnhancedTextAreasMode, FileInfo } from '../../../FormEnhancedTextArea';
+import { SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
+import { useMutation } from '@tanstack/react-query';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '../../../../libs';
-import FormEnhancedTextArea, { ContentElement, EnhancedTextAreasMode, FileInfo } from '../../../../components/form/FormEnhancedTextArea';
-import FormInput from '../../../../components/FormInput';
-import { ConfirmModal } from '../../../../components/ConfirmModal';
-import { SubmitErrorHandler } from 'react-hook-form/dist/types/form';
 import { useProductContentsStore } from '../../../../stores/product/useProductContentsStore';
-import { useMutation } from '@tanstack/react-query';
+import { toastError, toastSuccess } from '../../../ToastMessage';
 import { ImgToken } from '../../../../libs/const';
 
-export interface ProductContentsFields {
-  title: string;
-  content: ContentElement[];
+interface ProductContentShowPopProps {
+  open: boolean;
+  onClose: () => void;
+}
+interface extendedFileDet extends FileDet {
+  fileUrl?: string;
 }
 
-/** 상품관리 - 상품컨텐츠 페이지 */
-const ProductContents = () => {
+/**
+ * components/popup/product/contentList/ProductContentAddPop.tsx
+ * desc: 상품컨텐츠 추가 팝업
+ * Date: 2026/02/19
+ * Author: park junsung
+ * */
+const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
-  const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
+  //const [getFileUrl, selectFileList] = useCommonStore((s) => [s.getFileUrl, s.selectFileList]);
   const [modals, openModal, closeModal, insertProductContents] = useProductContentsStore((s) => [s.modals, s.openModal, s.closeModal, s.insertProductContents]);
 
-  /** 로컬 스토어 */
+  /** 팝업 내부 local state */
+  // const [managedDataState, setManagedDataState] = useState<ProductContentListResponseProductContent | undefined>(undefined);
+  // const [managedFileDetState, setManagedFileDetState] = useState<extendedFileDet[]>([]);
   const [displayMode, setDisplayMode] = useState<EnhancedTextAreasMode>('edit');
-  //const [openedModalType, setOpenedModalType] = useState<'SUBMIT' | null>(null);
-
-  /** 초기화 버튼 클릭 시 */
-  const reset = async () => {
-    control._reset();
-  };
 
   /** 상품 내용 입력 서식 */
   const {
@@ -103,18 +111,28 @@ const ProductContents = () => {
   };
 
   return (
-    <div className={'product_contents_root'}>
-      <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} reset={reset}></Title>
-      <div className={'product_contents'}>
-        <div className={'left_side'}>
-          <div className={'form_boxing'}>
-            <div className={'headed'}>
-              <div className={'title_boxing'}>
+    <div className="imgPopBox">
+      <PopupLayout
+        width={900}
+        open={open}
+        isEscClose={true}
+        title={'상품컨텐츠 미리보기'}
+        onClose={onClose}
+        footer={
+          <PopupFooter>
+            <button className="btn" onClick={onClose}>
+              닫기
+            </button>
+          </PopupFooter>
+        }
+      >
+        <PopupContent>
+          <PopupFormBox className={''}>
+            <PopupFormGroup>
+              <PopupFormType className={'type1'}>
                 <FormInput<ProductContentsFields> control={control} name={'title'} inputType={'label'} placeholder={'제목'} />
-              </div>
-            </div>
-            <div className={'content'}>
-              <div className={'content_boxing'}>
+              </PopupFormType>
+              <PopupFormType className={'type1'}>
                 <FormEnhancedTextArea<ProductContentsFields>
                   control={control}
                   name={'content'}
@@ -122,61 +140,13 @@ const ProductContents = () => {
                   mode={displayMode}
                   attachOnlyImg={true}
                 />
-              </div>
-            </div>
-            <div className={'bottom'}>
-              <div className={'bottom_boxing'}>
-                <div className={'btn-wrapper'}>
-                  <div className={'btn-per-wrapper'}>
-                    <button
-                      className={'btn btn_blue'}
-                      onClick={() => {
-                        if (errors.content == undefined) {
-                          openModal('ADD_CONF');
-                        } else {
-                          toastError('본문에서 문제가 되는 영역을 수정한 후 재시도하십시요.');
-                        }
-                      }}
-                    >
-                      저장
-                    </button>
-                  </div>
-                  <div className={'btn-per-wrapper'}>
-                    <button
-                      type={'button'}
-                      className={'btn'}
-                      onClick={() => {
-                        if (displayMode != 'preview') {
-                          setDisplayMode('preview');
-                        } else {
-                          setDisplayMode('edit');
-                        }
-                      }}
-                    >
-                      {displayMode == 'edit' ? '미리보기' : '편집'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className={'right_side'}></div>
-      </div>
-
-      <ConfirmModal
-        open={modals.type == 'ADD_CONF' && modals.active}
-        title={'저장 하시겠습니까?'}
-        confirmText={'저장'}
-        onConfirm={() => {
-          handleSubmit(onValid, onInvalid)(); // 함수를 반환하므로 다음과 같이, 호출하여야
-        }}
-        onClose={() => {
-          closeModal('ADD_CONF');
-        }}
-      />
+              </PopupFormType>
+            </PopupFormGroup>
+          </PopupFormBox>
+        </PopupContent>
+      </PopupLayout>
     </div>
   );
 };
 
-export default ProductContents;
+export default ProductContentAddPop;

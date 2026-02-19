@@ -4,7 +4,7 @@ import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { PageObject, ProductContentListResponseProductContent } from '../../generated';
 
-type ModalType = 'SHOW';
+type ModalType = 'SHOW' | 'ADD';
 
 interface ModalState {
   type: ModalType;

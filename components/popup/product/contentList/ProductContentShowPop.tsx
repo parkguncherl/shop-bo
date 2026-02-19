@@ -16,6 +16,7 @@ interface extendedFileDet extends FileDet {
 
 /**
  * components/popup/product/contentList/ProductContentShowPop.tsx
+ * desc: 상품컨텐츠 출력 팝업
  * Date: 2026/02/13
  * Author: park junsung
  * */

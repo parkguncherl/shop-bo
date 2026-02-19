@@ -16,6 +16,7 @@ import useFilters from '../../../../hooks/useFilters';
 import useDebounce from '../../../../hooks/useDebounce';
 import { AlertMessage, Placeholder, RegExpression } from '../../../../libs/const';
 import ProductContentShowPop from '../../../../components/popup/product/contentList/ProductContentShowPop';
+import ProductContentAddPop from '../../../../components/popup/product/contentList/ProductContentAddPop';
 
 /** 상품관리 - 상품컨텐츠 목록 페이지 */
 const ContentList = () => {
@@ -195,6 +196,7 @@ const ContentList = () => {
               className={'btn '}
               onClick={() => {
                 // todo
+                openModal('ADD');
               }}
             >
               {'행추가'}
@@ -220,6 +222,7 @@ const ContentList = () => {
           </div>
         </div>
       </Table>
+      <ProductContentAddPop open={modals.type == 'ADD' && modals.active} onClose={() => closeModal('ADD')} />
       <ProductContentShowPop open={modals.type == 'SHOW' && modals.active} productContentData={modals.stored_temporary} onClose={() => closeModal('SHOW')} />
     </div>
   );
