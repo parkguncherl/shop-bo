@@ -8,10 +8,12 @@ import { toastError } from '../ToastMessage';
 export type EnhancedTextAreasMode = 'edit' | 'preview';
 type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
   TControl<T> & {
-    //ref?: React.Ref<HTMLTextAreaElement>;
+    //ref?: React.Ref<HTMLTextAreaElement>; todo 추후 useImperativeHandle 등의 방법으로 참조를 통한 동작 사용 가능토록 하기
     mode?: EnhancedTextAreasMode;
     attachOnlyImg?: boolean;
     inputType?: 'label' | 'single';
+    dtWidth?: string;
+    textAreaBoxHeight?: string;
   };
 export interface FileInfo {
   file: File;
@@ -51,6 +53,8 @@ const FormEnhancedTextArea = <T extends FieldValues>({
   autoSize,
   mode,
   inputType,
+  dtWidth,
+  textAreaBoxHeight,
   label = '',
   attachOnlyImg = true,
 }: FormEnhancedTextAreaProps<T>) => {
@@ -234,7 +238,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({
     <>
       {(inputType === undefined || inputType === 'single') && (
         <div className={'enhanced_textArea'}>
-          <div className={'enhanced_textArea_box'} ref={boxRef}>
+          <div className={'enhanced_textArea_box'} style={{ height: textAreaBoxHeight ?? '' }} ref={boxRef}>
             {!mode || mode == 'edit' ? (
               // 편집 모드
               contentElements.map((contentElement, index) => {
@@ -486,10 +490,10 @@ const FormEnhancedTextArea = <T extends FieldValues>({
       )}
       {inputType === 'label' && (
         <dl>
-          <dt>{label}</dt>
+          <dt style={{ width: dtWidth ?? '' }}>{label}</dt>
           <dd>
             <div className={'enhanced_textArea'}>
-              <div className={'enhanced_textArea_box'} ref={boxRef}>
+              <div className={'enhanced_textArea_box'} style={{ height: textAreaBoxHeight ?? '' }} ref={boxRef}>
                 {!mode || mode == 'edit' ? (
                   // 편집 모드
                   contentElements.map((contentElement, index) => {

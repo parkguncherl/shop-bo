@@ -130,7 +130,7 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
           <PopupFormBox className={''}>
             <PopupFormGroup>
               <PopupFormType className={'type1'}>
-                <FormInput<ProductContentsFields> control={control} name={'title'} inputType={'label'} placeholder={'제목'} />
+                <FormInput<ProductContentsFields> control={control} name={'title'} label={'제목'} inputType={'label'} placeholder={'제목'} />
               </PopupFormType>
               <PopupFormType className={'type1'}>
                 <FormEnhancedTextArea<ProductContentsFields>
@@ -138,7 +138,10 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
                   name={'content'}
                   autoSize={{ minRows: 7, maxRows: 40 }}
                   mode={displayMode}
+                  inputType={'label'}
+                  label={'본문'}
                   attachOnlyImg={true}
+                  textAreaBoxHeight={'600px'}
                 />
               </PopupFormType>
             </PopupFormGroup>

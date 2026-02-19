@@ -96,9 +96,6 @@
 }
 
 .enhanced_textArea {
-  width: 100%;
-  height: 100%;
-
   & > textarea {
     height: 100%; // formBox 추종
   }
@@ -106,6 +103,8 @@
   .enhanced_textArea_box {
     display: flex;
     flex-direction: column;
+
+    overflow-y: scroll;
 
     .per_content_element {
       // editing 모드에서 각 문단, 이미지 영역의 최상단 wrapper 영역
