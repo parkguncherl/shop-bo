@@ -84,7 +84,19 @@ const ContentList = () => {
     lastId: undefined,
   });
 
-  /** 메뉴관리 페이징 목록 조회 */
+  useEffect(() => {
+    // spa 수준에서 페이지 이동 시(해당 csc 관점에서 최초 랜더링) 필요한 동작
+    return () => {
+      // 언마운트 시 paging 전역 상태 초기화하여 추후 재방문 시 상태 오염으로 인한 오동작 방지, 페이징 관련 초기화 동작도 수행
+      setPaging({
+        ...paging,
+        curPage: 1,
+      });
+      onChangelastInfos('lastId', undefined);
+    };
+  }, []);
+
+  /** 상품컨텐츠 페이징 목록 조회 */
   const {
     data: productContentListResponse,
     isSuccess: isProductContentListResponseSuccess,
@@ -106,7 +118,6 @@ const ContentList = () => {
     if (isProductContentListResponseSuccess) {
       const { resultCode, body, resultMessage } = productContentListResponse.data;
       if (resultCode === 200) {
-        console.log(body.rows);
         const perPagesRowCnt = paging.pageRowCount as number;
         if (perPagesRowCnt) {
           setProductContentList((body.rows || []).slice(0, perPagesRowCnt));
@@ -129,24 +140,24 @@ const ContentList = () => {
     await productContentListResponseRefetch();
   };
 
-  const debouncedFilters = useDebounce(filters.newsTitle + '☆' + paging.curPage, 500); // 0.5초 대기
-
-  useEffect(() => {
-    if (!pagingOption) return;
-    const fetchData = async () => {
-      if (paging.curPage === 1) {
-        // 1. 그리드 상태 초기화 (Promise 반환 시 기다림)
-        await gridRef.current?.initializePagingStatus();
-
-        // 2. 필터 초기화
-        // ※ 주의: 상태 업데이트는 비동기이므로, 초기화된 값을 refetch에 직접 넘기는 것이 안전합니다.
-        onlastInfosReset();
-        // 3. 데이터 조회
-      }
-    };
-
-    fetchData().then(() => productContentListResponseRefetch());
-  }, [debouncedFilters, pagingOption]);
+  // const debouncedFilters = useDebounce(filters.newsTitle + '☆' + paging.curPage, 500); // 0.5초 대기
+  //
+  // useEffect(() => {
+  //   if (!pagingOption) return;
+  //   const fetchData = async () => {
+  //     if (paging.curPage === 1) {
+  //       // 1. 그리드 상태 초기화 (Promise 반환 시 기다림)
+  //       await gridRef.current?.initializePagingStatus();
+  //
+  //       // 2. 필터 초기화
+  //       // ※ 주의: 상태 업데이트는 비동기이므로, 초기화된 값을 refetch에 직접 넘기는 것이 안전합니다.
+  //       onlastInfosReset();
+  //       // 3. 데이터 조회
+  //     }
+  //   };
+  //
+  //   fetchData().then(() => productContentListResponseRefetch());
+  // }, [debouncedFilters]);
 
   return (
     <div>
@@ -222,7 +233,16 @@ const ContentList = () => {
           </div>
         </div>
       </Table>
-      <ProductContentAddPop open={modals.type == 'ADD' && modals.active} onClose={() => closeModal('ADD')} />
+      <ProductContentAddPop
+        open={modals.type == 'ADD' && modals.active}
+        onClose={(closeRes) => {
+          if (closeRes == 'success') {
+            productContentListResponseRefetch();
+          }
+
+          closeModal('ADD');
+        }}
+      />
       <ProductContentShowPop open={modals.type == 'SHOW' && modals.active} productContentData={modals.stored_temporary} onClose={() => closeModal('SHOW')} />
     </div>
   );

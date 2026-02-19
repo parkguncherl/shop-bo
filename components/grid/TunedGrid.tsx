@@ -104,6 +104,8 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
 
   /** 참조 및 외부 노출 ref 속성 실 구현 */
   const gridRef = useRef<AgGridReact>(null);
+  const isLoadingRef = useRef(false);
+
   useImperativeHandle(ref, () => {
     const grid = gridRef.current as AgGridReact<P>;
 
@@ -123,23 +125,18 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
 
   /** 컬럼 정의는 상태로서 관리됨 */
   const [columnDefs, setColumnDefs] = useState<ColDef<P>[]>(props.columnDefs || []);
-
   /** 인자로 들어온 키 목록 중 그리드에서 눌려있는 키 목록을 상태로서 관리 */
   const [pressedKeys, setPressedKeys] = useState<string[]>([]);
 
-  const [firstRender, setFirstRender] = useState(true);
-  const isLoadingRef = useRef(false);
-  //const [prevClickedNodeList, setPrevClickedNodeList] = useState<IRowNode[]>([]);
+  //const [firstRender, setFirstRender] = useState(true); todo
 
   /** 본 페이지에서 사용되는 클립보드(복사 이후 사용하기 위해 임시 저장되는 값) 상태 관리 */
   const [copiedRowNode, setCopiedRowNode] = useState<IRowNode<P>[]>([]);
-
   /** 컴포넌트의 의도된 동작(페이징)을 위하여 외부 상태와 적절히 동기화되어 관리되어지는 상태 */
   const [controlledRowData, setControlledRowData] = useState<P[]>([]);
 
   const isReachedEventTriggerAllowed = useRef(true);
 
-  //props.rowSelection.clickSelectionConfigByPerCol
   /** cell click 이벤트를 외부 값과 동기화 */
   const onCellClicked = (event: CellClickedEvent<P>) => {
     if (props.onCellClicked) {
@@ -185,31 +182,28 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
           event.api.selectAll();
         }
       }
-      // for (let i = 0; i < clickSelectionConfigList.length; i++) {
-      //   console.log((event.column as Column).getColDef().field);
-      // }
     }
   };
 
-  /** coldef 상태 동기화할 시 사용할 함수를 역시 외부 값과 동기화 */
-  // const synchronizedColDef = useCallback<P>(
-  //   (colDefs: ColDef<P>[]): ColDef<P>[] => {
-  //     if (props.rowSelection?.clickSelectionConfigByPerCol && props.rowSelection?.clickSelectionConfigByPerCol.length > 0) {
-  //       const clickSelectionConfigList = props.rowSelection?.clickSelectionConfigByPerCol as clickSelectionConfig[];
-  //       for (let i = 0; i < clickSelectionConfigList.length; i++) {
-  //         for (let j = 0; j < colDefs.length; j++) {
-  //           if (clickSelectionConfigList[i].colField == colDefs[j].field) {
-  //             colDefs[j] = { ...colDefs[j], sortable: !clickSelectionConfigList[i].selectAllByHeaderClick };
-  //           }
-  //         }
-  //       }
-  //     }
-  //   },
-  //   [props.rowSelection?.clickSelectionConfigByPerCol],
-  // );
+  useEffect(() => {
+    // 최초 마운팅 시점에 실행할 동작
+    return () => {
+      // 언마운트 시점에 실행할 동작 정의
+
+      // 페이징 관련 정리 동작
+      if (props.pagingOptions) {
+        // 각 전략별로 컴포넌트 수준에서 적절한 정리 동작 수행
+        console.log('각 전략별로 컴포넌트 수준에서 적절한 정리 동작 수행');
+        if (props.pagingOptions.pagingStrategy == 'add') {
+          setControlledRowData([]);
+        }
+      }
+    };
+  }, []);
 
   useEffect(() => {
-    if (props.columnDefs && !firstRender) {
+    //if (props.columnDefs && !firstRender) { todo
+    if (props.columnDefs) {
       if (!props.preventPersonalizedColumnSetting && props.gridId) {
         selectGridColumnState(props.gridId).then((result) => {
           const { resultCode, body } = result.data;
@@ -247,6 +241,7 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
   }, [props.loading]);
 
   useEffect(() => {
+    // todo 해당 영역이 spa에서의 경로 이동 수행할 시 중복된 데이터를 출력하는 원인이 되는 듯 하니 수정하기
     if (props.pagingOptions != undefined) {
       // props.rowData 상태 변경 시점에 페이징 설정 존재할 시 필요한 동작을 실행하는 영역
       if (props.pagingOptions.pagingStrategy == 'add') {
@@ -275,7 +270,7 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
   }, [props.pagingOptions]);
 
   const onGridReady = (event: GridReadyEvent) => {
-    setFirstRender(false);
+    //setFirstRender(false); todo
     if (!props.preventPersonalizedColumnSetting && props.gridId) {
       selectGridColumnState(props.gridId).then((result) => {
         const { resultCode, body } = result.data;

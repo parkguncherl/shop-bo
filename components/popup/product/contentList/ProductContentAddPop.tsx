@@ -19,7 +19,7 @@ import { ConfirmModal } from '../../../ConfirmModal';
 
 interface ProductContentShowPopProps {
   open: boolean;
-  onClose: () => void;
+  onClose: (closeRes?: 'success') => void;
 }
 
 /**
@@ -54,7 +54,7 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('저장되었습니다.');
-          // todo 이후 필요한 동작 정의
+          onClose('success');
         } else {
           toastError(`컨텐츠 저장 도중 문제 발생 (${e.data.resultMessage})`);
         }
@@ -83,16 +83,16 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
         }
       })
       .join('');
-    // insertProductContentsMutate({
-    //   newsTitle: data.title,
-    //   newsSubTitle: data.title, // todo
-    //   newsContents: fileInfoIncludedContent,
-    //   commonRequestFileUploads: {
-    //     uploadFiles: uniqueFileList,
-    //   },
-    // });
-    console.log(fileInfoIncludedContent);
-    console.log(fileInfoIncludedContent.replace(/<<IMG\|[^>]+>>/g, '').replace(/\\n/g, '\n'));
+    insertProductContentsMutate({
+      newsTitle: data.title,
+      newsSubTitle: data.title, // todo
+      newsContents: fileInfoIncludedContent,
+      commonRequestFileUploads: {
+        uploadFiles: uniqueFileList,
+      },
+    });
+    // console.log(fileInfoIncludedContent);
+    // console.log(fileInfoIncludedContent.replace(/<<IMG\|[^>]+>>/g, '').replace(/\\n/g, '\n'));
     //console.log('fileInfoLists: ', uniqueFileList);
   };
 
@@ -134,7 +134,12 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
                 </button>
               </div>
               <div className={'btn-per-wrapper'}>
-                <button className="btn" onClick={onClose}>
+                <button
+                  className="btn"
+                  onClick={() => {
+                    onClose();
+                  }}
+                >
                   닫기
                 </button>
               </div>
