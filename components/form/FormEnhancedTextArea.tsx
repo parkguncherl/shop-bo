@@ -2,7 +2,6 @@ import { BaseTextAreaAtom, BaseTextAreaAtomProps } from '../atom/BaseTextAreaAto
 import { FieldError, FieldValues, useController } from 'react-hook-form';
 import { TControl } from '../../types/Control';
 import React, { useEffect, useRef, useState } from 'react';
-import NativeInputAtom from '../atom/NativeInputAtom';
 import { toastError } from '../ToastMessage';
 
 export type EnhancedTextAreasMode = 'edit' | 'preview';
@@ -18,7 +17,6 @@ type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
 export interface FileInfo {
   file: File;
   fileSrcUrl?: string; // 이미지 파일 출력을 위하여 브라우저에서 인스턴스화를 통해 생성한 url
-  //fileTitle: string;
 }
 export interface ContentElement {
   id: number; // 기본 1부터 시작, 순차적일 필요는 없으나 후행하는 요소의 id는 선행 요소의 id보다 커야 함
@@ -37,7 +35,6 @@ interface FieldErrorForContentElement {
   fileInfo?: FieldErrorForFileInfo;
 }
 interface FieldErrorForFileInfo {
-  //fileTitle: FieldError | undefined;
   fileSrcUrl: FieldError | undefined;
 }
 
@@ -144,24 +141,6 @@ const FormEnhancedTextArea = <T extends FieldValues>({
       init: true, // 최초 정의 시 init true
     };
   };
-
-  // 이미지 제목의 고유성을 보장하는 함수
-  // const uniquenessEnsuredTitle = (passedTitle: string): string => {
-  //   const duplicatedTitleExist = contentElements.filter((element) => element.fileInfo && element.fileInfo.fileTitle == passedTitle).length > 0;
-  //   if (duplicatedTitleExist) {
-  //     for (let i = 0; i < 100; i++) {
-  //       const candidateTitle = `${passedTitle} (${i})`;
-  //       const duplicatedTitleWithCandidateExist =
-  //         contentElements.filter((element) => element.fileInfo && element.fileInfo.fileTitle == candidateTitle).length > 0;
-  //       if (!duplicatedTitleWithCandidateExist) {
-  //         return candidateTitle;
-  //       }
-  //     }
-  //     return ''; // 비정상 상황
-  //   } else {
-  //     return passedTitle;
-  //   }
-  // };
 
   const attachRequestInterruptCallBack = (files: File[], contentElementOnTriggeredArea: ContentElement) => {
     if (attachOnlyImg && files.filter((file) => !file.type.startsWith('image/')).length > 0) {
@@ -316,32 +295,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({
                             </div>
                           )}
                           <div className={'img_title_wrapper'}>
-                            <NativeInputAtom
-                              value={contentElement.fileInfo.file.name}
-                              readOnly={true}
-                              // onChange={(event) => {
-                              //   setContentElements((contentElements) => {
-                              //     const modifiedContentElements: ContentElementInfo[] = []; // 배열 불변성 유지
-                              //     for (let i = 0; i < contentElements.length; i++) {
-                              //       if (contentElements[i].id == contentElement.id) {
-                              //         modifiedContentElements.push({
-                              //           ...contentElements[i],
-                              //           fileInfo: contentElements[i].fileInfo
-                              //             ? ({
-                              //                 ...(contentElements[i].fileInfo as FileInfo),
-                              //                 fileTitle: event.target.value || '', // fileTitle 동기화
-                              //               } as FileInfo)
-                              //             : undefined,
-                              //         });
-                              //       } else {
-                              //         modifiedContentElements.push(contentElements[i]);
-                              //       }
-                              //     }
-                              //     return modifiedContentElements;
-                              //   });
-                              // }}
-                              // placeholder={fileErrorExist ? innerErrorState[index]?.fileInfo?.fileTitle?.message : undefined}
-                            />
+                            <p>{contentElement.fileInfo.file.name}</p>
                           </div>
                         </div>
                       ) : (
@@ -426,11 +380,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({
                             </div>
                           )}
                           <div className={'img_title_wrapper'}>
-                            <NativeInputAtom
-                              value={contentElement.fileInfo.file.name}
-                              readOnly={true}
-                              //placeholder={fileErrorExist ? innerErrorState[index]?.fileInfo?.fileTitle?.message : undefined}
-                            />
+                            <p>{contentElement.fileInfo.file.name}</p>
                           </div>
                         </div>
                       ) : (
@@ -571,32 +521,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({
                                 </div>
                               )}
                               <div className={'img_title_wrapper'}>
-                                <NativeInputAtom
-                                  value={contentElement.fileInfo.file.name}
-                                  readOnly={true}
-                                  // onChange={(event) => {
-                                  //   setContentElements((contentElements) => {
-                                  //     const modifiedContentElements: ContentElementInfo[] = []; // 배열 불변성 유지
-                                  //     for (let i = 0; i < contentElements.length; i++) {
-                                  //       if (contentElements[i].id == contentElement.id) {
-                                  //         modifiedContentElements.push({
-                                  //           ...contentElements[i],
-                                  //           fileInfo: contentElements[i].fileInfo
-                                  //             ? ({
-                                  //                 ...(contentElements[i].fileInfo as FileInfo),
-                                  //                 fileTitle: event.target.value || '', // fileTitle 동기화
-                                  //               } as FileInfo)
-                                  //             : undefined,
-                                  //         });
-                                  //       } else {
-                                  //         modifiedContentElements.push(contentElements[i]);
-                                  //       }
-                                  //     }
-                                  //     return modifiedContentElements;
-                                  //   });
-                                  // }}
-                                  // placeholder={fileErrorExist ? innerErrorState[index]?.fileInfo?.fileTitle?.message : undefined}
-                                />
+                                <p>{contentElement.fileInfo.file.name}</p>
                               </div>
                             </div>
                           ) : (
@@ -681,11 +606,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({
                                 </div>
                               )}
                               <div className={'img_title_wrapper'}>
-                                <NativeInputAtom
-                                  value={contentElement.fileInfo.file.name}
-                                  readOnly={true}
-                                  //placeholder={fileErrorExist ? innerErrorState[index]?.fileInfo?.fileTitle?.message : undefined}
-                                />
+                                <p>{contentElement.fileInfo.file.name}</p>
                               </div>
                             </div>
                           ) : (
