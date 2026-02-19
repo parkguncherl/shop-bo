@@ -11,6 +11,7 @@ type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
     //ref?: React.Ref<HTMLTextAreaElement>;
     mode?: EnhancedTextAreasMode;
     attachOnlyImg?: boolean;
+    inputType?: 'label' | 'single';
   };
 export interface FileInfo {
   file: File;
@@ -43,7 +44,16 @@ interface FieldErrorForFileInfo {
  * 기존 textArea 와 달리 이미지 삽입 및 이에 따라 필요한 동작 지원
  * RHF 구독 하에서의 함수 컴포넌트 재평가에 따른 부수 효과 방지하도록 랜더링이 아닌 state, 이에 따른 hook trigger 에 의존토록 함
  * */
-const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, autoSize, mode, attachOnlyImg = true }: FormEnhancedTextAreaProps<T>) => {
+const FormEnhancedTextArea = <T extends FieldValues>({
+  control,
+  rules,
+  name,
+  autoSize,
+  mode,
+  inputType,
+  label = '',
+  attachOnlyImg = true,
+}: FormEnhancedTextAreaProps<T>) => {
   /** react hook form 의 controller 는 현재 영역에서는 수정 대상 영역의 값(contentElement)에 한정되어 적용함(전역 적용하지 아니함) */
   const {
     field: { value: value, onChange: controlChange },
@@ -221,127 +231,29 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
    * 이미지 붙여넣기, 드롭 동작 발생 시 기존 textArea freeze 및 상태 저장, 이미지 영역 하단에 이후 신규 textArea 활성화
    * */
   return (
-    <div className={'enhanced_textArea'}>
-      <div className={'enhanced_textArea_box'} ref={boxRef}>
-        {!mode || mode == 'edit' ? (
-          // 편집 모드
-          contentElements.map((contentElement, index) => {
-            const partialContentErrorExist = innerErrorState[index]?.partialContent != undefined;
-            const fileErrorExist = innerErrorState[index]?.fileInfo != undefined;
-            if (contentElements.length == index + 1) {
-              // 편집 가능(최하단 영역, 이 경우는 입력 영역만이 존재할수 있음, 파일 정보는 존재할수 없음)
-              if (contentElement.fileInfo != undefined) {
-                console.error('최하단 요소에는 파일 정보가 존재할수 없음, 상태 오염 정정!');
-              }
-              const partialContentErrorExist = innerErrorState[index]?.partialContent != undefined;
-              return (
-                <div className={'per_content_element'} key={contentElement.id}>
-                  <div className={'per_textArea_element'}>
-                    <div className={'textArea_wrapper'}>
-                      <BaseTextAreaAtom
-                        value={contentElement.partialContent}
-                        type={'text'}
-                        onChange={(e) => {
-                          setContentElements((prevState) => {
-                            return prevState.map((prev) => {
-                              if (prev.id == contentElement.id) {
-                                return {
-                                  ...prev,
-                                  partialContent: e.target.value,
-                                  init: prev.init ? false : prev.init, // 최초 상호작용이 발생한 경우 init 속성 무효화
-                                };
-                              } else {
-                                return prev;
-                              }
-                            });
-                          });
-                        }}
-                        onDrop={(e) => onDropEventHandler(e, contentElement)}
-                        onPaste={(e) => onPasteEventHandler(e, contentElement)}
-                        autoSize={autoSize}
-                        onFocus={() => {
-                          setUnFrozenElementId(-1);
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.nativeEvent.isComposing) return; // IME 조합 중인 경우 무동작 처리하여 이벤트가 제차 호출되는 걸 방지
-
-                          if (e.key == 'Enter' && e.shiftKey) {
-                            e.preventDefault();
-                            if (contentElement.partialContent != undefined && contentElement.partialContent.trim() != '') {
-                              // 값이 유효한 경우 한정으로만 정의된 동작 실행
-                              setContentElements((prevState) => {
-                                return [...prevState, configForInitContent({ id: contentElement.id + 1, partialContent: '' })];
-                              });
-                            }
-                          }
-                        }}
-                        ref={bottomTextArea}
-                      />
-                    </div>
-                    <div className={`err_msg_wrapper ${partialContentErrorExist ? 'error' : 'non'}`}>
-                      <p>{innerErrorState[index]?.partialContent?.message}</p>
-                    </div>
-                  </div>
-                </div>
-              );
-            } else if (contentElement.id == unFrozenElementId) {
-              // 편집 가능 영역(상태로 관리되는 element id와 해당 content 의 id가 일치하는 경우)
-              return (
-                <div className={'per_content_element'} key={contentElement.id}>
-                  {contentElement.fileInfo != undefined ? (
-                    <div className={'per_img_element unFrozen'}>
-                      {fileErrorExist && innerErrorState[index]?.fileInfo?.fileSrcUrl?.message ? (
-                        <div className={'err_msg_wrapper'}>
-                          <p>{innerErrorState[index]?.fileInfo?.fileSrcUrl?.message}</p>
-                        </div>
-                      ) : (
-                        <div className={'img_wrapper'}>
-                          <img src={contentElement.fileInfo.fileSrcUrl} />
-                        </div>
-                      )}
-                      <div className={'img_title_wrapper'}>
-                        <NativeInputAtom
-                          value={contentElement.fileInfo.file.name}
-                          readOnly={true}
-                          // onChange={(event) => {
-                          //   setContentElements((contentElements) => {
-                          //     const modifiedContentElements: ContentElementInfo[] = []; // 배열 불변성 유지
-                          //     for (let i = 0; i < contentElements.length; i++) {
-                          //       if (contentElements[i].id == contentElement.id) {
-                          //         modifiedContentElements.push({
-                          //           ...contentElements[i],
-                          //           fileInfo: contentElements[i].fileInfo
-                          //             ? ({
-                          //                 ...(contentElements[i].fileInfo as FileInfo),
-                          //                 fileTitle: event.target.value || '', // fileTitle 동기화
-                          //               } as FileInfo)
-                          //             : undefined,
-                          //         });
-                          //       } else {
-                          //         modifiedContentElements.push(contentElements[i]);
-                          //       }
-                          //     }
-                          //     return modifiedContentElements;
-                          //   });
-                          // }}
-                          // placeholder={fileErrorExist ? innerErrorState[index]?.fileInfo?.fileTitle?.message : undefined}
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className={'per_textArea_element'}>
-                      <div className={'textArea_wrapper'}>
-                        <BaseTextAreaAtom
-                          value={contentElement.partialContent}
-                          type={'text'}
-                          onChange={(e) => {
-                            if (e.target.value.trim() == '') {
-                              // 이 경우 해당 요소 del
-                              setContentElements((prevState) => {
-                                return [...prevState.filter((prev) => prev.id != contentElement.id)];
-                              });
-                              bottomTextArea.current?.focus(); // 최하단 영역으로 포커싱
-                            } else {
+    <>
+      {(inputType === undefined || inputType === 'single') && (
+        <div className={'enhanced_textArea'}>
+          <div className={'enhanced_textArea_box'} ref={boxRef}>
+            {!mode || mode == 'edit' ? (
+              // 편집 모드
+              contentElements.map((contentElement, index) => {
+                const partialContentErrorExist = innerErrorState[index]?.partialContent != undefined;
+                const fileErrorExist = innerErrorState[index]?.fileInfo != undefined;
+                if (contentElements.length == index + 1) {
+                  // 편집 가능(최하단 영역, 이 경우는 입력 영역만이 존재할수 있음, 파일 정보는 존재할수 없음)
+                  if (contentElement.fileInfo != undefined) {
+                    console.error('최하단 요소에는 파일 정보가 존재할수 없음, 상태 오염 정정!');
+                  }
+                  const partialContentErrorExist = innerErrorState[index]?.partialContent != undefined;
+                  return (
+                    <div className={'per_content_element'} key={contentElement.id}>
+                      <div className={'per_textArea_element'}>
+                        <div className={'textArea_wrapper'}>
+                          <BaseTextAreaAtom
+                            value={contentElement.partialContent}
+                            type={'text'}
+                            onChange={(e) => {
                               setContentElements((prevState) => {
                                 return prevState.map((prev) => {
                                   if (prev.id == contentElement.id) {
@@ -355,115 +267,475 @@ const FormEnhancedTextArea = <T extends FieldValues>({ control, rules, name, aut
                                   }
                                 });
                               });
-                            }
-                          }}
-                          onDrop={(e) => onDropEventHandler(e, contentElement)}
-                          onPaste={(e) => onPasteEventHandler(e, contentElement)}
-                          autoSize={autoSize}
-                          onKeyDown={(e) => {
-                            if (e.key == 'Enter' && e.shiftKey) {
-                              e.preventDefault();
-                              if (contentElement.partialContent != undefined && contentElement.partialContent != '') {
-                                // 값이 유효한 경우 한정으로만 정의된 동작 실행
-                                bottomTextArea.current?.focus(); // 최하단 영역으로 포커싱
+                            }}
+                            onDrop={(e) => onDropEventHandler(e, contentElement)}
+                            onPaste={(e) => onPasteEventHandler(e, contentElement)}
+                            autoSize={autoSize}
+                            onFocus={() => {
+                              setUnFrozenElementId(-1);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.nativeEvent.isComposing) return; // IME 조합 중인 경우 무동작 처리하여 이벤트가 제차 호출되는 걸 방지
+
+                              if (e.key == 'Enter' && e.shiftKey) {
+                                e.preventDefault();
+                                if (contentElement.partialContent != undefined && contentElement.partialContent.trim() != '') {
+                                  // 값이 유효한 경우 한정으로만 정의된 동작 실행
+                                  setContentElements((prevState) => {
+                                    return [...prevState, configForInitContent({ id: contentElement.id + 1, partialContent: '' })];
+                                  });
+                                }
                               }
-                            }
-                          }}
-                          ref={(node) => {
-                            node?.focus(); // unFrozenElementId 의 변경으로 인한 랜더링으로 간주함이 마땅하므로 focus
-                          }}
-                        />
-                      </div>
-                      <div className={`err_msg_wrapper ${partialContentErrorExist ? 'error' : 'non'}`}>
-                        <p>{innerErrorState[index]?.partialContent?.message}</p>
+                            }}
+                            ref={bottomTextArea}
+                          />
+                        </div>
+                        <div className={`err_msg_wrapper ${partialContentErrorExist ? 'error' : 'non'}`}>
+                          <p>{innerErrorState[index]?.partialContent?.message}</p>
+                        </div>
                       </div>
                     </div>
-                  )}
-                </div>
-              );
-            } else {
-              // 편집 제한
-              return (
-                <div className={'per_content_element'} key={contentElement.id}>
-                  {contentElement.fileInfo != undefined ? (
-                    <div
-                      className={`per_img_element ${contentElement.init ? '' : 'frozen'}`}
-                      onClick={() => {
-                        setUnFrozenElementId(contentElement.id);
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.classList.add('hovered');
-                        e.currentTarget.classList.remove('leaved');
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.classList.remove('hovered');
-                        e.currentTarget.classList.add('leaved');
-                      }}
-                    >
-                      {fileErrorExist && innerErrorState[index]?.fileInfo?.fileSrcUrl?.message ? (
-                        <div className={'err_msg_wrapper'}>
-                          <p>{innerErrorState[index]?.fileInfo?.fileSrcUrl?.message}</p>
+                  );
+                } else if (contentElement.id == unFrozenElementId) {
+                  // 편집 가능 영역(상태로 관리되는 element id와 해당 content 의 id가 일치하는 경우)
+                  return (
+                    <div className={'per_content_element'} key={contentElement.id}>
+                      {contentElement.fileInfo != undefined ? (
+                        <div className={'per_img_element unFrozen'}>
+                          {fileErrorExist && innerErrorState[index]?.fileInfo?.fileSrcUrl?.message ? (
+                            <div className={'err_msg_wrapper'}>
+                              <p>{innerErrorState[index]?.fileInfo?.fileSrcUrl?.message}</p>
+                            </div>
+                          ) : (
+                            <div className={'img_wrapper'}>
+                              <img src={contentElement.fileInfo.fileSrcUrl} />
+                            </div>
+                          )}
+                          <div className={'img_title_wrapper'}>
+                            <NativeInputAtom
+                              value={contentElement.fileInfo.file.name}
+                              readOnly={true}
+                              // onChange={(event) => {
+                              //   setContentElements((contentElements) => {
+                              //     const modifiedContentElements: ContentElementInfo[] = []; // 배열 불변성 유지
+                              //     for (let i = 0; i < contentElements.length; i++) {
+                              //       if (contentElements[i].id == contentElement.id) {
+                              //         modifiedContentElements.push({
+                              //           ...contentElements[i],
+                              //           fileInfo: contentElements[i].fileInfo
+                              //             ? ({
+                              //                 ...(contentElements[i].fileInfo as FileInfo),
+                              //                 fileTitle: event.target.value || '', // fileTitle 동기화
+                              //               } as FileInfo)
+                              //             : undefined,
+                              //         });
+                              //       } else {
+                              //         modifiedContentElements.push(contentElements[i]);
+                              //       }
+                              //     }
+                              //     return modifiedContentElements;
+                              //   });
+                              // }}
+                              // placeholder={fileErrorExist ? innerErrorState[index]?.fileInfo?.fileTitle?.message : undefined}
+                            />
+                          </div>
                         </div>
                       ) : (
-                        <div className={'img_wrapper'}>
-                          <img src={contentElement.fileInfo.fileSrcUrl} />
+                        <div className={'per_textArea_element'}>
+                          <div className={'textArea_wrapper'}>
+                            <BaseTextAreaAtom
+                              value={contentElement.partialContent}
+                              type={'text'}
+                              onChange={(e) => {
+                                if (e.target.value.trim() == '') {
+                                  // 이 경우 해당 요소 del
+                                  setContentElements((prevState) => {
+                                    return [...prevState.filter((prev) => prev.id != contentElement.id)];
+                                  });
+                                  bottomTextArea.current?.focus(); // 최하단 영역으로 포커싱
+                                } else {
+                                  setContentElements((prevState) => {
+                                    return prevState.map((prev) => {
+                                      if (prev.id == contentElement.id) {
+                                        return {
+                                          ...prev,
+                                          partialContent: e.target.value,
+                                          init: prev.init ? false : prev.init, // 최초 상호작용이 발생한 경우 init 속성 무효화
+                                        };
+                                      } else {
+                                        return prev;
+                                      }
+                                    });
+                                  });
+                                }
+                              }}
+                              onDrop={(e) => onDropEventHandler(e, contentElement)}
+                              onPaste={(e) => onPasteEventHandler(e, contentElement)}
+                              autoSize={autoSize}
+                              onKeyDown={(e) => {
+                                if (e.key == 'Enter' && e.shiftKey) {
+                                  e.preventDefault();
+                                  if (contentElement.partialContent != undefined && contentElement.partialContent != '') {
+                                    // 값이 유효한 경우 한정으로만 정의된 동작 실행
+                                    bottomTextArea.current?.focus(); // 최하단 영역으로 포커싱
+                                  }
+                                }
+                              }}
+                              ref={(node) => {
+                                node?.focus(); // unFrozenElementId 의 변경으로 인한 랜더링으로 간주함이 마땅하므로 focus
+                              }}
+                            />
+                          </div>
+                          <div className={`err_msg_wrapper ${partialContentErrorExist ? 'error' : 'non'}`}>
+                            <p>{innerErrorState[index]?.partialContent?.message}</p>
+                          </div>
                         </div>
                       )}
-                      <div className={'img_title_wrapper'}>
-                        <NativeInputAtom
-                          value={contentElement.fileInfo.file.name}
-                          readOnly={true}
-                          //placeholder={fileErrorExist ? innerErrorState[index]?.fileInfo?.fileTitle?.message : undefined}
-                        />
-                      </div>
                     </div>
-                  ) : (
-                    <BaseTextAreaAtom
-                      value={contentElement.partialContent}
-                      type={'text'}
-                      readOnly={true}
-                      onFocus={() => {
-                        setUnFrozenElementId(contentElement.id); // 해당 영역 unFrozen(편집 가능)
-                      }}
-                      autoSize={autoSize}
-                    />
-                  )}
-                </div>
-              );
-            }
-          })
-        ) : (
-          // 미리보기
-          <div
-            className={'flex-preview-area'}
-            style={{
-              height: boxHeight,
-            }}
-          >
-            {contentElements.map((contentElement) => {
-              return (
-                <div className={'per_preview_element'} key={contentElement.id}>
-                  {contentElement.fileInfo != undefined ? (
-                    <div className={'per_img_element'}>
-                      <div className={'img_wrapper'}>
-                        <img src={contentElement.fileInfo.fileSrcUrl} />
-                      </div>
-                      <div className={'img_title_wrapper'}>
-                        <p>{contentElement.fileInfo.file.name}</p>
-                      </div>
+                  );
+                } else {
+                  // 편집 제한
+                  return (
+                    <div className={'per_content_element'} key={contentElement.id}>
+                      {contentElement.fileInfo != undefined ? (
+                        <div
+                          className={`per_img_element ${contentElement.init ? '' : 'frozen'}`}
+                          onClick={() => {
+                            setUnFrozenElementId(contentElement.id);
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.classList.add('hovered');
+                            e.currentTarget.classList.remove('leaved');
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.classList.remove('hovered');
+                            e.currentTarget.classList.add('leaved');
+                          }}
+                        >
+                          {fileErrorExist && innerErrorState[index]?.fileInfo?.fileSrcUrl?.message ? (
+                            <div className={'err_msg_wrapper'}>
+                              <p>{innerErrorState[index]?.fileInfo?.fileSrcUrl?.message}</p>
+                            </div>
+                          ) : (
+                            <div className={'img_wrapper'}>
+                              <img src={contentElement.fileInfo.fileSrcUrl} />
+                            </div>
+                          )}
+                          <div className={'img_title_wrapper'}>
+                            <NativeInputAtom
+                              value={contentElement.fileInfo.file.name}
+                              readOnly={true}
+                              //placeholder={fileErrorExist ? innerErrorState[index]?.fileInfo?.fileTitle?.message : undefined}
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className={'per_textArea_element'}>
+                          <div className={'textArea_wrapper'}>
+                            <BaseTextAreaAtom
+                              value={contentElement.partialContent}
+                              type={'text'}
+                              readOnly={true}
+                              onFocus={() => {
+                                setUnFrozenElementId(contentElement.id); // 해당 영역 unFrozen(편집 가능)
+                              }}
+                              autoSize={autoSize}
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    <div className={'text_wrapper'}>
-                      <p>{contentElement.partialContent}</p>
+                  );
+                }
+              })
+            ) : (
+              // 미리보기
+              <div
+                className={'flex-preview-area'}
+                style={{
+                  height: boxHeight,
+                }}
+              >
+                {contentElements.map((contentElement) => {
+                  return (
+                    <div className={'per_preview_element'} key={contentElement.id}>
+                      {contentElement.fileInfo != undefined ? (
+                        <div className={'per_img_element'}>
+                          <div className={'img_wrapper'}>
+                            <img src={contentElement.fileInfo.fileSrcUrl} />
+                          </div>
+                          <div className={'img_title_wrapper'}>
+                            <p>{contentElement.fileInfo.file.name}</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className={'text_wrapper'}>
+                          <p>{contentElement.partialContent}</p>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              );
-            })}
+                  );
+                })}
+              </div>
+            )}
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+      )}
+      {inputType === 'label' && (
+        <dl>
+          <dt>{label}</dt>
+          <dd>
+            <div className={'enhanced_textArea'}>
+              <div className={'enhanced_textArea_box'} ref={boxRef}>
+                {!mode || mode == 'edit' ? (
+                  // 편집 모드
+                  contentElements.map((contentElement, index) => {
+                    const partialContentErrorExist = innerErrorState[index]?.partialContent != undefined;
+                    const fileErrorExist = innerErrorState[index]?.fileInfo != undefined;
+                    if (contentElements.length == index + 1) {
+                      // 편집 가능(최하단 영역, 이 경우는 입력 영역만이 존재할수 있음, 파일 정보는 존재할수 없음)
+                      if (contentElement.fileInfo != undefined) {
+                        console.error('최하단 요소에는 파일 정보가 존재할수 없음, 상태 오염 정정!');
+                      }
+                      const partialContentErrorExist = innerErrorState[index]?.partialContent != undefined;
+                      return (
+                        <div className={'per_content_element'} key={contentElement.id}>
+                          <div className={'per_textArea_element'}>
+                            <div className={'textArea_wrapper'}>
+                              <BaseTextAreaAtom
+                                value={contentElement.partialContent}
+                                type={'text'}
+                                onChange={(e) => {
+                                  setContentElements((prevState) => {
+                                    return prevState.map((prev) => {
+                                      if (prev.id == contentElement.id) {
+                                        return {
+                                          ...prev,
+                                          partialContent: e.target.value,
+                                          init: prev.init ? false : prev.init, // 최초 상호작용이 발생한 경우 init 속성 무효화
+                                        };
+                                      } else {
+                                        return prev;
+                                      }
+                                    });
+                                  });
+                                }}
+                                onDrop={(e) => onDropEventHandler(e, contentElement)}
+                                onPaste={(e) => onPasteEventHandler(e, contentElement)}
+                                autoSize={autoSize}
+                                onFocus={() => {
+                                  setUnFrozenElementId(-1);
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.nativeEvent.isComposing) return; // IME 조합 중인 경우 무동작 처리하여 이벤트가 제차 호출되는 걸 방지
+
+                                  if (e.key == 'Enter' && e.shiftKey) {
+                                    e.preventDefault();
+                                    if (contentElement.partialContent != undefined && contentElement.partialContent.trim() != '') {
+                                      // 값이 유효한 경우 한정으로만 정의된 동작 실행
+                                      setContentElements((prevState) => {
+                                        return [...prevState, configForInitContent({ id: contentElement.id + 1, partialContent: '' })];
+                                      });
+                                    }
+                                  }
+                                }}
+                                ref={bottomTextArea}
+                              />
+                            </div>
+                            <div className={`err_msg_wrapper ${partialContentErrorExist ? 'error' : 'non'}`}>
+                              <p>{innerErrorState[index]?.partialContent?.message}</p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    } else if (contentElement.id == unFrozenElementId) {
+                      // 편집 가능 영역(상태로 관리되는 element id와 해당 content 의 id가 일치하는 경우)
+                      return (
+                        <div className={'per_content_element'} key={contentElement.id}>
+                          {contentElement.fileInfo != undefined ? (
+                            <div className={'per_img_element unFrozen'}>
+                              {fileErrorExist && innerErrorState[index]?.fileInfo?.fileSrcUrl?.message ? (
+                                <div className={'err_msg_wrapper'}>
+                                  <p>{innerErrorState[index]?.fileInfo?.fileSrcUrl?.message}</p>
+                                </div>
+                              ) : (
+                                <div className={'img_wrapper'}>
+                                  <img src={contentElement.fileInfo.fileSrcUrl} />
+                                </div>
+                              )}
+                              <div className={'img_title_wrapper'}>
+                                <NativeInputAtom
+                                  value={contentElement.fileInfo.file.name}
+                                  readOnly={true}
+                                  // onChange={(event) => {
+                                  //   setContentElements((contentElements) => {
+                                  //     const modifiedContentElements: ContentElementInfo[] = []; // 배열 불변성 유지
+                                  //     for (let i = 0; i < contentElements.length; i++) {
+                                  //       if (contentElements[i].id == contentElement.id) {
+                                  //         modifiedContentElements.push({
+                                  //           ...contentElements[i],
+                                  //           fileInfo: contentElements[i].fileInfo
+                                  //             ? ({
+                                  //                 ...(contentElements[i].fileInfo as FileInfo),
+                                  //                 fileTitle: event.target.value || '', // fileTitle 동기화
+                                  //               } as FileInfo)
+                                  //             : undefined,
+                                  //         });
+                                  //       } else {
+                                  //         modifiedContentElements.push(contentElements[i]);
+                                  //       }
+                                  //     }
+                                  //     return modifiedContentElements;
+                                  //   });
+                                  // }}
+                                  // placeholder={fileErrorExist ? innerErrorState[index]?.fileInfo?.fileTitle?.message : undefined}
+                                />
+                              </div>
+                            </div>
+                          ) : (
+                            <div className={'per_textArea_element'}>
+                              <div className={'textArea_wrapper'}>
+                                <BaseTextAreaAtom
+                                  value={contentElement.partialContent}
+                                  type={'text'}
+                                  onChange={(e) => {
+                                    if (e.target.value.trim() == '') {
+                                      // 이 경우 해당 요소 del
+                                      setContentElements((prevState) => {
+                                        return [...prevState.filter((prev) => prev.id != contentElement.id)];
+                                      });
+                                      bottomTextArea.current?.focus(); // 최하단 영역으로 포커싱
+                                    } else {
+                                      setContentElements((prevState) => {
+                                        return prevState.map((prev) => {
+                                          if (prev.id == contentElement.id) {
+                                            return {
+                                              ...prev,
+                                              partialContent: e.target.value,
+                                              init: prev.init ? false : prev.init, // 최초 상호작용이 발생한 경우 init 속성 무효화
+                                            };
+                                          } else {
+                                            return prev;
+                                          }
+                                        });
+                                      });
+                                    }
+                                  }}
+                                  onDrop={(e) => onDropEventHandler(e, contentElement)}
+                                  onPaste={(e) => onPasteEventHandler(e, contentElement)}
+                                  autoSize={autoSize}
+                                  onKeyDown={(e) => {
+                                    if (e.key == 'Enter' && e.shiftKey) {
+                                      e.preventDefault();
+                                      if (contentElement.partialContent != undefined && contentElement.partialContent != '') {
+                                        // 값이 유효한 경우 한정으로만 정의된 동작 실행
+                                        bottomTextArea.current?.focus(); // 최하단 영역으로 포커싱
+                                      }
+                                    }
+                                  }}
+                                  ref={(node) => {
+                                    node?.focus(); // unFrozenElementId 의 변경으로 인한 랜더링으로 간주함이 마땅하므로 focus
+                                  }}
+                                />
+                              </div>
+                              <div className={`err_msg_wrapper ${partialContentErrorExist ? 'error' : 'non'}`}>
+                                <p>{innerErrorState[index]?.partialContent?.message}</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    } else {
+                      // 편집 제한
+                      return (
+                        <div className={'per_content_element'} key={contentElement.id}>
+                          {contentElement.fileInfo != undefined ? (
+                            <div
+                              className={`per_img_element ${contentElement.init ? '' : 'frozen'}`}
+                              onClick={() => {
+                                setUnFrozenElementId(contentElement.id);
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.classList.add('hovered');
+                                e.currentTarget.classList.remove('leaved');
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.classList.remove('hovered');
+                                e.currentTarget.classList.add('leaved');
+                              }}
+                            >
+                              {fileErrorExist && innerErrorState[index]?.fileInfo?.fileSrcUrl?.message ? (
+                                <div className={'err_msg_wrapper'}>
+                                  <p>{innerErrorState[index]?.fileInfo?.fileSrcUrl?.message}</p>
+                                </div>
+                              ) : (
+                                <div className={'img_wrapper'}>
+                                  <img src={contentElement.fileInfo.fileSrcUrl} />
+                                </div>
+                              )}
+                              <div className={'img_title_wrapper'}>
+                                <NativeInputAtom
+                                  value={contentElement.fileInfo.file.name}
+                                  readOnly={true}
+                                  //placeholder={fileErrorExist ? innerErrorState[index]?.fileInfo?.fileTitle?.message : undefined}
+                                />
+                              </div>
+                            </div>
+                          ) : (
+                            <div className={'per_textArea_element'}>
+                              <div className={'textArea_wrapper'}>
+                                <BaseTextAreaAtom
+                                  value={contentElement.partialContent}
+                                  type={'text'}
+                                  readOnly={true}
+                                  onFocus={() => {
+                                    setUnFrozenElementId(contentElement.id); // 해당 영역 unFrozen(편집 가능)
+                                  }}
+                                  autoSize={autoSize}
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }
+                  })
+                ) : (
+                  // 미리보기
+                  <div
+                    className={'flex-preview-area'}
+                    style={{
+                      height: boxHeight,
+                    }}
+                  >
+                    {contentElements.map((contentElement) => {
+                      return (
+                        <div className={'per_preview_element'} key={contentElement.id}>
+                          {contentElement.fileInfo != undefined ? (
+                            <div className={'per_img_element'}>
+                              <div className={'img_wrapper'}>
+                                <img src={contentElement.fileInfo.fileSrcUrl} />
+                              </div>
+                              <div className={'img_title_wrapper'}>
+                                <p>{contentElement.fileInfo.file.name}</p>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className={'text_wrapper'}>
+                              <p>{contentElement.partialContent}</p>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </dd>
+        </dl>
+      )}
+    </>
   );
 };
 
