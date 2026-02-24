@@ -142,10 +142,12 @@ const initialStateCreator: StateCreator<CommonState & CommonApiState, any> = (se
       }));
     },
     selectFileList: async (fileId: number) => {
-      return authApi.get(`/file/${fileId}`).then((res): FileDet[] => {
+      return authApi.get(`/common/file/${fileId}`).then((res): FileDet[] => {
+        console.log('res: ', res);
         if (res.data.resultCode === 200) {
           return res.data.body;
         } else {
+          console.error(res.data);
           return [];
         }
       });

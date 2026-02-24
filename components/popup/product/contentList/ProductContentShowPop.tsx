@@ -11,8 +11,6 @@ import { ProductContentsFields } from '../../../../app/(app)/product/Contents/Pr
 import FormEnhancedTextArea, { ContentElement } from '../../../form/FormEnhancedTextArea';
 import PopupFormBox from '../../content/PopupFormBox';
 import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { YupSchema } from '../../../../libs';
 import { RegExpression } from '../../../../libs/const';
 
 interface ProductContentShowPopProps {
@@ -27,7 +25,7 @@ interface extendedFileDet extends FileDet {
 /**
  * components/popup/product/contentList/ProductContentShowPop.tsx
  * desc: 상품컨텐츠 출력 팝업
- * Date: 2026/02/13
+ * Date: 2026/02/24
  * Author: park junsung
  * */
 const ProductContentShowPop = ({ open, productContentData, onClose }: ProductContentShowPopProps) => {
@@ -39,35 +37,50 @@ const ProductContentShowPop = ({ open, productContentData, onClose }: ProductCon
   const [managedContentElements, setManagedContentElements] = useState<ContentElement[]>([]);
   const [managedFileDetState, setManagedFileDetState] = useState<extendedFileDet[]>([]);
 
-  /** 상품 내용 입력 서식 */
-  const {
-    handleSubmit,
-    control,
-    getValues,
-    setValue,
-    formState: { errors, isValid },
-  } = useForm<ProductContentsFields>({
-    resolver: yupResolver(YupSchema.ProductContentsRequest()),
-    mode: 'onChange',
+  /** 출력을 위한 형식적 서식 */
+  const { control, setValue } = useForm<ProductContentsFields>({
+    mode: 'onBlur',
   });
 
   useEffect(() => {
     if (productContentData) {
       if (productContentData.fileId) {
-        const contentElements = (productContentData.newsContents || '').split(RegExpression.ProductContent.carriageReturn).filter((value) => value != '');
+        const splittedNewsContents = (productContentData.newsContents || '').split(RegExpression.ProductContent.carriageReturn).filter((value) => value != '');
         console.log('productContentData.newsContents: ', productContentData.newsContents);
-        console.log('contentElements: ', contentElements);
-        // selectFileList(productContentData.fileId).then((fileDetList) => {
-        //   const contentElements = (productContentData.newsContents || '').split(RegExpression.imgToken);
-        //   // const updatedFileDetStateList = fileDetList.map(async (fileDet) => {
-        //   //   return {
-        //   //     ...fileDet,
-        //   //     fileUrl: fileDet.sysFileNm ? await getFileUrl(fileDet.sysFileNm) : undefined,
-        //   //   };
-        //   // });
-        //   // // todo 마저 진행
-        //   // setManagedFileDetState(updatedFileDetStateList); // 저장 시점에 이미 중복 파일은 부재하리라 기대하며 이하 작성
+        console.log('splitedNewsContents: ', splittedNewsContents);
+
+        // const contentElements: ContentElement[] = splittedNewsContents.map((newsContent) => {
+        //   const extractedImgToken = [...newsContent.matchAll(RegExpression.ProductContent.imgToken)]; //newsContent.match(RegExpression.ProductContent.imgToken);
+        //   if (extractedImgToken.length > 0) {
+        //     const fileNames = extractedImgToken.map((token) => token[1]);
+        //     return {
+        //       id: productContentData,
+        //       partialContent: productContentData.newsContents,
+        //       fileInfo: {
+        //         file: {},
+        //         fileSrcUrl:
+        //       }
+        //     };
+        //   }
         // });
+        selectFileList(productContentData.fileId).then((fileDetList) => {
+          //const fileUrl = await getFileUrl(file.sysFileNm);
+          // todo 이하 주석 해제하고 이어서 작성
+          // const contentElements: ContentElement[] = splittedNewsContents.map(async (newsContent) => {
+          //   const extractedImgToken = [...newsContent.matchAll(RegExpression.ProductContent.imgToken)]; //newsContent.match(RegExpression.ProductContent.imgToken);
+          //   if (extractedImgToken.length > 0) {
+          //     const fileNames = extractedImgToken.map((token) => token[1]);
+          //     return {
+          //       id: productContentData.id,
+          //       partialContent: productContentData.newsContents,
+          //       fileInfo: {
+          //         file: {},
+          //         fileSrcUrl: await getFileUrl(file.sysFileNm),
+          //       },
+          //     };
+          //   }
+          // });
+        });
       }
     }
   }, [productContentData]);
