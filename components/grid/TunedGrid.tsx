@@ -40,6 +40,7 @@ export interface addPagingOptions extends defaultPagingOptions {}
 export interface otherPagingOptions extends defaultPagingOptions {
   // todo 추후 이러한 식의 뼈대 기반 확장 가능
 }
+type PagingOptions = addPagingOptions | otherPagingOptions;
 
 export interface selectedRowCopiedEvent<P> {
   copiedRowNodes: IRowNode<P>[];
@@ -70,12 +71,12 @@ export interface TunedGridOptions<P> extends GridOptions<P> {
   savedPrevClickedNodeCnt?: number; // 이전에 클릭된 행(node)들 중 저장될 행의 개수(2 이상의 값을 할당하여야)
   enableBrowserTooltips?: boolean;
   rowSelection?: extendedRowSelectionOptions<P>;
-  pagingOptions?: addPagingOptions | otherPagingOptions; // 본 인자 주어질 경우 상태 제어권 일부는 컴포넌트에 위임되어 외부 상태에 대응하여 요구되는 동작을 작동시킴, 상태로서 관리하여 적절한 시점에 페이징 동작을 비활성화, 재활성화 가능
+  pagingOptions?: PagingOptions; // 본 인자 주어질 경우 상태 제어권 일부는 컴포넌트에 위임되어 외부 상태에 대응하여 요구되는 동작을 작동시킴, 상태로서 관리하여 적절한 시점에 페이징 동작을 비활성화, 재활성화 가능
 }
 
 // TunedGrid 참조 인터페이스
 export interface TunedGridRef<P> extends AgGridReact<P> {
-  initializePagingStatus: () => void | Promise<any>; // todo 추후 비동기 처리 필요할 시 Promise 이하 제네릭도 유효한 값으로 지정하기
+  initializePagingStatus: () => void | Promise<unknown>;
 }
 
 type excludedTypes = 'columnDefs';
@@ -96,16 +97,33 @@ type TunedGridProps<P> =
  * ArrowDown, ArrowUp 키는 본 요소 내부에서 사용되므로 외부에서 이벤트 리스너를 던질 시 유의하여야 함
  * */
 const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
-  const [selectGridColumnState, updateGridColumnState, initGridColumnState] = useCommonStore((s) => [
-    s.selectGridColumnState,
-    s.updateGridColumnState,
-    s.initGridColumnState,
-  ]);
+  const defaultGridOption: GridOptions = {
+    rowHeight: 28,
+    //localeText: AG_CHARTS_LOCALE_KO_KR,
+  };
+
+  /** 컨트롤 키 press 가 발생할 시 일부 설정을 고정하여 연관 동작의 원할한 실행을 가능토록 하는 상수 */
+  const rowSelectionOptionInCtrlInterrupt: RowSelectionOptions<P, any, any> = {
+    mode: 'multiRow',
+    checkboxes: false, // 기본적으로 체크박스 비활성화
+    headerCheckbox: false, // 헤더 체크박스 안 보이게
+    enableClickSelection: true,
+    enableSelectionWithoutKeys: true,
+  };
+
+  const gridComponents = {
+    ...props.components,
+    NUMBER_COMMA: GridSetting.CellRenderer.NUMBER_COMMA,
+    PERCENTAGE: GridSetting.CellRenderer.PERCENTAGE,
+  };
+
+  /** 사용하고자 하는 전역 상태 하의 요소들 */
+  const [selectGridColumnState, updateGridColumnState] = useCommonStore((s) => [s.selectGridColumnState, s.updateGridColumnState]);
 
   /** 참조 및 외부 노출 ref 속성 실 구현 */
   const gridRef = useRef<AgGridReact>(null);
-  const isLoadingRef = useRef(false);
 
+  /** 참조를 통해 외부로 노출되는 영역을 정의함 */
   useImperativeHandle(ref, () => {
     const grid = gridRef.current as AgGridReact<P>;
 
@@ -123,18 +141,20 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
     });
   });
 
+  /** 기존 키에 관한 정보 저장(여기서는 arrowDown, arrowUp) */
+  const prevEventKey = useRef<string | undefined>(undefined);
+
   /** 컬럼 정의는 상태로서 관리됨 */
   const [columnDefs, setColumnDefs] = useState<ColDef<P>[]>(props.columnDefs || []);
   /** 인자로 들어온 키 목록 중 그리드에서 눌려있는 키 목록을 상태로서 관리 */
   const [pressedKeys, setPressedKeys] = useState<string[]>([]);
-
-  //const [firstRender, setFirstRender] = useState(true); todo
 
   /** 본 페이지에서 사용되는 클립보드(복사 이후 사용하기 위해 임시 저장되는 값) 상태 관리 */
   const [copiedRowNode, setCopiedRowNode] = useState<IRowNode<P>[]>([]);
   /** 컴포넌트의 의도된 동작(페이징)을 위하여 외부 상태와 적절히 동기화되어 관리되어지는 상태 */
   const [controlledRowData, setControlledRowData] = useState<P[]>([]);
 
+  /** 최하단 도달 시점에 이벤트를 트리거할지 결정하는 분기 참조 */
   const isReachedEventTriggerAllowed = useRef(true);
 
   /** cell click 이벤트를 외부 값과 동기화 */
@@ -185,96 +205,11 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
     }
   };
 
-  useEffect(() => {
-    // 최초 마운팅 시점에 실행할 동작
-    return () => {
-      // 언마운트 시점에 실행할 동작 정의
-
-      // 페이징 관련 정리 동작
-      if (props.pagingOptions) {
-        // 각 전략별로 컴포넌트 수준에서 적절한 정리 동작 수행
-        console.log('각 전략별로 컴포넌트 수준에서 적절한 정리 동작 수행');
-        if (props.pagingOptions.pagingStrategy == 'add') {
-          setControlledRowData([]);
-        }
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    //if (props.columnDefs && !firstRender) { todo
-    if (props.columnDefs) {
-      if (!props.preventPersonalizedColumnSetting && props.gridId) {
-        selectGridColumnState(props.gridId).then((result) => {
-          const { resultCode, body } = result.data;
-          if (resultCode === 200 && body) {
-            const GridResponse = body as GridResponse;
-            if (GridResponse.columnState) {
-              const savedColumns = JSON.parse(GridResponse.columnState) as ColDef<P>[];
-
-              // 원본 컬럼(props.columnDefs)을 기준으로 저장된 설정을 병합
-              const mergedColumns = props.columnDefs.map((origCol) => {
-                const savedCol = savedColumns.find((sc) => sc.field === origCol.field);
-                return savedCol
-                  ? {
-                      ...origCol, // 원본 컬럼 (cellRenderer 포함)
-                      ...savedCol, // 저장된 설정 (width, order 등)
-                      cellRenderer: origCol.cellRenderer, // cellRenderer는 원본 유지
-                      cellStyle: origCol.cellStyle, // cellStyle도 원본 유지
-                    }
-                  : origCol;
-              });
-              setColumnDefs(mergedColumns);
-            }
-          }
-        });
-      } else {
-        setColumnDefs(props.columnDefs);
-      }
-    }
-  }, [props.columnDefs]);
-
-  useEffect(() => {
-    if (isLoadingRef.current) {
-      isLoadingRef.current = !!props.loading;
-    }
-  }, [props.loading]);
-
-  useEffect(() => {
-    // todo 해당 영역이 spa에서의 경로 이동 수행할 시 중복된 데이터를 출력하는 원인이 되는 듯 하니 수정하기
-    if (props.pagingOptions != undefined) {
-      // props.rowData 상태 변경 시점에 페이징 설정 존재할 시 필요한 동작을 실행하는 영역
-      if (props.pagingOptions.pagingStrategy == 'add') {
-        if (controlledRowData.length > 0) {
-          const api = gridRef.current?.api; // (AgGridReact ref면 보통 .api)
-          if (api) {
-            api.applyTransaction({ add: props.rowData }); // ✅ 스크롤 덜 튐(거의 유지)
-          }
-        } else {
-          setControlledRowData(props.rowData || []);
-        }
-      }
-    }
-  }, [props.rowData]);
-
-  useEffect(() => {
-    if (props.pagingOptions != undefined) {
-      // 페이징 동작 활성화
-      if (props.pagingOptions.pagingStrategy == 'add') {
-        // todo
-      }
-    } else {
-      // 페이징 동작 비활성화에 필요한 동작 정의
-      setControlledRowData([]); // 이하에 주어진 조건부 인자에 따라 이 시점부터 rowData는 props에 주어진 값을 직접 추종
-    }
-  }, [props.pagingOptions]);
-
   const onGridReady = (event: GridReadyEvent) => {
-    //setFirstRender(false); todo
+    /** 개인화된 컬럼 설정 불러오는 영역 */
     if (!props.preventPersonalizedColumnSetting && props.gridId) {
       selectGridColumnState(props.gridId).then((result) => {
         const { resultCode, body } = result.data;
-        // console.log('result.data>>', result.data);
         if (resultCode === 200 && body) {
           const GridResponse = body as GridResponse;
           if (GridResponse.columnState) {
@@ -294,23 +229,6 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
       props.onGridReady(event);
     }
   };
-
-  const defaultGridOption: GridOptions = {
-    rowHeight: 28,
-    //localeText: AG_CHARTS_LOCALE_KO_KR,
-  };
-
-  /** 컨트롤 키 press 가 발생할 시 일부 설정을 고정하여 연관 동작의 원할한 실행을 가능토록 하는 상수 */
-  const rowSelectionOptionInCtrlInterrupt: RowSelectionOptions<P, any, any> = {
-    mode: 'multiRow',
-    checkboxes: false, // 기본적으로 체크박스 비활성화
-    headerCheckbox: false, // 헤더 체크박스 안 보이게
-    enableClickSelection: true,
-    enableSelectionWithoutKeys: true,
-  };
-
-  // 기존 키에 관한 정보 저장(여기서는 arrowDown, arrowUp)
-  const prevEventKey = useRef<string | undefined>(undefined);
 
   const onKeyUp = (event: React.KeyboardEvent<HTMLDivElement>) => {
     /** 눌린 키 목록 최신화(목록에서 제거) */
@@ -357,8 +275,7 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
   };
 
   const onSortChanged = (event: SortChangedEvent<P>) => {
-    // 정렬 발생할 시 prevClickedNodeList 초기화
-
+    // todo 추후 개인화 컬럼 설정 등에서 사용처를 찾지 못할 경우 해당 정의는 불필요하므로 삭제하기
     if (props.onSortChanged) {
       props.onSortChanged(event);
     }
@@ -537,11 +454,75 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
     }
   };
 
-  const gridComponents = {
-    ...props.components,
-    NUMBER_COMMA: GridSetting.CellRenderer.NUMBER_COMMA,
-    PERCENTAGE: GridSetting.CellRenderer.PERCENTAGE,
-  };
+  /** 외부 컬럼 정의와의 동기화 */
+  useEffect(() => {
+    if (props.columnDefs) {
+      if (!props.preventPersonalizedColumnSetting && props.gridId) {
+        selectGridColumnState(props.gridId).then((result) => {
+          const { resultCode, body } = result.data;
+          if (resultCode === 200 && body) {
+            const GridResponse = body as GridResponse;
+            if (GridResponse.columnState) {
+              const savedColumns = JSON.parse(GridResponse.columnState) as ColDef<P>[];
+
+              // 원본 컬럼(props.columnDefs)을 기준으로 저장된 설정을 병합
+              const mergedColumns = props.columnDefs.map((origCol) => {
+                const savedCol = savedColumns.find((sc) => sc.field === origCol.field);
+                return savedCol
+                  ? {
+                      ...origCol, // 원본 컬럼 (cellRenderer 포함)
+                      ...savedCol, // 저장된 설정 (width, order 등)
+                      cellRenderer: origCol.cellRenderer, // cellRenderer는 원본 유지
+                      cellStyle: origCol.cellStyle, // cellStyle도 원본 유지
+                    }
+                  : origCol;
+              });
+              setColumnDefs(mergedColumns);
+            }
+          }
+        });
+      } else {
+        setColumnDefs(props.columnDefs);
+      }
+    }
+  }, [props.columnDefs]);
+
+  /** 인자로 받은 rowData 변경에 따른 동작 */
+  useEffect(() => {
+    if (props.pagingOptions != undefined) {
+      // props.rowData 상태 변경 시점에 페이징 설정 존재할 시 필요한 동작을 실행하는 영역
+      //console.log('props.rowData: ', props.rowData, controlledRowData, props.pagingOptions);
+      if (props.pagingOptions.pagingStrategy == 'add') {
+        const api = gridRef.current?.api; // (AgGridReact ref면 보통 .api)
+        if (api != undefined) {
+          // api 존재 확인으로 그리드 마운트 이후 시점임을 보장(onGridReady 호출 이후)
+          if (controlledRowData.length > 0) {
+            api.applyTransaction({ add: props.rowData }); // controlledRowData 를 동기화하여 리랜더링을 유발하여 스크롤을 무효화하는 대신 api를 통한 추가를 사용하여 스크롤 무호화 없이 자연스레 추가
+          } else {
+            setControlledRowData(props.rowData || []);
+          }
+        }
+      }
+    }
+  }, [props.rowData]);
+
+  /** pagingOption 변경에 따른 동기화 */
+  useEffect(() => {
+    if (props.pagingOptions == undefined) {
+      /** 페이징 동작 비활성화에 필요한 동작 정의 */
+      setControlledRowData([]);
+    }
+
+    return () => {
+      // 페이징 관련 정리 동작
+      if (props.pagingOptions) {
+        // 각 전략별로 컴포넌트 수준에서 적절한 정리 동작 수행
+        if (props.pagingOptions.pagingStrategy == 'add') {
+          setControlledRowData([]);
+        }
+      }
+    };
+  }, [props.pagingOptions]);
 
   return (
     <div className={`ag-theme-alpine ${props.className}`} onWheel={props.onWheel} onKeyDown={onKeyDown} onKeyUp={onKeyUp} tabIndex={-1}>
@@ -560,7 +541,6 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
         onCellKeyDown={(event) => {
           onCellKeyDown(event, props.columnDefs, props.colIndexForSuppressKeyEvent, props.rowData);
         }}
-        loading={isLoadingRef.current}
         ref={gridRef}
         onCellClicked={onCellClicked}
         onSortChanged={onSortChanged}
