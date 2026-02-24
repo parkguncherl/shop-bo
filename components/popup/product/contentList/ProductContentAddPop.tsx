@@ -14,7 +14,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '../../../../libs';
 import { useProductContentsStore } from '../../../../stores/product/useProductContentsStore';
 import { toastError, toastSuccess } from '../../../ToastMessage';
-import { Formatter } from '../../../../libs/const';
+import { Formatter, RegExpression } from '../../../../libs/const';
 import { ConfirmModal } from '../../../ConfirmModal';
 
 interface ProductContentShowPopProps {
@@ -66,34 +66,45 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
 
   // 입력이 유효한 경우
   // 컨텐츠로서 저장하는 내용은 내용 영역에서 파일 제목, 문단 단위 절삭을 위한 정보를 포함하도록 한다.
-  // 줄바꿈: \n, 파일(이미지)명: <<IMG|image_title>> --> 둘중 하나를 기준으로 문단 나눔
+  // 줄바꿈(\n) 기준으로 문단 분기, 파일(이미지)명(<<IMG|image_title>>) 뒤에는 반드시 이를(캐리지 리턴) 첨부
   const onValid: SubmitHandler<ProductContentsFields> = (data, event) => {
     const fileInfoList: FileInfo[] = [
       ...data.content.filter((content) => content.fileInfo && content.fileInfo.file).map((content) => content.fileInfo as FileInfo),
     ];
     const uniqueFileList: File[] = Array.from(new Map(fileInfoList.map((fileInfo) => [fileInfo.file.name, fileInfo.file])).values());
-    const fileInfoIncludedContent = data.content
+    const fileInfoIncludedContentList = data.content
       .map((content) => {
         if (content.fileInfo && content.fileInfo.file.name) {
           // regex = /<<IMG\|([^>]+)>>/g;
           //return `<<IMG|${content.fileInfo.file.name}>>`; // <<IMG|image_title>>
           //return ImgToken(content.fileInfo.file.name);
-          return Formatter.ProductContent.ImgToken(content.fileInfo.file.name);
+
+          return Formatter.ProductContent.CarriageReturn(Formatter.ProductContent.ImgToken(content.fileInfo.file.name));
         } else {
           //return content.partialContent + '\\n'; // 문단 구분을 위한 구분자 추가 ('\\n' → 문자열 \n)
-          return Formatter.ProductContent.CarriageReturn(content.partialContent || '');
+          return content.partialContent && content.partialContent != '' ? Formatter.ProductContent.CarriageReturn(content.partialContent) : '';
         }
       })
-      .join('');
+      .filter((value) => value != undefined && value != ''); // 빈 문단의 경우 저장 이전에 제거
+
+    const joinedFileInfoIncludedContent = fileInfoIncludedContentList.join('');
     insertProductContentsMutate({
       newsTitle: data.title,
       newsSubTitle: data.title, // 현재는 newsTitle 과 동일한 값을 사용하나 추후 요청이 들어올 경우 수정
-      newsContents: fileInfoIncludedContent,
+      newsContents: joinedFileInfoIncludedContent,
       commonRequestFileUploads: {
         uploadFiles: uniqueFileList,
       },
     });
-    // console.log(fileInfoIncludedContent);
+
+    // console.log(fileInfoIncludedContentList);
+    //console.log(joinedFileInfoIncludedContent);
+
+    //const combinedRegex = new RegExp(`${RegExpression.ProductContent.imgToken.source}|${RegExpression.ProductContent.carriageReturn.source}`, 'g');
+
+    // const contentElements = joinedFileInfoIncludedContent.split(RegExpression.ProductContent.carriageReturn).filter((value) => value != '');
+    // console.log('contentElements: ', contentElements);
+
     // console.log(fileInfoIncludedContent.replace(/<<IMG\|[^>]+>>/g, '').replace(/\\n/g, '\n'));
     //console.log('fileInfoLists: ', uniqueFileList);
   };

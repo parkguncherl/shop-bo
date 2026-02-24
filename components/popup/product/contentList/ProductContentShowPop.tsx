@@ -54,14 +54,9 @@ const ProductContentShowPop = ({ open, productContentData, onClose }: ProductCon
   useEffect(() => {
     if (productContentData) {
       if (productContentData.fileId) {
-        const combinedRegex = new RegExp(`${RegExpression.ProductContent.imgToken.source}|${RegExpression.ProductContent.carriageReturn.source}`, 'g');
-        const contentElements = (productContentData.newsContents || '').split(combinedRegex);
-        console.log(
-          'contentElements: ',
-          contentElements,
-          (productContentData.newsContents || '').split(RegExpression.ProductContent.imgToken),
-          productContentData.newsContents,
-        );
+        const contentElements = (productContentData.newsContents || '').split(RegExpression.ProductContent.carriageReturn).filter((value) => value != '');
+        console.log('productContentData.newsContents: ', productContentData.newsContents);
+        console.log('contentElements: ', contentElements);
         // selectFileList(productContentData.fileId).then((fileDetList) => {
         //   const contentElements = (productContentData.newsContents || '').split(RegExpression.imgToken);
         //   // const updatedFileDetStateList = fileDetList.map(async (fileDet) => {

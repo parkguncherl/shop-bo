@@ -97,6 +97,8 @@ const ContentList = () => {
     queryFn: () =>
       authApi.get('/productContentList/productContentListPaging', {
         params: {
+          curPage: paging.curPage,
+          pageRowCount: paging.pageRowCount,
           ...filters,
           ...lastInfos,
         },
