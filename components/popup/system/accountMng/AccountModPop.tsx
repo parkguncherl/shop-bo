@@ -44,7 +44,6 @@ interface Props {
 export const AccountModPop = ({ data }: Props) => {
   console.log('AccountModPop data: ==>', data);
   const session = useSession();
-  const workLogisId = session.data?.user.workLogisId ? session.data?.user.workLogisId : 0;
   const authCd = parseInt(session.data?.user.authCd || '');
   const defaultOption = { value: '0', label: '전체' };
   const [partnerOption, setPartnerOption] = useState<any>([defaultOption]);
@@ -70,8 +69,6 @@ export const AccountModPop = ({ data }: Props) => {
       deptNm: data.deptNm || '',
       positionNm: data.positionNm || '',
       orgPartnerId: data.orgPartnerId ?? 0,
-      orgPartnerNm: data.orgPartnerNm ?? '선택',
-      workLogisId: data.workLogisId ?? 0,
     },
     mode: 'onSubmit',
   });
@@ -124,7 +121,7 @@ export const AccountModPop = ({ data }: Props) => {
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('삭제되었습니다.');
-          await queryClient.invalidateQueries(['/user/paging']);
+          await queryClient.invalidateQueries({ queryKey: ['/user/paging'] }); // 즐겨찾기 영역 cached fetch 무효화
           closeModal('MOD');
 
           // sendMailUserMutate({
@@ -296,7 +293,7 @@ export const AccountModPop = ({ data }: Props) => {
                     setUserAuthCd(value ? Number(value) : 0);
                   }}
                 />
-                <FormDropDown<AccountRequestUpdateFields> control={control} title={'상태' || ''} name={'useYn'} codeUpper={'10280'} required={true} />
+                <FormDropDown<AccountRequestUpdateFields> control={control} title={'상태' || ''} name={'useYn'} codeUpper={'10030'} required={true} />
               </PopupSearchType>
               <PopupSearchType className={'type_2'}>
                 <FormInput<AccountRequestUpdateFields>
@@ -310,20 +307,6 @@ export const AccountModPop = ({ data }: Props) => {
               </PopupSearchType>
               <PopupSearchType className={'type_2'}>
                 <FormInput<AccountRequestUpdateFields> control={control} name={'positionNm'} label={'직책'} placeholder={Placeholder.Input || ''} />
-                {authCd > 399 ? (
-                  <TunedReactSelector
-                    title={'연결화주'}
-                    name={'orgPartnerId'}
-                    onChange={(option) => {
-                      setValue('orgPartnerId', option.value ? Number(option.value) : undefined);
-                    }}
-                    options={partnerOption}
-                    placeholder="연결화주"
-                    values={getValues('orgPartnerId')}
-                  />
-                ) : (
-                  ''
-                )}
               </PopupSearchType>
               <PopupSearchType className={'type_2'}>
                 <dl>
