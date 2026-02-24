@@ -42,7 +42,7 @@ const AccountMng = () => {
   ]);
 
   const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<AccountPagingFilter>({
-    partnerNm: ''
+    partnerNm: '',
   });
 
   const [loginId, setLoginId] = useState<string | undefined>(undefined);
@@ -199,7 +199,7 @@ const AccountMng = () => {
           title={'상태'}
           name={'useYn'}
           //defaultOptions={[...DefaultOptions.Select]}
-          codeUpper={'10280'}
+          codeUpper={'10030'}
           value={filters.useYn || ''}
           onChange={onChangeFilters}
         />

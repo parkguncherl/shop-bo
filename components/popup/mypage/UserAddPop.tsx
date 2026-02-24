@@ -136,7 +136,7 @@ const UserAddPop = () => {
               title={'상태'}
               name={'useYn'}
               defaultOptions={[...DefaultOptions.Select]}
-              codeUpper={'10280'}
+              codeUpper={'10030'}
               required={true}
             />
           </PopupSearchType>
