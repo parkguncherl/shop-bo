@@ -115,8 +115,8 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
         onClose={onClose}
         footer={
           <PopupFooter>
-            <div className={'btn-wrapper'}>
-              <div className={'btn-per-wrapper'}>
+            <div className="btnArea between">
+              <div className="left">
                 <button
                   className="btn btn_blue"
                   onClick={() => {
@@ -132,8 +132,21 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
                 >
                   저장
                 </button>
+                <button
+                  type={'button'}
+                  className={'btn'}
+                  onClick={() => {
+                    if (displayMode != 'preview') {
+                      setDisplayMode('preview');
+                    } else {
+                      setDisplayMode('edit');
+                    }
+                  }}
+                >
+                  {displayMode == 'edit' ? '미리보기' : '편집'}
+                </button>
               </div>
-              <div className={'btn-per-wrapper'}>
+              <div className="right">
                 <button
                   className="btn"
                   onClick={() => {
