@@ -51,19 +51,9 @@ const ContentList = () => {
       maxWidth: 1300,
       suppressHeaderMenuButton: true,
       valueFormatter: (params) => {
-        // return (
-        //   params.value
-        //     // 이미지 토큰 제거
-        //     .replace(/<<IMG\|[^>]+>>/g, '')
-        //
-        //     // 줄바꿈 기호 제거
-        //     .replace(/\\n/g, '\n')
-        //
-        //     .trim()
-        // );
         return params.value
-          .replace(RegExpression.removeImgToken, '') // 이미지 토큰 제거
-          .replace(RegExpression.removeCarriageReturn, '\n') // 줄바꿈 기호 제거
+          .replace(RegExpression.ProductContent.imgToken, '') // 이미지 토큰 제거
+          .replace(RegExpression.ProductContent.carriageReturn, '\n') // 줄바꿈 기호 제거
           .trim(); // 양 끝단 공백 제거
       },
     },

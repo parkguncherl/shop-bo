@@ -6,15 +6,6 @@ export const Placeholder = {
   PhoneNo: '-를 제외한 숫자만 입력하세요.',
 };
 
-/* 판매상태 코드 / 코드명 / grid className / 단축키( alt + ), 본 상수를 사용하는 코드들이 각 배열 요소의 순서에 의존적이므로 이점에 유의 */
-export const ProductStatus = {
-  sell: ['90', '판매', '', '1'], // 판매
-  refund: ['40', '반품', 'ag-grid-refund', '2'],
-  beforeDelivery: ['99', '미송', 'ag-grid-beforeDelivery', '3'],
-  sample: ['50', '샘플', 'ag-grid-sample', '4'],
-  notDelivered: ['80', '미출', 'ag-grid-notDelivered', '5'],
-};
-
 // 작업구분코드
 export const JobType = {
   jumun: 'A',
@@ -42,12 +33,19 @@ export const AsnStatCd = {
 
 // 정규표현식 모음
 export const RegExpression = {
-  removeImgToken: /<<IMG\|[^>]+>>/g, // <<IMG|image_title>>
-  removeCarriageReturn: /\\n/g, // '\\n' → 문자열 \n
+  ProductContent: {
+    imgToken: /<<IMG\|[^>]+>>/g, // <<IMG|image_title>>
+    carriageReturn: /\\n/g, // '\\n' → 문자열 \n
+  },
 };
 
-// 텍스트 데이터에 사용되는 표준 이미지 토큰
-export const ImgToken = (fileName: string) => `<<IMG|${fileName}>>`;
+// 요구되는 값에 맞추어 포매팅 수행하는 함수(혹은 그러한 역할을 하는 무언가)의 모음
+export const Formatter = {
+  ProductContent: {
+    CarriageReturn: (content: string) => content + '\\n', // 명시적 캐리지 리턴 추가
+    ImgToken: (fileName: string) => `<<IMG|${fileName}>>`, // 텍스트 데이터에 사용되는 표준 이미지 토큰
+  },
+};
 
 export const AlertMessage = { RequiredParams: '검색조건을 1개 이상 입력하세요.', LastDataHasBeenReached: '더 이상 데이터가 존재하지 않습니다.' };
 

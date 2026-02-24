@@ -14,7 +14,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '../../../../libs';
 import { useProductContentsStore } from '../../../../stores/product/useProductContentsStore';
 import { toastError, toastSuccess } from '../../../ToastMessage';
-import { ImgToken } from '../../../../libs/const';
+import { Formatter } from '../../../../libs/const';
 import { ConfirmModal } from '../../../ConfirmModal';
 
 interface ProductContentShowPopProps {
@@ -31,7 +31,7 @@ interface ProductContentShowPopProps {
 const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
   //const [getFileUrl, selectFileList] = useCommonStore((s) => [s.getFileUrl, s.selectFileList]);
-  const [modals, openModal, closeModal, insertProductContents] = useProductContentsStore((s) => [s.modals, s.openModal, s.closeModal, s.insertProductContents]);
+  const [insertProductContents] = useProductContentsStore((s) => [s.insertProductContents]);
 
   /** 팝업 내부 local state */
   const [displayMode, setDisplayMode] = useState<EnhancedTextAreasMode>('edit');
@@ -77,15 +77,17 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
         if (content.fileInfo && content.fileInfo.file.name) {
           // regex = /<<IMG\|([^>]+)>>/g;
           //return `<<IMG|${content.fileInfo.file.name}>>`; // <<IMG|image_title>>
-          return ImgToken(content.fileInfo.file.name);
+          //return ImgToken(content.fileInfo.file.name);
+          return Formatter.ProductContent.ImgToken(content.fileInfo.file.name);
         } else {
-          return content.partialContent + '\\n'; // 문단 구분을 위한 구분자 추가 ('\\n' → 문자열 \n)
+          //return content.partialContent + '\\n'; // 문단 구분을 위한 구분자 추가 ('\\n' → 문자열 \n)
+          return Formatter.ProductContent.CarriageReturn(content.partialContent || '');
         }
       })
       .join('');
     insertProductContentsMutate({
       newsTitle: data.title,
-      newsSubTitle: data.title, // todo
+      newsSubTitle: data.title, // 현재는 newsTitle 과 동일한 값을 사용하나 추후 요청이 들어올 경우 수정
       newsContents: fileInfoIncludedContent,
       commonRequestFileUploads: {
         uploadFiles: uniqueFileList,
