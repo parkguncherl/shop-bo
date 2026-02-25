@@ -8,10 +8,10 @@ import PopupFormGroup from '../../content/PopupFormGroup';
 import PopupFormType from '../../content/PopupFormType';
 import FormInput from '../../../form/FormInput';
 import { ProductContentsFields } from '../../../../app/(app)/product/Contents/ProductContents';
-import FormEnhancedTextArea, { ContentElement } from '../../../form/FormEnhancedTextArea';
 import PopupFormBox from '../../content/PopupFormBox';
 import { useForm } from 'react-hook-form';
 import { RegExpression } from '../../../../libs/const';
+import FormCombineParagraphs, { ContentElement } from '../../../form/FormCombineParagraphs';
 
 interface ProductContentShowPopProps {
   open: boolean;
@@ -125,7 +125,7 @@ const ProductContentShowPop = ({ open, productContentData, onClose }: ProductCon
                 <FormInput<ProductContentsFields> control={control} name={'title'} label={'제목'} inputType={'single'} readOnly={true} />
               </PopupFormType>
               <PopupFormType className={'type1'}>
-                <FormEnhancedTextArea<ProductContentsFields>
+                <FormCombineParagraphs<ProductContentsFields>
                   control={control}
                   name={'content'}
                   autoSize={{ minRows: 7, maxRows: 40 }}

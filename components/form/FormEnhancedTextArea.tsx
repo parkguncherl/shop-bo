@@ -38,6 +38,7 @@ interface FieldErrorForFileInfo {
   fileSrcUrl: FieldError | undefined;
 }
 
+// todo FormCombineParagraphs 로 대체되었으니 마이그레이션이 끝났다 여겨질 시 삭제할 것
 /**
  * stateFul 컴포넌트
  * 기존 textArea 와 달리 이미지 삽입 및 이에 따라 필요한 동작 지원

@@ -7,7 +7,6 @@ import PopupFormGroup from '../../content/PopupFormGroup';
 import PopupFormType from '../../content/PopupFormType';
 import FormInput from '../../../form/FormInput';
 import { ProductContentsFields } from '../../../../app/(app)/product/Contents/ProductContents';
-import FormEnhancedTextArea, { EnhancedTextAreasMode, FileInfo } from '../../../form/FormEnhancedTextArea';
 import { SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -16,6 +15,7 @@ import { useProductContentsStore } from '../../../../stores/product/useProductCo
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import { Formatter, RegExpression } from '../../../../libs/const';
 import { ConfirmModal } from '../../../ConfirmModal';
+import FormCombineParagraphs, { EnhancedTextAreasMode, FileInfo } from '../../../form/FormCombineParagraphs';
 
 interface ProductContentShowPopProps {
   open: boolean;
@@ -180,7 +180,7 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
                 <FormInput<ProductContentsFields> control={control} name={'title'} label={'제목'} inputType={'label'} placeholder={'제목'} />
               </PopupFormType>
               <PopupFormType className={'type1'}>
-                <FormEnhancedTextArea<ProductContentsFields>
+                <FormCombineParagraphs<ProductContentsFields>
                   control={control}
                   name={'content'}
                   autoSize={{ minRows: 7, maxRows: 40 }}
