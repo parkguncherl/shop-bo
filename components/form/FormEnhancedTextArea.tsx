@@ -15,8 +15,8 @@ type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
     textAreaBoxHeight?: string;
   };
 export interface FileInfo {
-  file: File;
-  fileSrcUrl?: string; // 이미지 파일 출력을 위하여 브라우저에서 인스턴스화를 통해 생성한 url
+  file?: File; // 단순 파일 출력을 위한 경우는 생략 가능(브라우저 paste 이벤트 등에 의하지 않고는 할당되지 않으리라 가정)
+  fileSrcUrl?: string; // 이미지 파일 출력 혹은 버킷 참조를 위한 url
 }
 export interface ContentElement {
   id: number; // 기본 1부터 시작, 순차적일 필요는 없으나 후행하는 요소의 id는 선행 요소의 id보다 커야 함
@@ -294,9 +294,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({
                               <img src={contentElement.fileInfo.fileSrcUrl} />
                             </div>
                           )}
-                          <div className={'img_title_wrapper'}>
-                            <p>{contentElement.fileInfo.file.name}</p>
-                          </div>
+                          <div className={'img_title_wrapper'}>{contentElement.fileInfo.file?.name && <p>{contentElement.fileInfo.file.name}</p>}</div>
                         </div>
                       ) : (
                         <div className={'per_textArea_element'}>
@@ -379,9 +377,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({
                               <img src={contentElement.fileInfo.fileSrcUrl} />
                             </div>
                           )}
-                          <div className={'img_title_wrapper'}>
-                            <p>{contentElement.fileInfo.file.name}</p>
-                          </div>
+                          <div className={'img_title_wrapper'}>{contentElement.fileInfo.file?.name && <p>{contentElement.fileInfo.file.name}</p>}</div>
                         </div>
                       ) : (
                         <div className={'per_textArea_element'}>
@@ -421,9 +417,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({
                           <div className={'img_wrapper'}>
                             <img src={contentElement.fileInfo.fileSrcUrl} />
                           </div>
-                          <div className={'img_title_wrapper'}>
-                            <p>{contentElement.fileInfo.file.name}</p>
-                          </div>
+                          <div className={'img_title_wrapper'}>{contentElement.fileInfo.file?.name && <p>{contentElement.fileInfo.file.name}</p>}</div>
                         </div>
                       ) : (
                         <div className={'text_wrapper'}>
@@ -520,9 +514,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({
                                   <img src={contentElement.fileInfo.fileSrcUrl} />
                                 </div>
                               )}
-                              <div className={'img_title_wrapper'}>
-                                <p>{contentElement.fileInfo.file.name}</p>
-                              </div>
+                              <div className={'img_title_wrapper'}>{contentElement.fileInfo.file?.name && <p>{contentElement.fileInfo.file.name}</p>}</div>
                             </div>
                           ) : (
                             <div className={'per_textArea_element'}>
@@ -605,9 +597,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({
                                   <img src={contentElement.fileInfo.fileSrcUrl} />
                                 </div>
                               )}
-                              <div className={'img_title_wrapper'}>
-                                <p>{contentElement.fileInfo.file.name}</p>
-                              </div>
+                              <div className={'img_title_wrapper'}>{contentElement.fileInfo.file?.name && <p>{contentElement.fileInfo.file.name}</p>}</div>
                             </div>
                           ) : (
                             <div className={'per_textArea_element'}>
@@ -647,9 +637,7 @@ const FormEnhancedTextArea = <T extends FieldValues>({
                               <div className={'img_wrapper'}>
                                 <img src={contentElement.fileInfo.fileSrcUrl} />
                               </div>
-                              <div className={'img_title_wrapper'}>
-                                <p>{contentElement.fileInfo.file.name}</p>
-                              </div>
+                              <div className={'img_title_wrapper'}>{contentElement.fileInfo.file?.name && <p>{contentElement.fileInfo.file.name}</p>}</div>
                             </div>
                           ) : (
                             <div className={'text_wrapper'}>
