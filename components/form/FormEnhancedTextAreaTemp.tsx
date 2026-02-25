@@ -1,5 +1,5 @@
 import { BaseTextAreaAtom, BaseTextAreaAtomProps } from '../atom/BaseTextAreaAtom';
-import { Control, FieldError, FieldPathByValue, FieldValues, useController } from 'react-hook-form';
+import { Control, FieldError, FieldPathByValue, FieldValues, PathValue, useController } from 'react-hook-form';
 import React, { useEffect, useRef, useState } from 'react';
 import { toastError } from '../ToastMessage';
 
@@ -44,15 +44,15 @@ interface FieldErrorForFileInfo {
  * RHF 구독 하에서의 함수 컴포넌트 재평가에 따른 부수 효과 방지하도록 랜더링이 아닌 state, 이에 따른 hook trigger 에 의존토록 함
  * */
 const FormEnhancedTextAreaTemp = <TForm extends FieldValues>({
-   control,
-   name,
-   autoSize,
-   mode,
-   inputType,
-   dtWidth,
-   textAreaBoxHeight,
-   label = '',
-   attachOnlyImg = true,
+  control,
+  name,
+  autoSize,
+  mode,
+  inputType,
+  dtWidth,
+  textAreaBoxHeight,
+  label = '',
+  attachOnlyImg = true,
 }: FormEnhancedTextAreaProps<TForm> & BaseTextAreaAtomProps) => {
   /** react hook form 의 controller 는 현재 영역에서는 수정 대상 영역의 값(contentElement)에 한정되어 적용함(전역 적용하지 아니함) */
   const {
@@ -61,26 +61,22 @@ const FormEnhancedTextAreaTemp = <TForm extends FieldValues>({
   } = useController<TForm, FieldPathByValue<TForm, ContentElement[]>>({
     control,
     name,
-    defaultValue: [],
+    defaultValue: [] as PathValue<TForm, FieldPathByValue<TForm, ContentElement[]>>,
   });
 
   const boxRef = useRef<HTMLDivElement>(null);
   const bottomTextArea = useRef<HTMLTextAreaElement | null>(null);
 
-  /** 해당 지역 상태는 반드시 배열의 불변성을 유지할 것 */
-    //const [contentElements, setContentElements] = useState<ContentElementInfo[]>([{ id: 1, partialContent: '', init: true }]);
-  const [perContentStatusList, setPerContentStatusList] = useState<{ id: number; init: boolean }[]>([{ id: 1, init: true }]);
+  /** 이하 지역 상태는 반드시 배열의 불변성을 유지할 것 */
+  //const [contentElements, setContentElements] = useState<ContentElementInfo[]>([{ id: 1, partialContent: '', init: true }]);
+  const [perContentStatusList, setPerContentStatusList] = useState<{ id: number; init: boolean }[]>([{ id: 1, init: true }]); // 각 컨텐츠 요소에 일대일로 대응하는 상태 정보 목록
   const [unFrozenElementId, setUnFrozenElementId] = useState<number>(-1); // 최하단 영역 이외 편집 가능한 영역 지정(by Id), -1인 경우 최하단 영역 이외 frozen(편집 가능 속성을 회수)
-  const [boxHeight, setBoxHeight] = useState(0);
+  const [boxHeight, setBoxHeight] = useState(0); // textArea(div box 의 컨텐츠) 높이에 따라 동기화
 
   const [innerErrorState, setInnerErrorState] = useState<FieldErrorForContentElement[]>([]); // contentElements 의 순서와 대응되므로, 배열 index 기준으로 error가 발생한 contentElement 를 찾을 수 있음
 
   /** 랜더링 시점 초기화 동작 */
   useEffect(() => {
-    if (!value || value.length === 0) {
-      controlChange([{ id: 1, partialContent: '', init: true }]);
-    }
-
     // 컨텐츠 박스 높이에 따른 state 동기화를 위한 ResizeObserver 인스턴스 생성 및 등록, 추후 반환까지 생명주기 지정
     if (!boxRef.current) return;
 
@@ -107,13 +103,14 @@ const FormEnhancedTextAreaTemp = <TForm extends FieldValues>({
 
   useEffect(() => {
     setPerContentStatusList((prevState) => {
-      prevState.map((prevContentElement) => {
-        if (prevContentElement.id == unFrozenElementId) {
+      return prevState.map((prevContentElement) => {
+        if (prevContentElement.id == unFrozenElementId && prevContentElement.init) {
           return {
             ...prevContentElement,
             init: false, // 상호작용이 최초로 일어난 경우 init false, 이후 기존에 랜더링되어진 레거시 상태로 취급
           };
         }
+        return prevContentElement;
       });
     });
     // setContentElements((prevContentElements) => {
@@ -155,27 +152,56 @@ const FormEnhancedTextAreaTemp = <TForm extends FieldValues>({
 
   useEffect(() => {
     /** rhf value 에 따라 각 content status 동기화 */
-    if (value.length > perContentStatusList) {
-      // 기존 State가 포함하지 않는 value 에 대응하는 state element 추가
-      setPerContentStatusList((prevState) => {
-        const notIncluded: ContentElement = value.filter((val: ContentElement) => !prevState.map((prev) => prev.id).includes(val.id))[0];
-        return [
-          ...prevState,
-          {
-            id: notIncluded.id,
-            init: false,
-          },
-        ];
-      });
-    } else if (value.length < perContentStatusList) {
-      if (value.length == 0) {
-        // 초기값으로 복귀
-      } else {
+    if (!value || value.length === 0) {
+      // rhf controlled value 초기값 할당
+      controlChange([{ id: 1, partialContent: '', init: true }]);
+    } else {
+      if (value.length > perContentStatusList) {
+        // 기존 State가 포함하지 않는 value 에 대응하는 state element 추가
+        setPerContentStatusList((prevState) => {
+          const notIncluded: ContentElement = value.filter((val: ContentElement) => !prevState.map((prev) => prev.id).includes(val.id))[0];
+          return [
+            ...prevState,
+            {
+              id: notIncluded.id,
+              init: true, // 최초 정의 시 init true (상호작용 이전 상태)
+            },
+          ];
+        });
+      } else if (value.length < perContentStatusList) {
         // 제거된 content 제거
         setPerContentStatusList((prevState) => prevState.filter((prev) => value.filter((val: ContentElement) => val.id == prev.id).length == 1));
       }
     }
   }, [value]);
+
+  const changeContentElementByTargetValue = (target: EventTarget & HTMLTextAreaElement, targetContentElement: ContentElement) => {
+    controlChange(
+      value.map((prev: ContentElement) => {
+        if (prev.id == targetContentElement.id) {
+          return {
+            ...prev,
+            partialContent: target.value,
+          };
+        } else {
+          return prev;
+        }
+      }),
+    );
+    // setContentElements((prevState) => {
+    //   return prevState.map((prev) => {
+    //     if (prev.id == contentElement.id) {
+    //       return {
+    //         ...prev,
+    //         partialContent: e.target.value,
+    //         init: prev.init ? false : prev.init, // 최초 상호작용이 발생한 경우 init 속성 무효화
+    //       };
+    //     } else {
+    //       return prev;
+    //     }
+    //   });
+    // });
+  };
 
   /** 주어진 id에 대응하는 init 상태를 false 로 변환 */
   const flipInitStatusToFalseById = (id: number) => {
@@ -193,18 +219,17 @@ const FormEnhancedTextAreaTemp = <TForm extends FieldValues>({
     );
   };
 
-  const getPerContentStatusById = (id: number) => {
-    return perContentStatusList..filter((perContentStatus) => perContentStatus.id == id)[0];
+  const getPerContentStatusById = (id: number): { id: number; init: boolean } | undefined => {
+    return perContentStatusList.filter((perContentStatus) => perContentStatus.id == id)[0];
   };
 
   /** contentElement 정의(구성) 시점에서 필요한 기본값을 설정한 contentElementInfo 타입의 객체 반환, */
-    // todo
-  const configForInitContent = (addedContentElement: ContentElement) => {
-      return {
-        ...addedContentElement,
-        init: true, // 최초 정의 시 init true
-      };
-    };
+  // const configForInitContent = (addedContentElement: ContentElement) => {
+  //   return {
+  //     ...addedContentElement,
+  //     init: true, // 최초 정의 시 init true
+  //   };
+  // };
 
   const attachRequestInterruptCallBack = (files: File[], contentElementOnTriggeredArea: ContentElement) => {
     if (attachOnlyImg && files.filter((file) => !file.type.startsWith('image/')).length > 0) {
@@ -216,16 +241,24 @@ const FormEnhancedTextAreaTemp = <TForm extends FieldValues>({
         if (contentElementOnTriggeredArea.id == value[i].id) {
           // 대상 영역
           files.forEach((file) => {
-            modifiedContentElements.push(
-              configForInitContent({
-                id: modifiedContentElements.length + 1,
-                fileInfo: {
-                  file: file,
-                  //fileTitle: uniquenessEnsuredTitle(file.name), // 최초로 할당되어지는 제목
-                  fileSrcUrl: URL.createObjectURL(file),
-                } as FileInfo,
-              }),
-            );
+            // modifiedContentElements.push(
+            //   configForInitContent({
+            //     id: modifiedContentElements.length + 1,
+            //     fileInfo: {
+            //       file: file,
+            //       //fileTitle: uniquenessEnsuredTitle(file.name), // 최초로 할당되어지는 제목
+            //       fileSrcUrl: URL.createObjectURL(file),
+            //     } as FileInfo,
+            //   }),
+            // );
+            modifiedContentElements.push({
+              id: modifiedContentElements.length + 1,
+              fileInfo: {
+                file: file,
+                //fileTitle: uniquenessEnsuredTitle(file.name), // 최초로 할당되어지는 제목
+                fileSrcUrl: URL.createObjectURL(file),
+              } as FileInfo,
+            });
           });
 
           // 기존 상태 영속을 위한 추가 동작
@@ -334,6 +367,7 @@ const FormEnhancedTextAreaTemp = <TForm extends FieldValues>({
                             type={'text'}
                             onChange={(e) => {
                               flipInitStatusToFalseById(contentElement.id);
+                              changeContentElementByTargetValue(e.target, contentElement);
                               // setContentElements((prevState) => {
                               //   return prevState.map((prev) => {
                               //     if (prev.id == contentElement.id) {
@@ -361,7 +395,7 @@ const FormEnhancedTextAreaTemp = <TForm extends FieldValues>({
                                 e.preventDefault();
                                 if (contentElement.partialContent != undefined && contentElement.partialContent.trim() != '') {
                                   // 값이 유효한 경우 한정으로만 정의된 동작 실행
-                                  controlChange([...value, { id: contentElement.id + 1, partialContent: '' }]);
+                                  controlChange([...value, { id: contentElement.id + 1, partialContent: '' }]); // 입력 완료 후 다음 문단 생성 동작
                                   // setContentElements((prevState) => {
                                   //   return [...prevState, configForInitContent({ id: contentElement.id + 1, partialContent: '' })];
                                   // });
@@ -422,6 +456,7 @@ const FormEnhancedTextAreaTemp = <TForm extends FieldValues>({
                                   //     }
                                   //   });
                                   // });
+                                  changeContentElementByTargetValue(e.target, contentElement);
                                   flipInitStatusToFalseById(contentElement.id);
                                 }
                               }}
@@ -455,7 +490,7 @@ const FormEnhancedTextAreaTemp = <TForm extends FieldValues>({
                     <div className={'per_content_element'} key={contentElement.id}>
                       {contentElement.fileInfo != undefined ? (
                         <div
-                          className={`per_img_element ${getPerContentStatusById(contentElement.id).init ? '' : 'frozen'}`}
+                          className={`per_img_element ${getPerContentStatusById(contentElement.id)?.init ? '' : 'frozen'}`}
                           onClick={() => {
                             setUnFrozenElementId(contentElement.id);
                           }}
@@ -570,6 +605,7 @@ const FormEnhancedTextAreaTemp = <TForm extends FieldValues>({
                                   //     }
                                   //   });
                                   // });
+                                  changeContentElementByTargetValue(e.target, contentElement);
                                   flipInitStatusToFalseById(contentElement.id);
                                 }}
                                 onDrop={(e) => onDropEventHandler(e, contentElement)}
@@ -588,7 +624,7 @@ const FormEnhancedTextAreaTemp = <TForm extends FieldValues>({
                                       // setContentElements((prevState) => {
                                       //   return [...prevState, configForInitContent({ id: contentElement.id + 1, partialContent: '' })];
                                       // });
-                                      controlChange([...value, { id: contentElement.id + 1, partialContent: '' }]);
+                                      controlChange([...value, { id: contentElement.id + 1, partialContent: '' }]); // 입력 완료 후 다음 문단 생성 동작
                                     }
                                   }
                                 }}
@@ -646,6 +682,7 @@ const FormEnhancedTextAreaTemp = <TForm extends FieldValues>({
                                       //     }
                                       //   });
                                       // });
+                                      changeContentElementByTargetValue(e.target, contentElement);
                                       flipInitStatusToFalseById(contentElement.id);
                                     }
                                   }}
@@ -679,7 +716,7 @@ const FormEnhancedTextAreaTemp = <TForm extends FieldValues>({
                         <div className={'per_content_element'} key={contentElement.id}>
                           {contentElement.fileInfo != undefined ? (
                             <div
-                              className={`per_img_element ${getPerContentStatusById(contentElement.id).init ? '' : 'frozen'}`}
+                              className={`per_img_element ${getPerContentStatusById(contentElement.id)?.init ? '' : 'frozen'}`}
                               onClick={() => {
                                 setUnFrozenElementId(contentElement.id);
                               }}
@@ -762,4 +799,4 @@ const FormEnhancedTextAreaTemp = <TForm extends FieldValues>({
   );
 };
 
-export default FormEnhancedTextArea;
+export default FormEnhancedTextAreaTemp;
