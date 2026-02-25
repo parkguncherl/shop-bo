@@ -44,43 +44,54 @@ const ProductContentShowPop = ({ open, productContentData, onClose }: ProductCon
 
   useEffect(() => {
     if (productContentData) {
-      if (productContentData.fileId) {
-        const splittedNewsContents = (productContentData.newsContents || '').split(RegExpression.ProductContent.carriageReturn).filter((value) => value != '');
-        console.log('productContentData.newsContents: ', productContentData.newsContents);
-        console.log('splitedNewsContents: ', splittedNewsContents);
+      const contentElements: ContentElement[] = [];
+      const splittedNewsContents = (productContentData.newsContents || '').split(RegExpression.ProductContent.carriageReturn).filter((value) => value != '');
 
-        // const contentElements: ContentElement[] = splittedNewsContents.map((newsContent) => {
-        //   const extractedImgToken = [...newsContent.matchAll(RegExpression.ProductContent.imgToken)]; //newsContent.match(RegExpression.ProductContent.imgToken);
-        //   if (extractedImgToken.length > 0) {
-        //     const fileNames = extractedImgToken.map((token) => token[1]);
-        //     return {
-        //       id: productContentData,
-        //       partialContent: productContentData.newsContents,
-        //       fileInfo: {
-        //         file: {},
-        //         fileSrcUrl:
-        //       }
-        //     };
-        //   }
-        // });
-        selectFileList(productContentData.fileId).then((fileDetList) => {
-          //const fileUrl = await getFileUrl(file.sysFileNm);
-          // todo 이하 주석 해제하고 이어서 작성
-          // const contentElements: ContentElement[] = splittedNewsContents.map(async (newsContent) => {
-          //   const extractedImgToken = [...newsContent.matchAll(RegExpression.ProductContent.imgToken)]; //newsContent.match(RegExpression.ProductContent.imgToken);
-          //   if (extractedImgToken.length > 0) {
-          //     const fileNames = extractedImgToken.map((token) => token[1]);
-          //     return {
-          //       id: productContentData.id,
-          //       partialContent: productContentData.newsContents,
-          //       fileInfo: {
-          //         file: {},
-          //         fileSrcUrl: await getFileUrl(file.sysFileNm),
-          //       },
-          //     };
-          //   }
-          // });
+      /** 파일 정보 존재 여부에 따라 분기 */
+      if (productContentData.fileId) {
+        selectFileList(productContentData.fileId)
+          .then((fileDetList) => {
+            splittedNewsContents.forEach(async (newsContent, index) => {
+              const extractedImgToken = [...newsContent.matchAll(RegExpression.ProductContent.imgToken)]; //newsContent.match(RegExpression.ProductContent.imgToken);
+              if (extractedImgToken.length > 0) {
+                const fileNames = extractedImgToken.map((token) => token[1]);
+                if (fileNames.length != 1) {
+                  console.error('단일 파일명을 기대하는 영역에 파일명이 부재하거나 혹은 다수의 파일명이 추출됨, 데이터 오염 여부 점검!');
+                  return Promise.reject('improperData');
+                }
+                const correspondedFileDet = fileDetList.filter((fileDet) => fileDet.fileNm == fileNames[0]);
+
+                if (correspondedFileDet.length != 1 || !correspondedFileDet[0].sysFileNm) {
+                  console.error();
+                  return Promise.reject('failed to the corresponded fileDet');
+                }
+                contentElements.push({
+                  id: index + 1,
+                  partialContent: undefined,
+                  fileInfo: {
+                    fileSrcUrl: await getFileUrl(correspondedFileDet[0].sysFileNm),
+                  },
+                });
+              } else {
+                contentElements.push({
+                  id: index + 1,
+                  partialContent: newsContent,
+                  fileInfo: undefined,
+                });
+              }
+            });
+          })
+          .then(() => {
+            console.log('contentElements: ', contentElements);
+          });
+      } else {
+        splittedNewsContents.forEach((newsContent, index) => {
+          contentElements.push({
+            id: index + 1,
+            partialContent: newsContent,
+          });
         });
+        console.log('bottom splittedNewsContents', splittedNewsContents);
       }
     }
   }, [productContentData]);
