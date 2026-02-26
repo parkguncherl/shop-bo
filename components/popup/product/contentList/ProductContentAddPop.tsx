@@ -92,9 +92,12 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
       newsTitle: data.title,
       newsSubTitle: data.title, // 현재는 newsTitle 과 동일한 값을 사용하나 추후 요청이 들어올 경우 수정
       newsContents: joinedFileInfoIncludedContent,
-      commonRequestFileUploads: {
-        uploadFiles: uniqueFileList,
-      },
+      commonRequestFileUploads:
+        uniqueFileList.length == 0
+          ? undefined
+          : {
+              uploadFiles: uniqueFileList,
+            },
     });
 
     // console.log('uniqueFileList: ', uniqueFileList);

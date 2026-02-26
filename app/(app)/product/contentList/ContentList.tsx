@@ -6,7 +6,7 @@ import { ProductContentListRequestProductContentListFilter, ProductContentListRe
 import { ColDef } from 'ag-grid-community';
 import { TableHeader, toastError } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
 import { useAgGridApi } from '../../../../hooks';
 import { authApi } from '../../../../libs';
@@ -28,7 +28,14 @@ const ContentList = () => {
   const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
 
   /** 코드관리 스토어 - State */
-  const [paging, setPaging, modals, openModal, closeModal] = useProductContentListStore((s) => [s.paging, s.setPaging, s.modals, s.openModal, s.closeModal]);
+  const [paging, setPaging, modals, openModal, closeModal, deleteProductContents] = useProductContentListStore((s) => [
+    s.paging,
+    s.setPaging,
+    s.modals,
+    s.openModal,
+    s.closeModal,
+    s.deleteProductContents,
+  ]);
 
   const gridRef = useRef<TunedGridRef<ProductContentListResponseProductContent>>(null);
 
@@ -73,6 +80,22 @@ const ContentList = () => {
   });
   const [lastInfos, onChangelastInfos, onlastInfosReset] = useFilters<ProductContentListRequestProductContentListFilter>({
     lastId: undefined,
+  });
+
+  const { mutate: deleteProductContentsMutate } = useMutation(deleteProductContents, {
+    onSuccess: async (e) => {
+      try {
+        if (e.data.resultCode === 200) {
+          toastSuccess('컨텐츠가 정상 삭제되었습니다.');
+          closeModal('DEL_CONF');
+          productContentListResponseRefetch();
+        } else {
+          toastError(`컨텐츠 삭제 도중 문제 발생 (${e.data.resultMessage})`);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
   });
 
   useEffect(() => {
@@ -241,15 +264,17 @@ const ContentList = () => {
         }}
       />
       <ProductContentShowPop open={modals.type == 'SHOW' && modals.active} productContentData={modals.stored_temporary} onClose={() => closeModal('SHOW')} />
-      {/*<ConfirmModal*/}
-      {/*  open={modals.type == 'DEL_CONF' && modals.active}*/}
-      {/*  title={`'${(modals.stored_temporary as ProductContentListResponseProductContent).newsTitle}' 컨텐츠를 삭제 하시겠습니까?`}*/}
-      {/*  confirmText={'삭제'}*/}
-      {/*  onConfirm={() => {}}*/}
-      {/*  onClose={() => {*/}
-      {/*    closeModal('DEL_CONF');*/}
-      {/*  }}*/}
-      {/*/>*/}
+      <ConfirmModal
+        open={modals.type == 'DEL_CONF' && modals.active}
+        title={`'${(modals.stored_temporary as ProductContentListResponseProductContent | undefined)?.newsTitle}' 컨텐츠를 삭제 하시겠습니까?`}
+        confirmText={'삭제'}
+        onConfirm={() => {
+          deleteProductContentsMutate(modals.stored_temporary as ProductContentListResponseProductContent);
+        }}
+        onClose={() => {
+          closeModal('DEL_CONF');
+        }}
+      />
     </div>
   );
 };
