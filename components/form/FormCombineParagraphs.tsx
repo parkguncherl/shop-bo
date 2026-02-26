@@ -16,7 +16,7 @@ type FormEnhancedTextAreaProps<TForm extends FieldValues> = {
 };
 export interface FileInfo {
   file?: File; // 단순 파일 출력을 위한 경우는 생략 가능(브라우저 paste 이벤트 등에 의하지 않고는 할당되지 않으리라 가정)
-  fileSrcUrl?: string; // 이미지 파일 출력 혹은 버킷 참조를 위한 url
+  fileSrcUrl?: string; // 이미지 파일 출력을 위한 url
 }
 export interface ContentElement {
   id: number; // 기본 1부터 시작, 순차적일 필요는 없으나 후행하는 요소의 id는 선행 요소의 id보다 커야 함

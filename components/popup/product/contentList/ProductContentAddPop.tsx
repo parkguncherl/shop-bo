@@ -71,10 +71,10 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
     const fileInfoList: FileInfo[] = [
       ...data.content.filter((content) => content.fileInfo && content.fileInfo.file).map((content) => content.fileInfo as FileInfo),
     ];
-    const uniqueFileList: File[] = Array.from(new Map(fileInfoList.map((fileInfo) => [fileInfo.file.name, fileInfo.file])).values());
+    const uniqueFileList: File[] = Array.from(new Map(fileInfoList.map((fileInfo) => [(fileInfo.file as File).name, fileInfo.file as File])).values());
     const fileInfoIncludedContentList = data.content
       .map((content) => {
-        if (content.fileInfo && content.fileInfo.file.name) {
+        if (content.fileInfo && content.fileInfo.file && content.fileInfo.file.name) {
           // regex = /<<IMG\|([^>]+)>>/g;
           //return `<<IMG|${content.fileInfo.file.name}>>`; // <<IMG|image_title>>
           //return ImgToken(content.fileInfo.file.name);
@@ -97,8 +97,8 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
       },
     });
 
-    // console.log(fileInfoIncludedContentList);
-    //console.log(joinedFileInfoIncludedContent);
+    // console.log('uniqueFileList: ', uniqueFileList);
+    // console.log('joinedFileInfoIncludedContent: ', joinedFileInfoIncludedContent);
 
     //const combinedRegex = new RegExp(`${RegExpression.ProductContent.imgToken.source}|${RegExpression.ProductContent.carriageReturn.source}`, 'g');
 
