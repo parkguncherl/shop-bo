@@ -20,7 +20,7 @@ interface ProductContentsState {
 }
 
 interface ProductContentsApiState {
-  insertProductContents: (productContentsRequestInsertProductContents: ProductContentsRequestInsertProductContents) => AxiosPromise<ApiResponse>;
+  //insertProductContents: (productContentsRequestInsertProductContents: ProductContentsRequestInsertProductContents) => AxiosPromise<ApiResponse>;
 }
 
 type FabricStateOfAll = ProductContentsState & ProductContentsApiState;
@@ -45,17 +45,17 @@ const initialStateCreator: StateCreator<FabricStateOfAll, any> = (set, get, api)
         },
       }));
     },
-    insertProductContents: async (insertFabricDatas_request) => {
-      const formData = new FormData();
-      if (insertFabricDatas_request.commonRequestFileUploads?.uploadFiles && insertFabricDatas_request.commonRequestFileUploads.uploadFiles.length > 0) {
-        for (let i = 0; i < insertFabricDatas_request.commonRequestFileUploads.uploadFiles.length; i++) {
-          formData.append('files', insertFabricDatas_request.commonRequestFileUploads.uploadFiles[i]);
-        }
-        insertFabricDatas_request.commonRequestFileUploads.uploadFiles = undefined; // 본 요청 객체의 파일 목록은 무효화
-      }
-      formData.append('main', new Blob([JSON.stringify(insertFabricDatas_request)], { type: 'application/json' })); // 파일을
-      return authApi.put('/productContents/insertProductContents', formData); // Blob 형태로 전송하여 백앤드 차원에서 이를 다시 프론트와 동기화된 dto로 변환, 이하 처리
-    },
+    // insertProductContents: async (insertFabricDatas_request) => {
+    //   const formData = new FormData();
+    //   if (insertFabricDatas_request.commonRequestFileUploads?.uploadFiles && insertFabricDatas_request.commonRequestFileUploads.uploadFiles.length > 0) {
+    //     for (let i = 0; i < insertFabricDatas_request.commonRequestFileUploads.uploadFiles.length; i++) {
+    //       formData.append('files', insertFabricDatas_request.commonRequestFileUploads.uploadFiles[i]);
+    //     }
+    //     insertFabricDatas_request.commonRequestFileUploads.uploadFiles = undefined; // 본 요청 객체의 파일 목록은 무효화
+    //   }
+    //   formData.append('main', new Blob([JSON.stringify(insertFabricDatas_request)], { type: 'application/json' })); // 파일을
+    //   return authApi.put('/productContents/insertProductContents', formData); // Blob 형태로 전송하여 백앤드 차원에서 이를 다시 프론트와 동기화된 dto로 변환, 이하 처리
+    // },
   };
 };
 

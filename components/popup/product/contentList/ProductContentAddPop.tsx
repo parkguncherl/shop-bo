@@ -11,11 +11,11 @@ import { SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '../../../../libs';
-import { useProductContentsStore } from '../../../../stores/product/useProductContentsStore';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import { Formatter, RegExpression } from '../../../../libs/const';
 import { ConfirmModal } from '../../../ConfirmModal';
 import FormCombineParagraphs, { EnhancedTextAreasMode, FileInfo } from '../../../form/FormCombineParagraphs';
+import { useProductContentListStore } from '../../../../stores/product/useProductContentListStore';
 
 interface ProductContentShowPopProps {
   open: boolean;
@@ -31,7 +31,7 @@ interface ProductContentShowPopProps {
 const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
   //const [getFileUrl, selectFileList] = useCommonStore((s) => [s.getFileUrl, s.selectFileList]);
-  const [insertProductContents] = useProductContentsStore((s) => [s.insertProductContents]);
+  const [insertProductContents] = useProductContentListStore((s) => [s.insertProductContents]);
 
   /** 팝업 내부 local state */
   const [displayMode, setDisplayMode] = useState<EnhancedTextAreasMode>('edit');

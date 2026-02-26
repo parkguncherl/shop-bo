@@ -17,6 +17,7 @@ import useDebounce from '../../../../hooks/useDebounce';
 import { AlertMessage, Placeholder, RegExpression } from '../../../../libs/const';
 import ProductContentShowPop from '../../../../components/popup/product/contentList/ProductContentShowPop';
 import ProductContentAddPop from '../../../../components/popup/product/contentList/ProductContentAddPop';
+import { ConfirmModal } from '../../../../components/ConfirmModal';
 
 /** 상품관리 - 상품컨텐츠 목록 페이지 */
 const ContentList = () => {
@@ -169,7 +170,7 @@ const ContentList = () => {
           defaultColDef={defaultColDef}
           rowSelection={{
             mode: 'singleRow',
-            enableClickSelection: false,
+            enableClickSelection: true,
           }}
           onRowDoubleClicked={(e) => openModal('SHOW', e.data)}
           pagingOptions={pagingOption}
@@ -198,7 +199,6 @@ const ContentList = () => {
             <button
               className={'btn '}
               onClick={() => {
-                // todo
                 openModal('ADD');
               }}
             >
@@ -207,7 +207,12 @@ const ContentList = () => {
             <button
               className={'btn '}
               onClick={() => {
-                // todo
+                const selectedRows = gridRef.current?.api.getSelectedRows();
+                if (selectedRows && selectedRows.length > 0) {
+                  openModal('DEL_CONF', selectedRows[0]);
+                } else {
+                  toastError('하나의 행을 선택한 후 재시도하십시요.');
+                }
               }}
             >
               {'행삭제'}
@@ -236,6 +241,15 @@ const ContentList = () => {
         }}
       />
       <ProductContentShowPop open={modals.type == 'SHOW' && modals.active} productContentData={modals.stored_temporary} onClose={() => closeModal('SHOW')} />
+      {/*<ConfirmModal*/}
+      {/*  open={modals.type == 'DEL_CONF' && modals.active}*/}
+      {/*  title={`'${(modals.stored_temporary as ProductContentListResponseProductContent).newsTitle}' 컨텐츠를 삭제 하시겠습니까?`}*/}
+      {/*  confirmText={'삭제'}*/}
+      {/*  onConfirm={() => {}}*/}
+      {/*  onClose={() => {*/}
+      {/*    closeModal('DEL_CONF');*/}
+      {/*  }}*/}
+      {/*/>*/}
     </div>
   );
 };
