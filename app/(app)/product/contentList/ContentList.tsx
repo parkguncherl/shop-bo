@@ -82,13 +82,38 @@ const ContentList = () => {
     lastId: undefined,
   });
 
+  // lastInfos, paging.curPage 디바운스 처리하여 그리드 내부 페이징 상태 초기화 시 실행 순서를 보장토록 함
+  const debouncedCurPage = useDebounce(paging.curPage?.toString() || '', 500); // 0.5초 대기 todo 디바운싱 상태가 원하는 경우에 업데이트되는지 확인하며 페이징 동작 손보기
+  //  // const debouncedFilters = useDebounce(filters.newsTitle + '☆' + paging.curPage, 500); // 0.5초 대기
+
+  /** 검색 버튼 클릭 시 */
+  const search = async () => {
+    await onSearch();
+  };
+
+  const onSearch = async () => {
+    await productContentListResponseRefetch();
+  };
+
+  /** 초기 페이징 상태로 복귀 */
+  const revertToInitPageStatus = async () => {
+    // Promise 반환 영역 우선
+    await gridRef.current?.customs.api.initializePagingStatus();
+
+    setPaging({
+      ...paging,
+      curPage: 1,
+    });
+    onlastInfosReset();
+  };
+
   const { mutate: deleteProductContentsMutate } = useMutation(deleteProductContents, {
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('컨텐츠가 정상 삭제되었습니다.');
           closeModal('DEL_CONF');
-          productContentListResponseRefetch();
+          revertToInitPageStatus();
         } else {
           toastError(`컨텐츠 삭제 도중 문제 발생 (${e.data.resultMessage})`);
         }
@@ -110,6 +135,23 @@ const ContentList = () => {
     };
   }, []);
 
+  // useEffect(() => {
+  //   if (!pagingOption) return;
+  //   const fetchData = async () => {
+  //     if (paging.curPage === 1) {
+  //       // 본 시점에 초기화 동작 수행
+  //
+  //       // 1. 그리드 상태 초기화 (Promise 반환 시 기다림)
+  //       await gridRef.current?.customs.api.initializePagingStatus();
+  //
+  //       // 2. 필터 초기화
+  //       onlastInfosReset();
+  //     }
+  //   };
+  //
+  //   //fetchData();
+  // }, [paging.curPage]);
+
   /** 상품컨텐츠 페이징 목록 조회 */
   const {
     data: productContentListResponse,
@@ -117,11 +159,11 @@ const ContentList = () => {
     isLoading: isProductContentListResponseLoading,
     refetch: productContentListResponseRefetch,
   } = useQuery({
-    queryKey: ['/productContentList/productContentListPaging', filters],
+    queryKey: ['/productContentList/productContentListPaging', filters, debouncedCurPage],
     queryFn: () =>
       authApi.get('/productContentList/productContentListPaging', {
         params: {
-          curPage: paging.curPage,
+          //curPage: paging.curPage,
           pageRowCount: paging.pageRowCount,
           ...filters,
           ...lastInfos,
@@ -136,8 +178,9 @@ const ContentList = () => {
       if (resultCode === 200) {
         const perPagesRowCnt = paging.pageRowCount as number;
         if (perPagesRowCnt) {
+          console.log('body.rows: ', body.rows);
           setProductContentList((body.rows || []).slice(0, perPagesRowCnt));
-          setLastProductContent((body.rows || [])[perPagesRowCnt]); // 51번째 요소
+          setLastProductContent((body.rows || [])[perPagesRowCnt]);
         } else {
           console.error('pageRowCount 를 찾을 수 없음');
         }
@@ -146,34 +189,6 @@ const ContentList = () => {
       }
     }
   }, [productContentListResponse, isProductContentListResponseSuccess]);
-
-  /** 검색 버튼 클릭 시 */
-  const search = async () => {
-    await onSearch();
-  };
-
-  const onSearch = async () => {
-    await productContentListResponseRefetch();
-  };
-
-  // const debouncedFilters = useDebounce(filters.newsTitle + '☆' + paging.curPage, 500); // 0.5초 대기
-  //
-  // useEffect(() => {
-  //   if (!pagingOption) return;
-  //   const fetchData = async () => {
-  //     if (paging.curPage === 1) {
-  //       // 1. 그리드 상태 초기화 (Promise 반환 시 기다림)
-  //       await gridRef.current?.initializePagingStatus();
-  //
-  //       // 2. 필터 초기화
-  //       // ※ 주의: 상태 업데이트는 비동기이므로, 초기화된 값을 refetch에 직접 넘기는 것이 안전합니다.
-  //       onlastInfosReset();
-  //       // 3. 데이터 조회
-  //     }
-  //   };
-  //
-  //   fetchData().then(() => productContentListResponseRefetch());
-  // }, [debouncedFilters]);
 
   return (
     <div>

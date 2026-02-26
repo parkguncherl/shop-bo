@@ -74,10 +74,15 @@ export interface TunedGridOptions<P> extends GridOptions<P> {
   pagingOptions?: PagingOptions; // 본 인자 주어질 경우 상태 제어권 일부는 컴포넌트에 위임되어 외부 상태에 대응하여 요구되는 동작을 작동시킴, 상태로서 관리하여 적절한 시점에 페이징 동작을 비활성화, 재활성화 가능
 }
 
-// TunedGrid 참조 인터페이스
-export interface TunedGridRef<P> extends AgGridReact<P> {
-  initializePagingStatus: () => void | Promise<unknown>;
-}
+type customGridRefs<P> = {
+  customs: {
+    api: {
+      initializePagingStatus: () => void | Promise<unknown>;
+    };
+  };
+};
+// TunedGrid 참조 타입
+export type TunedGridRef<P> = AgGridReact<P> & customGridRefs<P>;
 
 type excludedTypes = 'columnDefs';
 type TunedGridProps<P> =
@@ -124,19 +129,23 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
   const gridRef = useRef<AgGridReact>(null);
 
   /** 참조를 통해 외부로 노출되는 영역을 정의함 */
-  useImperativeHandle(ref, () => {
+  useImperativeHandle<AgGridReact<P>, TunedGridRef<P>>(ref, () => {
     const grid = gridRef.current as AgGridReact<P>;
 
-    return Object.assign(grid ?? {}, {
+    return Object.assign<AgGridReact<P>, customGridRefs<P>>(grid ?? {}, {
       // 이하 TunedGrid 에서 노출코자 하는 기타 속성 및 api 목록
-      initializePagingStatus: () => {
-        // 현재 진행 중인 페이징 동작을 TunedGrid 하에서 초기화(비활성화와 유사한 부분이 다수 존재하나 이는 페이징 동작을 계속하리라 여기어 작성되었다는 점을 유념하여야 한다)
-        if (props.pagingOptions) {
-          // 각 전략별로 컴포넌트 수준에서 적절한 초기화 동작 수행
-          if (props.pagingOptions.pagingStrategy == 'add') {
-            setControlledRowData([]);
-          }
-        }
+      customs: {
+        api: {
+          initializePagingStatus: () => {
+            // 현재 진행 중인 페이징 동작을 TunedGrid 하에서 초기화(비활성화와 유사한 부분이 다수 존재하나 이는 페이징 동작을 계속하리라 여기어 작성되었다는 점을 유념하여야 한다)
+            if (props.pagingOptions) {
+              // 각 전략별로 컴포넌트 수준에서 적절한 초기화 동작 수행
+              if (props.pagingOptions.pagingStrategy == 'add') {
+                setControlledRowData([]);
+              }
+            }
+          },
+        },
       },
     });
   });
@@ -433,7 +442,7 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
 
       // 최초 랜더링 시점 무시하도록 처리
       if (lastDisplayedRowIndex != -1) {
-        // ✅ 마지막 row가 "보이는 순간"
+        // 마지막 row가 "보이는 순간"
         if (lastDisplayedRowIndex === totalRowCount - 1 && isReachedEventTriggerAllowed.current) {
           isReachedEventTriggerAllowed.current = false;
 
@@ -491,7 +500,6 @@ const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
   useEffect(() => {
     if (props.pagingOptions != undefined) {
       // props.rowData 상태 변경 시점에 페이징 설정 존재할 시 필요한 동작을 실행하는 영역
-      //console.log('props.rowData: ', props.rowData, controlledRowData, props.pagingOptions);
       if (props.pagingOptions.pagingStrategy == 'add') {
         const api = gridRef.current?.api; // (AgGridReact ref면 보통 .api)
         if (api != undefined) {
