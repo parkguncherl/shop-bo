@@ -38,6 +38,7 @@ const ProductContentShowPop = ({ open, productContentData, onClose }: ProductCon
     if (productContentData) {
       const contentElements: ContentElement[] = [];
       const splittedNewsContents = (productContentData.newsContents || '').split(RegExpression.ProductContent.carriageReturn).filter((value) => value != '');
+      setValue('title', productContentData.newsTitle || '제목을 찾을 수 없음');
 
       /** 파일 정보 존재 여부에 따라 분기 */
       if (productContentData.fileId) {
