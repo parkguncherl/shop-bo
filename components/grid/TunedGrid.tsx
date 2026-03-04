@@ -31,15 +31,17 @@ type extendedRowSelectionOptions<P> = RowSelectionOptions<P> & {
 };
 
 /** 페이징 관련 타입 */
-interface defaultPagingOptions {
-  // pagingStrategy 를 정의하지 않음(pagingStrategy 존재 여부에 따라 페이징 구성 인자 전달 여부 확인 가능)
+type pagingStrategy = 'add' | 'other';
+interface DefaultPagingOptions {
+  pagingStrategy?: pagingStrategy;
 }
 
-export interface addPagingOptions extends defaultPagingOptions {
-  pagingStrategy?: 'add';
+export interface AddPagingOptions extends DefaultPagingOptions {
+  // add 전략에서는 controlledRowData 상태를 초기화하여 페이징 동작 초기화 가능
+  pagingStrategy: 'add';
 }
-export interface otherPagingOptions extends defaultPagingOptions {
-  pagingStrategy?: 'other';
+export interface OtherPagingOptions extends DefaultPagingOptions {
+  pagingStrategy: 'other';
   // todo 추후 이러한 식의 뼈대 기반 확장 가능
 }
 
@@ -76,13 +78,14 @@ export interface TunedGridOptions<P, PO> extends GridOptions<P> {
   enableBrowserTooltips?: boolean;
   rowSelection?: extendedRowSelectionOptions<P>;
   pagingOptions?: PO;
+  pagingDeps?: React.DependencyList; // 내부에서 hook 트리거 등에 사용 가능한 페이징 관련 의존 배열
   //pagingOptions?: PagingOptions; // 본 인자 주어질 경우 상태 제어권 일부는 컴포넌트에 위임되어 외부 상태에 대응하여 요구되는 동작을 작동시킴, 상태로서 관리하여 적절한 시점에 페이징 동작을 비활성화, 재활성화 가능
 }
 
 type customGridRefs<P> = {
   customs: {
     api: {
-      initializePagingStatus: () => void | Promise<unknown>;
+      //initializePagingStatus: () => void | Promise<unknown>;
     };
   };
 };
@@ -91,7 +94,7 @@ export type TunedGridRef<P> = AgGridReact<P> & customGridRefs<P>;
 type excludedTypes = 'columnDefs';
 
 // 첫번째 제네릭은 다루어지는 행의 (데이터)타입, 두번째는 페이징 타입(option)
-type TunedGridProps<P, PO extends defaultPagingOptions> =
+type TunedGridProps<P, PO extends DefaultPagingOptions> =
   // 추후 일부 api를 노출하지 않고자 할 때 Omit key에 해당 타입 지정
   Omit<AgGridReactProps<P>, excludedTypes> &
     TunedGridOptions<P, PO> &
@@ -107,7 +110,7 @@ type TunedGridProps<P, PO extends defaultPagingOptions> =
  * keyForBeingPressed 인자로 들어온 키에 해당하는 키가 눌린 상태로 화살표 이동할 시 다중 행 선택이 이루어짐
  * ArrowDown, ArrowUp 키는 본 요소 내부에서 사용되므로 외부에서 이벤트 리스너를 던질 시 유의하여야 함
  * */
-const TunedGrid = <P, PO extends defaultPagingOptions = defaultPagingOptions>({ ref, ...props }: TunedGridProps<P, PO>) => {
+const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ ref, ...props }: TunedGridProps<P, PO>) => {
   const defaultGridOption: GridOptions = {
     rowHeight: 28,
     //localeText: AG_CHARTS_LOCALE_KO_KR,
@@ -142,15 +145,19 @@ const TunedGrid = <P, PO extends defaultPagingOptions = defaultPagingOptions>({ 
       // 이하 TunedGrid 에서 노출코자 하는 기타 속성 및 api 목록
       customs: {
         api: {
-          initializePagingStatus: () => {
-            // 현재 진행 중인 페이징 동작을 TunedGrid 하에서 초기화(비활성화와 유사한 부분이 다수 존재하나 이는 페이징 동작을 계속하리라 여기어 작성되었다는 점을 유념하여야 한다)
-            if (props.pagingOptions) {
-              // 각 전략별로 컴포넌트 수준에서 적절한 초기화 동작 수행
-              if (props.pagingOptions.pagingStrategy == 'add') {
-                setControlledRowData([]);
-              }
-            }
-          },
+          // todo
+          // initializePagingStatus: () => {
+          //   // 현재 진행 중인 페이징 동작을 TunedGrid 하에서 초기화(비활성화와 유사한 부분이 다수 존재하나 이는 페이징 동작을 계속하리라 여기어 작성되었다는 점을 유념하여야 한다)
+          //   if (props.pagingOptions) {
+          //     // 각 전략별로 컴포넌트 수준에서 적절한 초기화 동작 수행
+          //     if (props.pagingOptions.pagingStrategy == 'add') {
+          //       const pagingOptions = props.pagingOptions as addPagingOptions;
+          //       setControlledRowData([]);
+          //     } else if (props.pagingOptions.pagingStrategy == 'other') {
+          //       const pagingOptions = props.pagingOptions as otherPagingOptions;
+          //     }
+          //   }
+          // },
         },
       },
     });
@@ -505,6 +512,7 @@ const TunedGrid = <P, PO extends defaultPagingOptions = defaultPagingOptions>({ 
   /** 인자로 받은 rowData 변경에 따른 동작 */
   useEffect(() => {
     if (props.pagingOptions != undefined) {
+      /** 페이징 동작 영역 */
       // props.rowData 상태 변경 시점에 페이징 설정 존재할 시 필요한 동작을 실행하는 영역
       if (props.pagingOptions.pagingStrategy == 'add') {
         const api = gridRef.current?.api; // (AgGridReact ref면 보통 .api)
@@ -513,7 +521,7 @@ const TunedGrid = <P, PO extends defaultPagingOptions = defaultPagingOptions>({ 
           if (controlledRowData.length > 0) {
             api.applyTransaction({ add: props.rowData }); // controlledRowData 를 동기화하여 리랜더링을 유발하여 스크롤을 무효화하는 대신 api를 통한 추가를 사용하여 스크롤 무호화 없이 자연스레 추가
           } else {
-            setControlledRowData(props.rowData || []);
+            setControlledRowData(props.rowData || []); // 최초 controlledRowData 할당
           }
         }
       }
@@ -525,6 +533,7 @@ const TunedGrid = <P, PO extends defaultPagingOptions = defaultPagingOptions>({ 
     if (props.pagingOptions == undefined) {
       /** 페이징 동작 비활성화에 필요한 동작 정의 */
       setControlledRowData([]);
+      return;
     }
 
     return () => {
@@ -537,6 +546,16 @@ const TunedGrid = <P, PO extends defaultPagingOptions = defaultPagingOptions>({ 
       }
     };
   }, [props.pagingOptions]);
+
+  /** paging 의존 배열 hook */
+  useEffect(() => {
+    if (props.pagingOptions) {
+      if (props.pagingOptions.pagingStrategy == 'add') {
+        // add 전략에서는 의존 배열 변경 시점에 페이징 초기화 동작 수행
+        setControlledRowData([]);
+      }
+    }
+  }, [props.pagingDeps]);
 
   return (
     <div className={`ag-theme-alpine ${props.className}`} onWheel={props.onWheel} onKeyDown={onKeyDown} onKeyUp={onKeyUp} tabIndex={-1}>

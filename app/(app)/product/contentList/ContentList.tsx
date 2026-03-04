@@ -10,7 +10,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
 import { useAgGridApi } from '../../../../hooks';
 import { authApi } from '../../../../libs';
-import TunedGrid, { addPagingOptions, TunedGridRef } from '../../../../components/grid/TunedGrid';
+import TunedGrid, { AddPagingOptions, TunedGridRef } from '../../../../components/grid/TunedGrid';
 import { useProductContentListStore } from '../../../../stores/product/useProductContentListStore';
 import useFilters from '../../../../hooks/useFilters';
 import useDebounce from '../../../../hooks/useDebounce';
@@ -70,7 +70,7 @@ const ContentList = () => {
   const [productContentList, setProductContentList] = useState<ProductContentListResponseProductContent[]>([]);
   const [lastProductContent, setLastProductContent] = useState<ProductContentListResponseProductContent | undefined>(undefined); // 다음 페이징 동작에서 사용할 마지막 행의 정보(last row's info)
 
-  const [pagingOption] = useState<addPagingOptions | undefined>({
+  const [pagingOption] = useState<AddPagingOptions | undefined>({
     pagingStrategy: 'add',
   });
 
@@ -95,25 +95,19 @@ const ContentList = () => {
     await productContentListResponseRefetch();
   };
 
-  /** 초기 페이징 상태로 복귀 */
-  const revertToInitPageStatus = async () => {
-    // Promise 반환 영역 우선
-    await gridRef.current?.customs.api.initializePagingStatus();
-
-    setPaging({
-      ...paging,
-      curPage: 1,
-    });
-    onlastInfosReset();
-  };
-
   const { mutate: deleteProductContentsMutate } = useMutation(deleteProductContents, {
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('컨텐츠가 정상 삭제되었습니다.');
           closeModal('DEL_CONF');
-          revertToInitPageStatus();
+
+          setPaging({
+            ...paging,
+            curPage: 1,
+          });
+          onlastInfosReset();
+          onFiltersReset();
         } else {
           toastError(`컨텐츠 삭제 도중 문제 발생 (${e.data.resultMessage})`);
         }
@@ -212,6 +206,7 @@ const ContentList = () => {
           }}
           onRowDoubleClicked={(e) => openModal('SHOW', e.data)}
           pagingOptions={pagingOption}
+          pagingDeps={[filters]}
           onTouchedByBottom={() => {
             if (pagingOption) {
               // 페이징 관련 동작 처리 영역
