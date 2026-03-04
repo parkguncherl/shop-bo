@@ -29,19 +29,21 @@ type extendedRowSelectionOptions<P> = RowSelectionOptions<P> & {
   // 기본 설정과 겹치는 영역이 존재할 시 이하 정의된 확장 설정이 우선
   clickSelectionConfigByPerCol?: clickSelectionConfig[]; // 유효한 값이 주어질 시 rowSelection 일부 속성 잠금, selection 동작은 api를 통해 명시적으로 통제함
 };
-type pagingStrategies = 'add';
 
+/** 페이징 관련 타입 */
 interface defaultPagingOptions {
-  pagingStrategy: pagingStrategies;
+  // pagingStrategy 를 정의하지 않음(pagingStrategy 존재 여부에 따라 페이징 구성 인자 전달 여부 확인 가능)
 }
 
-export interface addPagingOptions extends defaultPagingOptions {}
-
+export interface addPagingOptions extends defaultPagingOptions {
+  pagingStrategy?: 'add';
+}
 export interface otherPagingOptions extends defaultPagingOptions {
+  pagingStrategy?: 'other';
   // todo 추후 이러한 식의 뼈대 기반 확장 가능
 }
-type PagingOptions = addPagingOptions | otherPagingOptions;
 
+/** 복사, 붙여넣기 이벤트 */
 export interface selectedRowCopiedEvent<P> {
   copiedRowNodes: IRowNode<P>[];
 }
@@ -49,8 +51,9 @@ export interface copiedRowPastedEvent<P> {
   eventTriggeredRowIndex: number | null;
   pastedRowNodes: IRowNode<P>[];
 }
+
+/** api 인터페이스 */
 export interface TunedGridApi<P> {
-  // onReachEachSide?: (event: 'T' | 'B') => void; todo deprecated
   onTouchedByBottom?: () =>
     | Promise<void>
     | {
@@ -60,7 +63,8 @@ export interface TunedGridApi<P> {
   onCopiedRowNodePasted?: (event: copiedRowPastedEvent<P>) => void;
   onWheel?: (event: React.WheelEvent<HTMLDivElement>) => void;
 }
-export interface TunedGridOptions<P> extends GridOptions<P> {
+/** 인자 목록 */
+export interface TunedGridOptions<P, PO> extends GridOptions<P> {
   columnDefs: ColDef<P>[]; // 컬럼 정의 제공을 의무화하는 차원에서 재정의
   colIndexForSuppressKeyEvent?: number; // 인자 제공할 경우 다중 선택 사용 시 해당 인덱스의 컬럼으로 포커싱 후 이후 동작을 진행함
   preventPersonalizedColumnSetting?: boolean; // 개인화된 컬럼 셋팅 비활성 여부, true 값을 명시적으로 제공해야만 비활성화
@@ -71,7 +75,8 @@ export interface TunedGridOptions<P> extends GridOptions<P> {
   savedPrevClickedNodeCnt?: number; // 이전에 클릭된 행(node)들 중 저장될 행의 개수(2 이상의 값을 할당하여야)
   enableBrowserTooltips?: boolean;
   rowSelection?: extendedRowSelectionOptions<P>;
-  pagingOptions?: PagingOptions; // 본 인자 주어질 경우 상태 제어권 일부는 컴포넌트에 위임되어 외부 상태에 대응하여 요구되는 동작을 작동시킴, 상태로서 관리하여 적절한 시점에 페이징 동작을 비활성화, 재활성화 가능
+  pagingOptions?: PO;
+  //pagingOptions?: PagingOptions; // 본 인자 주어질 경우 상태 제어권 일부는 컴포넌트에 위임되어 외부 상태에 대응하여 요구되는 동작을 작동시킴, 상태로서 관리하여 적절한 시점에 페이징 동작을 비활성화, 재활성화 가능
 }
 
 type customGridRefs<P> = {
@@ -83,12 +88,13 @@ type customGridRefs<P> = {
 };
 // TunedGrid 참조 타입
 export type TunedGridRef<P> = AgGridReact<P> & customGridRefs<P>;
-
 type excludedTypes = 'columnDefs';
-type TunedGridProps<P> =
+
+// 첫번째 제네릭은 다루어지는 행의 (데이터)타입, 두번째는 페이징 타입(option)
+type TunedGridProps<P, PO extends defaultPagingOptions> =
   // 추후 일부 api를 노출하지 않고자 할 때 Omit key에 해당 타입 지정
   Omit<AgGridReactProps<P>, excludedTypes> &
-    TunedGridOptions<P> &
+    TunedGridOptions<P, PO> &
     TunedGridApi<P> & {
       ref?: React.Ref<TunedGridRef<P>>;
     };
@@ -101,7 +107,7 @@ type TunedGridProps<P> =
  * keyForBeingPressed 인자로 들어온 키에 해당하는 키가 눌린 상태로 화살표 이동할 시 다중 행 선택이 이루어짐
  * ArrowDown, ArrowUp 키는 본 요소 내부에서 사용되므로 외부에서 이벤트 리스너를 던질 시 유의하여야 함
  * */
-const TunedGrid = <P,>({ ref, ...props }: TunedGridProps<P>) => {
+const TunedGrid = <P, PO extends defaultPagingOptions = defaultPagingOptions>({ ref, ...props }: TunedGridProps<P, PO>) => {
   const defaultGridOption: GridOptions = {
     rowHeight: 28,
     //localeText: AG_CHARTS_LOCALE_KO_KR,
