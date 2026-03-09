@@ -7,9 +7,28 @@
 
 
 .srcEnumerator {
+  width: 100%;
+  height: 100%;
+
   display: flex;
   flex-direction: column;
+  .upper {
 
-  overflow-y: scroll;
+    //display: grid;
+    //grid-template-rows: 100px 1fr;
+
+    height: 100%;
+
+    .main {
+
+      display: flex;
+      flex-direction: column;
+      overflow-y: scroll;
+    }
+  }
+
+  .bottom {
+    margin-top: 5px;
+  }
 
 }

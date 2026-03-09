@@ -15,6 +15,7 @@ import useFilters from '../../../../hooks/useFilters';
 import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
 import { Placeholder } from '../../../../libs/const';
 import { Utils } from '../../../../libs/utils';
+import SrcEnumerator from '../../../../components/layout/product/productMng/SrcEnumerator';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
@@ -259,10 +260,10 @@ const ProductMng = () => {
         <Search.Input title={'미정'} name={'prodNm'} placeholder={Placeholder.Input} value={filters.prodNm} onChange={onChangeFilters} onEnter={onSearch} />
       </Search>
       <Table>
-        <TableHeader count={0} search={search}></TableHeader>
         <div className="tblPreview">
           <div className="layoutBox">
             <div className={'layout70'}>
+              <TableHeader count={0} search={search}></TableHeader>
               <TunedGrid<ProductMngResponseProductInfo>
                 headerHeight={35}
                 onGridReady={onGridReady}
@@ -307,7 +308,9 @@ const ProductMng = () => {
                 </div>
               </div>
             </div>
-            <div className={'layout30'}></div>
+            <div className={'layout30'}>
+              <SrcEnumerator />
+            </div>
           </div>
         </div>
       </Table>
