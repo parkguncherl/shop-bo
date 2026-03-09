@@ -1,0 +1,15 @@
+@charset "UTF-8";
+
+/*******************************
+  srcEnumerator.scss
+  'product/' srcEnumerator 컴포넌트에 대하여 적용됨
+********************************/
+
+
+.srcEnumerator {
+  display: flex;
+  flex-direction: column;
+
+  overflow-y: scroll;
+
+}

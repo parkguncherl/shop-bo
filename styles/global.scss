@@ -7,6 +7,8 @@
 @use "style.scss";
 @use "popup.scss";
 @use "components";
+@use "form/form.module";
+
 .ag-theme-alpine, .ag-theme-alpine-dark, .ag-theme-alpine-auto-dark {
   //--ag-alpine-active-color: var(--main-color) !important; // 카피 앤 페이스트 컬러
 }

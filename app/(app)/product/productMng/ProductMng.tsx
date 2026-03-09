@@ -15,7 +15,6 @@ import useFilters from '../../../../hooks/useFilters';
 import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
 import { Placeholder } from '../../../../libs/const';
 import { Utils } from '../../../../libs/utils';
-import { ContentElement } from '../../../../components/form/FormCombineParagraphs';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
