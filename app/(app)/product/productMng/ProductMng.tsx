@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Search, Table, Title } from '../../../../components';
-import { MenuResponsePaging } from '../../../../generated';
+import { ProductMngRequestProductInfoFilter, ProductMngResponseProductInfo } from '../../../../generated';
 import { ColDef } from 'ag-grid-community';
 import { TableHeader, toastError } from '../../../../components';
 import { useCommonStore, useMenuStore } from '../../../../stores';
@@ -10,9 +10,13 @@ import { useQuery } from '@tanstack/react-query';
 import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
 import { useAgGridApi } from '../../../../hooks';
 import { authApi } from '../../../../libs';
-import TunedGrid from '../../../../components/grid/TunedGrid';
+import TunedGrid, { AddPagingOptions } from '../../../../components/grid/TunedGrid';
+import useFilters from '../../../../hooks/useFilters';
+import { useProductContentListStore } from '../../../../stores/product/useProductContentListStore';
+import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
+import { Placeholder } from '../../../../libs/const';
 
-/** 시스템 - 메뉴접근 권한관리 페이지 */
+/** 시스템 - 상품관리 페이지 */
 const ProductMng = () => {
   /** Grid Api */
   const { onGridReady } = useAgGridApi();
@@ -20,46 +24,80 @@ const ProductMng = () => {
   /** 공통 스토어 - State */
   const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
 
-  /** 코드관리 스토어 - State */
-  const [modalType, openModal, filter] = useMenuStore((s) => [s.modalType, s.openModal, s.filter]);
+  /** 상품관리 스토어 - State */
+  const [modals, openModal, closeModal] = useProductMngStore((s) => [s.modals, s.openModal, s.closeModal]);
+
+  /** 검색 필터 */
+  const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<ProductMngRequestProductInfoFilter>({
+    prodNm: undefined,
+  });
+
+  /** local states */
+  const [productInfoList, setproductInfoList] = useState<ProductMngResponseProductInfo[]>([]);
 
   /** 메뉴관리 페이징 목록 조회 */
   const {
-    data: menu,
-    isSuccess: isMenuListSuccess,
-    isLoading,
-    refetch: MenuRefetch,
+    data: productInfos,
+    isSuccess: isProductInfosSuccess,
+    isLoading: isProductInfosLoading,
+    refetch: productInfosRefetch,
   } = useQuery({
-    queryKey: ['/menu/paging', filter],
+    queryKey: ['/productMng/productInfoList'],
     queryFn: () =>
-      authApi.get('/menu/paging', {
+      authApi.get('/productMng/productInfoList', {
         params: {
-          ...filter,
+          ...filters,
         },
       }),
     refetchOnMount: 'always',
   });
 
   useEffect(() => {
-    if (isMenuListSuccess) {
-      const { resultCode, body, resultMessage } = menu.data;
+    if (isProductInfosSuccess) {
+      const { resultCode, body, resultMessage } = productInfos.data;
       if (resultCode === 200) {
-        // todo state 관리
+        setproductInfoList(body || []);
       } else {
         toastError(resultMessage);
       }
     }
-  }, [menu, isMenuListSuccess]);
+  }, [productInfos, isProductInfosSuccess]);
 
-  /** 컬럼 설정 - 권한 컬럼 포함 */
-  const [columnDefs] = useState<ColDef[]>([
-    { field: 'no', headerName: 'NO', minWidth: 70, maxWidth: 80, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
-    { field: 'menuCd', headerName: '코드', minWidth: 150, suppressHeaderMenuButton: true },
-    { field: 'menuNm', headerName: '이름', minWidth: 150, suppressHeaderMenuButton: true },
-    { field: 'menuEngNm', headerName: '영문명', minWidth: 150, suppressHeaderMenuButton: true },
-    { field: 'menuUri', headerName: filter?.upMenuCd === 'TOP' ? 'ICO' : 'URI' || '', minWidth: 150, suppressHeaderMenuButton: true },
-    { field: 'menuOrder', headerName: '순서', minWidth: 60, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
-    { field: 'createDateTime', headerName: '등록일시', minWidth: 150, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
+  /** 컬럼 설정 */
+  const [columnDefs] = useState<ColDef<ProductMngResponseProductInfo>[]>([
+    {
+      field: 'no',
+      headerName: 'NO',
+      minWidth: 70,
+      maxWidth: 80,
+      valueGetter: (params) => (params.node ? (params.node.rowIndex ?? 0) + 1 : ''),
+      cellStyle: GridSetting.CellStyle.CENTER,
+      suppressHeaderMenuButton: true,
+    },
+    { field: 'prodNm', headerName: '상품명', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
+    { field: 'prodTpNm', headerName: '상품대분류', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
+
+    { field: 'prodDetTpNm', headerName: '상품소분류', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
+
+    { field: 'prodColors', headerName: '크기', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
+
+    { field: 'prodSizes', headerName: '색상', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
+
+    { field: 'composition', headerName: '혼용율', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
+
+    { field: 'makeYmd', headerName: '출시일', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
+
+    { field: 'orgAmt', headerName: '원가', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
+
+    { field: 'sellAmt', headerName: '판매가', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
+
+    { field: 'repFileIdCnt', headerName: '대표이미지', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
+
+    { field: 'detailFileIdCnt', headerName: '상세이미지', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
+
+    { field: 'sizeFileIdCnt', headerName: '사이즈이미지', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
+
+    { field: 'etcFileIdCnt', headerName: '기타이미지', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
   ]);
 
   /** 검색 버튼 클릭 시 */
@@ -68,34 +106,25 @@ const ProductMng = () => {
   };
 
   const onSearch = async () => {
-    await MenuRefetch();
+    await productInfosRefetch();
   };
 
   return (
     <div>
       <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} />
       <Search className="type_2">
-        <Search.DropDown
-          title={'미정'}
-          name={'partnerId'}
-          // placeholder={Placeholder.Select}
-          // value={filters.partnerId}
-          // onChange={onChangeFilters}
-          // defaultOptions={partnerList}
-          showAll={true}
-          readonly={true}
-        />
+        <Search.Input title={'미정'} name={'prodNm'} placeholder={Placeholder.Input} value={filters.prodNm} onChange={onChangeFilters} onEnter={onSearch} />
       </Search>
       <Table>
         <TableHeader count={0} search={search}></TableHeader>
         <div className="tblPreview">
           <div className="layoutBox">
             <div className={'layout60'}>
-              <TunedGrid
+              <TunedGrid<ProductMngResponseProductInfo>
                 headerHeight={35}
                 onGridReady={onGridReady}
-                loading={isLoading}
-                rowData={(menu?.data?.body?.rows as MenuResponsePaging[]) || []}
+                loading={isProductInfosLoading}
+                rowData={productInfoList}
                 columnDefs={columnDefs}
                 defaultColDef={defaultColDef}
                 rowSelection={{
@@ -134,31 +163,7 @@ const ProductMng = () => {
                 </div>
               </div>
             </div>
-            <div className={'layout40'}>
-              <TunedGrid
-                headerHeight={35}
-                onGridReady={onGridReady}
-                loading={isLoading}
-                rowData={(menu?.data?.body?.rows as MenuResponsePaging[]) || []}
-                columnDefs={columnDefs}
-                defaultColDef={defaultColDef}
-                rowSelection={{
-                  mode: 'singleRow',
-                  enableClickSelection: false,
-                }}
-                className={'wmsDefault'}
-              />
-              <div className="btnArea between">
-                <div className="left">
-                  <button className={'btn'} onClick={() => openModal('ADD')}>
-                    {'행추가'}
-                  </button>
-                  <button className={'btn'} onClick={() => openModal('ADD')}>
-                    {'행삭제'}
-                  </button>
-                </div>
-              </div>
-            </div>
+            <div className={'layout40'}></div>
           </div>
         </div>
       </Table>
