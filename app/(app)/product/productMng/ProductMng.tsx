@@ -157,85 +157,98 @@ const ProductMng = () => {
 
     if (cellsColField && ['repFileIdCnt', 'detailFileIdCnt', 'sizeFileIdCnt', 'etcFileIdCnt'].includes(cellsColField)) {
       if (event.data && (event.data[cellsColField as keyof ProductMngResponseProductInfo] as number) == 0) {
-        // 카운트된 이미지 개수가 0인경우 이하 동작이 무의미하므로 return
+        // 카운트된 이미지 개수가 0인경우 초기화 동작 이하가 무의미하므로 return
+        setTargetedFileSetInfo(undefined);
         return;
       }
       if (cellsColField == 'repFileIdCnt') {
-        if (event.data?.repFileId) {
-          setTargetedFileSetInfo({
-            type: 'rep',
-            fileId: event.data.repFileId,
-            fileInfos: await selectFileList(event.data.repFileId).then(async (fileDetList) => {
-              const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
-              for (let index = 0; index < fileDetList.length; index++) {
-                fileSetsElementInfos.push({
-                  fileSeq: fileDetList[index].fileSeq,
-                  fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
-                });
-              }
-              return fileSetsElementInfos;
-            }),
-          });
-        } else {
+        if (!event.data?.repFileId) {
           toastError('file 식별자를 찾을 수 없음');
+          return;
         }
+        if (targetedFileSetInfo?.fileId == event.data?.repFileId) {
+          return;
+        }
+        setTargetedFileSetInfo({
+          type: 'rep',
+          fileId: event.data.repFileId,
+          fileInfos: await selectFileList(event.data.repFileId).then(async (fileDetList) => {
+            const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
+            for (let index = 0; index < fileDetList.length; index++) {
+              fileSetsElementInfos.push({
+                fileSeq: fileDetList[index].fileSeq,
+                fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
+              });
+            }
+            return fileSetsElementInfos;
+          }),
+        });
       } else if (cellsColField == 'detailFileIdCnt') {
-        if (event.data?.detailFileId) {
-          setTargetedFileSetInfo({
-            type: 'detail',
-            fileId: event.data?.detailFileId,
-            fileInfos: await selectFileList(event.data.detailFileId).then(async (fileDetList) => {
-              const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
-              for (let index = 0; index < fileDetList.length; index++) {
-                fileSetsElementInfos.push({
-                  fileSeq: fileDetList[index].fileSeq,
-                  fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
-                });
-              }
-              return fileSetsElementInfos;
-            }),
-          });
-        } else {
+        if (!event.data?.detailFileId) {
           toastError('file 식별자를 찾을 수 없음');
+          return;
         }
+        if (targetedFileSetInfo?.fileId == event.data?.detailFileId) {
+          return;
+        }
+        setTargetedFileSetInfo({
+          type: 'detail',
+          fileId: event.data?.detailFileId,
+          fileInfos: await selectFileList(event.data.detailFileId).then(async (fileDetList) => {
+            const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
+            for (let index = 0; index < fileDetList.length; index++) {
+              fileSetsElementInfos.push({
+                fileSeq: fileDetList[index].fileSeq,
+                fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
+              });
+            }
+            return fileSetsElementInfos;
+          }),
+        });
       } else if (cellsColField == 'sizeFileIdCnt') {
-        if (event.data?.sizeFileId) {
-          setTargetedFileSetInfo({
-            type: 'size',
-            fileId: event.data?.sizeFileId,
-            fileInfos: await selectFileList(event.data.sizeFileId).then(async (fileDetList) => {
-              const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
-              for (let index = 0; index < fileDetList.length; index++) {
-                fileSetsElementInfos.push({
-                  fileSeq: fileDetList[index].fileSeq,
-                  fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
-                });
-              }
-              return fileSetsElementInfos;
-            }),
-          });
-        } else {
+        if (!event.data?.sizeFileId) {
           toastError('file 식별자를 찾을 수 없음');
+          return;
         }
+        if (targetedFileSetInfo?.fileId == event.data?.sizeFileId) {
+          return;
+        }
+        setTargetedFileSetInfo({
+          type: 'size',
+          fileId: event.data?.sizeFileId,
+          fileInfos: await selectFileList(event.data.sizeFileId).then(async (fileDetList) => {
+            const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
+            for (let index = 0; index < fileDetList.length; index++) {
+              fileSetsElementInfos.push({
+                fileSeq: fileDetList[index].fileSeq,
+                fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
+              });
+            }
+            return fileSetsElementInfos;
+          }),
+        });
       } else if (cellsColField == 'etcFileIdCnt') {
-        if (event.data?.etcFileId) {
-          setTargetedFileSetInfo({
-            type: 'etc',
-            fileId: event.data?.etcFileId,
-            fileInfos: await selectFileList(event.data.etcFileId).then(async (fileDetList) => {
-              const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
-              for (let index = 0; index < fileDetList.length; index++) {
-                fileSetsElementInfos.push({
-                  fileSeq: fileDetList[index].fileSeq,
-                  fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
-                });
-              }
-              return fileSetsElementInfos;
-            }),
-          });
-        } else {
+        if (!event.data?.etcFileId) {
           toastError('file 식별자를 찾을 수 없음');
+          return;
         }
+        if (targetedFileSetInfo?.fileId == event.data?.etcFileId) {
+          return;
+        }
+        setTargetedFileSetInfo({
+          type: 'etc',
+          fileId: event.data?.etcFileId,
+          fileInfos: await selectFileList(event.data.etcFileId).then(async (fileDetList) => {
+            const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
+            for (let index = 0; index < fileDetList.length; index++) {
+              fileSetsElementInfos.push({
+                fileSeq: fileDetList[index].fileSeq,
+                fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
+              });
+            }
+            return fileSetsElementInfos;
+          }),
+        });
       }
     }
   };
