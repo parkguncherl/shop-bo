@@ -83,6 +83,14 @@
   //}
 }
 
+.ag-theme-alpine .ag-cell.ag-cell-focus {
+  background-color: #f1f9ff !important;
+}
+
+.ag-theme-alpine .ag-cell-focus:not(.ag-cell-range-selected) {
+  background-color: #f1f9ff !important;
+}
+
 // 미송
 .ag-theme-alpine .ag-ltr .ag-grid-beforeDelivery { // 미송
   color: #0064ed !important;
