@@ -5,7 +5,7 @@ import { Search, Table, Title } from '../../../../components';
 import { ProductMngRequestProductInfoFilter, ProductMngResponseProductInfo } from '../../../../generated';
 import { CellClickedEvent, ColDef } from 'ag-grid-community';
 import { TableHeader, toastError } from '../../../../components';
-import { useCommonStore, useMenuStore } from '../../../../stores';
+import { useCommonStore } from '../../../../stores';
 import { useQuery } from '@tanstack/react-query';
 import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
 import { useAgGridApi } from '../../../../hooks';
@@ -15,16 +15,17 @@ import useFilters from '../../../../hooks/useFilters';
 import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
 import { Placeholder } from '../../../../libs/const';
 import { Utils } from '../../../../libs/utils';
-import SrcEnumerator from '../../../../components/layout/product/productMng/SrcEnumerator';
+import SrcEnumerator, { SrcElement, SrcEnumeratorProps } from '../../../../components/layout/product/productMng/SrcEnumerator';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
-interface targetedFileSetsElementInfo {
-  fileSeq?: number;
-  fileSrc?: string;
+interface targetedFileSetsElementInfo extends SrcElement {
+  //fileSeq?: number;
+  //fileSrc?: string;
 }
-interface targetedFileSetInfo {
+interface targetedFileSetInfo extends Omit<SrcEnumeratorProps, 'title' | 'srcInfo'> {
   type: targetedFileTypes;
+  rowData: ProductMngResponseProductInfo;
   fileId: number;
   fileInfos: targetedFileSetsElementInfo[];
 }
@@ -171,6 +172,7 @@ const ProductMng = () => {
         }
         setTargetedFileSetInfo({
           type: 'rep',
+          rowData: event.data,
           fileId: event.data.repFileId,
           fileInfos: await selectFileList(event.data.repFileId).then(async (fileDetList) => {
             const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
@@ -193,6 +195,7 @@ const ProductMng = () => {
         }
         setTargetedFileSetInfo({
           type: 'detail',
+          rowData: event.data,
           fileId: event.data?.detailFileId,
           fileInfos: await selectFileList(event.data.detailFileId).then(async (fileDetList) => {
             const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
@@ -215,6 +218,7 @@ const ProductMng = () => {
         }
         setTargetedFileSetInfo({
           type: 'size',
+          rowData: event.data,
           fileId: event.data?.sizeFileId,
           fileInfos: await selectFileList(event.data.sizeFileId).then(async (fileDetList) => {
             const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
@@ -237,6 +241,7 @@ const ProductMng = () => {
         }
         setTargetedFileSetInfo({
           type: 'etc',
+          rowData: event.data,
           fileId: event.data?.etcFileId,
           fileInfos: await selectFileList(event.data.etcFileId).then(async (fileDetList) => {
             const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
@@ -263,7 +268,7 @@ const ProductMng = () => {
         <div className="tblPreview">
           <div className="layoutBox">
             <div className={'layout70'}>
-              <TableHeader count={0} search={search}></TableHeader>
+              <TableHeader count={productInfoList.length} search={search}></TableHeader>
               <TunedGrid<ProductMngResponseProductInfo>
                 headerHeight={35}
                 onGridReady={onGridReady}
@@ -279,22 +284,14 @@ const ProductMng = () => {
               />
               <div className="btnArea between">
                 <div className="left">
-                  <button
-                    className={'btn '}
-                    onClick={() => {
-                      // todo
-                    }}
-                  >
-                    {'행추가'}
-                  </button>
-                  <button
-                    className={'btn '}
-                    onClick={() => {
-                      // todo
-                    }}
-                  >
-                    {'행삭제'}
-                  </button>
+                  {/*<button*/}
+                  {/*  className={'btn '}*/}
+                  {/*  onClick={() => {*/}
+                  {/*    // todo*/}
+                  {/*  }}*/}
+                  {/*>*/}
+                  {/*  {'행추가'}*/}
+                  {/*</button>*/}
                 </div>
                 <div className="right">
                   <button
@@ -309,7 +306,29 @@ const ProductMng = () => {
               </div>
             </div>
             <div className={'layout30'}>
-              <SrcEnumerator />
+              <SrcEnumerator
+                title={{
+                  left: `${targetedFileSetInfo?.rowData.prodNm ? '[' + targetedFileSetInfo?.rowData.prodNm + ']' : ''} ${
+                    targetedFileSetInfo == undefined
+                      ? ''
+                      : targetedFileSetInfo?.type == 'rep'
+                      ? '대표이미지'
+                      : targetedFileSetInfo?.type == 'detail'
+                      ? '상세이미지'
+                      : targetedFileSetInfo?.type == 'size'
+                      ? '사이즈이미지'
+                      : '기타이미지'
+                  }`,
+                }}
+                srcInfo={
+                  targetedFileSetInfo?.fileId != undefined
+                    ? {
+                        fileId: targetedFileSetInfo?.fileId,
+                        srcElements: [...(targetedFileSetInfo?.fileInfos || []), {}, {}, {}, {}],
+                      }
+                    : undefined
+                }
+              />
             </div>
           </div>
         </div>
