@@ -1,7 +1,7 @@
 import { create, StateCreator } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { ApiResponse, CommonRequestFileDownload, FileDet, GridRequest } from '../generated';
+import { ApiResponse, CommonRequestFileDownload, CommonRequestFileRearrangementRequest, FileDet, GridRequest } from '../generated';
 import { AxiosPromise } from 'axios';
 import { authApi, authDownApi } from '../libs';
 
@@ -55,6 +55,7 @@ interface CommonApiState {
   updateGridColumnState: (gridRequest: GridRequest) => AxiosPromise<ApiResponse>;
   initGridColumnState: (gridRequest: GridRequest) => AxiosPromise<ApiResponse>;
   //getFilterData: (filterDataList: FilterData[], uri: string) => any;
+  rearrangeFilesBySeqToSeq: (commonRequestFileRearrangementRequest: CommonRequestFileRearrangementRequest) => AxiosPromise<ApiResponse>;
 }
 
 const initialStateCreator: StateCreator<CommonState & CommonApiState, any> = (set, get, api) => {
@@ -245,6 +246,9 @@ const initialStateCreator: StateCreator<CommonState & CommonApiState, any> = (se
     //     return JSON.parse(JSON.stringify(rows)).filter((row: any) => row[colField] != undefined);
     //   }
     // },
+    rearrangeFilesBySeqToSeq: (commonRequestFileRearrangementRequest) => {
+      return authApi.patch('/common/rearrangeFilesBySeqToSeq', commonRequestFileRearrangementRequest);
+    },
   };
 };
 

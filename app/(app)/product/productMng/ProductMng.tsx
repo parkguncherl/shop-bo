@@ -52,10 +52,6 @@ const ProductMng = () => {
 
   const [targetedFileSetInfo, setTargetedFileSetInfo] = useState<targetedFileSetInfo | undefined>(undefined);
 
-  useEffect(() => {
-    console.log('targetedFileSetInfo: ', targetedFileSetInfo);
-  }, [targetedFileSetInfo]);
-
   /** 메뉴관리 페이징 목록 조회 */
   const {
     data: productInfos,
@@ -328,6 +324,30 @@ const ProductMng = () => {
                       }
                     : undefined
                 }
+                callBack={{
+                  onToUpperReqSuccess: async () => {
+                    const targetedFileSetInfoRefreshFn = async (prevState: targetedFileSetInfo | undefined) => {
+                      return {
+                        ...prevState,
+                        fileInfos: !prevState?.fileId
+                          ? undefined
+                          : await selectFileList(prevState.fileId).then(async (fileDetList) => {
+                              const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
+                              for (let index = 0; index < fileDetList.length; index++) {
+                                fileSetsElementInfos.push({
+                                  fileSeq: fileDetList[index].fileSeq,
+                                  fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
+                                });
+                              }
+                              return fileSetsElementInfos;
+                            }),
+                      };
+                    };
+
+                    const refreshedTargetedFileSetInfo = await targetedFileSetInfoRefreshFn(targetedFileSetInfo);
+                    setTargetedFileSetInfo(refreshedTargetedFileSetInfo);
+                  },
+                }}
               />
             </div>
           </div>

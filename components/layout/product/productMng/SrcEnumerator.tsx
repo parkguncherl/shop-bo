@@ -1,4 +1,6 @@
-import React, { useRef } from 'react';
+import React, { useEffect } from 'react';
+import { useCommonStore } from '../../../../stores';
+import { toastSuccess } from '../../../ToastMessage';
 
 export interface SrcElement {
   fileSeq?: number;
@@ -14,13 +16,19 @@ export interface SrcEnumeratorProps {
     left?: string;
     right?: string;
   };
+  callBack?: {
+    onToUpperReqSuccess?: (srcElement: SrcElement) => void;
+    onToUpperReqFailure?: (srcElement: SrcElement, resultMessage?: string) => void;
+  };
 }
 interface EnumElementProps {
   srcElement?: SrcElement;
   toUpperReqHandler?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }
 
-interface ToUpperReqEvent extends React.MouseEvent<HTMLButtonElement, MouseEvent> {}
+interface ToUpperReqEvent extends React.MouseEvent<HTMLButtonElement, MouseEvent> {
+  srcElement: SrcElement;
+}
 
 const EnumElement = ({ srcElement, toUpperReqHandler }: EnumElementProps) => {
   return (
@@ -53,9 +61,28 @@ const EnumElement = ({ srcElement, toUpperReqHandler }: EnumElementProps) => {
   );
 };
 
-const SrcEnumerator = ({ srcInfo, title }: SrcEnumeratorProps) => {
+const SrcEnumerator = ({ srcInfo, title, callBack }: SrcEnumeratorProps) => {
+  const [rearrangeFilesBySeqToSeq] = useCommonStore((s) => [s.rearrangeFilesBySeqToSeq]);
+
   const onToUpperReqEmerged = (event: ToUpperReqEvent) => {
     // 최상단 이동 요청 처리(fileSeq 업데이트 동작)
+    rearrangeFilesBySeqToSeq({
+      fileId: srcInfo?.fileId,
+      fromSeq: event.srcElement.fileSeq,
+      toSeq: 1, // 최상단 영역으로 이동하고자 하므로
+    }).then((result) => {
+      const { resultCode, body, resultMessage } = result.data;
+
+      if (resultCode == 200) {
+        if (callBack?.onToUpperReqSuccess) {
+          callBack.onToUpperReqSuccess(event.srcElement);
+        }
+      } else {
+        if (callBack?.onToUpperReqFailure) {
+          callBack.onToUpperReqFailure(event.srcElement, resultMessage);
+        }
+      }
+    });
   };
 
   return (
@@ -89,7 +116,16 @@ const SrcEnumerator = ({ srcInfo, title }: SrcEnumeratorProps) => {
               <EnumElement
                 key={index}
                 srcElement={srcElement}
-                toUpperReqHandler={srcElement.fileSeq != undefined && srcElement.fileSeq != 1 ? (event) => onToUpperReqEmerged(event) : undefined}
+                toUpperReqHandler={
+                  srcElement.fileSeq != undefined && srcElement.fileSeq != 1
+                    ? (event) => {
+                        onToUpperReqEmerged({
+                          ...event,
+                          srcElement: srcElement,
+                        });
+                      }
+                    : undefined
+                }
               />
             ))}
         </div>
