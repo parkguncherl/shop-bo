@@ -1,0 +1,16 @@
+@charset "UTF-8";
+/*******************************
+  formFileDropPlate.scss
+  '전역' formFileDropPlate 컴포넌트에 대하여 적용됨
+********************************/
+
+.file_drop_plate {
+  width: 100%;
+  height: 400px;
+
+  .drop_plate_wrapper {
+    width: 100%;
+    height: 100%;
+    padding: 5px;
+  }
+}

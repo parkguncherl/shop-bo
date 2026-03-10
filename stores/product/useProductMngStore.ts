@@ -4,7 +4,7 @@ import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { PageObject, ProductContentListResponseProductContent } from '../../generated';
 
-type ModalType = '';
+type ModalType = 'IMG_UPLOAD';
 
 interface ModalState {
   type: ModalType;
@@ -38,7 +38,7 @@ const initialStateCreator: StateCreator<ProductMngStateOfAll> = (set, get, api) 
     //     },
     //   }));
     // },
-    modals: { type: '', active: false, stored_temporary: undefined },
+    modals: { type: 'IMG_UPLOAD', active: false, stored_temporary: undefined },
     openModal: (type, stored_temp) => {
       set((state) => ({
         modals: {

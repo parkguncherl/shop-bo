@@ -20,6 +20,8 @@ export interface SrcEnumeratorProps {
     onToUpperReqSuccess?: (srcElement: SrcElement) => void;
     onToUpperReqFailure?: (srcElement: SrcElement, resultMessage?: string) => void;
   };
+
+  children?: React.ReactNode;
 }
 interface EnumElementProps {
   srcElement?: SrcElement;
@@ -61,7 +63,7 @@ const EnumElement = ({ srcElement, toUpperReqHandler }: EnumElementProps) => {
   );
 };
 
-const SrcEnumerator = ({ srcInfo, title, callBack }: SrcEnumeratorProps) => {
+const SrcEnumerator = ({ srcInfo, title, callBack, children }: SrcEnumeratorProps) => {
   const [rearrangeFilesBySeqToSeq] = useCommonStore((s) => [s.rearrangeFilesBySeqToSeq]);
 
   const onToUpperReqEmerged = (event: ToUpperReqEvent) => {
@@ -130,21 +132,7 @@ const SrcEnumerator = ({ srcInfo, title, callBack }: SrcEnumeratorProps) => {
             ))}
         </div>
       </div>
-      <div className={'bottom'}>
-        <div className="btnArea between">
-          <div className="left"></div>
-          <div className="right">
-            <button
-              className={'btn btn_blue'}
-              onClick={() => {
-                // todo
-              }}
-            >
-              {'업로드'}
-            </button>
-          </div>
-        </div>
-      </div>
+      <div className={'bottom'}>{children}</div>
     </div>
   );
 };

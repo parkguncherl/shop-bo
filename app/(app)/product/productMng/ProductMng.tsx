@@ -16,6 +16,7 @@ import { useProductMngStore } from '../../../../stores/product/useProductMngStor
 import { Placeholder } from '../../../../libs/const';
 import { Utils } from '../../../../libs/utils';
 import SrcEnumerator, { SrcElement, SrcEnumeratorProps } from '../../../../components/layout/product/productMng/SrcEnumerator';
+import ProductImgUploadPop from '../../../../components/popup/product/productMng/ProductImgUploadPop';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
@@ -348,11 +349,26 @@ const ProductMng = () => {
                     setTargetedFileSetInfo(refreshedTargetedFileSetInfo);
                   },
                 }}
-              />
+              >
+                <div className="btnArea between">
+                  <div className="left"></div>
+                  <div className="right">
+                    <button
+                      className={'btn btn_blue'}
+                      onClick={() => {
+                        openModal('IMG_UPLOAD');
+                      }}
+                    >
+                      {'업로드'}
+                    </button>
+                  </div>
+                </div>
+              </SrcEnumerator>
             </div>
           </div>
         </div>
       </Table>
+      <ProductImgUploadPop open={modals.type == 'IMG_UPLOAD' && modals.active} onClose={() => closeModal('IMG_UPLOAD')} />
     </div>
   );
 };
