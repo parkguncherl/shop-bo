@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useCommonStore } from '../../../../stores';
-import { toastSuccess } from '../../../ToastMessage';
 
 export interface SrcElement {
   fileSeq?: number;
@@ -53,7 +52,7 @@ const EnumElement = ({ srcElement, toUpperReqHandler, oneStepMovementReqHandler 
           )}
         </div>
         <div className={'btn_wrapper'}>
-          {(toUpperReqHandler || oneStepMovementReqHandler) && srcElement && (
+          {(toUpperReqHandler || oneStepMovementReqHandler) && srcElement?.fileSrc && (
             <div className={'btnArea between'}>
               <div className={'left'}>
                 {toUpperReqHandler && (
@@ -91,8 +90,33 @@ const SrcEnumerator = ({ srcInfo, title, callBack, children }: SrcEnumeratorProp
     if (event.srcElement.fileSeq) {
       rearrangeFilesBySeqToSeq({
         fileId: srcInfo?.fileId,
-        fromSeq: event.srcElement.fileSeq,
-        stepsToMove: -(event.srcElement.fileSeq - 1), // 최상단 영역으로 이동하고자 하므로 이동하고자 하는 step 또한 fileSeq - 1 에 대응됨
+        stepsToMove: -(event.srcElement.fileSeq - 1), // 최상단 영역으로 이동하고자 하므로 이동하고자 하는 step 또한 -(fileSeq - 1) 에 대응됨
+      }).then((result) => {
+        const { resultCode, body, resultMessage } = result.data;
+
+        if (resultCode == 200) {
+          if (callBack?.onToUpperReqSuccess) {
+            callBack.onToUpperReqSuccess(event.srcElement);
+          }
+        } else {
+          if (callBack?.onToUpperReqFailure) {
+            callBack.onToUpperReqFailure(event.srcElement, resultMessage);
+          }
+        }
+      });
+    } else {
+      console.error('fileSeq 를 찾을 수 없음');
+    }
+  };
+
+  const oneStepMovementReqEmerged = (event: OneStepMovementReqEvent) => {
+    // 한 단계의 seq 갱신을 통한 이동 요청 처리(fileSeq 업데이트 동작)
+
+    console.log('event.direction: ', event.direction);
+    if (event.srcElement.fileSeq) {
+      rearrangeFilesBySeqToSeq({
+        fileId: srcInfo?.fileId,
+        stepsToMove: event.direction == 'down' ? 1 : -1, // down 인 경우 각 요소들이 한 단계 뒤 seq에 대응되므로 움직일 step 은 1, 반대의 경우 -1
       }).then((result) => {
         const { resultCode, body, resultMessage } = result.data;
 
@@ -149,9 +173,7 @@ const SrcEnumerator = ({ srcInfo, title, callBack, children }: SrcEnumeratorProp
                       }
                     : undefined
                 }
-                // oneStepMovementReqHandler={(event) => {
-                //   on(event);
-                // }}
+                oneStepMovementReqHandler={oneStepMovementReqEmerged}
               />
             ))}
         </div>
