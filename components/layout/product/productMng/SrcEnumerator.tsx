@@ -25,14 +25,19 @@ export interface SrcEnumeratorProps {
 }
 interface EnumElementProps {
   srcElement?: SrcElement;
-  toUpperReqHandler?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  toUpperReqHandler?: (event: ToUpperReqEvent) => void;
+  oneStepMovementReqHandler?: (event: OneStepMovementReqEvent) => void;
 }
 
 interface ToUpperReqEvent extends React.MouseEvent<HTMLButtonElement, MouseEvent> {
   srcElement: SrcElement;
 }
+interface OneStepMovementReqEvent extends React.MouseEvent<HTMLButtonElement, MouseEvent> {
+  srcElement: SrcElement;
+  direction: 'up' | 'down';
+}
 
-const EnumElement = ({ srcElement, toUpperReqHandler }: EnumElementProps) => {
+const EnumElement = ({ srcElement, toUpperReqHandler, oneStepMovementReqHandler }: EnumElementProps) => {
   return (
     <div className={'enumElement'}>
       <div className={'element_container'}>
@@ -48,12 +53,26 @@ const EnumElement = ({ srcElement, toUpperReqHandler }: EnumElementProps) => {
           )}
         </div>
         <div className={'btn_wrapper'}>
-          {toUpperReqHandler && (
+          {(toUpperReqHandler || oneStepMovementReqHandler) && srcElement && (
             <div className={'btnArea between'}>
               <div className={'left'}>
-                <button className={'btn btn_blue'} onClick={toUpperReqHandler}>
-                  맨 위로
-                </button>
+                {toUpperReqHandler && (
+                  <button className={'btn btn_blue'} onClick={(e) => toUpperReqHandler({ ...e, srcElement: srcElement })}>
+                    맨 위로
+                  </button>
+                )}
+              </div>
+              <div className={'right'}>
+                {oneStepMovementReqHandler && (
+                  <>
+                    <button className={'btn btn_blue'} onClick={(e) => oneStepMovementReqHandler({ ...e, srcElement: srcElement, direction: 'up' })}>
+                      위로
+                    </button>
+                    <button className={'btn btn_blue'} onClick={(e) => oneStepMovementReqHandler({ ...e, srcElement: srcElement, direction: 'down' })}>
+                      아래로
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -68,23 +87,28 @@ const SrcEnumerator = ({ srcInfo, title, callBack, children }: SrcEnumeratorProp
 
   const onToUpperReqEmerged = (event: ToUpperReqEvent) => {
     // 최상단 이동 요청 처리(fileSeq 업데이트 동작)
-    rearrangeFilesBySeqToSeq({
-      fileId: srcInfo?.fileId,
-      fromSeq: event.srcElement.fileSeq,
-      toSeq: 1, // 최상단 영역으로 이동하고자 하므로
-    }).then((result) => {
-      const { resultCode, body, resultMessage } = result.data;
 
-      if (resultCode == 200) {
-        if (callBack?.onToUpperReqSuccess) {
-          callBack.onToUpperReqSuccess(event.srcElement);
+    if (event.srcElement.fileSeq) {
+      rearrangeFilesBySeqToSeq({
+        fileId: srcInfo?.fileId,
+        fromSeq: event.srcElement.fileSeq,
+        stepsToMove: -(event.srcElement.fileSeq - 1), // 최상단 영역으로 이동하고자 하므로 이동하고자 하는 step 또한 fileSeq - 1 에 대응됨
+      }).then((result) => {
+        const { resultCode, body, resultMessage } = result.data;
+
+        if (resultCode == 200) {
+          if (callBack?.onToUpperReqSuccess) {
+            callBack.onToUpperReqSuccess(event.srcElement);
+          }
+        } else {
+          if (callBack?.onToUpperReqFailure) {
+            callBack.onToUpperReqFailure(event.srcElement, resultMessage);
+          }
         }
-      } else {
-        if (callBack?.onToUpperReqFailure) {
-          callBack.onToUpperReqFailure(event.srcElement, resultMessage);
-        }
-      }
-    });
+      });
+    } else {
+      console.error('fileSeq 를 찾을 수 없음');
+    }
   };
 
   return (
@@ -121,13 +145,13 @@ const SrcEnumerator = ({ srcInfo, title, callBack, children }: SrcEnumeratorProp
                 toUpperReqHandler={
                   srcElement.fileSeq != undefined && srcElement.fileSeq != 1
                     ? (event) => {
-                        onToUpperReqEmerged({
-                          ...event,
-                          srcElement: srcElement,
-                        });
+                        onToUpperReqEmerged(event);
                       }
                     : undefined
                 }
+                // oneStepMovementReqHandler={(event) => {
+                //   on(event);
+                // }}
               />
             ))}
         </div>
