@@ -82,13 +82,13 @@ const EnumElement = ({ srcElement, toUpperReqHandler, oneStepMovementReqHandler 
 };
 
 const SrcEnumerator = ({ srcInfo, title, callBack, children }: SrcEnumeratorProps) => {
-  const [rearrangeFilesBySeqToSeq] = useCommonStore((s) => [s.rearrangeFilesBySeqToSeq]);
+  const [rearrangeFilesByStepsToMove] = useCommonStore((s) => [s.rearrangeFilesByStepsToMove]);
 
   const onToUpperReqEmerged = (event: ToUpperReqEvent) => {
     // 최상단 이동 요청 처리(fileSeq 업데이트 동작)
 
     if (event.srcElement.fileSeq) {
-      rearrangeFilesBySeqToSeq({
+      rearrangeFilesByStepsToMove({
         fileId: srcInfo?.fileId,
         stepsToMove: -(event.srcElement.fileSeq - 1), // 최상단 영역으로 이동하고자 하므로 이동하고자 하는 step 또한 -(fileSeq - 1) 에 대응됨
       }).then((result) => {
@@ -112,9 +112,8 @@ const SrcEnumerator = ({ srcInfo, title, callBack, children }: SrcEnumeratorProp
   const oneStepMovementReqEmerged = (event: OneStepMovementReqEvent) => {
     // 한 단계의 seq 갱신을 통한 이동 요청 처리(fileSeq 업데이트 동작)
 
-    console.log('event.direction: ', event.direction);
     if (event.srcElement.fileSeq) {
-      rearrangeFilesBySeqToSeq({
+      rearrangeFilesByStepsToMove({
         fileId: srcInfo?.fileId,
         stepsToMove: event.direction == 'down' ? 1 : -1, // down 인 경우 각 요소들이 한 단계 뒤 seq에 대응되므로 움직일 step 은 1, 반대의 경우 -1
       }).then((result) => {

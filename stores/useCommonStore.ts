@@ -1,7 +1,7 @@
 import { create, StateCreator } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { ApiResponse, CommonRequestFileDownload, CommonRequestFileRearrangementRequest, FileDet, GridRequest } from '../generated';
+import { ApiResponse, CommonRequestFileDownload, CommonRequestFileRearrangementRequest, FileDet } from '../generated';
 import { AxiosPromise } from 'axios';
 import { authApi, authDownApi } from '../libs';
 
@@ -51,11 +51,11 @@ interface CommonApiState {
   fileDownloadBlob: (commonRequest: CommonRequestFileDownload) => any;
   deleteFile: (commonRequest: any) => AxiosPromise<ApiResponse>;
   getFileUrl: (fileKey: string) => Promise<string>;
-  selectGridColumnState: (uri: string) => AxiosPromise<ApiResponse>;
-  updateGridColumnState: (gridRequest: GridRequest) => AxiosPromise<ApiResponse>;
-  initGridColumnState: (gridRequest: GridRequest) => AxiosPromise<ApiResponse>;
+  // selectGridColumnState: (uri: string) => AxiosPromise<ApiResponse>;
+  // updateGridColumnState: (gridRequest: GridRequest) => AxiosPromise<ApiResponse>;
+  // initGridColumnState: (gridRequest: GridRequest) => AxiosPromise<ApiResponse>;
   //getFilterData: (filterDataList: FilterData[], uri: string) => any;
-  rearrangeFilesBySeqToSeq: (commonRequestFileRearrangementRequest: CommonRequestFileRearrangementRequest) => AxiosPromise<ApiResponse>;
+  rearrangeFilesByStepsToMove: (commonRequestFileRearrangementRequest: CommonRequestFileRearrangementRequest) => AxiosPromise<ApiResponse>;
 }
 
 const initialStateCreator: StateCreator<CommonState & CommonApiState, any> = (set, get, api) => {
@@ -189,20 +189,20 @@ const initialStateCreator: StateCreator<CommonState & CommonApiState, any> = (se
         });
       }
     },
-    selectGridColumnState: (uri) => {
-      return authApi.get('/common/grid-column', {
-        params: {
-          uri: uri,
-        },
-      });
-    },
-    updateGridColumnState: (gridRequest) => {
-      return authApi.post('/common/grid-column/update', gridRequest);
-    },
-    initGridColumnState: (gridRequest) => {
-      // 실제로 삭제함
-      return authApi.post('/common/grid-column/init', gridRequest);
-    },
+    // selectGridColumnState: (uri) => {
+    //   return authApi.get('/common/grid-column', {
+    //     params: {
+    //       uri: uri,
+    //     },
+    //   });
+    // },
+    // updateGridColumnState: (gridRequest) => {
+    //   return authApi.post('/common/grid-column/update', gridRequest);
+    // },
+    // initGridColumnState: (gridRequest) => {
+    //   // 실제로 삭제함
+    //   return authApi.post('/common/grid-column/init', gridRequest);
+    // },
     // getFilterData: (filterDataList: FilterData[], uri: string) => {
     //   const filterInfo = filterDataList.filter((data: FilterData) => data.uri === uri);
     //   if (filterInfo && filterInfo.length > 0) {
@@ -246,8 +246,8 @@ const initialStateCreator: StateCreator<CommonState & CommonApiState, any> = (se
     //     return JSON.parse(JSON.stringify(rows)).filter((row: any) => row[colField] != undefined);
     //   }
     // },
-    rearrangeFilesBySeqToSeq: (commonRequestFileRearrangementRequest) => {
-      return authApi.patch('/common/rearrangeFilesBySeqToSeq', commonRequestFileRearrangementRequest);
+    rearrangeFilesByStepsToMove: (commonRequestFileRearrangementRequest) => {
+      return authApi.patch('/common/rearrangeFilesByStepsToMove', commonRequestFileRearrangementRequest);
     },
   };
 };

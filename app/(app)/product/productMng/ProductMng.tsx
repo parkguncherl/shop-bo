@@ -16,7 +16,7 @@ import { useProductMngStore } from '../../../../stores/product/useProductMngStor
 import { Placeholder } from '../../../../libs/const';
 import { Utils } from '../../../../libs/utils';
 import SrcEnumerator, { SrcElement, SrcEnumeratorProps } from '../../../../components/layout/product/productMng/SrcEnumerator';
-import ProductImgUploadPop from '../../../../components/popup/product/productMng/ProductImgUploadPop';
+import { FileUploadPop } from '../../../../components/popup/common';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
@@ -368,7 +368,32 @@ const ProductMng = () => {
           </div>
         </div>
       </Table>
-      <ProductImgUploadPop open={modals.type == 'IMG_UPLOAD' && modals.active} onClose={() => closeModal('IMG_UPLOAD')} />
+      <FileUploadPop
+        open={modals.type == 'IMG_UPLOAD' && modals.active}
+        onClose={() => closeModal('IMG_UPLOAD')}
+        onSuccess={async () => {
+          const targetedFileSetInfoRefreshFn = async (prevState: targetedFileSetInfo | undefined) => {
+            return {
+              ...prevState,
+              fileInfos: !prevState?.fileId
+                ? undefined
+                : await selectFileList(prevState.fileId).then(async (fileDetList) => {
+                    const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
+                    for (let index = 0; index < fileDetList.length; index++) {
+                      fileSetsElementInfos.push({
+                        fileSeq: fileDetList[index].fileSeq,
+                        fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
+                      });
+                    }
+                    return fileSetsElementInfos;
+                  }),
+            };
+          };
+
+          const refreshedTargetedFileSetInfo = await targetedFileSetInfoRefreshFn(targetedFileSetInfo);
+          setTargetedFileSetInfo(refreshedTargetedFileSetInfo);
+        }}
+      />
     </div>
   );
 };

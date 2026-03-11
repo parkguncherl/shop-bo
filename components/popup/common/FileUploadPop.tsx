@@ -1,24 +1,24 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, useRef, useState } from 'react';
 import { PopupContent } from '../PopupContent';
 import { PopupFooter } from '../PopupFooter';
 import { authApi } from '../../../libs';
 import { toastError, toastSuccess } from '../../ToastMessage';
-import { useCommonStore } from '../../../stores';
 import { CommonResponseFileDown } from '../../../generated';
 import { PopupLayout } from '../PopupLayout';
 
 interface FileUploadPopProps {
-  ref?: React.MutableRefObject<null>;
-  onValueChange?: (fileInfo: CommonResponseFileDown) => void;
+  open: boolean;
+  onClose: () => void;
+  onSuccess?: (fileInfo: CommonResponseFileDown) => void;
   fileId?: number;
   imageFileWidth?: number;
   imageFileHeight?: number;
 }
 
-export const FileUploadPop = ({ ref, onValueChange, fileId, imageFileWidth, imageFileHeight }: FileUploadPopProps) => {
-  /** 공통 스토어 - State */
-  const [modalType, closeModal] = useCommonStore((s) => [s.modalType, s.closeModal]);
+export const FileUploadPop = ({ open, onClose, onSuccess, fileId, imageFileWidth, imageFileHeight }: FileUploadPopProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  /** 공통 스토어 - State */
   const [file, setFile] = useState<File | undefined>();
   const [filePreview, setFilePreview] = useState<string | undefined>();
   const [isDragging, setIsDragging] = useState(false);
@@ -45,24 +45,23 @@ export const FileUploadPop = ({ ref, onValueChange, fileId, imageFileWidth, imag
       authApi
         .post('/common/file/upload', formData, {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            'Content-Type': 'multipart/form-data', // form Data 형식으로 요청 인자를 보내므로 반드시 명시!
           },
         })
         .then((response) => {
           if (response.data.resultCode === 200) {
-            if (onValueChange) {
-              onValueChange(response.data.body);
+            if (onSuccess) {
+              onSuccess(response.data.body);
             }
             toastSuccess('업로드되었습니다.');
-            closeModal('UPLOAD');
+            onClose();
           } else {
             toastError(response.data.resultMessage);
-            closeModal('UPLOAD');
+            onClose();
             throw new Error(response.data.resultMessage);
           }
         })
         .catch((error) => {
-          console.log('error occured', error);
           console.error(error);
           toastError(error.message);
         });
@@ -124,17 +123,17 @@ export const FileUploadPop = ({ ref, onValueChange, fileId, imageFileWidth, imag
   return (
     <PopupLayout
       width={800}
-      open={true}
+      open={open}
       isEscClose={true}
       title={'파일 업로드'}
-      onClose={() => closeModal('UPLOAD')}
+      onClose={onClose}
       footer={
         <PopupFooter>
           <div className={'btnArea'}>
             <button className={'btn'} onClick={handleUpload}>
               파일 업로드
             </button>
-            <button className={'btn'} onClick={() => closeModal('UPLOAD')}>
+            <button className={'btn'} onClick={onClose}>
               닫기
             </button>
           </div>
