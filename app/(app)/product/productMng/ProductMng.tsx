@@ -59,7 +59,7 @@ const ProductMng = () => {
 
   /** local states */
   const [productInfoList, setProductInfoList] = useState<ProductMngResponseProductInfo[]>([]);
-  const [productDetInfo, setProductDetInfo] = useState<ProductMngResponseProductDetInfo>(undefined); // prodId + prodDetColor 조합으로 조회된 결과는 고유하리라 기대되니 배열이 아닌 단일 객체로 관리
+  const [productDetInfo, setProductDetInfo] = useState<ProductMngResponseProductDetInfo | undefined>(undefined); // prodId + prodDetColor 조합으로 조회된 결과는 고유하리라 기대되니 배열이 아닌 단일 객체로 관리
 
   const [targetedFileSetInfo, setTargetedFileSetInfo] = useState<targetedFileSetInfo | undefined>(undefined);
 
@@ -117,7 +117,6 @@ const ProductMng = () => {
           console.error('단일 반환을 기대하였으나 다수의 데이터 반환됨, 데이터 오염 여부 점검!');
           return;
         }
-        console.log('body[0]: ', body[0]);
         setProductDetInfo(body[0]);
       } else {
         toastError(resultMessage);
@@ -126,21 +125,19 @@ const ProductMng = () => {
   }, [productDetInfos, isProductDetInfosSuccess]);
 
   useEffect(() => {
-    if (productDetInfo == undefined) {
+    console.log('productDetInfo: ', productDetInfo);
+    if (productDetInfo == undefined || !productDetInfo.fileId) {
+      setTargetedFileSetInfo(undefined); // state 초기화
       return;
     }
-    if (!productDetInfo.fileId) {
-      console.log('유효한 파일 식별자가 전달되지 않음');
-      return;
-    }
-    const targetedFileSetInfoRefreshFn = async (prevState: targetedFileSetInfo | undefined): Promise<targetedFileSetInfo | undefined> => {
-      if (prevState == undefined) {
-        return prevState;
-      }
+    console.log('productDetInfo: ', productDetInfo);
+    const targetedFileSetInfoRefreshFn = async (): Promise<targetedFileSetInfo | undefined> => {
       return {
-        ...prevState,
         type: undefined, // 색상이므로
+        rowData: productInfoList.filter((productInfo) => productInfo.id == productDetInfo.productId)[0],
+        fileId: productDetInfo.fileId as number,
         fileInfos: await selectFileList(productDetInfo.fileId as number).then(async (fileDetList) => {
+          console.log('fileDetList: ', fileDetList);
           const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
           for (let index = 0; index < fileDetList.length; index++) {
             fileSetsElementInfos.push({
@@ -152,7 +149,7 @@ const ProductMng = () => {
         }),
       };
     };
-    targetedFileSetInfoRefreshFn(targetedFileSetInfo).then((updatedFileSetInfo: targetedFileSetInfo) => {
+    targetedFileSetInfoRefreshFn().then((updatedFileSetInfo: targetedFileSetInfo) => {
       setTargetedFileSetInfo(updatedFileSetInfo);
     });
   }, [productDetInfo]);
@@ -162,6 +159,7 @@ const ProductMng = () => {
     (params: Omit<ValueSetterParams<ProductMngResponseProductInfo>, 'api'>) => {
       onChangeDetFilters('prodId', params.data.id);
       onChangeDetFilters('prodDetColor', params.newValue);
+      console.log('prodId, prodDetColor: ', params.data.id, params.newValue);
     },
     [onChangeDetFilters],
   );
