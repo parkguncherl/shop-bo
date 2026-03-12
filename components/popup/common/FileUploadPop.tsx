@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useRef, useState } from 'react';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { PopupContent } from '../PopupContent';
 import { PopupFooter } from '../PopupFooter';
 import { authApi } from '../../../libs';
@@ -6,29 +6,69 @@ import { toastError, toastSuccess } from '../../ToastMessage';
 import { CommonResponseFileDown } from '../../../generated';
 import { PopupLayout } from '../PopupLayout';
 
+interface LimitationOnImg {
+  maxWidth?: number;
+  maxHeight?: number;
+}
 interface FileUploadPopProps {
   open: boolean;
   onClose: () => void;
   onSuccess?: (fileInfo: CommonResponseFileDown) => void;
+  onlyImg?: boolean;
   fileId?: number;
-  imageFileWidth?: number;
-  imageFileHeight?: number;
+  limOnImg?: LimitationOnImg;
+  imageFileWidth?: number; // 백앤드에서 재조정 요청코자 하는 너비
+  imageFileHeight?: number; // 백앤드에서 재조정 요청코자 하는 높이
 }
 
-export const FileUploadPop = ({ open, onClose, onSuccess, fileId, imageFileWidth, imageFileHeight }: FileUploadPopProps) => {
+export const FileUploadPop = ({ open, onClose, onSuccess, onlyImg = false, fileId, limOnImg, imageFileWidth, imageFileHeight }: FileUploadPopProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   /** 공통 스토어 - State */
   const [file, setFile] = useState<File | undefined>();
   const [filePreview, setFilePreview] = useState<string | undefined>();
   const [isDragging, setIsDragging] = useState(false);
+  const [limOnImgAsState, setLimOnImgAsState] = useState<LimitationOnImg | undefined>(undefined);
+
+  useEffect(() => {
+    setLimOnImgAsState(limOnImg); // 추후 필요한 조건에 따라 내부 상태는 외부에서 전달된 상태와 독립적으로 관리 가능
+  }, [limOnImg]);
+
+  // 파일 추가 동작 공통함수
+  const passedFileCommonHandler = (file: File | undefined) => {
+    if (file == undefined) {
+      return;
+    }
+
+    // 이미지 파일 한정 속성이 참인 경우의 이미지 여부 검증 영역
+    if (onlyImg && !file.type.startsWith('image/')) {
+      toastError('이미지 파일 이외의 파일은 업로드할 수 없습니다.');
+      return;
+    }
+
+    // 이미지 파일 관련 규제가 주어질 시
+    // if (limOnImgAsState) {
+    // todo
+    // }
+    if (file) {
+      setFile(file);
+      readImage(file);
+    }
+  };
+
+  // 닫힘 콜백 공통 영역 핸들링
+  const onCloseCommonHandler = () => {
+    // state 초기화
+    setFile(undefined);
+    setFilePreview(undefined);
+    setIsDragging(false);
+
+    onClose();
+  };
 
   const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      readImage(selectedFile);
-    }
+    passedFileCommonHandler(selectedFile); // 공통 함수 처리
   };
 
   const handleUpload = (e: React.MouseEvent) => {
@@ -59,10 +99,10 @@ export const FileUploadPop = ({ open, onClose, onSuccess, fileId, imageFileWidth
               onSuccess(response.data.body);
             }
             toastSuccess('업로드되었습니다.');
-            onClose();
+            onCloseCommonHandler();
           } else {
             toastError(response.data.resultMessage);
-            onClose();
+            onCloseCommonHandler();
             throw new Error(response.data.resultMessage);
           }
         })
@@ -100,11 +140,8 @@ export const FileUploadPop = ({ open, onClose, onSuccess, fileId, imageFileWidth
     e.preventDefault();
     e.stopPropagation();
     const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile) {
-      setFile(droppedFile);
-      readImage(droppedFile);
-    }
     setIsDragging(false);
+    passedFileCommonHandler(droppedFile); // 공통 함수 처리
   };
 
   // 미리보기
@@ -123,22 +160,23 @@ export const FileUploadPop = ({ open, onClose, onSuccess, fileId, imageFileWidth
     setFilePreview(undefined);
   };
 
-  const uniqueId = `fileInp-${Math.random().toString(36).substr(2, 9)}`; // 고유한 id 생성
+  //const uniqueId = `fileInp-${Math.random().toString(36).substr(2, 9)}`; // 고유한 id 생성 // todo substr deprecated 된 관계로 아래와 같이 대체
+  const uniqueId = `fileInp-${Math.random().toString(36).slice(2, 11)}`; // 고유한 id 생성
 
   return (
     <PopupLayout
       width={800}
       open={open}
       isEscClose={true}
-      title={'파일 업로드'}
-      onClose={onClose}
+      title={onlyImg ? '이미지 업로드' : '파일 및 이미지 업로드'}
+      onClose={onCloseCommonHandler}
       footer={
         <PopupFooter>
           <div className={'btnArea'}>
             <button className={'btn'} onClick={handleUpload}>
-              파일 업로드
+              {onlyImg ? '이미지 업로드' : '파일 업로드'}
             </button>
-            <button className={'btn'} onClick={onClose}>
+            <button className={'btn'} onClick={onCloseCommonHandler}>
               닫기
             </button>
           </div>
@@ -156,8 +194,8 @@ export const FileUploadPop = ({ open, onClose, onSuccess, fileId, imageFileWidth
           <input ref={inputRef} type="file" id={uniqueId} onChange={handleFileInputChange} style={{ display: 'none' }} />
           <div className="">
             <span className="ico_upload"></span>
-            파일을 드래그 하거나 클릭해주세요.
-            <label htmlFor={uniqueId}>파일업로드</label>
+            {onlyImg ? '이미지를 드래그 하거나 클릭해주세요' : '파일을 드래그 하거나 클릭해주세요'}
+            <label htmlFor={uniqueId}>{onlyImg ? '이미지 업로드' : '파일 업로드'}</label>
           </div>
           {file && (
             <ul className="imagePreview">

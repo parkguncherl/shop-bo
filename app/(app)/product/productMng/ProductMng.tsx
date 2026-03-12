@@ -380,7 +380,7 @@ const ProductMng = () => {
     <div>
       <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} />
       <Search className="type_2">
-        <Search.Input title={'미정'} name={'prodNm'} placeholder={Placeholder.Input} value={filters.prodNm} onChange={onChangeFilters} onEnter={onSearch} />
+        <Search.Input title={'상품명'} name={'prodNm'} placeholder={Placeholder.Input} value={filters.prodNm} onChange={onChangeFilters} onEnter={onSearch} />
       </Search>
       <Table>
         <div className="tblPreview">
@@ -447,7 +447,7 @@ const ProductMng = () => {
                   targetedFileSetInfo?.fileId != undefined
                     ? {
                         fileId: targetedFileSetInfo?.fileId,
-                        srcElements: [...(targetedFileSetInfo?.fileInfos || []), {}, {}, {}, {}],
+                        srcElements: [...(targetedFileSetInfo?.fileInfos || [])],
                       }
                     : undefined
                 }
@@ -501,6 +501,7 @@ const ProductMng = () => {
       <FileUploadPop
         open={modals.type == 'IMG_UPLOAD' && modals.active}
         onClose={() => closeModal('IMG_UPLOAD')}
+        onlyImg={true}
         fileId={targetedFileSetInfo?.fileId}
         onSuccess={async () => {
           const targetedFileSetInfoRefreshFn = async (prevState: targetedFileSetInfo | undefined) => {
