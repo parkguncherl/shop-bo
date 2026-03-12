@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Search, Table, Title } from '../../../../components';
 import {
   ProductMngRequestProductDetInfoFilter,
@@ -8,7 +8,7 @@ import {
   ProductMngResponseProductDetInfo,
   ProductMngResponseProductInfo,
 } from '../../../../generated';
-import { CellClickedEvent, ColDef, ICellEditorParams, ValueSetterParams } from 'ag-grid-community';
+import { CellClickedEvent, ColDef, ICellEditorParams } from 'ag-grid-community';
 import { TableHeader, toastError } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
 import { useQuery } from '@tanstack/react-query';
@@ -36,6 +36,10 @@ interface targetedFileSetInfo extends Omit<SrcEnumeratorProps, 'title' | 'srcInf
   fileInfos: targetedFileSetsElementInfo[];
 }
 
+interface MngProductInfo extends ProductMngResponseProductInfo {
+  representedProdColor?: string;
+}
+
 /** 시스템 - 상품관리 페이지 */
 const ProductMng = () => {
   /** Grid Api */
@@ -49,16 +53,16 @@ const ProductMng = () => {
   const [modals, openModal, closeModal] = useProductMngStore((s) => [s.modals, s.openModal, s.closeModal]);
 
   /** 검색 필터 */
-  const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<ProductMngRequestProductInfoFilter>({
+  const [filters, onChangeFilters] = useFilters<ProductMngRequestProductInfoFilter>({
     prodNm: undefined,
   });
-  const [detFilters, onChangeDetFilters] = useFilters<ProductMngRequestProductDetInfoFilter>({
+  const [detFilters, onChangeDetFilters, onDetFiltersReset] = useFilters<ProductMngRequestProductDetInfoFilter>({
     prodId: undefined,
     prodDetColor: undefined,
   });
 
   /** local states */
-  const [productInfoList, setProductInfoList] = useState<ProductMngResponseProductInfo[]>([]);
+  const [productInfoList, setProductInfoList] = useState<MngProductInfo[]>([]);
   const [productDetInfo, setProductDetInfo] = useState<ProductMngResponseProductDetInfo | undefined>(undefined); // prodId + prodDetColor 조합으로 조회된 결과는 고유하리라 기대되니 배열이 아닌 단일 객체로 관리
 
   const [targetedFileSetInfo, setTargetedFileSetInfo] = useState<targetedFileSetInfo | undefined>(undefined);
@@ -95,8 +99,8 @@ const ProductMng = () => {
   const {
     data: productDetInfos,
     isSuccess: isProductDetInfosSuccess,
-    isLoading: isProductDetInfosLoading,
-    refetch: productDetInfosRefetch,
+    // isLoading: isProductDetInfosLoading,
+    // refetch: productDetInfosRefetch,
   } = useQuery({
     queryKey: ['/productMng/productDetInfoList', detFilters.prodDetColor],
     queryFn: () =>
@@ -125,12 +129,10 @@ const ProductMng = () => {
   }, [productDetInfos, isProductDetInfosSuccess]);
 
   useEffect(() => {
-    console.log('productDetInfo: ', productDetInfo);
     if (productDetInfo == undefined || !productDetInfo.fileId) {
       setTargetedFileSetInfo(undefined); // state 초기화
       return;
     }
-    console.log('productDetInfo: ', productDetInfo);
     const targetedFileSetInfoRefreshFn = async (): Promise<targetedFileSetInfo | undefined> => {
       return {
         type: undefined, // 색상이므로
@@ -149,23 +151,13 @@ const ProductMng = () => {
         }),
       };
     };
-    targetedFileSetInfoRefreshFn().then((updatedFileSetInfo: targetedFileSetInfo) => {
+    targetedFileSetInfoRefreshFn().then((updatedFileSetInfo) => {
       setTargetedFileSetInfo(updatedFileSetInfo);
     });
   }, [productDetInfo]);
 
-  /** 그리드 색상 영역 드롭다운에서 값을 선택할 시 필요한 동작을 처리하는 영역 */
-  const onProdColorSelectionOccurred = useCallback(
-    (params: Omit<ValueSetterParams<ProductMngResponseProductInfo>, 'api'>) => {
-      onChangeDetFilters('prodId', params.data.id);
-      onChangeDetFilters('prodDetColor', params.newValue);
-      console.log('prodId, prodDetColor: ', params.data.id, params.newValue);
-    },
-    [onChangeDetFilters],
-  );
-
   /** 컬럼 설정 */
-  const columnDefs = useMemo<ColDef<ProductMngResponseProductInfo>[]>(
+  const columnDefs = useMemo<ColDef<MngProductInfo>[]>(
     () => [
       {
         field: 'no',
@@ -193,8 +185,28 @@ const ProductMng = () => {
             values: splittedColors,
           };
         },
+        valueFormatter: (params) => {
+          if (params.data?.representedProdColor) {
+            return params.data?.representedProdColor; // representedProdColor 우선 출력
+          }
+          return params.value; // comma 단위로 쪼개어 나열된 기본 prodColors 반환
+        },
         valueSetter: (params) => {
-          onProdColorSelectionOccurred(params);
+          onChangeDetFilters('prodId', params.data.id);
+          onChangeDetFilters('prodDetColor', params.newValue);
+
+          setProductInfoList((prevState) =>
+            prevState.map((prev) => {
+              if (prev.id == params.data.id) {
+                return {
+                  ...prev,
+                  representedProdColor: params.newValue,
+                };
+              }
+              return prev;
+            }),
+          );
+
           // false를 반환하여 그리드 데이터 업데이트를 원천 차단
           return false;
         },
@@ -243,7 +255,7 @@ const ProductMng = () => {
       },
       { field: 'etcFileIdCnt', headerName: '기타이미지', minWidth: 80, maxWidth: 80, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
     ],
-    [onProdColorSelectionOccurred],
+    [],
   );
 
   /** 검색 버튼 클릭 시 */
@@ -260,6 +272,9 @@ const ProductMng = () => {
 
     // 대표이미지 이하 4개의 컬럼 중 하나를 클릭하는 경우 동작
     if (cellsColField && ['repFileIdCnt', 'detailFileIdCnt', 'sizeFileIdCnt', 'etcFileIdCnt'].includes(cellsColField)) {
+      setProductInfoList(productInfos?.data.body || []); // query cached 된 값으로 초기화(색상 목록과의 상호작용으로 어떠한 색상이 선택되어 있는 경우에 대한 초기화 동작)
+      onDetFiltersReset(); // 상세정보 필터 또한 초기화
+
       if (event.data && (event.data[cellsColField as keyof ProductMngResponseProductInfo] as number) == 0) {
         // 카운트된 이미지 개수가 0인경우 초기화 동작 이하가 무의미하므로 return
         setTargetedFileSetInfo(undefined);
@@ -412,17 +427,21 @@ const ProductMng = () => {
             <div className={'layout30'}>
               <SrcEnumerator
                 title={{
-                  left: `${targetedFileSetInfo?.rowData.prodNm ? '[' + targetedFileSetInfo?.rowData.prodNm + ']' : ''} ${
-                    targetedFileSetInfo == undefined
-                      ? ''
-                      : targetedFileSetInfo?.type == 'rep'
-                      ? '대표이미지'
-                      : targetedFileSetInfo?.type == 'detail'
-                      ? '상세이미지'
-                      : targetedFileSetInfo?.type == 'size'
-                      ? '사이즈이미지'
-                      : '기타이미지'
-                  }`,
+                  left: !targetedFileSetInfo
+                    ? ''
+                    : `${targetedFileSetInfo?.rowData.prodNm ? '[' + targetedFileSetInfo?.rowData.prodNm + ']' : ''} ${
+                        targetedFileSetInfo?.type == 'rep'
+                          ? '대표이미지'
+                          : targetedFileSetInfo?.type == 'detail'
+                          ? '상세이미지'
+                          : targetedFileSetInfo?.type == 'size'
+                          ? '사이즈이미지'
+                          : targetedFileSetInfo?.type == 'etc'
+                          ? '기타이미지'
+                          : detFilters.prodDetColor != undefined
+                          ? detFilters.prodDetColor
+                          : '알수 없음'
+                      }`,
                 }}
                 srcInfo={
                   targetedFileSetInfo?.fileId != undefined
