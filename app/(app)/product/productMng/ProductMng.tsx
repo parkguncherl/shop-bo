@@ -351,17 +351,21 @@ const ProductMng = () => {
                 }}
               >
                 <div className="btnArea between">
-                  <div className="left"></div>
-                  <div className="right">
-                    <button
-                      className={'btn btn_blue'}
-                      onClick={() => {
-                        openModal('IMG_UPLOAD');
-                      }}
-                    >
-                      {'업로드'}
-                    </button>
-                  </div>
+                  {targetedFileSetInfo?.fileId && (
+                    <>
+                      <div className="left"></div>
+                      <div className="right">
+                        <button
+                          className={'btn btn_blue'}
+                          onClick={() => {
+                            openModal('IMG_UPLOAD');
+                          }}
+                        >
+                          {'업로드'}
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </SrcEnumerator>
             </div>
@@ -371,6 +375,7 @@ const ProductMng = () => {
       <FileUploadPop
         open={modals.type == 'IMG_UPLOAD' && modals.active}
         onClose={() => closeModal('IMG_UPLOAD')}
+        fileId={targetedFileSetInfo?.fileId}
         onSuccess={async () => {
           const targetedFileSetInfoRefreshFn = async (prevState: targetedFileSetInfo | undefined) => {
             return {

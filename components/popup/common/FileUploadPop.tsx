@@ -33,6 +33,11 @@ export const FileUploadPop = ({ open, onClose, onSuccess, fileId, imageFileWidth
 
   const handleUpload = (e: React.MouseEvent) => {
     e.preventDefault();
+    if (!fileId) {
+      console.error('업로드하고자 하는 file 영역의 식별자를 찾을 수 없음');
+      return;
+    }
+
     if (file) {
       const formData = new FormData();
       formData.append('uploadFile', file);
