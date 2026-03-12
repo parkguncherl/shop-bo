@@ -1,9 +1,14 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Search, Table, Title } from '../../../../components';
-import { ProductMngRequestProductInfoFilter, ProductMngResponseProductInfo } from '../../../../generated';
-import { CellClickedEvent, ColDef } from 'ag-grid-community';
+import {
+  ProductMngRequestProductDetInfoFilter,
+  ProductMngRequestProductInfoFilter,
+  ProductMngResponseProductDetInfo,
+  ProductMngResponseProductInfo,
+} from '../../../../generated';
+import { CellClickedEvent, ColDef, ICellEditorParams, ValueSetterParams } from 'ag-grid-community';
 import { TableHeader, toastError } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
 import { useQuery } from '@tanstack/react-query';
@@ -25,8 +30,8 @@ interface targetedFileSetsElementInfo extends SrcElement {
   //fileSrc?: string;
 }
 interface targetedFileSetInfo extends Omit<SrcEnumeratorProps, 'title' | 'srcInfo'> {
-  type: targetedFileTypes;
-  rowData: ProductMngResponseProductInfo;
+  type?: targetedFileTypes; // 색상 등의 경우 undefined
+  rowData: ProductMngResponseProductInfo; // file 호출을 요청하게끔 한 상호작용이 발생한 행의 data
   fileId: number;
   fileInfos: targetedFileSetsElementInfo[];
 }
@@ -47,13 +52,18 @@ const ProductMng = () => {
   const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<ProductMngRequestProductInfoFilter>({
     prodNm: undefined,
   });
+  const [detFilters, onChangeDetFilters] = useFilters<ProductMngRequestProductDetInfoFilter>({
+    prodId: undefined,
+    prodDetColor: undefined,
+  });
 
   /** local states */
-  const [productInfoList, setproductInfoList] = useState<ProductMngResponseProductInfo[]>([]);
+  const [productInfoList, setProductInfoList] = useState<ProductMngResponseProductInfo[]>([]);
+  const [productDetInfo, setProductDetInfo] = useState<ProductMngResponseProductDetInfo>(undefined); // prodId + prodDetColor 조합으로 조회된 결과는 고유하리라 기대되니 배열이 아닌 단일 객체로 관리
 
   const [targetedFileSetInfo, setTargetedFileSetInfo] = useState<targetedFileSetInfo | undefined>(undefined);
 
-  /** 메뉴관리 페이징 목록 조회 */
+  /** 상품정보 목록 조회 */
   const {
     data: productInfos,
     isSuccess: isProductInfosSuccess,
@@ -74,72 +84,169 @@ const ProductMng = () => {
     if (isProductInfosSuccess) {
       const { resultCode, body, resultMessage } = productInfos.data;
       if (resultCode === 200) {
-        setproductInfoList(body || []);
+        setProductInfoList(body || []);
       } else {
         toastError(resultMessage);
       }
     }
   }, [productInfos, isProductInfosSuccess]);
 
+  /** 상품상세정보 목록 조회 */
+  const {
+    data: productDetInfos,
+    isSuccess: isProductDetInfosSuccess,
+    isLoading: isProductDetInfosLoading,
+    refetch: productDetInfosRefetch,
+  } = useQuery({
+    queryKey: ['/productMng/productDetInfoList', detFilters.prodDetColor],
+    queryFn: () =>
+      authApi.get('/productMng/productDetInfoList', {
+        params: {
+          ...detFilters,
+        },
+      }),
+    refetchOnMount: 'always',
+    enabled: detFilters.prodId != undefined,
+  });
+
+  useEffect(() => {
+    if (isProductDetInfosSuccess) {
+      const { resultCode, body, resultMessage } = productDetInfos.data;
+      if (resultCode === 200) {
+        if (body.length > 1) {
+          console.error('단일 반환을 기대하였으나 다수의 데이터 반환됨, 데이터 오염 여부 점검!');
+          return;
+        }
+        console.log('body[0]: ', body[0]);
+        setProductDetInfo(body[0]);
+      } else {
+        toastError(resultMessage);
+      }
+    }
+  }, [productDetInfos, isProductDetInfosSuccess]);
+
+  useEffect(() => {
+    if (productDetInfo == undefined) {
+      return;
+    }
+    if (!productDetInfo.fileId) {
+      console.log('유효한 파일 식별자가 전달되지 않음');
+      return;
+    }
+    const targetedFileSetInfoRefreshFn = async (prevState: targetedFileSetInfo | undefined): Promise<targetedFileSetInfo | undefined> => {
+      if (prevState == undefined) {
+        return prevState;
+      }
+      return {
+        ...prevState,
+        type: undefined, // 색상이므로
+        fileInfos: await selectFileList(productDetInfo.fileId as number).then(async (fileDetList) => {
+          const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
+          for (let index = 0; index < fileDetList.length; index++) {
+            fileSetsElementInfos.push({
+              fileSeq: fileDetList[index].fileSeq,
+              fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
+            });
+          }
+          return fileSetsElementInfos;
+        }),
+      };
+    };
+    targetedFileSetInfoRefreshFn(targetedFileSetInfo).then((updatedFileSetInfo: targetedFileSetInfo) => {
+      setTargetedFileSetInfo(updatedFileSetInfo);
+    });
+  }, [productDetInfo]);
+
+  /** 그리드 색상 영역 드롭다운에서 값을 선택할 시 필요한 동작을 처리하는 영역 */
+  const onProdColorSelectionOccurred = useCallback(
+    (params: Omit<ValueSetterParams<ProductMngResponseProductInfo>, 'api'>) => {
+      onChangeDetFilters('prodId', params.data.id);
+      onChangeDetFilters('prodDetColor', params.newValue);
+    },
+    [onChangeDetFilters],
+  );
+
   /** 컬럼 설정 */
-  const [columnDefs] = useState<ColDef<ProductMngResponseProductInfo>[]>([
-    {
-      field: 'no',
-      headerName: 'NO',
-      minWidth: 70,
-      maxWidth: 80,
-      valueGetter: (params) => (params.node ? (params.node.rowIndex ?? 0) + 1 : ''),
-      cellStyle: GridSetting.CellStyle.CENTER,
-      suppressHeaderMenuButton: true,
-    },
-    { field: 'prodNm', headerName: '상품명', minWidth: 120, maxWidth: 120, suppressHeaderMenuButton: true },
-    { field: 'prodTpNm', headerName: '상품대분류', minWidth: 120, maxWidth: 120, suppressHeaderMenuButton: true },
-    { field: 'prodDetTpNm', headerName: '상품소분류', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
-    { field: 'prodColors', headerName: '크기', minWidth: 130, maxWidth: 130, suppressHeaderMenuButton: true },
-    { field: 'prodSizes', headerName: '색상', minWidth: 130, maxWidth: 130, suppressHeaderMenuButton: true },
-    { field: 'composition', headerName: '혼용율', minWidth: 120, maxWidth: 120, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
-    { field: 'makeYmd', headerName: '출시일', minWidth: 100, maxWidth: 100, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
-    {
-      field: 'orgAmt',
-      headerName: '원가',
-      minWidth: 80,
-      maxWidth: 80,
-      suppressHeaderMenuButton: true,
-      cellStyle: GridSetting.CellStyle.RIGHT,
-      valueFormatter: (params: any) => {
-        return Utils.setComma(Math.round(params.value));
+  const columnDefs = useMemo<ColDef<ProductMngResponseProductInfo>[]>(
+    () => [
+      {
+        field: 'no',
+        headerName: 'NO',
+        minWidth: 70,
+        maxWidth: 80,
+        valueGetter: (params) => (params.node ? (params.node.rowIndex ?? 0) + 1 : ''),
+        cellStyle: GridSetting.CellStyle.CENTER,
+        suppressHeaderMenuButton: true,
       },
-    },
-    {
-      field: 'sellAmt',
-      headerName: '판매가',
-      minWidth: 80,
-      maxWidth: 80,
-      suppressHeaderMenuButton: true,
-      cellStyle: GridSetting.CellStyle.RIGHT,
-      valueFormatter: (params: any) => {
-        return Utils.setComma(Math.round(params.value));
+      { field: 'prodNm', headerName: '상품명', minWidth: 120, maxWidth: 120, suppressHeaderMenuButton: true },
+      { field: 'prodTpNm', headerName: '상품대분류', minWidth: 120, maxWidth: 120, suppressHeaderMenuButton: true },
+      { field: 'prodDetTpNm', headerName: '상품소분류', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
+      { field: 'prodSizes', headerName: '크기', minWidth: 130, maxWidth: 130, suppressHeaderMenuButton: true },
+      {
+        field: 'prodColors',
+        headerName: '색상',
+        minWidth: 130,
+        maxWidth: 130,
+        editable: true,
+        cellEditor: 'agSelectCellEditor',
+        cellEditorParams: (params: ICellEditorParams) => {
+          const splittedColors: string[] = params.value.split(',');
+          return {
+            values: splittedColors,
+          };
+        },
+        valueSetter: (params) => {
+          onProdColorSelectionOccurred(params);
+          // false를 반환하여 그리드 데이터 업데이트를 원천 차단
+          return false;
+        },
+        suppressHeaderMenuButton: true,
       },
-    },
-    { field: 'repFileIdCnt', headerName: '대표이미지', minWidth: 80, maxWidth: 80, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
-    {
-      field: 'detailFileIdCnt',
-      headerName: '상세이미지',
-      minWidth: 80,
-      maxWidth: 80,
-      suppressHeaderMenuButton: true,
-      cellStyle: GridSetting.CellStyle.CENTER,
-    },
-    {
-      field: 'sizeFileIdCnt',
-      headerName: '사이즈이미지',
-      minWidth: 80,
-      maxWidth: 80,
-      suppressHeaderMenuButton: true,
-      cellStyle: GridSetting.CellStyle.CENTER,
-    },
-    { field: 'etcFileIdCnt', headerName: '기타이미지', minWidth: 80, maxWidth: 80, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
-  ]);
+      { field: 'composition', headerName: '혼용율', minWidth: 120, maxWidth: 120, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
+      { field: 'makeYmd', headerName: '출시일', minWidth: 100, maxWidth: 100, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
+      {
+        field: 'orgAmt',
+        headerName: '원가',
+        minWidth: 80,
+        maxWidth: 80,
+        suppressHeaderMenuButton: true,
+        cellStyle: GridSetting.CellStyle.RIGHT,
+        valueFormatter: (params: any) => {
+          return Utils.setComma(Math.round(params.value));
+        },
+      },
+      {
+        field: 'sellAmt',
+        headerName: '판매가',
+        minWidth: 80,
+        maxWidth: 80,
+        suppressHeaderMenuButton: true,
+        cellStyle: GridSetting.CellStyle.RIGHT,
+        valueFormatter: (params: any) => {
+          return Utils.setComma(Math.round(params.value));
+        },
+      },
+      { field: 'repFileIdCnt', headerName: '대표이미지', minWidth: 80, maxWidth: 80, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
+      {
+        field: 'detailFileIdCnt',
+        headerName: '상세이미지',
+        minWidth: 80,
+        maxWidth: 80,
+        suppressHeaderMenuButton: true,
+        cellStyle: GridSetting.CellStyle.CENTER,
+      },
+      {
+        field: 'sizeFileIdCnt',
+        headerName: '사이즈이미지',
+        minWidth: 80,
+        maxWidth: 80,
+        suppressHeaderMenuButton: true,
+        cellStyle: GridSetting.CellStyle.CENTER,
+      },
+      { field: 'etcFileIdCnt', headerName: '기타이미지', minWidth: 80, maxWidth: 80, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
+    ],
+    [onProdColorSelectionOccurred],
+  );
 
   /** 검색 버튼 클릭 시 */
   const search = async () => {
@@ -153,6 +260,7 @@ const ProductMng = () => {
   const onCellClickedCallBack = async (event: CellClickedEvent<ProductMngResponseProductInfo>) => {
     const cellsColField = event.column.getColDef().field;
 
+    // 대표이미지 이하 4개의 컬럼 중 하나를 클릭하는 경우 동작
     if (cellsColField && ['repFileIdCnt', 'detailFileIdCnt', 'sizeFileIdCnt', 'etcFileIdCnt'].includes(cellsColField)) {
       if (event.data && (event.data[cellsColField as keyof ProductMngResponseProductInfo] as number) == 0) {
         // 카운트된 이미지 개수가 0인경우 초기화 동작 이하가 무의미하므로 return
@@ -277,6 +385,7 @@ const ProductMng = () => {
                   mode: 'singleRow',
                   enableClickSelection: false,
                 }}
+                popupParent={document.body ? document.body : undefined} // ag grid 내장 드롭다운 사용 시 그리드가 사라지는 현상을 방지하기 위하여 document.body 영역을 popup의 부모 요소로 명시
                 onCellClicked={onCellClickedCallBack}
               />
               <div className="btnArea between">
@@ -342,7 +451,7 @@ const ProductMng = () => {
                               }
                               return fileSetsElementInfos;
                             }),
-                      };
+                      } as targetedFileSetInfo;
                     };
 
                     const refreshedTargetedFileSetInfo = await targetedFileSetInfoRefreshFn(targetedFileSetInfo);
@@ -392,7 +501,7 @@ const ProductMng = () => {
                     }
                     return fileSetsElementInfos;
                   }),
-            };
+            } as targetedFileSetInfo;
           };
 
           const refreshedTargetedFileSetInfo = await targetedFileSetInfoRefreshFn(targetedFileSetInfo);
