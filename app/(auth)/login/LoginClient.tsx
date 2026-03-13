@@ -57,7 +57,7 @@ const LoginClient = () => {
     // 최초 1회 동작 영역
     const parser = new UAParser();
     const result = parser.getResult();
-    setPersistTypedId(!!getCookie('smartLoginId')); // 최초 시점에 브라우저에 체크 활성화 값이 존재하는지 확인
+    setPersistTypedId(!!getCookie('gguangggLocalStoriageId')); // 최초 시점에 브라우저에 체크 활성화 값이 존재하는지 확인
 
     setDeviceInfo({
       deviceType: result.device.type || 'desktop',
@@ -78,7 +78,8 @@ const LoginClient = () => {
   }, [deviceInfo]);
 
   const defaultValues: LoginVerificationFields = {
-    loginId: (getCookie('smartLoginId') as string) || '',
+    //loginId: (getCookie('gguangggLocalStoriageId') as string) || '',
+    loginId: (getCookie('gguangggLocalStoriageId') as string) || '',
     password: '1230',
     isMobileLogin: isMobileLogin,
   };
@@ -178,9 +179,9 @@ const LoginClient = () => {
 
     // id 저장하기 버튼 체크
     if (persistTypedId) {
-      setCookie('smartLoginId', loginId, { expires: date });
+      setCookie('gguangggLocalStoriageId', loginId, { expires: date });
     } else {
-      deleteCookie('smartLoginId');
+      deleteCookie('gguangggLocalStoriageId');
     }
 
     /** 본 로그인 요청, 성공 시 즉시 리다이렉트 되므로 실패한 경우 이외에는 이후의 작성은 무의미 */

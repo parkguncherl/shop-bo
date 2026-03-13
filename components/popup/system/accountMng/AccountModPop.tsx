@@ -102,7 +102,7 @@ export const AccountModPop = ({ data }: Props) => {
           toastSuccess('저장되었습니다.');
           await queryClient.invalidateQueries({ queryKey: ['/user/paging'] });
           closeModal('MOD');
-          // if (getCookie('smartLoginId') == data.loginId) {
+          // if (getCookie('gguangggLocalStoriageId') == data.loginId) {
           //   window.location.reload();
           // }
         } else {
