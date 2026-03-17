@@ -19,7 +19,29 @@ import FormDatePicker from '../../../form/FormDatePicker';
 
 /** form 영역 입력 인터페이스 */
 export interface ProductInfoCreateFields {
+  // id?: number;
+  // prodNm: string;
+  // prodTp: string;
+  // prodDetTp: string;
+  // composition: string;
+  // repFileId?: number;
+  // detailFileId?: number;
+  // sizeFileId?: number;
+  // etcFileId?: number;
+  // makeYmd: string;
+  // orgAmt: number;
+  // sellAmt: number;
+  // discountRate?: number;
+  // weather: 'spring' | 'summer' | 'autumn' | 'winter';
+  // // isSpring?: string;
+  // // isSummer?: string;
+  // // isAutumn?: string;
+  // // isWinter?: string;
   id?: number;
+  product?: ProductCreateFields;
+  productDet: ProductDetCreateFields;
+}
+export interface ProductCreateFields {
   prodNm: string;
   prodTp: string;
   prodDetTp: string;
@@ -37,7 +59,6 @@ export interface ProductInfoCreateFields {
   // isSummer?: string;
   // isAutumn?: string;
   // isWinter?: string;
-  productDet: ProductDetCreateFields;
 }
 export interface ProductDetCreateFields {
   productDetSeq: number;
@@ -66,7 +87,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
   const [insertProductInfo] = useProductMngStore((s) => [s.insertProductInfo]);
 
   /** 팝업 내부 local state */
-  const [openAddConf, setOpenAddConf] = useState(false);
+  const [openAddConf, setOpenAddConf] = useState<{ open: boolean; stored?: unknown }>({ open: false });
 
   /** 상품 내용 입력 서식 */
   const {
@@ -74,8 +95,9 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
     control,
     getValues,
     setValue,
+    reset,
     clearErrors,
-    formState: { errors, isValid },
+    //formState: { errors, isValid },
   } = useForm<ProductInfoCreateFields>({
     resolver: yupResolver(YupSchema.InsertProductInfoRequest()),
     mode: 'onChange',
@@ -104,46 +126,68 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
   });
 
   useEffect(() => {
-    setValue('id', selectedProductInfoData?.id); // 외부의 selectedProductInfoData 변경 시점에 id 존재 여부에 따른 동기화 보장 todo 콘솔 로그로 확인 후 백앤드 인서트 테스트할 것
+    // 인자 상태 변경에 따라 id 동기화
+    setValue('id', selectedProductInfoData?.id); // 외부의 selectedProductInfoData 변경 시점에 id 존재 여부에 따른 동기화 보장
   }, [selectedProductInfoData]);
 
   useEffect(() => {
     if (!open) {
-      clearErrors();
+      // 닫힘 시점 동작
+      reset({
+        productDet: {
+          skuDiscountRate: 0,
+          sleepYn: 'N',
+        },
+        id: getValues('id'), // id는 유지함
+      }); // 초기화
+      clearErrors(); // 에러 상태 초기화
     }
   }, [open]);
 
   // 입력이 유효한 경우
   const onValid: SubmitHandler<ProductInfoCreateFields> = (data, event) => {
-    let insertProductInfoReqObj: ProductMngRequestInsertProduct | undefined = undefined;
-    switch (data.weather) {
-      case 'spring': {
-        insertProductInfoReqObj = { ...data, isSpring: 'Y' };
-        break;
-      }
-      case 'summer': {
-        insertProductInfoReqObj = { ...data, isSummer: 'Y' };
-        break;
-      }
-      case 'autumn': {
-        insertProductInfoReqObj = { ...data, isAutumn: 'Y' };
-        break;
-      }
-      case 'winter': {
-        insertProductInfoReqObj = { ...data, isWinter: 'Y' };
-        break;
-      }
-    }
+    if (data.id) {
+      // 상품상세정보만 추가하는 경우
+      setOpenAddConf({
+        open: true,
+        stored: data,
+      });
+    } else {
+      // id 부재 --> 상품정보 또한 추가
+      let insertProductInfoReqObj: ProductMngRequestInsertProduct | undefined = undefined;
 
-    if (insertProductInfoReqObj == undefined) {
-      console.error('입력 폼에 의한 값을 요청 객체에 할당하는 과정에서 문제 발생, 점검!');
+      // id 부재하는 경우 검증 규칙에 따라 product 가 존재함이 보장되므로 단언 처리
+      switch ((data.product as ProductCreateFields).weather) {
+        case 'spring': {
+          insertProductInfoReqObj = { ...data, isSpring: 'Y' };
+          break;
+        }
+        case 'summer': {
+          insertProductInfoReqObj = { ...data, isSummer: 'Y' };
+          break;
+        }
+        case 'autumn': {
+          insertProductInfoReqObj = { ...data, isAutumn: 'Y' };
+          break;
+        }
+        case 'winter': {
+          insertProductInfoReqObj = { ...data, isWinter: 'Y' };
+          break;
+        }
+      }
+      if (insertProductInfoReqObj == undefined) {
+        console.error('입력 폼에 의한 값을 요청 객체에 할당하는 과정에서 문제 발생, 점검!');
+      }
+      setOpenAddConf({
+        open: true,
+        stored: insertProductInfoReqObj,
+      });
     }
-
-    console.log('insertProductInfoReqObj: ', insertProductInfoReqObj);
   };
 
   // 유효하지 않은 경우
   const onInvalid: SubmitErrorHandler<ProductInfoCreateFields> = (errors, event) => {
+    //console.error(errors);
     if (errors) {
       toastError('문제가 되는 영역 혹은 누락된 영역을 수정 및 추가한 후 재시도하십시요.');
     }
@@ -155,7 +199,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
         width={900}
         open={open}
         isEscClose={true}
-        title={!getValues('id') ? '상품정보 추가' : selectedProductInfoData?.prodNm + ' 이하 상세정보 추가'}
+        title={!(getValues('id') && getValues('id') == selectedProductInfoData?.id) ? '상품정보 추가' : selectedProductInfoData?.prodNm + ' 이하 상세정보 추가'}
         onClose={onClose}
         footer={
           <PopupFooter>
@@ -187,28 +231,28 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
       >
         <PopupContent>
           <PopupFormBox className={''}>
-            {!getValues('id') && (
+            {!(getValues('id') && getValues('id') == selectedProductInfoData?.id) && (
               <PopupFormGroup title={'상품정보'}>
                 <PopupFormType className={'type2'}>
-                  <FormInput<ProductInfoCreateFields> control={control} name={'prodNm'} label={'상품명'} placeholder={'제목'} />
-                  <FormDropDown<ProductInfoCreateFields> control={control} name={'prodTp'} title={'상품유형'} codeUpper={'90010'} />
+                  <FormInput<ProductInfoCreateFields> control={control} name={'product.prodNm'} label={'상품명'} placeholder={'제목'} />
+                  <FormDropDown<ProductInfoCreateFields> control={control} name={'product.prodTp'} title={'상품유형'} codeUpper={'90010'} />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
-                  <FormDropDown<ProductInfoCreateFields> control={control} name={'prodDetTp'} title={'상품상세유형'} codeUpper={'90011'} />
-                  <FormInput<ProductInfoCreateFields> control={control} name={'composition'} label={'혼용율'} />
+                  <FormDropDown<ProductInfoCreateFields> control={control} name={'product.prodDetTp'} title={'상품상세유형'} codeUpper={'90011'} />
+                  <FormInput<ProductInfoCreateFields> control={control} name={'product.composition'} label={'혼용율'} />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
-                  <FormDatePicker<ProductInfoCreateFields> control={control} name={'makeYmd'} title={'제조일자'} />
-                  <FormInput<ProductInfoCreateFields> control={control} name={'discountRate'} label={'할인율'} inputType={'number'} />
+                  <FormDatePicker<ProductInfoCreateFields> control={control} name={'product.makeYmd'} title={'제조일자'} />
+                  <FormInput<ProductInfoCreateFields> control={control} name={'product.discountRate'} label={'할인율'} inputType={'number'} />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
-                  <FormInput<ProductInfoCreateFields> control={control} name={'orgAmt'} label={'원가'} inputType={'number'} />
-                  <FormInput<ProductInfoCreateFields> control={control} name={'sellAmt'} label={'판매가'} inputType={'number'} />
+                  <FormInput<ProductInfoCreateFields> control={control} name={'product.orgAmt'} label={'원가'} inputType={'number'} />
+                  <FormInput<ProductInfoCreateFields> control={control} name={'product.sellAmt'} label={'판매가'} inputType={'number'} />
                 </PopupFormType>
                 <PopupFormType className={'type1'}>
                   <FormDropDown<ProductInfoCreateFields>
                     control={control}
-                    name={'weather'}
+                    name={'product.weather'}
                     title={'계절'}
                     options={[
                       { key: 0, value: 'spring', label: '봄' },
@@ -242,7 +286,6 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
                   control={control}
                   name={'productDet.skuDiscountRate'}
                   label={'스큐 할인율'}
-                  inputType={'number'}
                   placeholder={'스큐단위 할인율'}
                 />
                 <FormDropDown<ProductInfoCreateFields>
@@ -260,14 +303,16 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
         </PopupContent>
       </PopupLayout>
       <ConfirmModal
-        open={openAddConf}
+        open={openAddConf.open}
         title={'저장 하시겠습니까?'}
         confirmText={'저장'}
         onConfirm={() => {
-          // handleSubmit(onValid, onInvalid)(); // 함수를 반환하므로 다음과 같이, 호출하여야
+          console.log('openAddConf: ', openAddConf.stored);
         }}
         onClose={() => {
-          setOpenAddConf(false);
+          setOpenAddConf({
+            open: false,
+          });
         }}
       />
     </div>

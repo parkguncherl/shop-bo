@@ -273,29 +273,44 @@ export const YupSchema = {
   InsertProductInfoRequest: (): yup.ObjectSchema<ProductInfoCreateFields> =>
     yup.object({
       id: yup.number().notRequired(),
-      prodNm: yup.string().required('상품명은 필수값입니다!'),
-      prodTp: yup.string().required('상품유형은 필수값입니다!'),
-      prodDetTp: yup.string().required('상품상세유형은 필수값입니다!'),
-      composition: yup.string().required('혼용율은 필수값입니다!'),
-      // repFileId: yup.number().notRequired(),
-      // detailFileId: yup.number().notRequired(),
-      // sizeFileId: yup.number().notRequired(),
-      // etcFileId: yup.number().notRequired(),
-      makeYmd: yup.string().required('제조일자는 필수값입니다!'),
-      orgAmt: yup.number().notRequired(),
-      sellAmt: yup.number().notRequired(),
-      discountRate: yup.number().notRequired(),
-      weather: yup.string().required('계절 유형은 필수값입니다!'),
-      // isSpring: yup.string().notRequired(),
-      // isSummer: yup.string().notRequired(),
-      // isAutumn: yup.string().notRequired(),
-      // isWinter: yup.string().notRequired(),
+      product: yup
+        .object({
+          prodNm: yup.string().required('상품명은 필수값입니다!'),
+          prodTp: yup.string().required('상품유형은 필수값입니다!'),
+          prodDetTp: yup.string().required('상품상세유형은 필수값입니다!'),
+          composition: yup.string().required('혼용율은 필수값입니다!'),
+          // repFileId: yup.number().notRequired(),
+          // detailFileId: yup.number().notRequired(),
+          // sizeFileId: yup.number().notRequired(),
+          // etcFileId: yup.number().notRequired(),
+          makeYmd: yup.string().required('제조일자는 필수값입니다!'),
+          orgAmt: yup.number().typeError('원가는 숫자만 입력 가능합니다.').notRequired(),
+          sellAmt: yup.number().typeError('판매가는 숫자만 입력 가능합니다.').notRequired(),
+          discountRate: yup.number().typeError('할인율은 숫자만 입력 가능합니다.').notRequired(),
+          weather: yup.string().required('계절 유형은 필수값입니다!'),
+          // isSpring: yup.string().notRequired(),
+          // isSummer: yup.string().notRequired(),
+          // isAutumn: yup.string().notRequired(),
+          // isWinter: yup.string().notRequired(),
+        })
+        .when('id', {
+          is: (val: number | undefined) => val == undefined, // id 부재하는 경우 완전한 신규 인서트 시도로 간주, 상품정보 입력 의무화
+          then: (schema) => schema.required('상품정보는 반드시 입력하셔야 합니다.'),
+          // id가 있는 경우 (수정/상세 추가)
+          otherwise: (schema) =>
+            schema
+              .nullable()
+              .notRequired()
+              // 중요: 상위에서 필수값을 해제해도 내부 필드 검증이 남을 수 있으므로
+              // id가 있을 때는 product 객체 자체가 없어도 통과되도록 설정
+              .default(undefined),
+        }),
       productDet: yup
         .object({
           //productDetSeq: yup.number().required(),
           productDetSize: yup.string().required('(상품상세)사이즈는 필수값입니다!'),
           productDetColor: yup.string().required('(상품상세)컬러는 필수값입니다!'),
-          skuDiscountRate: yup.number().required('스큐 단위 할인율은 필수값입니다!'),
+          skuDiscountRate: yup.number().typeError('스큐 단위 할인율은 숫자만 입력 가능합니다.').required('스큐 단위 할인율은 필수값입니다!'),
           //fileId: yup.number().notRequired(),
           sleepYn: yup.string().required('휴면 여부는 필수값입니다!'),
         })
