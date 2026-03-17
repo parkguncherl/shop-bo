@@ -87,7 +87,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
   const [insertProductInfo] = useProductMngStore((s) => [s.insertProductInfo]);
 
   /** 팝업 내부 local state */
-  const [openAddConf, setOpenAddConf] = useState<{ open: boolean; stored?: unknown }>({ open: false });
+  const [openAddConf, setOpenAddConf] = useState<{ open: boolean; stored?: object & { id?: number } }>({ open: false });
 
   /** 상품 내용 입력 서식 */
   const {
@@ -159,19 +159,19 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
       // id 부재하는 경우 검증 규칙에 따라 product 가 존재함이 보장되므로 단언 처리
       switch ((data.product as ProductCreateFields).weather) {
         case 'spring': {
-          insertProductInfoReqObj = { ...data, isSpring: 'Y' };
+          insertProductInfoReqObj = { ...data.product, isSpring: 'Y', productDet: data.productDet };
           break;
         }
         case 'summer': {
-          insertProductInfoReqObj = { ...data, isSummer: 'Y' };
+          insertProductInfoReqObj = { ...data.product, isSummer: 'Y', productDet: data.productDet };
           break;
         }
         case 'autumn': {
-          insertProductInfoReqObj = { ...data, isAutumn: 'Y' };
+          insertProductInfoReqObj = { ...data.product, isAutumn: 'Y', productDet: data.productDet };
           break;
         }
         case 'winter': {
-          insertProductInfoReqObj = { ...data, isWinter: 'Y' };
+          insertProductInfoReqObj = { ...data.product, isWinter: 'Y', productDet: data.productDet };
           break;
         }
       }
@@ -243,11 +243,11 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
                   <FormDatePicker<ProductInfoCreateFields> control={control} name={'product.makeYmd'} title={'제조일자'} />
-                  <FormInput<ProductInfoCreateFields> control={control} name={'product.discountRate'} label={'할인율'} inputType={'number'} />
+                  <FormInput<ProductInfoCreateFields> control={control} name={'product.discountRate'} label={'할인율'} />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
-                  <FormInput<ProductInfoCreateFields> control={control} name={'product.orgAmt'} label={'원가'} inputType={'number'} />
-                  <FormInput<ProductInfoCreateFields> control={control} name={'product.sellAmt'} label={'판매가'} inputType={'number'} />
+                  <FormInput<ProductInfoCreateFields> control={control} name={'product.orgAmt'} label={'원가'} />
+                  <FormInput<ProductInfoCreateFields> control={control} name={'product.sellAmt'} label={'판매가'} />
                 </PopupFormType>
                 <PopupFormType className={'type1'}>
                   <FormDropDown<ProductInfoCreateFields>
@@ -307,7 +307,19 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
         title={'저장 하시겠습니까?'}
         confirmText={'저장'}
         onConfirm={() => {
-          console.log('openAddConf: ', openAddConf.stored);
+          if (openAddConf.stored) {
+            //console.log('openAddConf: ', openAddConf.stored);
+            if (openAddConf.stored.id) {
+              // 상세정보 추가(기존 product 에 대한 식별자 존재)
+              const productDetData = openAddConf.stored as ProductInfoCreateFields;
+              console.log('productDetData: ', productDetData);
+            } else {
+              // 상품, 상세정보 추가(id 부재)
+              const productDataWithDet = openAddConf.stored as ProductMngRequestInsertProduct;
+              console.log('productDataWithDet: ', productDataWithDet);
+            }
+            // todo 마저 진행
+          }
         }}
         onClose={() => {
           setOpenAddConf({
