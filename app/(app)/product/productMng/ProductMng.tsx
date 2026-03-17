@@ -22,6 +22,7 @@ import { Placeholder } from '../../../../libs/const';
 import { Utils } from '../../../../libs/utils';
 import SrcEnumerator, { SrcElement, SrcEnumeratorProps } from '../../../../components/layout/product/productMng/SrcEnumerator';
 import { FileUploadPop } from '../../../../components/popup/common';
+import ProductInfoAddPop from '../../../../components/popup/product/productMng/ProductInfoAddPop';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
@@ -36,9 +37,9 @@ interface targetedFileSetInfo extends Omit<SrcEnumeratorProps, 'title' | 'srcInf
   fileInfos: targetedFileSetsElementInfo[];
 }
 
-interface MngProductInfo extends ProductMngResponseProductInfo {
-  representedProdColor?: string;
-}
+// interface MngProductInfo extends ProductMngResponseProductInfo {
+//   representedProdColor?: string;
+// }
 
 /** 시스템 - 상품관리 페이지 */
 const ProductMng = () => {
@@ -62,10 +63,12 @@ const ProductMng = () => {
   });
 
   /** local states */
-  const [productInfoList, setProductInfoList] = useState<MngProductInfo[]>([]);
+  const [productInfoList, setProductInfoList] = useState<ProductMngResponseProductInfo[]>([]);
   const [productDetInfo, setProductDetInfo] = useState<ProductMngResponseProductDetInfo | undefined>(undefined); // prodId + prodDetColor 조합으로 조회된 결과는 고유하리라 기대되니 배열이 아닌 단일 객체로 관리
 
   const [targetedFileSetInfo, setTargetedFileSetInfo] = useState<targetedFileSetInfo | undefined>(undefined);
+
+  const [selectedRowsData, setSelectedRowsData] = useState<ProductMngResponseProductInfo | undefined>(undefined);
 
   /** 상품정보 목록 조회 */
   const {
@@ -157,7 +160,7 @@ const ProductMng = () => {
   }, [productDetInfo]);
 
   /** 컬럼 설정 */
-  const columnDefs = useMemo<ColDef<MngProductInfo>[]>(
+  const columnDefs = useMemo<ColDef<ProductMngResponseProductInfo>[]>(
     () => [
       {
         field: 'no',
@@ -185,12 +188,12 @@ const ProductMng = () => {
             values: splittedColors,
           };
         },
-        valueFormatter: (params) => {
-          if (params.data?.representedProdColor) {
-            return params.data?.representedProdColor; // representedProdColor 우선 출력
-          }
-          return params.value; // comma 단위로 쪼개어 나열된 기본 prodColors 반환
-        },
+        // valueFormatter: (params) => {
+        //   if (params.data?.representedProdColor) {
+        //     return params.data?.representedProdColor; // representedProdColor 우선 출력
+        //   }
+        //   return params.value; // comma 단위로 쪼개어 나열된 기본 prodColors 반환
+        // },
         valueSetter: (params) => {
           onChangeDetFilters('prodId', params.data.id);
           onChangeDetFilters('prodDetColor', params.newValue);
@@ -221,9 +224,7 @@ const ProductMng = () => {
         maxWidth: 80,
         suppressHeaderMenuButton: true,
         cellStyle: GridSetting.CellStyle.RIGHT,
-        valueFormatter: (params: any) => {
-          return Utils.setComma(Math.round(params.value));
-        },
+        valueFormatter: (params) => Utils.setComma(Math.round(params.value)),
       },
       {
         field: 'sellAmt',
@@ -232,9 +233,7 @@ const ProductMng = () => {
         maxWidth: 80,
         suppressHeaderMenuButton: true,
         cellStyle: GridSetting.CellStyle.RIGHT,
-        valueFormatter: (params: any) => {
-          return Utils.setComma(Math.round(params.value));
-        },
+        valueFormatter: (params) => Utils.setComma(Math.round(params.value)),
       },
       { field: 'repFileIdCnt', headerName: '대표이미지', minWidth: 80, maxWidth: 80, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
       {
@@ -396,7 +395,11 @@ const ProductMng = () => {
                 defaultColDef={defaultColDef}
                 rowSelection={{
                   mode: 'singleRow',
-                  enableClickSelection: false,
+                  enableClickSelection: true,
+                }}
+                onSelectionChanged={(event) => {
+                  const selectedRows = event.api.getSelectedRows();
+                  setSelectedRowsData(selectedRows.length > 0 ? selectedRows[0] : undefined);
                 }}
                 popupParent={document.body ? document.body : undefined} // ag grid 내장 드롭다운 사용 시 그리드가 사라지는 현상을 방지하기 위하여 document.body 영역을 popup의 부모 요소로 명시
                 onCellClicked={onCellClickedCallBack}
@@ -416,10 +419,10 @@ const ProductMng = () => {
                   <button
                     className={'btn btn_blue'}
                     onClick={() => {
-                      // todo
+                      openModal('PROD_INFO_ADD');
                     }}
                   >
-                    {'저장'}
+                    {`${selectedRowsData == undefined ? '상품추가' : selectedRowsData.prodNm + ' 이하 상세정보 추가'}`}
                   </button>
                 </div>
               </div>
@@ -525,6 +528,11 @@ const ProductMng = () => {
           const refreshedTargetedFileSetInfo = await targetedFileSetInfoRefreshFn(targetedFileSetInfo);
           setTargetedFileSetInfo(refreshedTargetedFileSetInfo);
         }}
+      />
+      <ProductInfoAddPop
+        open={modals.active && modals.type == 'PROD_INFO_ADD'}
+        onClose={() => closeModal('PROD_INFO_ADD')}
+        selectedProductInfoData={selectedRowsData}
       />
     </div>
   );

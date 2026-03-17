@@ -7,6 +7,8 @@ import { CodeRequestCreateFields, CodeRequestUpdateFields } from '../components/
 import { MenuFormData, MenuRequestCreateFields } from '../components/popup/system/menuMng';
 import { LoginVerificationFields } from '../app/(auth)/login/LoginClient';
 import { ProductContentsFields } from '../app/(app)/product/Contents/ProductContents';
+import { ProductMngRequestInsertProduct } from '../generated';
+import { ProductInfoCreateFields } from '../components/popup/product/productMng/ProductInfoAddPop';
 
 export interface MenuRequestParams {
   menuCd?: string;
@@ -267,4 +269,25 @@ export const YupSchema = {
           return fileTitles.length === new Set(fileTitles).size;
         }),
     }) as yup.ObjectSchema<ProductContentsFields>,
+
+  InsertProductInfoRequest: (): yup.ObjectSchema<ProductInfoCreateFields> =>
+    yup.object({
+      id: yup.number().notRequired(),
+      prodNm: yup.string().notRequired(),
+      prodTp: yup.string().notRequired(),
+      prodDetTp: yup.string().notRequired(),
+      composition: yup.string().notRequired(),
+      repFileId: yup.number().notRequired(),
+      detailFileId: yup.number().notRequired(),
+      sizeFileId: yup.number().notRequired(),
+      etcFileId: yup.number().notRequired(),
+      makeYmd: yup.string().notRequired(),
+      orgAmt: yup.number().notRequired(),
+      sellAmt: yup.number().notRequired(),
+      discountRate: yup.number().notRequired(),
+      isSpring: yup.string().notRequired(),
+      isSummer: yup.string().notRequired(),
+      isAutumn: yup.string().notRequired(),
+      isWinter: yup.string().notRequired(),
+    }) as yup.ObjectSchema<ProductInfoCreateFields>,
 };

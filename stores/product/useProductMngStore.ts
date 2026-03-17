@@ -2,9 +2,11 @@ import { StateCreator } from 'zustand/esm';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { PageObject, ProductContentListResponseProductContent } from '../../generated';
+import { ApiResponse, ProductContentListResponseProductContent, ProductMngRequestInsertProduct } from '../../generated';
+import { AxiosPromise } from 'axios';
+import { authApi } from '../../libs';
 
-type ModalType = 'IMG_UPLOAD';
+type ModalType = 'IMG_UPLOAD' | 'PROD_INFO_ADD';
 
 interface ModalState {
   type: ModalType;
@@ -20,7 +22,9 @@ interface ProductMngState {
   closeModal: (type: ModalType) => void;
 }
 
-interface ProductMngApiState {}
+interface ProductMngApiState {
+  insertProductInfo: (insertProductInfoRequest: ProductMngRequestInsertProduct) => AxiosPromise<ApiResponse>;
+}
 
 type ProductMngStateOfAll = ProductMngState & ProductMngApiState;
 
@@ -56,6 +60,9 @@ const initialStateCreator: StateCreator<ProductMngStateOfAll> = (set, get, api) 
           stored_temporary: undefined,
         },
       }));
+    },
+    insertProductInfo: (codeRequestList) => {
+      return authApi.put('/productMng/insertProductInfo', codeRequestList);
     },
   };
 };
