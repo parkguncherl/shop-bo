@@ -406,16 +406,7 @@ const ProductMng = () => {
                 onCellClicked={onCellClickedCallBack}
               />
               <div className="btnArea between">
-                <div className="left">
-                  {/*<button*/}
-                  {/*  className={'btn '}*/}
-                  {/*  onClick={() => {*/}
-                  {/*    // todo*/}
-                  {/*  }}*/}
-                  {/*>*/}
-                  {/*  {'행추가'}*/}
-                  {/*</button>*/}
-                </div>
+                <div className="left"></div>
                 <div className="right">
                   <button
                     className={'btn btn_blue'}

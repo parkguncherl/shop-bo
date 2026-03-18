@@ -76,6 +76,7 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('수정되었습니다.');
+          reset();
           if (onSuccess) onSuccess();
         } else {
           toastError(`컨텐츠 저장 도중 문제 발생 (${e.data.resultMessage})`);
@@ -89,10 +90,19 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
   useEffect(() => {
     if (productInfo) {
       Object.entries(productInfo).forEach(([key, value]) => {
-        setValue(key as keyof ProductModFields, value, {
-          shouldValidate: true,
-          shouldDirty: true,
-        });
+        if (['isSpring', 'isSummer', 'isAutumn', 'isWinter'].includes(key)) {
+          if (value == 'Y') {
+            setValue('weather', key == 'isSpring' ? 'spring' : key == 'isSummer' ? 'summer' : key == 'isAutumn' ? 'autumn' : 'winter', {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
+          }
+        } else {
+          setValue(key as keyof ProductModFields, value, {
+            shouldValidate: true,
+            shouldDirty: true,
+          });
+        }
       });
     } else {
       reset(); // 초기화
@@ -236,7 +246,7 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
         onConfirm={() => {
           if (openModConf.stored) {
             console.log('openModConf.stored: ', openModConf.stored);
-            //updateProductMutate(openModConf.stored);
+            updateProductMutate(openModConf.stored);
           } else {
             toastError('저장하고자 하는 입력 결과를 찾을 수 없습니다.');
             console.error('저장하고자 하는 입력 결과를 찾을 수 없습니다.');
