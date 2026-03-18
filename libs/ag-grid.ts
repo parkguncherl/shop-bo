@@ -12,6 +12,20 @@ export const defaultColDef: ColDef = {
   tooltipComponent: CustomTooltip,
 };
 
+export const formatDateWithDay = (params: any): string => {
+    if (!params.value) return '';
+    const formatDated = params.value.indexOf('.') > -1 ? params.value.split('.')[0] : params.value;
+    const date = new Date(formatDated);
+    const year = String(date.getFullYear()).slice(2); // 25
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // 10
+    const day = String(date.getDate()).padStart(2, '0'); // 02
+
+    const days = ['일', '월', '화', '수', '목', '금', '토'];
+    const dayOfWeek = days[date.getDay()]; // 목
+
+    return `${year}/${month}/${day}(${dayOfWeek})`;
+};
+
 export const GridSetting = {
   CellStyle: {
     CENTER: {

@@ -60,9 +60,7 @@ export const LOCAL_STORAGE_HISTORY = 'shopMenuHistoryList';
 export const LOCAL_STORAGE_GUBUN = 'shopGubun';
 export const LOCAL_STORAGE_WMS_HISTORY = 'shopWmsMenuHistoryList';
 
-export const PARTNER_CODE = { expense: 'P0001', categories: 'P0002', boryuCategories: 'P0003' };
-export const CODE = { todayColor: '10310', logis: '10090', asnStatCd: '10370' };
-export const DEFAULT_SELLER = '소매처를 선택해주세요';
+export const PARTNER_CODE = { categories: '10001'};
 
 export const DefaultOptions = {
   // 전체

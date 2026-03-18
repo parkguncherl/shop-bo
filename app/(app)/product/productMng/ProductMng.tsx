@@ -18,12 +18,14 @@ import { authApi } from '../../../../libs';
 import TunedGrid from '../../../../components/grid/TunedGrid';
 import useFilters from '../../../../hooks/useFilters';
 import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
-import { Placeholder } from '../../../../libs/const';
+import {PARTNER_CODE, Placeholder} from '../../../../libs/const';
 import { Utils } from '../../../../libs/utils';
 import SrcEnumerator, { SrcElement, SrcEnumeratorProps } from '../../../../components/layout/product/productMng/SrcEnumerator';
 import { FileUploadPop } from '../../../../components/popup/common';
 import ProductInfoAddPop from '../../../../components/popup/product/productMng/ProductInfoAddPop';
 import ProductModPop from '../../../../components/popup/product/productMng/ProductModPop';
+import { PartnerCodePop } from "../../../../components/popup/system/PartnerCodePop";
+import {usePartnerCodeStore} from "../../../../stores/usePartnerCodeStore";
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
@@ -53,6 +55,7 @@ const ProductMng = () => {
 
   /** 상품관리 스토어 - State */
   const [modals, openModal, closeModal] = useProductMngStore((s) => [s.modals, s.openModal, s.closeModal]);
+  const [partnerCodeModals, partnerCodeOpenModal, partnerCodeCloseModal] = usePartnerCodeStore((s) => [s.modals, s.openModal, s.closeModal]);
 
   /** 검색 필터 */
   const [filters, onChangeFilters] = useFilters<ProductMngRequestProductInfoFilter>({
@@ -564,6 +567,13 @@ const ProductMng = () => {
           onDetFiltersReset();
         }}
         productInfo={selectedRowsData}
+      />
+      <PartnerCodePop
+        partnerCodeUpper={PARTNER_CODE.categories}
+        title={'상품카테고리관리'}
+        activated={partnerCodeModals?.type === 'PARTNER_CODE_OPEN' && partnerCodeModals.active}
+        codeName={'부자재유형'}
+        onCloseRequestEmerged={() => partnerCodeCloseModal('PARTNER_CODE_OPEN')}
       />
     </div>
   );
