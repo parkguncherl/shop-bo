@@ -47,10 +47,10 @@ export interface ProductCreateFields {
   prodTp: string;
   prodDetTp: string;
   composition: string;
-  repFileId?: number;
-  detailFileId?: number;
-  sizeFileId?: number;
-  etcFileId?: number;
+  // repFileId?: number;
+  // detailFileId?: number;
+  // sizeFileId?: number;
+  // etcFileId?: number;
   makeYmd: string;
   orgAmt: number;
   sellAmt: number;
