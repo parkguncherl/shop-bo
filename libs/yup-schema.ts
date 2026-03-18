@@ -7,8 +7,8 @@ import { CodeRequestCreateFields, CodeRequestUpdateFields } from '../components/
 import { MenuFormData, MenuRequestCreateFields } from '../components/popup/system/menuMng';
 import { LoginVerificationFields } from '../app/(auth)/login/LoginClient';
 import { ProductContentsFields } from '../app/(app)/product/Contents/ProductContents';
-import { ProductMngRequestInsertProduct } from '../generated';
 import { ProductInfoCreateFields } from '../components/popup/product/productMng/ProductInfoAddPop';
+import { ProductModFields } from '../components/popup/product/productMng/ProductModPop';
 
 export interface MenuRequestParams {
   menuCd?: string;
@@ -310,4 +310,25 @@ export const YupSchema = {
         })
         .required('상품상세 정보는 필수값입니다!'),
     }) as yup.ObjectSchema<ProductInfoCreateFields>,
+
+  UpdateProductRequest: (): yup.ObjectSchema<ProductModFields> =>
+    yup.object({
+      prodNm: yup.string().required('상품명은 필수값입니다!'),
+      prodTp: yup.string().required('상품유형은 필수값입니다!'),
+      prodDetTp: yup.string().required('상품상세유형은 필수값입니다!'),
+      composition: yup.string().required('혼용율은 필수값입니다!'),
+      // repFileId: yup.number().notRequired(),
+      // detailFileId: yup.number().notRequired(),
+      // sizeFileId: yup.number().notRequired(),
+      // etcFileId: yup.number().notRequired(),
+      makeYmd: yup.string().required('제조일자는 필수값입니다!'),
+      orgAmt: yup.number().typeError('원가는 숫자만 입력 가능합니다.').notRequired(),
+      sellAmt: yup.number().typeError('판매가는 숫자만 입력 가능합니다.').notRequired(),
+      discountRate: yup.number().typeError('할인율은 숫자만 입력 가능합니다.').notRequired(),
+      weather: yup.string().required('계절 유형은 필수값입니다!'),
+      // isSpring: yup.string().notRequired(),
+      // isSummer: yup.string().notRequired(),
+      // isAutumn: yup.string().notRequired(),
+      // isWinter: yup.string().notRequired(),
+    }) as yup.ObjectSchema<ProductModFields>,
 };

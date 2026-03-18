@@ -23,6 +23,7 @@ import { Utils } from '../../../../libs/utils';
 import SrcEnumerator, { SrcElement, SrcEnumeratorProps } from '../../../../components/layout/product/productMng/SrcEnumerator';
 import { FileUploadPop } from '../../../../components/popup/common';
 import ProductInfoAddPop from '../../../../components/popup/product/productMng/ProductInfoAddPop';
+import ProductModPop from '../../../../components/popup/product/productMng/ProductModPop';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
@@ -433,6 +434,15 @@ const ProductMng = () => {
                   >
                     {`${selectedRowsData == undefined ? '상세정보 추가할 상품 선택' : selectedRowsData.prodNm + ' 이하 상세정보 추가'}`}
                   </button>
+                  <button
+                    className={`btn ${selectedRowsData != undefined && 'btn_blue'}`}
+                    disabled={selectedRowsData == undefined}
+                    onClick={() => {
+                      openModal('PROD_MOD');
+                    }}
+                  >
+                    {`${selectedRowsData == undefined ? '수정할 행 선택' : selectedRowsData.prodNm + ' 을 수정'}`}
+                  </button>
                 </div>
               </div>
             </div>
@@ -549,7 +559,20 @@ const ProductMng = () => {
           productInfosRefetch();
           onDetFiltersReset();
         }}
-        productInfo={modals.type == 'PROD_DET_INFO_ADD' && selectedRowsData}
+        productInfo={modals.type == 'PROD_DET_INFO_ADD' ? selectedRowsData : undefined}
+      />
+      <ProductModPop
+        open={modals.active && modals.type == 'PROD_MOD'}
+        onClose={() => {
+          closeModal(modals.type);
+        }}
+        onSuccess={() => {
+          closeModal(modals.type);
+
+          productInfosRefetch();
+          onDetFiltersReset();
+        }}
+        productInfo={selectedRowsData}
       />
     </div>
   );

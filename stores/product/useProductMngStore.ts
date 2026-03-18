@@ -2,11 +2,11 @@ import { StateCreator } from 'zustand/esm';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { ApiResponse, ProductContentListResponseProductContent, ProductMngRequestInsertProduct } from '../../generated';
+import { ApiResponse, ProductContentListResponseProductContent, ProductMngRequestInsertProduct, ProductMngRequestUpdateProduct } from '../../generated';
 import { AxiosPromise } from 'axios';
 import { authApi } from '../../libs';
 
-type ModalType = 'IMG_UPLOAD' | 'PROD_INFO_ADD' | 'PROD_DET_INFO_ADD';
+type ModalType = 'IMG_UPLOAD' | 'PROD_INFO_ADD' | 'PROD_DET_INFO_ADD' | 'PROD_MOD';
 
 interface ModalState {
   type: ModalType;
@@ -24,6 +24,7 @@ interface ProductMngState {
 
 interface ProductMngApiState {
   insertProductInfo: (insertProductInfoRequest: ProductMngRequestInsertProduct) => AxiosPromise<ApiResponse>;
+  updateProduct: (updateProductRequest: ProductMngRequestUpdateProduct) => AxiosPromise<ApiResponse>;
 }
 
 type ProductMngStateOfAll = ProductMngState & ProductMngApiState;
@@ -61,8 +62,11 @@ const initialStateCreator: StateCreator<ProductMngStateOfAll> = (set, get, api) 
         },
       }));
     },
-    insertProductInfo: (codeRequestList) => {
-      return authApi.put('/productMng/insertProductInfo', codeRequestList);
+    insertProductInfo: (insertProductInfoRequest) => {
+      return authApi.put('/productMng/insertProductInfo', insertProductInfoRequest);
+    },
+    updateProduct: (updateProductRequest) => {
+      return authApi.patch('/productMng/updateProduct', updateProductRequest);
     },
   };
 };
