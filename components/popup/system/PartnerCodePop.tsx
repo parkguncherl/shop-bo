@@ -25,7 +25,6 @@ interface Props {
   onCloseRequestEmerged: () => void;
 }
 
-// todo 현재 조건부 랜더링 대신 open close 동작에 전적으로 의지하도록 변경됨, 이로 인한 부조화 발생할 시 useEffect 적절히 활용하여 대처
 export const PartnerCodePop = ({ partnerCodeUpper, activated, title, codeName, onCloseRequestEmerged }: Props) => {
   const session = useSession();
   const [gridRowData, setGridRowData] = useState<PartnerCodeResponseLowerSelect[] | undefined>();
