@@ -24,6 +24,7 @@ import SrcEnumerator, { SrcElement, SrcEnumeratorProps } from '../../../../compo
 import { FileUploadPop } from '../../../../components/popup/common';
 import ProductInfoAddPop from '../../../../components/popup/product/productMng/ProductInfoAddPop';
 import ProductModPop from '../../../../components/popup/product/productMng/ProductModPop';
+import ProductDetInfoPop from '../../../../components/popup/product/productMng/ProductDetInfoPop';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
@@ -434,6 +435,15 @@ const ProductMng = () => {
                   >
                     {`${selectedRowsData == undefined ? '수정할 행 선택' : selectedRowsData.prodNm + ' 을 수정'}`}
                   </button>
+                  <button
+                    className={`btn ${selectedRowsData != undefined && 'btn_blue'}`}
+                    disabled={selectedRowsData == undefined}
+                    onClick={() => {
+                      openModal('PROD_DET_INFO');
+                    }}
+                  >
+                    {`${selectedRowsData == undefined ? '상품 데이터 선택..' : selectedRowsData.prodNm + ' 의 상품상세 목록 출력'}`}
+                  </button>
                 </div>
               </div>
             </div>
@@ -558,6 +568,19 @@ const ProductMng = () => {
           closeModal(modals.type);
         }}
         onSuccess={() => {
+          closeModal(modals.type);
+
+          productInfosRefetch();
+          onDetFiltersReset();
+        }}
+        productInfo={selectedRowsData}
+      />
+      <ProductDetInfoPop
+        open={modals.active && modals.type == 'PROD_DET_INFO'}
+        onClose={() => {
+          closeModal(modals.type);
+        }}
+        onUpdated={() => {
           closeModal(modals.type);
 
           productInfosRefetch();
