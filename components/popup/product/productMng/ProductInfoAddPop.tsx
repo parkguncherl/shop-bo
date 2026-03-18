@@ -65,7 +65,7 @@ export interface ProductDetCreateFields {
   productDetSize: string;
   productDetColor: string;
   skuDiscountRate: number;
-  fileId?: number;
+  //fileId?: number;
   sleepYn: string;
 }
 
@@ -87,7 +87,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
   const [insertProductInfo] = useProductMngStore((s) => [s.insertProductInfo]);
 
   /** 팝업 내부 local state */
-  const [openAddConf, setOpenAddConf] = useState<{ open: boolean; stored?: object & { id?: number } }>({ open: false });
+  const [openAddConf, setOpenAddConf] = useState<{ open: boolean; stored?: ProductMngRequestInsertProduct }>({ open: false });
 
   /** 상품 내용 입력 서식 */
   const {
@@ -148,9 +148,21 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
   const onValid: SubmitHandler<ProductInfoCreateFields> = (data, event) => {
     if (data.id) {
       // 상품상세정보만 추가하는 경우
+      const insertProductInfoReqObj = {
+        id: data.id,
+
+        productDet: {
+          // productId 는 백앤드에서 할당
+          productDetSize: data.productDet?.productDetSize,
+          productDetColor: data.productDet?.productDetColor,
+          skuDiscountRate: data.productDet?.skuDiscountRate,
+          sleepYn: data.productDet?.sleepYn,
+        },
+      } as ProductMngRequestInsertProduct;
+
       setOpenAddConf({
         open: true,
-        stored: data,
+        stored: insertProductInfoReqObj,
       });
     } else {
       // id 부재 --> 상품정보 또한 추가
@@ -187,7 +199,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
 
   // 유효하지 않은 경우
   const onInvalid: SubmitErrorHandler<ProductInfoCreateFields> = (errors, event) => {
-    //console.error(errors);
+    //console.error(errors, getValues('id'));
     if (errors) {
       toastError('문제가 되는 영역 혹은 누락된 영역을 수정 및 추가한 후 재시도하십시요.');
     }
@@ -308,10 +320,9 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
         confirmText={'저장'}
         onConfirm={() => {
           if (openAddConf.stored) {
-            //console.log('openAddConf: ', openAddConf.stored);
             if (openAddConf.stored.id) {
               // 상세정보 추가(기존 product 에 대한 식별자 존재)
-              const productDetData = openAddConf.stored as ProductInfoCreateFields;
+              const productDetData = openAddConf.stored;
               console.log('productDetData: ', productDetData);
             } else {
               // 상품, 상세정보 추가(id 부재)

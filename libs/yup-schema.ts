@@ -273,8 +273,17 @@ export const YupSchema = {
   InsertProductInfoRequest: (): yup.ObjectSchema<ProductInfoCreateFields> =>
     yup.object({
       id: yup.number().notRequired(),
-      product: yup
-        .object({
+      product: yup.lazy((value, options) => {
+        // context나 parent에서 id 추출
+        const id = options.parent?.id;
+
+        // 1. id가 있으면 (수정 모드): 모든 필드를 선택사항으로 변경
+        if (id !== undefined && id !== null) {
+          return yup.object().notRequired().nullable();
+        }
+
+        // 2. id가 없으면 (신규 등록): 기존의 엄격한 필수 스키마 적용
+        return yup.object({
           prodNm: yup.string().required('상품명은 필수값입니다!'),
           prodTp: yup.string().required('상품유형은 필수값입니다!'),
           prodDetTp: yup.string().required('상품상세유형은 필수값입니다!'),
@@ -292,19 +301,8 @@ export const YupSchema = {
           // isSummer: yup.string().notRequired(),
           // isAutumn: yup.string().notRequired(),
           // isWinter: yup.string().notRequired(),
-        })
-        .when('id', {
-          is: (val: number | undefined) => val == undefined, // id 부재하는 경우 완전한 신규 인서트 시도로 간주, 상품정보 입력 의무화
-          then: (schema) => schema.required('상품정보는 반드시 입력하셔야 합니다.'),
-          // id가 있는 경우 (수정/상세 추가)
-          otherwise: (schema) =>
-            schema
-              .nullable()
-              .notRequired()
-              // 중요: 상위에서 필수값을 해제해도 내부 필드 검증이 남을 수 있으므로
-              // id가 있을 때는 product 객체 자체가 없어도 통과되도록 설정
-              .default(undefined),
-        }),
+        });
+      }),
       productDet: yup
         .object({
           //productDetSeq: yup.number().required(),
