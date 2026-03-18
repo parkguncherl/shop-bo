@@ -270,15 +270,11 @@ export const YupSchema = {
         }),
     }) as yup.ObjectSchema<ProductContentsFields>,
 
-  InsertProductInfoRequest: (): yup.ObjectSchema<ProductInfoCreateFields> =>
+  InsertProductInfoRequest: (productId?: number): yup.ObjectSchema<ProductInfoCreateFields> =>
     yup.object({
-      id: yup.number().notRequired(),
-      product: yup.lazy((value, options) => {
-        // context나 parent에서 id 추출
-        const id = options.parent?.id;
-
+      product: yup.lazy(() => {
         // 1. id가 있으면 (수정 모드): 모든 필드를 선택사항으로 변경
-        if (id !== undefined && id !== null) {
+        if (productId) {
           return yup.object().notRequired().nullable();
         }
 

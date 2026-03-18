@@ -6,7 +6,7 @@ import { ApiResponse, ProductContentListResponseProductContent, ProductMngReques
 import { AxiosPromise } from 'axios';
 import { authApi } from '../../libs';
 
-type ModalType = 'IMG_UPLOAD' | 'PROD_INFO_ADD';
+type ModalType = 'IMG_UPLOAD' | 'PROD_INFO_ADD' | 'PROD_DET_INFO_ADD';
 
 interface ModalState {
   type: ModalType;

@@ -74,7 +74,7 @@ interface ProductContentShowPopProps {
   open: boolean;
   onClose: () => void;
   onSuccess?: () => void;
-  selectedProductInfoData?: ProductMngResponseProductInfo;
+  productInfo?: ProductMngResponseProductInfo;
 }
 
 /**
@@ -83,7 +83,7 @@ interface ProductContentShowPopProps {
  * Date: 2026/03/17
  * Author: park junsung
  * */
-const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }: ProductContentShowPopProps) => {
+const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
   const [insertProductInfo] = useProductMngStore((s) => [s.insertProductInfo]);
 
@@ -100,7 +100,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
     clearErrors,
     //formState: { errors, isValid },
   } = useForm<ProductInfoCreateFields>({
-    resolver: yupResolver(YupSchema.InsertProductInfoRequest()),
+    resolver: yupResolver(YupSchema.InsertProductInfoRequest(productInfo?.id)),
     mode: 'onChange',
     defaultValues: {
       productDet: {
@@ -127,11 +127,6 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
   });
 
   useEffect(() => {
-    // 인자 상태 변경에 따라 id 동기화
-    setValue('id', selectedProductInfoData?.id); // 외부의 selectedProductInfoData 변경 시점에 id 존재 여부에 따른 동기화 보장
-  }, [selectedProductInfoData]);
-
-  useEffect(() => {
     if (!open) {
       // 닫힘 시점 동작
       reset({
@@ -139,7 +134,6 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
           skuDiscountRate: 0,
           sleepYn: 'N',
         },
-        id: getValues('id'), // id는 유지함
       }); // 초기화
       clearErrors(); // 에러 상태 초기화
     }
@@ -147,10 +141,14 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
 
   // 입력이 유효한 경우
   const onValid: SubmitHandler<ProductInfoCreateFields> = (data, event) => {
-    if (data.id) {
+    if (productInfo && !productInfo.id) {
+      console.error('상품정보는 전달되었으나 유효한 식별자를 찾을 수 없음');
+      return;
+    }
+    if (productInfo?.id) {
       // 상품상세정보만 추가하는 경우
       const insertProductInfoReqObj: ProductMngRequestInsertProduct = {
-        id: data.id,
+        id: productInfo.id,
 
         productDet: {
           // productId 는 백앤드에서 할당
@@ -231,7 +229,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
         width={900}
         open={open}
         isEscClose={true}
-        title={!(getValues('id') && getValues('id') == selectedProductInfoData?.id) ? '상품정보 추가' : selectedProductInfoData?.prodNm + ' 이하 상세정보 추가'}
+        title={productInfo?.id ? productInfo?.prodNm + ' 이하 상세정보 추가' : '상품정보 추가'}
         onClose={onClose}
         footer={
           <PopupFooter>
@@ -263,7 +261,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
       >
         <PopupContent>
           <PopupFormBox className={''}>
-            {!(getValues('id') && getValues('id') == selectedProductInfoData?.id) && (
+            {!productInfo?.id && (
               <PopupFormGroup title={'상품정보'}>
                 <PopupFormType className={'type2'}>
                   <FormInput<ProductInfoCreateFields> control={control} name={'product.prodNm'} label={'상품명'} placeholder={'제목'} />
@@ -340,16 +338,6 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
         confirmText={'저장'}
         onConfirm={() => {
           if (openAddConf.stored) {
-            // if (openAddConf.stored.id) {
-            //   // 상세정보 추가(기존 product 에 대한 식별자 존재)
-            //   const productDetData = openAddConf.stored;
-            //   console.log('productDetData: ', productDetData);
-            // } else {
-            //   // 상품, 상세정보 추가(id 부재)
-            //   const productDataWithDet = openAddConf.stored as ProductMngRequestInsertProduct;
-            //   console.log('productDataWithDet: ', productDataWithDet);
-            // }
-            console.log(openAddConf.stored);
             insertProductInfoMutate(openAddConf.stored);
           } else {
             toastError('저장하고자 하는 입력 결과를 찾을 수 없습니다.');

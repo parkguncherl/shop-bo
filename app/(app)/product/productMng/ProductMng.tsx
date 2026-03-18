@@ -422,7 +422,16 @@ const ProductMng = () => {
                       openModal('PROD_INFO_ADD');
                     }}
                   >
-                    {`${selectedRowsData == undefined ? '상품추가' : selectedRowsData.prodNm + ' 이하 상세정보 추가'}`}
+                    상품추가
+                  </button>
+                  <button
+                    className={`btn ${selectedRowsData != undefined && 'btn_blue'}`}
+                    disabled={selectedRowsData == undefined}
+                    onClick={() => {
+                      openModal('PROD_DET_INFO_ADD');
+                    }}
+                  >
+                    {`${selectedRowsData == undefined ? '상세정보 추가할 상품 선택' : selectedRowsData.prodNm + ' 이하 상세정보 추가'}`}
                   </button>
                 </div>
               </div>
@@ -530,15 +539,17 @@ const ProductMng = () => {
         }}
       />
       <ProductInfoAddPop
-        open={modals.active && modals.type == 'PROD_INFO_ADD'}
-        onClose={() => closeModal('PROD_INFO_ADD')}
+        open={modals.active && (modals.type == 'PROD_INFO_ADD' || modals.type == 'PROD_DET_INFO_ADD')}
+        onClose={() => {
+          closeModal(modals.type);
+        }}
         onSuccess={() => {
-          closeModal('PROD_INFO_ADD');
+          closeModal(modals.type);
 
           productInfosRefetch();
           onDetFiltersReset();
         }}
-        selectedProductInfoData={selectedRowsData}
+        productInfo={modals.type == 'PROD_DET_INFO_ADD' && selectedRowsData}
       />
     </div>
   );
