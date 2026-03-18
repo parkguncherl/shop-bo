@@ -15,6 +15,7 @@ import useFilters from '../../../hooks/useFilters';
 import TunedGrid, { TunedGridRef } from '../../grid/TunedGrid';
 import { usePausedEventQueue } from '../../../customFn/pausedEventsQueue';
 import {usePartnerCodeStore} from "../../../stores/usePartnerCodeStore";
+import {useSession} from "next-auth/react";
 
 interface Props {
   partnerCodeUpper: string;
@@ -26,6 +27,7 @@ interface Props {
 
 // todo 현재 조건부 랜더링 대신 open close 동작에 전적으로 의지하도록 변경됨, 이로 인한 부조화 발생할 시 useEffect 적절히 활용하여 대처
 export const PartnerCodePop = ({ partnerCodeUpper, activated, title, codeName, onCloseRequestEmerged }: Props) => {
+  const session = useSession();
   const [gridRowData, setGridRowData] = useState<PartnerCodeResponseLowerSelect[] | undefined>();
   const gridRef = useRef<TunedGridRef<PartnerCodeResponseLowerSelect>>(null);
   const [confirmModal, setConfirmModal] = useState(false);
@@ -33,7 +35,6 @@ export const PartnerCodePop = ({ partnerCodeUpper, activated, title, codeName, o
   const queryClient = useQueryClient();
   const { selectLowerPartnerCodeByCodeUpper, savePartnerCode, deletePartnerCode } = usePartnerCodeStore();
   const { runWhenReady, setReady } = usePausedEventQueue();
-
   const [filters, onChangeFilters] = useFilters({
     searchKeyword: '',
   });
@@ -209,11 +210,9 @@ export const PartnerCodePop = ({ partnerCodeUpper, activated, title, codeName, o
       width={800}
       isEscClose={true}
       open={activated}
-      title={title + ' 관리'}
+      title={title}
       onClose={() => {
         onCloseRequestEmerged();
-        // closeModal('FABRIC');
-        // closeModal('SUB_METERIAL');
       }}
       footer={
         <PopupFooter>

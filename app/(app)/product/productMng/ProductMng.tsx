@@ -24,8 +24,9 @@ import SrcEnumerator, { SrcElement, SrcEnumeratorProps } from '../../../../compo
 import { FileUploadPop } from '../../../../components/popup/common';
 import ProductInfoAddPop from '../../../../components/popup/product/productMng/ProductInfoAddPop';
 import ProductModPop from '../../../../components/popup/product/productMng/ProductModPop';
-import { PartnerCodePop } from "../../../../components/popup/system/PartnerCodePop";
+import ProductDetInfoPop from '../../../../components/popup/product/productMng/ProductDetInfoPop';
 import {usePartnerCodeStore} from "../../../../stores/usePartnerCodeStore";
+import {PartnerCodePop} from "../../../../components/popup/system/PartnerCodePop";
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
@@ -56,7 +57,6 @@ const ProductMng = () => {
   /** 상품관리 스토어 - State */
   const [modals, openModal, closeModal] = useProductMngStore((s) => [s.modals, s.openModal, s.closeModal]);
   const [partnerCodeModals, partnerCodeOpenModal, partnerCodeCloseModal] = usePartnerCodeStore((s) => [s.modals, s.openModal, s.closeModal]);
-
   /** 검색 필터 */
   const [filters, onChangeFilters] = useFilters<ProductMngRequestProductInfoFilter>({
     prodNm: undefined,
@@ -409,7 +409,16 @@ const ProductMng = () => {
                 onCellClicked={onCellClickedCallBack}
               />
               <div className="btnArea between">
-                <div className="left"></div>
+                <div className="left">
+                  <button
+                    className={'btn btn_blue'}
+                    onClick={() => {
+                      partnerCodeOpenModal('PARTNER_CODE_OPEN');
+                    }}
+                  >
+                    상품카테고리 추가
+                  </button>
+                </div>
                 <div className="right">
                   <button
                     className={'btn btn_blue'}
@@ -436,6 +445,15 @@ const ProductMng = () => {
                     }}
                   >
                     {`${selectedRowsData == undefined ? '수정할 행 선택' : selectedRowsData.prodNm + ' 을 수정'}`}
+                  </button>
+                  <button
+                    className={`btn ${selectedRowsData != undefined && 'btn_blue'}`}
+                    disabled={selectedRowsData == undefined}
+                    onClick={() => {
+                      openModal('PROD_DET_INFO');
+                    }}
+                  >
+                    {`${selectedRowsData == undefined ? '상품 데이터 선택..' : selectedRowsData.prodNm + ' 의 상품상세 목록 출력'}`}
                   </button>
                 </div>
               </div>
@@ -568,11 +586,24 @@ const ProductMng = () => {
         }}
         productInfo={selectedRowsData}
       />
+      <ProductDetInfoPop
+        open={modals.active && modals.type == 'PROD_DET_INFO'}
+        onClose={() => {
+          closeModal(modals.type);
+        }}
+        onUpdated={() => {
+          closeModal(modals.type);
+
+          productInfosRefetch();
+          onDetFiltersReset();
+        }}
+        productInfo={selectedRowsData}
+      />
       <PartnerCodePop
-        partnerCodeUpper={PARTNER_CODE.categories}
+        partnerCodeUpper={PARTNER_CODE.categories.code}
         title={'상품카테고리관리'}
         activated={partnerCodeModals?.type === 'PARTNER_CODE_OPEN' && partnerCodeModals.active}
-        codeName={'부자재유형'}
+        codeName={PARTNER_CODE.categories.name}
         onCloseRequestEmerged={() => partnerCodeCloseModal('PARTNER_CODE_OPEN')}
       />
     </div>
