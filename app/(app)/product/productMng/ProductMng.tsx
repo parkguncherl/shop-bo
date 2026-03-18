@@ -405,7 +405,7 @@ const ProductMng = () => {
                   const selectedRows = event.api.getSelectedRows();
                   setSelectedRowsData(selectedRows.length > 0 ? selectedRows[0] : undefined);
                 }}
-                popupParent={document.body ? document.body : undefined} // ag grid 내장 드롭다운 사용 시 그리드가 사라지는 현상을 방지하기 위하여 document.body 영역을 popup의 부모 요소로 명시
+                popupParent={typeof document !== 'undefined' ? document.body : undefined}// ag grid 내장 드롭다운 사용 시 그리드가 사라지는 현상을 방지하기 위하여 document.body 영역을 popup의 부모 요소로 명시
                 onCellClicked={onCellClickedCallBack}
               />
               <div className="btnArea between">
