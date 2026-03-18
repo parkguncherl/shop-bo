@@ -532,6 +532,12 @@ const ProductMng = () => {
       <ProductInfoAddPop
         open={modals.active && modals.type == 'PROD_INFO_ADD'}
         onClose={() => closeModal('PROD_INFO_ADD')}
+        onSuccess={() => {
+          closeModal('PROD_INFO_ADD');
+
+          productInfosRefetch();
+          onDetFiltersReset();
+        }}
         selectedProductInfoData={selectedRowsData}
       />
     </div>

@@ -16,6 +16,7 @@ import { ProductMngRequestInsertProduct, ProductMngResponseProductInfo } from '.
 import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
 import FormDropDown from '../../../form/FormDropDown';
 import FormDatePicker from '../../../form/FormDatePicker';
+import dayjs from 'dayjs';
 
 /** form 영역 입력 인터페이스 */
 export interface ProductInfoCreateFields {
@@ -148,7 +149,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
   const onValid: SubmitHandler<ProductInfoCreateFields> = (data, event) => {
     if (data.id) {
       // 상품상세정보만 추가하는 경우
-      const insertProductInfoReqObj = {
+      const insertProductInfoReqObj: ProductMngRequestInsertProduct = {
         id: data.id,
 
         productDet: {
@@ -158,7 +159,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
           skuDiscountRate: data.productDet?.skuDiscountRate,
           sleepYn: data.productDet?.sleepYn,
         },
-      } as ProductMngRequestInsertProduct;
+      };
 
       setOpenAddConf({
         open: true,
@@ -167,23 +168,42 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
     } else {
       // id 부재 --> 상품정보 또한 추가
       let insertProductInfoReqObj: ProductMngRequestInsertProduct | undefined = undefined;
-
       // id 부재하는 경우 검증 규칙에 따라 product 가 존재함이 보장되므로 단언 처리
       switch ((data.product as ProductCreateFields).weather) {
         case 'spring': {
-          insertProductInfoReqObj = { ...data.product, isSpring: 'Y', productDet: data.productDet };
+          insertProductInfoReqObj = {
+            ...data.product,
+            makeYmd: dayjs(data.product?.makeYmd).format('YYYY-MM-DD'), // localDate 형식에 적합하도록 변환
+            isSpring: 'Y',
+            productDet: data.productDet,
+          };
           break;
         }
         case 'summer': {
-          insertProductInfoReqObj = { ...data.product, isSummer: 'Y', productDet: data.productDet };
+          insertProductInfoReqObj = {
+            ...data.product,
+            makeYmd: dayjs(data.product?.makeYmd).format('YYYY-MM-DD'), // localDate 형식에 적합하도록 변환
+            isSummer: 'Y',
+            productDet: data.productDet,
+          };
           break;
         }
         case 'autumn': {
-          insertProductInfoReqObj = { ...data.product, isAutumn: 'Y', productDet: data.productDet };
+          insertProductInfoReqObj = {
+            ...data.product,
+            makeYmd: dayjs(data.product?.makeYmd).format('YYYY-MM-DD'), // localDate 형식에 적합하도록 변환
+            isAutumn: 'Y',
+            productDet: data.productDet,
+          };
           break;
         }
         case 'winter': {
-          insertProductInfoReqObj = { ...data.product, isWinter: 'Y', productDet: data.productDet };
+          insertProductInfoReqObj = {
+            ...data.product,
+            makeYmd: dayjs(data.product?.makeYmd).format('YYYY-MM-DD'), // localDate 형식에 적합하도록 변환
+            isWinter: 'Y',
+            productDet: data.productDet,
+          };
           break;
         }
       }
@@ -320,16 +340,20 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, selectedProductInfoData }
         confirmText={'저장'}
         onConfirm={() => {
           if (openAddConf.stored) {
-            if (openAddConf.stored.id) {
-              // 상세정보 추가(기존 product 에 대한 식별자 존재)
-              const productDetData = openAddConf.stored;
-              console.log('productDetData: ', productDetData);
-            } else {
-              // 상품, 상세정보 추가(id 부재)
-              const productDataWithDet = openAddConf.stored as ProductMngRequestInsertProduct;
-              console.log('productDataWithDet: ', productDataWithDet);
-            }
-            // todo 마저 진행
+            // if (openAddConf.stored.id) {
+            //   // 상세정보 추가(기존 product 에 대한 식별자 존재)
+            //   const productDetData = openAddConf.stored;
+            //   console.log('productDetData: ', productDetData);
+            // } else {
+            //   // 상품, 상세정보 추가(id 부재)
+            //   const productDataWithDet = openAddConf.stored as ProductMngRequestInsertProduct;
+            //   console.log('productDataWithDet: ', productDataWithDet);
+            // }
+            console.log(openAddConf.stored);
+            insertProductInfoMutate(openAddConf.stored);
+          } else {
+            toastError('저장하고자 하는 입력 결과를 찾을 수 없습니다.');
+            console.error('저장하고자 하는 입력 결과를 찾을 수 없습니다.');
           }
         }}
         onClose={() => {
