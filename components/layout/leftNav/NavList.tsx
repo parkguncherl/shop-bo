@@ -99,7 +99,7 @@ const ChildLevel = ({ item }: { item: IMenu }) => {
 
   return (
     <li>
-      <Link style={{color: isSelected ? '' : 'var(--main-color)'}}
+      <Link style={{color: isSelected ? 'var(--main-color)' : ''}}
         href={pathname === lastUri ? '#' : lastUri}
         onClick={(e) => {
           if (pathname === lastUri) {
