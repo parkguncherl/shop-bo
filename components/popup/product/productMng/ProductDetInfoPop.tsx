@@ -76,24 +76,58 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
         cellStyle: GridSetting.CellStyle.CENTER,
         suppressHeaderMenuButton: true,
       },
-      { field: 'productDetColor', headerName: '컬러', minWidth: 80, maxWidth: 100, suppressHeaderMenuButton: true, onCellValueChanged: (event) => {
-        if (event.data.id) {
-          updateProductDetMutate({
-            id: event.data.id,
-            productDetColor: event.newValue,
-          })
-        } else {
-          console.error('상품상세정보 식별자를 확인할 수 없음')
-        }
-        } },
-      { field: 'productDetSize', headerName: '사이즈', minWidth: 80, maxWidth: 100, suppressHeaderMenuButton: true },
-      {
-        field: 'skuDiscountRate',
-        headerName: '스큐단위 할인율',
+      { field: 'productDetColor',
+        headerName: '컬러',
         minWidth: 80,
         maxWidth: 100,
         suppressHeaderMenuButton: true,
+        editable: true,
+        onCellValueChanged: (event) => {
+          if (event.data.id) {
+            updateProductDetMutate({
+              id: event.data.id,
+              productDetColor: event.newValue,
+            })
+          } else {
+            console.error('상품상세정보 식별자를 확인할 수 없음')
+          }
+        }
+      },
+      { field: 'productDetSize',
+        headerName: '사이즈',
+        minWidth: 80,
+        maxWidth: 100,
+        suppressHeaderMenuButton: true,
+        editable: true,
+        onCellValueChanged: (event) => {
+          if (event.data.id) {
+            updateProductDetMutate({
+              id: event.data.id,
+              productDetSize: event.newValue,
+            })
+          } else {
+            console.error('상품상세정보 식별자를 확인할 수 없음')
+          }
+        }
+      },
+      {
+        field: 'skuDiscountRate',
+        headerName: '할인율',
+        minWidth: 50,
+        maxWidth: 70,
+        suppressHeaderMenuButton: true,
+        editable: true,
         cellStyle: GridSetting.CellStyle.CENTER,
+        onCellValueChanged: (event) => {
+          if (event.data.id) {
+            updateProductDetMutate({
+              id: event.data.id,
+              skuDiscountRate: event.newValue,
+            })
+          } else {
+            console.error('상품상세정보 식별자를 확인할 수 없음')
+          }
+        }
       },
       {
         field: 'productDetCntn',
@@ -101,7 +135,18 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
         minWidth: 230,
         maxWidth: 230,
         suppressHeaderMenuButton: true,
-        cellStyle: GridSetting.CellStyle.CENTER,
+        editable: true,
+        cellStyle: GridSetting.CellStyle.LEFT,
+        onCellValueChanged: (event) => {
+          if (event.data.id) {
+            updateProductDetMutate({
+              id: event.data.id,
+              productDetCntn: event.newValue,
+            })
+          } else {
+            console.error('상품상세정보 식별자를 확인할 수 없음')
+          }
+        }
       },
     ],
     [productInfo],
@@ -112,7 +157,8 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('수정되었습니다.');
-          productDetInfosRefetch();
+          await productDetInfosRefetch();
+          if (onUpdated) onUpdated();
         } else {
           toastError(`컨텐츠 저장 도중 문제 발생 (${e.data.resultMessage})`);
         }

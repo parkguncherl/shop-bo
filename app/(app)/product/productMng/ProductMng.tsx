@@ -592,10 +592,7 @@ const ProductMng = () => {
           closeModal(modals.type);
         }}
         onUpdated={() => {
-          closeModal(modals.type);
-
           productInfosRefetch();
-          onDetFiltersReset();
         }}
         productInfo={selectedRowsData}
       />
