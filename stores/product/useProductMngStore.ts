@@ -2,7 +2,10 @@ import { StateCreator } from 'zustand/esm';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { ApiResponse, ProductContentListResponseProductContent, ProductMngRequestInsertProduct, ProductMngRequestUpdateProduct } from '../../generated';
+import {
+  ApiResponse, ProductContentListResponseProductContent, ProductMngRequestInsertProduct, ProductMngRequestUpdateProduct,
+  ProductMngRequestUpdateProductDet,
+} from '../../generated';
 import { AxiosPromise } from 'axios';
 import { authApi } from '../../libs';
 
@@ -25,6 +28,7 @@ interface ProductMngState {
 interface ProductMngApiState {
   insertProductInfo: (insertProductInfoRequest: ProductMngRequestInsertProduct) => AxiosPromise<ApiResponse>;
   updateProduct: (updateProductRequest: ProductMngRequestUpdateProduct) => AxiosPromise<ApiResponse>;
+  updateProductDet: (updateProductDetRequest: ProductMngRequestUpdateProductDet) => AxiosPromise<ApiResponse>;
 }
 
 type ProductMngStateOfAll = ProductMngState & ProductMngApiState;
@@ -67,6 +71,9 @@ const initialStateCreator: StateCreator<ProductMngStateOfAll> = (set, get, api) 
     },
     updateProduct: (updateProductRequest) => {
       return authApi.patch('/productMng/updateProduct', updateProductRequest);
+    },
+    updateProductDet: (updateProductDetRequest) => {
+      return authApi.patch('/productMng/updateProductDet', updateProductDetRequest);
     },
   };
 };
