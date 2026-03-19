@@ -41,19 +41,19 @@ export interface ProductInfoCreateFields {
   product?: ProductCreateFields;
   productDet: ProductDetCreateFields;
 }
-export interface ProductCreateFields {
-  prodNm: string;
-  prodTp: string;
-  prodDetTp: string;
-  composition: string;
-  // repFileId?: number;
-  // detailFileId?: number;
-  // sizeFileId?: number;
-  // etcFileId?: number;
-  makeYmd: string;
-  orgAmt: number;
-  sellAmt: number;
-  discountRate?: number;
+export interface ProductCreateFields extends ProductMngRequestInsertProduct {
+  // prodNm: string;
+  // prodTp: string;
+  // prodDetTp: string;
+  // composition: string;
+  // // repFileId?: number;
+  // // detailFileId?: number;
+  // // sizeFileId?: number;
+  // // etcFileId?: number;
+  // makeYmd: string;
+  // orgAmt: number;
+  // sellAmt: number;
+  // discountRate?: number;
   weather: ('spring' | 'summer' | 'autumn' | 'winter')[];
   // isSpring?: string;
   // isSummer?: string;
