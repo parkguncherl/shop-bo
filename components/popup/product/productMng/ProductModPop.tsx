@@ -19,19 +19,19 @@ import FormDatePicker from '../../../form/FormDatePicker';
 import dayjs from 'dayjs';
 
 /** form 영역 입력 인터페이스 */
-export interface ProductModFields {
-  prodNm: string;
-  prodTp: string;
-  prodDetTp: string;
-  composition: string;
-  // repFileId?: number;
-  // detailFileId?: number;
-  // sizeFileId?: number;
-  // etcFileId?: number;
-  makeYmd: string;
-  orgAmt: number;
-  sellAmt: number;
-  discountRate?: number;
+export interface ProductModFields extends ProductMngRequestUpdateProduct {
+  // prodNm: string;
+  // prodTp: string;
+  // prodDetTp: string;
+  // composition: string;
+  // // repFileId?: number;
+  // // detailFileId?: number;
+  // // sizeFileId?: number;
+  // // etcFileId?: number;
+  // makeYmd: string;
+  // orgAmt: number;
+  // sellAmt: number;
+  // discountRate?: number;
   weather: ('spring' | 'summer' | 'autumn' | 'winter')[];
   // isSpring?: string;
   // isSummer?: string;
@@ -89,13 +89,13 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
 
   useEffect(() => {
     if (productInfo) {
+      const includedWeathers: ('spring' | 'summer' | 'autumn' | 'winter')[] = [];
       Object.entries(productInfo).forEach(([key, value]) => {
         if (['isSpring', 'isSummer', 'isAutumn', 'isWinter'].includes(key)) {
           if (value == 'Y') {
-            setValue('weather', key == 'isSpring' ? 'spring' : key == 'isSummer' ? 'summer' : key == 'isAutumn' ? 'autumn' : 'winter', {
-              shouldValidate: true,
-              shouldDirty: true,
-            });
+            if (!includedWeathers.includes(key as 'spring' | 'summer' | 'autumn' | 'winter')) {
+              includedWeathers.push(key == 'isSpring' ? 'spring' : key == 'isSummer' ? 'summer' : key == 'isAutumn' ? 'autumn' : 'winter');
+            }
           }
         } else {
           setValue(key as keyof ProductModFields, value, {
@@ -103,6 +103,10 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
             shouldDirty: true,
           });
         }
+      });
+      setValue('weather', includedWeathers, {
+        shouldValidate: true,
+        shouldDirty: true,
       });
     } else {
       reset(); // 초기화
@@ -118,8 +122,6 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
     let updateProductInfoReqObj: ProductMngRequestUpdateProduct = {
       ...data,
       makeYmd: dayjs(data?.makeYmd).format('YYYY-MM-DD'), // localDate 형식에 적합하도록 변환
-
-      isSpring: undefined,
     };
     if ((data as ProductModFields).weather.includes('spring')) {
       updateProductInfoReqObj = {
@@ -174,7 +176,6 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
                 <button
                   className="btn btn_blue"
                   onClick={() => {
-                    // todo
                     handleSubmit(onValid, onInvalid)(); // 함수를 반환하므로 다음과 같이, 호출하여야
                   }}
                 >
@@ -219,6 +220,7 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
                   control={control}
                   name={'weather'}
                   title={'계절'}
+                  multiple={true}
                   options={[
                     { key: 0, value: 'spring', label: '봄' },
                     { key: 1, value: 'summer', label: '여름' },
@@ -237,7 +239,6 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
         confirmText={'저장'}
         onConfirm={() => {
           if (openModConf.stored) {
-            console.log('openModConf.stored: ', openModConf.stored);
             updateProductMutate(openModConf.stored);
           } else {
             toastError('저장하고자 하는 입력 결과를 찾을 수 없습니다.');

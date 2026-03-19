@@ -15,27 +15,6 @@ import CustomNoRowsOverlay from '../../../CustomNoRowsOverlay';
 import { GridSetting } from '../../../../libs/ag-grid';
 import { ColDef } from 'ag-grid-community';
 
-/** form 영역 입력 인터페이스 */
-export interface ProductModFields {
-  prodNm: string;
-  prodTp: string;
-  prodDetTp: string;
-  composition: string;
-  // repFileId?: number;
-  // detailFileId?: number;
-  // sizeFileId?: number;
-  // etcFileId?: number;
-  makeYmd: string;
-  orgAmt: number;
-  sellAmt: number;
-  discountRate?: number;
-  weather: 'spring' | 'summer' | 'autumn' | 'winter';
-  // isSpring?: string;
-  // isSummer?: string;
-  // isAutumn?: string;
-  // isWinter?: string;
-}
-
 interface ProductContentShowPopProps {
   open: boolean;
   onClose: (updated: boolean) => void;
@@ -59,6 +38,38 @@ const ProductModPop = ({ open, onClose, productInfo }: ProductContentShowPopProp
 
   const RefForGrid = useRef<TunedGridRef<ProductMngResponseProductDetInfo>>(null);
   const flagAboutUpdatedOrNot = useRef(false);
+
+  const { mutate: updateProductDetMutate } = useMutation(updateProductDet, {
+    onSuccess: async (e) => {
+      try {
+        if (e.data.resultCode === 200) {
+          toastSuccess('수정되었습니다.');
+          await productDetInfosRefetch();
+          flagAboutUpdatedOrNot.current = true;
+        } else {
+          toastError(`컨텐츠 저장 도중 문제 발생 (${e.data.resultMessage})`);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+  });
+
+  const { mutate: deleteProductDetMutate } = useMutation(deleteProductDet, {
+    onSuccess: async (e) => {
+      try {
+        if (e.data.resultCode === 200) {
+          toastSuccess('삭제되었습니다.');
+          await productDetInfosRefetch();
+          flagAboutUpdatedOrNot.current = true;
+        } else {
+          toastError(`컨텐츠 저장 도중 문제 발생 (${e.data.resultMessage})`);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+  });
 
   /** 컬럼 설정 */
   const columnDefs = useMemo<ColDef<ProductMngResponseProductDetInfo>[]>(
@@ -147,40 +158,8 @@ const ProductModPop = ({ open, onClose, productInfo }: ProductContentShowPopProp
         },
       },
     ],
-    [productInfo],
+    [updateProductDetMutate],
   );
-
-  const { mutate: updateProductDetMutate } = useMutation(updateProductDet, {
-    onSuccess: async (e) => {
-      try {
-        if (e.data.resultCode === 200) {
-          toastSuccess('수정되었습니다.');
-          await productDetInfosRefetch();
-          flagAboutUpdatedOrNot.current = true;
-        } else {
-          toastError(`컨텐츠 저장 도중 문제 발생 (${e.data.resultMessage})`);
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    },
-  });
-
-  const { mutate: deleteProductDetMutate } = useMutation(deleteProductDet, {
-    onSuccess: async (e) => {
-      try {
-        if (e.data.resultCode === 200) {
-          toastSuccess('삭제되었습니다.');
-          await productDetInfosRefetch();
-          flagAboutUpdatedOrNot.current = true;
-        } else {
-          toastError(`컨텐츠 저장 도중 문제 발생 (${e.data.resultMessage})`);
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    },
-  });
 
   /** 상품상세정보 목록 조회 */
   const {

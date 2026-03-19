@@ -12,7 +12,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '../../../../libs';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import { ConfirmModal } from '../../../ConfirmModal';
-import { ProductMngRequestInsertProduct, ProductMngResponseProductInfo } from '../../../../generated';
+import { ProductMngRequestInsertProduct, ProductMngRequestInsertProductDet, ProductMngResponseProductInfo } from '../../../../generated';
 import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
 import FormDropDown from '../../../form/FormDropDown';
 import FormDatePicker from '../../../form/FormDatePicker';
@@ -60,13 +60,13 @@ export interface ProductCreateFields extends ProductMngRequestInsertProduct {
   // isAutumn?: string;
   // isWinter?: string;
 }
-export interface ProductDetCreateFields {
-  productDetSeq: number;
-  productDetSize: string;
-  productDetColor: string;
-  skuDiscountRate: number;
-  //fileId?: number;
-  sleepYn: string;
+export interface ProductDetCreateFields extends ProductMngRequestInsertProductDet {
+  // productDetSeq: number;
+  // productDetSize: string;
+  // productDetColor: string;
+  // skuDiscountRate: number;
+  // //fileId?: number;
+  // sleepYn: string;
 }
 
 interface ProductContentShowPopProps {
