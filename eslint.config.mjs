@@ -40,8 +40,8 @@ export default [
             "@typescript-eslint/no-explicit-any": "off",
             "react/no-unescaped-entities": "off",
             "react/react-in-jsx-scope": "off",
-            "react-hooks/set-state-in-effect": "off",
-            "react-hooks/preserve-manual-memoization": "off",
+            "react-hooks/set-state-in-effect": "warn",
+            "react-hooks/preserve-manual-memoization": "warn",
         },
     },
 ];
