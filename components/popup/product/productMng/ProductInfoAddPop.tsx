@@ -33,7 +33,6 @@ export interface ProductInfoCreateFields {
   // orgAmt: number;
   // sellAmt: number;
   // discountRate?: number;
-  // weather: 'spring' | 'summer' | 'autumn' | 'winter';
   // // isSpring?: string;
   // // isSummer?: string;
   // // isAutumn?: string;
@@ -55,7 +54,7 @@ export interface ProductCreateFields {
   orgAmt: number;
   sellAmt: number;
   discountRate?: number;
-  weather: 'spring' | 'summer' | 'autumn' | 'winter';
+  weather: ('spring' | 'summer' | 'autumn' | 'winter')[];
   // isSpring?: string;
   // isSummer?: string;
   // isAutumn?: string;
@@ -163,49 +162,37 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
       });
     } else {
       // id 부재 --> 상품정보 또한 추가
-      let insertProductInfoReqObj: ProductMngRequestInsertProduct | undefined = undefined;
-      // id 부재하는 경우 검증 규칙에 따라 product 가 존재함이 보장되므로 단언 처리
-      switch ((data.product as ProductCreateFields).weather) {
-        case 'spring': {
-          insertProductInfoReqObj = {
-            ...data.product,
-            makeYmd: dayjs(data.product?.makeYmd).format('YYYY-MM-DD'), // localDate 형식에 적합하도록 변환
-            isSpring: 'Y',
-            productDet: data.productDet,
-          };
-          break;
-        }
-        case 'summer': {
-          insertProductInfoReqObj = {
-            ...data.product,
-            makeYmd: dayjs(data.product?.makeYmd).format('YYYY-MM-DD'), // localDate 형식에 적합하도록 변환
-            isSummer: 'Y',
-            productDet: data.productDet,
-          };
-          break;
-        }
-        case 'autumn': {
-          insertProductInfoReqObj = {
-            ...data.product,
-            makeYmd: dayjs(data.product?.makeYmd).format('YYYY-MM-DD'), // localDate 형식에 적합하도록 변환
-            isAutumn: 'Y',
-            productDet: data.productDet,
-          };
-          break;
-        }
-        case 'winter': {
-          insertProductInfoReqObj = {
-            ...data.product,
-            makeYmd: dayjs(data.product?.makeYmd).format('YYYY-MM-DD'), // localDate 형식에 적합하도록 변환
-            isWinter: 'Y',
-            productDet: data.productDet,
-          };
-          break;
-        }
+      let insertProductInfoReqObj: ProductMngRequestInsertProduct = {
+        ...data.product,
+        makeYmd: dayjs(data.product?.makeYmd).format('YYYY-MM-DD'), // localDate 형식에 적합하도록 변환
+        productDet: data.productDet,
+      };
+
+      if ((data.product as ProductCreateFields).weather.includes('spring')) {
+        insertProductInfoReqObj = {
+          ...insertProductInfoReqObj,
+          isSpring: 'Y',
+        };
       }
-      if (insertProductInfoReqObj == undefined) {
-        console.error('입력 폼에 의한 값을 요청 객체에 할당하는 과정에서 문제 발생, 점검!');
+      if ((data.product as ProductCreateFields).weather.includes('summer')) {
+        insertProductInfoReqObj = {
+          ...insertProductInfoReqObj,
+          isSummer: 'Y',
+        };
       }
+      if ((data.product as ProductCreateFields).weather.includes('autumn')) {
+        insertProductInfoReqObj = {
+          ...insertProductInfoReqObj,
+          isAutumn: 'Y',
+        };
+      }
+      if ((data.product as ProductCreateFields).weather.includes('winter')) {
+        insertProductInfoReqObj = {
+          ...insertProductInfoReqObj,
+          isWinter: 'Y',
+        };
+      }
+
       setOpenAddConf({
         open: true,
         stored: insertProductInfoReqObj,
@@ -281,6 +268,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
                     control={control}
                     name={'product.weather'}
                     title={'계절'}
+                    multiple={true}
                     options={[
                       { key: 0, value: 'spring', label: '봄' },
                       { key: 1, value: 'summer', label: '여름' },

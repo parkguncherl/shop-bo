@@ -32,7 +32,7 @@ export interface ProductModFields {
   orgAmt: number;
   sellAmt: number;
   discountRate?: number;
-  weather: 'spring' | 'summer' | 'autumn' | 'winter';
+  weather: ('spring' | 'summer' | 'autumn' | 'winter')[];
   // isSpring?: string;
   // isSummer?: string;
   // isAutumn?: string;
@@ -115,43 +115,35 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
       console.error('상품정보는 전달되었으나 유효한 식별자를 찾을 수 없음');
       return;
     }
-    let updateProductInfoReqObj: ProductMngRequestUpdateProduct | undefined = undefined;
-    switch (data.weather) {
-      case 'spring': {
-        updateProductInfoReqObj = {
-          ...data,
-          makeYmd: dayjs(data?.makeYmd).format('YYYY-MM-DD'), // localDate 형식에 적합하도록 변환
-          isSpring: 'Y',
-        };
-        break;
-      }
-      case 'summer': {
-        updateProductInfoReqObj = {
-          ...data,
-          makeYmd: dayjs(data?.makeYmd).format('YYYY-MM-DD'), // localDate 형식에 적합하도록 변환
-          isSummer: 'Y',
-        };
-        break;
-      }
-      case 'autumn': {
-        updateProductInfoReqObj = {
-          ...data,
-          makeYmd: dayjs(data?.makeYmd).format('YYYY-MM-DD'), // localDate 형식에 적합하도록 변환
-          isAutumn: 'Y',
-        };
-        break;
-      }
-      case 'winter': {
-        updateProductInfoReqObj = {
-          ...data,
-          makeYmd: dayjs(data?.makeYmd).format('YYYY-MM-DD'), // localDate 형식에 적합하도록 변환
-          isWinter: 'Y',
-        };
-        break;
-      }
+    let updateProductInfoReqObj: ProductMngRequestUpdateProduct = {
+      ...data,
+      makeYmd: dayjs(data?.makeYmd).format('YYYY-MM-DD'), // localDate 형식에 적합하도록 변환
+
+      isSpring: undefined,
+    };
+    if ((data as ProductModFields).weather.includes('spring')) {
+      updateProductInfoReqObj = {
+        ...updateProductInfoReqObj,
+        isSpring: 'Y',
+      };
     }
-    if (updateProductInfoReqObj == undefined) {
-      console.error('입력 폼에 의한 값을 요청 객체에 할당하는 과정에서 문제 발생, 점검!');
+    if ((data as ProductModFields).weather.includes('summer')) {
+      updateProductInfoReqObj = {
+        ...updateProductInfoReqObj,
+        isSummer: 'Y',
+      };
+    }
+    if ((data as ProductModFields).weather.includes('autumn')) {
+      updateProductInfoReqObj = {
+        ...updateProductInfoReqObj,
+        isAutumn: 'Y',
+      };
+    }
+    if ((data as ProductModFields).weather.includes('winter')) {
+      updateProductInfoReqObj = {
+        ...updateProductInfoReqObj,
+        isWinter: 'Y',
+      };
     }
     setOpenAddConf({
       open: true,

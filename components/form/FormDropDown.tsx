@@ -48,12 +48,6 @@ const FormDropDown = <T extends FieldValues>({ ref, ...props }: TProps<T>) => {
   const params = { codeUpper: props.codeUpper };
   const [gbVal, setGbVal] = useState(props.title);
 
-  useEffect(() => {
-    if (props.codeUpper) {
-      getDropDownData();
-    }
-  }, [props.codeUpper]);
-
   const getDropDownData = async () => {
     try {
       const apiUrl = props.isPartnerCode ? '/partnerCode/dropdown' : '/code/dropdown';
@@ -80,6 +74,12 @@ const FormDropDown = <T extends FieldValues>({ ref, ...props }: TProps<T>) => {
       console.log('실패');
     }
   };
+
+  useEffect(() => {
+    if (props.codeUpper) {
+      getDropDownData();
+    }
+  }, [props.codeUpper]);
 
   const values = props.multiple ? (Array.isArray(value) ? value : []) : value;
 

@@ -443,7 +443,7 @@ const ProductMng = () => {
                       openModal('PROD_DET_INFO_ADD');
                     }}
                   >
-                    {`${selectedRowsData == undefined ? '상세정보 추가할 상품 선택' : selectedRowsData.prodNm + ' 이하 상세정보 추가'}`}
+                    {`${selectedRowsData == undefined ? '상세정보 추가할 상품 선택' : '이하 상세정보 추가'}`}
                   </button>
                   <button
                     className={`btn ${selectedRowsData != undefined && 'btn_blue'}`}
@@ -452,7 +452,7 @@ const ProductMng = () => {
                       openModal('PROD_MOD');
                     }}
                   >
-                    {`${selectedRowsData == undefined ? '수정할 행 선택' : selectedRowsData.prodNm + ' 을 수정'}`}
+                    {`${selectedRowsData == undefined ? '수정할 행 선택' : '상품정보 수정'}`}
                   </button>
                   <button
                     className={`btn ${selectedRowsData != undefined && 'btn_blue'}`}
@@ -461,7 +461,7 @@ const ProductMng = () => {
                       openModal('PROD_DET_INFO');
                     }}
                   >
-                    {`${selectedRowsData == undefined ? '상품 데이터 선택' : selectedRowsData.prodNm + ' 의 상품상세 목록 출력'}`}
+                    {`${selectedRowsData == undefined ? '상품 데이터 선택' : '상품상세 목록 출력'}`}
                   </button>
                   <button
                     className={`btn ${selectedRowsData != undefined && selectedRowsData.prodDetCnt == 0 && 'btn_blue'}`}
@@ -479,7 +479,7 @@ const ProductMng = () => {
                         ? '삭제할 상품 선택'
                         : selectedRowsData.prodDetCnt != 0
                         ? selectedRowsData.prodDetCnt + '개의 상세정보가 잔존'
-                        : selectedRowsData.prodNm + ' 을 삭제'
+                        : '선택한 상품 삭제'
                     }`}
                   </button>
                 </div>
