@@ -100,19 +100,19 @@
     }
   }
   & input {
-    border-radius: 0;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 15px 20px 15px 45px;
-    border: none;
-    border-bottom: 1px solid #333;
-    height: auto;
-    font-size: var(--m-size);
+    border-radius: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 15px 20px 15px 45px !important;
+    border: none !important;
+    border-bottom: 1px solid #333 !important;
+    height: auto !important;
+    font-size: var(--m-size) !important;
     &:focus,
     &:hover {
-      outline: none;
-      border: none;
-      border-bottom: 1px solid #333;
+      outline: none !important;
+      border: none !important;
+      border-bottom: 1px solid #333 !important;
     }
   }
   & input[type="password"]::-ms-reveal,
