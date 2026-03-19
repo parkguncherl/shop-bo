@@ -1,8 +1,6 @@
 // eslint.config.mjs
 import globals from "globals";
 import tsParser from "@typescript-eslint/parser";
-import js from "@eslint/js";
-import tseslint from "typescript-eslint";
 import prettierPlugin from "eslint-plugin-prettier";
 import prettierConfig from "eslint-config-prettier";
 import react from "eslint-plugin-react";
