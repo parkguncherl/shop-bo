@@ -46,7 +46,7 @@ const SingleLevel = ({ item }: { item: IMenu }) => {
 /** 하위 메뉴가 있는 메뉴 */
 const MultiLevel = ({ item }: { item: IMenu }) => {
   const { items: children } = item;
-
+  const pathname = usePathname();
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     const aSide = e.currentTarget;
 
@@ -69,10 +69,11 @@ const MultiLevel = ({ item }: { item: IMenu }) => {
         }
       }
     }
-  };
+  }; // handleClick 닫기
 
+  const isSelected = children?.some((child) => child.menuUri === pathname);
   return (
-    <li className={''}>
+    <li className={`${isSelected ? 'on' : ''}`}>
       <Link href={''} onClick={(e) => handleClick(e)}>
         <span className={item.iconClassName}></span>
         <strong>{item.menuNm}</strong>
@@ -92,18 +93,13 @@ const ChildLevel = ({ item }: { item: IMenu }) => {
   const pathname = usePathname();
 
   const lastUri = !item.menuUri ? '' : item.menuUri;
-  let isSelected = false;
+  const isSelected = pathname === lastUri;
 
-  if (pathname && pathname.indexOf('_') > -1) {
-    if (pathname.substring(0, pathname.indexOf('_')) == lastUri) {
-      isSelected = false;
-    }
-  }
+  console.log('isSelected : ===>', isSelected, lastUri, pathname);
 
   return (
     <li>
-      <Link
-        className={`${isSelected ? 'on' : ''} ${lastUri.split('/')[2]}`}
+      <Link style={{color: isSelected ? '' : 'var(--main-color)'}}
         href={pathname === lastUri ? '#' : lastUri}
         onClick={(e) => {
           if (pathname === lastUri) {
