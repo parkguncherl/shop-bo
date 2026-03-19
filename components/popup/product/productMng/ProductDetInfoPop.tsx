@@ -7,15 +7,13 @@ import { authApi } from '../../../../libs';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import { ConfirmModal } from '../../../ConfirmModal';
 import {
-  ProductMngRequestProductDetInfoFilter,
-  ProductMngRequestUpdateProduct,
+  ProductMngRequestDeleteProductDet,
   ProductMngResponseProductDetInfo,
   ProductMngResponseProductInfo,
 } from '../../../../generated';
 import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
 import TunedGrid, { TunedGridRef } from '../../../grid/TunedGrid';
 import { PopupSearchBox, PopupSearchType } from '../../content';
-import useFilters from '../../../../hooks/useFilters';
 import CustomGridLoading from '../../../CustomGridLoading';
 import CustomNoRowsOverlay from '../../../CustomNoRowsOverlay';
 import { GridSetting } from '../../../../libs/ag-grid';
@@ -57,10 +55,14 @@ interface ProductContentShowPopProps {
  * */
 const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
-  const [updateProductDet] = useProductMngStore((s) => [s.updateProductDet]);
+  const [updateProductDet, deleteProductDet] = useProductMngStore((s) => [s.updateProductDet, s.deleteProductDet]);
 
   /** 팝업 내부 local state */
   const [productDetInfoList, setProductDetInfoList] = useState<ProductMngResponseProductDetInfo[]>([]);
+  const [selectedRowsData, setSelectedRowsData] = useState<ProductMngResponseProductDetInfo | undefined>(undefined);
+  const [openModConf, setOpenAddConf] = useState<{ open: boolean; stored?: ProductMngRequestDeleteProductDet }>({ open: false });
+
+
 
   const RefForGrid = useRef<TunedGridRef<ProductMngResponseProductDetInfo>>(null);
 
@@ -168,6 +170,22 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
     },
   });
 
+  const { mutate: deleteProductDetMutate } = useMutation(deleteProductDet, {
+    onSuccess: async (e) => {
+      try {
+        if (e.data.resultCode === 200) {
+          toastSuccess('삭제되었습니다.');
+          await productDetInfosRefetch();
+          if (onUpdated) onUpdated();
+        } else {
+          toastError(`컨텐츠 저장 도중 문제 발생 (${e.data.resultMessage})`);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+  });
+
   /** 상품상세정보 목록 조회 */
   const {
     data: productDetInfos,
@@ -217,7 +235,26 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
         footer={
           <PopupFooter>
             <div className="btnArea between">
-              <div className="left"></div>
+              <div className="left">
+                <button
+                  className={`btn ${productInfo != undefined && selectedRowsData != undefined && 'btn_blue'}`}
+                  disabled={productInfo == undefined || selectedRowsData == undefined}
+                  onClick={() => {
+                    if (selectedRowsData?.id) {
+                      setOpenAddConf({
+                        open: true,
+                        stored: {
+                          id: selectedRowsData?.id,
+                        }
+                      })
+                    } else {
+                      console.error('삭제하고자 하는 상품상세의 식별자를 찾을 수 없음');
+                    }
+                  }}
+                >
+                  {`${(productInfo == undefined || selectedRowsData == undefined) ? '삭제할 상세정보 선택' : (productInfo?.prodNm || '') + ' ' + selectedRowsData?.productDetColor + ' 을 삭제'}`}
+                </button>
+              </div>
               <div className="right">
                 <button
                   className="btn"
@@ -254,10 +291,36 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
               noRowsOverlayComponent={CustomNoRowsOverlay}
               ref={RefForGrid}
               loading={isProductDetInfosLoading}
+              rowSelection={{
+                mode: 'singleRow',
+                enableClickSelection: true,
+              }}
+              onSelectionChanged={(event) => {
+                const selectedRows = event.api.getSelectedRows();
+                setSelectedRowsData(selectedRows.length > 0 ? selectedRows[0] : undefined);
+              }}
             />
           </div>
         </PopupContent>
       </PopupLayout>
+      <ConfirmModal
+        open={openModConf.open}
+        title={'저장 하시겠습니까?'}
+        confirmText={'저장'}
+        onConfirm={() => {
+          if (openModConf.stored) {
+            deleteProductDetMutate(openModConf.stored);
+          } else {
+            toastError('저장하고자 하는 입력 결과를 찾을 수 없습니다.');
+            console.error('저장하고자 하는 입력 결과를 찾을 수 없습니다.');
+          }
+        }}
+        onClose={() => {
+          setOpenAddConf({
+            open: false,
+          });
+        }}
+      />
     </div>
   );
 };

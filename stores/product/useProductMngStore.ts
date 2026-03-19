@@ -3,10 +3,8 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import {
-  ApiResponse,
-  ProductContentListResponseProductContent,
-  ProductMngRequestInsertProduct,
-  ProductMngRequestUpdateProduct,
+  ApiResponse, ProductContentListResponseProductContent, ProductMngRequestDeleteProduct,
+  ProductMngRequestDeleteProductDet, ProductMngRequestInsertProduct, ProductMngRequestUpdateProduct,
   ProductMngRequestUpdateProductDet,
 } from '../../generated';
 import { AxiosPromise } from 'axios';
@@ -32,6 +30,9 @@ interface ProductMngApiState {
   insertProductInfo: (insertProductInfoRequest: ProductMngRequestInsertProduct) => AxiosPromise<ApiResponse>;
   updateProduct: (updateProductRequest: ProductMngRequestUpdateProduct) => AxiosPromise<ApiResponse>;
   updateProductDet: (updateProductDetRequest: ProductMngRequestUpdateProductDet) => AxiosPromise<ApiResponse>;
+  deleteProduct: (updateProductDetRequest: ProductMngRequestDeleteProduct) => AxiosPromise<ApiResponse>;
+  deleteProductDet: (updateProductDetRequest: ProductMngRequestDeleteProductDet) => AxiosPromise<ApiResponse>;
+
 }
 
 type ProductMngStateOfAll = ProductMngState & ProductMngApiState;
@@ -77,6 +78,12 @@ const initialStateCreator: StateCreator<ProductMngStateOfAll> = (set, get, api) 
     },
     updateProductDet: (updateProductDetRequest) => {
       return authApi.patch('/productMng/updateProductDet', updateProductDetRequest);
+    },
+    deleteProduct: (deleteProductRequest) => {
+      return authApi.patch('/productMng/deleteProduct', deleteProductRequest);
+    },
+    deleteProductDet: (deleteProductDetRequest) => {
+      return authApi.patch('/productMng/deleteProductDet', deleteProductDetRequest);
     },
   };
 };
