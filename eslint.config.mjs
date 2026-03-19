@@ -40,6 +40,7 @@ export default [
             "@typescript-eslint/no-explicit-any": "off",
             "react/no-unescaped-entities": "off",
             "react/react-in-jsx-scope": "off",
+            "react-hooks/set-state-in-effect": "off",  // ← 추가
         },
     },
 ];

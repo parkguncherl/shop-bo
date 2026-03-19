@@ -18,15 +18,15 @@ import { authApi } from '../../../../libs';
 import TunedGrid from '../../../../components/grid/TunedGrid';
 import useFilters from '../../../../hooks/useFilters';
 import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
-import {PARTNER_CODE, Placeholder} from '../../../../libs/const';
+import { PARTNER_CODE, Placeholder } from '../../../../libs/const';
 import { Utils } from '../../../../libs/utils';
 import SrcEnumerator, { SrcElement, SrcEnumeratorProps } from '../../../../components/layout/product/productMng/SrcEnumerator';
 import { FileUploadPop } from '../../../../components/popup/common';
 import ProductInfoAddPop from '../../../../components/popup/product/productMng/ProductInfoAddPop';
 import ProductModPop from '../../../../components/popup/product/productMng/ProductModPop';
 import ProductDetInfoPop from '../../../../components/popup/product/productMng/ProductDetInfoPop';
-import {usePartnerCodeStore} from "../../../../stores/usePartnerCodeStore";
-import {PartnerCodePop} from "../../../../components/popup/system/PartnerCodePop";
+import { usePartnerCodeStore } from '../../../../stores/usePartnerCodeStore';
+import { PartnerCodePop } from '../../../../components/popup/system/PartnerCodePop';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
@@ -405,7 +405,7 @@ const ProductMng = () => {
                   const selectedRows = event.api.getSelectedRows();
                   setSelectedRowsData(selectedRows.length > 0 ? selectedRows[0] : undefined);
                 }}
-                popupParent={typeof document !== 'undefined' ? document.body : undefined}// ag grid 내장 드롭다운 사용 시 그리드가 사라지는 현상을 방지하기 위하여 document.body 영역을 popup의 부모 요소로 명시 박근철 수정
+                popupParent={typeof document !== 'undefined' ? document.body : undefined} // ag grid 내장 드롭다운 사용 시 그리드가 사라지는 현상을 방지하기 위하여 document.body 영역을 popup의 부모 요소로 명시 박근철 수정
                 onCellClicked={onCellClickedCallBack}
               />
               <div className="btnArea between">
