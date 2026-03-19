@@ -453,7 +453,16 @@ const ProductMng = () => {
                       openModal('PROD_DET_INFO');
                     }}
                   >
-                    {`${selectedRowsData == undefined ? '상품 데이터 선택..' : selectedRowsData.prodNm + ' 의 상품상세 목록 출력'}`}
+                    {`${selectedRowsData == undefined ? '상품 데이터 선택' : selectedRowsData.prodNm + ' 의 상품상세 목록 출력'}`}
+                  </button>
+                  <button
+                    className={`btn ${selectedRowsData != undefined && selectedRowsData.prodDetCnt == 0 && 'btn_blue'}`}
+                    disabled={selectedRowsData == undefined || selectedRowsData.prodDetCnt != 0}
+                    onClick={() => {
+                      // todo
+                    }}
+                  >
+                    {`${selectedRowsData == undefined ? '삭제할 상품 선택' : selectedRowsData.prodDetCnt != 0 ? selectedRowsData.prodDetCnt + '개의 상세정보가 잔존': selectedRowsData.prodNm + ' 을 삭제'}`}
                   </button>
                 </div>
               </div>
