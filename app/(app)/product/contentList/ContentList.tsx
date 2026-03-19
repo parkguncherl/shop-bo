@@ -53,17 +53,20 @@ const ContentList = () => {
     { field: 'newsTitle', headerName: '제목', minWidth: 60, maxWidth: 150, suppressHeaderMenuButton: true },
     { field: 'newsSubTitle', headerName: '하위 제목', minWidth: 60, maxWidth: 150, suppressHeaderMenuButton: true },
     {
-      field: 'newsContents',
-      headerName: '본문',
-      minWidth: 150,
-      maxWidth: 1300,
+      field: 'imageCnt',
+      headerName: '이미지 건수',
+      minWidth: 80,
+      maxWidth: 80,
       suppressHeaderMenuButton: true,
-      valueFormatter: (params) => {
-        return params.value
-          .replace(RegExpression.ProductContent.imgToken, '') // 이미지 토큰 제거
-          .replace(RegExpression.ProductContent.carriageReturn, '\n') // 줄바꿈 기호 제거
-          .trim(); // 양 끝단 공백 제거
-      },
+      cellStyle: GridSetting.CellStyle.CENTER,
+    },
+    {
+      field: 'productCnt',
+      headerName: '연결상품',
+      minWidth: 80,
+      maxWidth: 80,
+      suppressHeaderMenuButton: true,
+      cellStyle: GridSetting.CellStyle.CENTER,
     },
   ]);
 
@@ -230,15 +233,15 @@ const ContentList = () => {
         <div className="btnArea between">
           <div className="left">
             <button
-              className={'btn '}
+              className={'btn btn_blue'}
               onClick={() => {
                 openModal('ADD');
               }}
             >
-              {'행추가'}
+              {'신규'}
             </button>
             <button
-              className={'btn '}
+              className={'btn btn_blue'}
               onClick={() => {
                 const selectedRows = gridRef.current?.api.getSelectedRows();
                 if (selectedRows && selectedRows.length > 0) {
@@ -248,7 +251,7 @@ const ContentList = () => {
                 }
               }}
             >
-              {'행삭제'}
+              {'수정'}
             </button>
           </div>
           <div className="right">
@@ -258,7 +261,7 @@ const ContentList = () => {
                 // todo
               }}
             >
-              {'저장'}
+              {'임시'}
             </button>
           </div>
         </div>

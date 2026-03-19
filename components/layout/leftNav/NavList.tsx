@@ -94,12 +94,9 @@ const ChildLevel = ({ item }: { item: IMenu }) => {
 
   const lastUri = !item.menuUri ? '' : item.menuUri;
   const isSelected = pathname === lastUri;
-
-  console.log('isSelected : ===>', isSelected, lastUri, pathname);
-
   return (
     <li>
-      <Link style={{color: isSelected ? '' : 'var(--main-color)'}}
+      <Link style={{color: isSelected ? 'var(--main-color)' : ''}}
         href={pathname === lastUri ? '#' : lastUri}
         onClick={(e) => {
           if (pathname === lastUri) {
