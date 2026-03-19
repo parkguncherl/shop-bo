@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { authApi } from '../../../libs';
-import { toastError } from '../../ToastMessage';
 import { useSession } from 'next-auth/react';
 
 interface IMenu {
@@ -96,7 +95,8 @@ const ChildLevel = ({ item }: { item: IMenu }) => {
   const isSelected = pathname === lastUri;
   return (
     <li>
-      <Link style={{color: isSelected ? 'var(--main-color)' : ''}}
+      <Link
+        style={{ color: isSelected ? 'var(--main-color)' : '' }}
         href={pathname === lastUri ? '#' : lastUri}
         onClick={(e) => {
           if (pathname === lastUri) {
@@ -116,24 +116,13 @@ const ChildLevel = ({ item }: { item: IMenu }) => {
 const NavList = () => {
   const sessions = useSession();
 
-  const [menuList, setMenuList] = useState<LeftMenu[]>([]);
-
-  const { data: menus, isSuccess: isMenuListFetchSuccess } = useQuery({
+  const { data: menus } = useQuery({
     queryKey: ['/menu/leftMenu'],
     queryFn: () => authApi.get<ApiResponseListLeftMenu>('/menu/leftMenu'),
     enabled: sessions.status === 'authenticated',
   });
 
-  useEffect(() => {
-    if (isMenuListFetchSuccess) {
-      const { resultCode, body, resultMessage } = menus.data;
-      if (resultCode == 200) {
-        setMenuList(body || []);
-      } else {
-        toastError(resultMessage);
-      }
-    }
-  }, [menus, isMenuListFetchSuccess]);
+  const menuList = menus?.data?.resultCode === 200 ? menus.data.body || [] : [];
 
   return (
     <ul>
