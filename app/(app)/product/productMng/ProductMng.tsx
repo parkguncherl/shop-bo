@@ -18,15 +18,15 @@ import { authApi } from '../../../../libs';
 import TunedGrid from '../../../../components/grid/TunedGrid';
 import useFilters from '../../../../hooks/useFilters';
 import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
-import {PARTNER_CODE, Placeholder} from '../../../../libs/const';
+import { PARTNER_CODE, Placeholder } from '../../../../libs/const';
 import { Utils } from '../../../../libs/utils';
 import SrcEnumerator, { SrcElement, SrcEnumeratorProps } from '../../../../components/layout/product/productMng/SrcEnumerator';
 import { FileUploadPop } from '../../../../components/popup/common';
 import ProductInfoAddPop from '../../../../components/popup/product/productMng/ProductInfoAddPop';
 import ProductModPop from '../../../../components/popup/product/productMng/ProductModPop';
 import ProductDetInfoPop from '../../../../components/popup/product/productMng/ProductDetInfoPop';
-import {usePartnerCodeStore} from "../../../../stores/usePartnerCodeStore";
-import {PartnerCodePop} from "../../../../components/popup/system/PartnerCodePop";
+import { usePartnerCodeStore } from '../../../../stores/usePartnerCodeStore';
+import { PartnerCodePop } from '../../../../components/popup/system/PartnerCodePop';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
@@ -136,11 +136,11 @@ const ProductMng = () => {
   }, [productDetInfos, isProductDetInfosSuccess]);
 
   useEffect(() => {
-    if (productDetInfo == undefined || !productDetInfo.fileId) {
-      setTargetedFileSetInfo(undefined); // state 초기화
-      return;
-    }
-    const targetedFileSetInfoRefreshFn = async (): Promise<targetedFileSetInfo | undefined> => {
+    const targetedFileSetInfoRefreshFn = async (productDetInfo: ProductMngResponseProductDetInfo | undefined): Promise<targetedFileSetInfo | undefined> => {
+      if (productDetInfo == undefined || !productDetInfo.fileId) {
+        setTargetedFileSetInfo(undefined); // state 초기화
+        return;
+      }
       return {
         type: undefined, // 색상이므로
         rowData: productInfoList.filter((productInfo) => productInfo.id == productDetInfo.productId)[0],
@@ -158,7 +158,7 @@ const ProductMng = () => {
         }),
       };
     };
-    targetedFileSetInfoRefreshFn().then((updatedFileSetInfo) => {
+    targetedFileSetInfoRefreshFn(productDetInfo).then((updatedFileSetInfo) => {
       setTargetedFileSetInfo(updatedFileSetInfo);
     });
   }, [productDetInfo]);
@@ -258,7 +258,7 @@ const ProductMng = () => {
       },
       { field: 'etcFileIdCnt', headerName: '기타이미지', minWidth: 80, maxWidth: 80, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
     ],
-    [],
+    [onChangeDetFilters],
   );
 
   /** 검색 버튼 클릭 시 */
@@ -273,6 +273,7 @@ const ProductMng = () => {
   const onCellClickedCallBack = async (event: CellClickedEvent<ProductMngResponseProductInfo>) => {
     const cellsColField = event.column.getColDef().field;
 
+    //if (cellsColField == ) todo
     // 대표이미지 이하 4개의 컬럼 중 하나를 클릭하는 경우 동작
     if (cellsColField && ['repFileIdCnt', 'detailFileIdCnt', 'sizeFileIdCnt', 'etcFileIdCnt'].includes(cellsColField)) {
       setProductInfoList(productInfos?.data.body || []); // query cached 된 값으로 초기화(색상 목록과의 상호작용으로 어떠한 색상이 선택되어 있는 경우에 대한 초기화 동작)
@@ -405,7 +406,7 @@ const ProductMng = () => {
                   const selectedRows = event.api.getSelectedRows();
                   setSelectedRowsData(selectedRows.length > 0 ? selectedRows[0] : undefined);
                 }}
-                popupParent={typeof document !== 'undefined' ? document.body : undefined}// ag grid 내장 드롭다운 사용 시 그리드가 사라지는 현상을 방지하기 위하여 document.body 영역을 popup의 부모 요소로 명시 박근철 수정
+                popupParent={typeof document !== 'undefined' ? document.body : undefined} // ag grid 내장 드롭다운 사용 시 그리드가 사라지는 현상을 방지하기 위하여 document.body 영역을 popup의 부모 요소로 명시 박근철 수정
                 onCellClicked={onCellClickedCallBack}
               />
               <div className="btnArea between">
@@ -462,7 +463,13 @@ const ProductMng = () => {
                       // todo
                     }}
                   >
-                    {`${selectedRowsData == undefined ? '삭제할 상품 선택' : selectedRowsData.prodDetCnt != 0 ? selectedRowsData.prodDetCnt + '개의 상세정보가 잔존': selectedRowsData.prodNm + ' 을 삭제'}`}
+                    {`${
+                      selectedRowsData == undefined
+                        ? '삭제할 상품 선택'
+                        : selectedRowsData.prodDetCnt != 0
+                        ? selectedRowsData.prodDetCnt + '개의 상세정보가 잔존'
+                        : selectedRowsData.prodNm + ' 을 삭제'
+                    }`}
                   </button>
                 </div>
               </div>

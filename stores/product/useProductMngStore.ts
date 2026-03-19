@@ -3,8 +3,12 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import {
-  ApiResponse, ProductContentListResponseProductContent, ProductMngRequestDeleteProduct,
-  ProductMngRequestDeleteProductDet, ProductMngRequestInsertProduct, ProductMngRequestUpdateProduct,
+  ApiResponse,
+  ProductContentListResponseProductContent,
+  ProductMngRequestDeleteProduct,
+  ProductMngRequestDeleteProductDet,
+  ProductMngRequestInsertProduct,
+  ProductMngRequestUpdateProduct,
   ProductMngRequestUpdateProductDet,
 } from '../../generated';
 import { AxiosPromise } from 'axios';
@@ -30,9 +34,8 @@ interface ProductMngApiState {
   insertProductInfo: (insertProductInfoRequest: ProductMngRequestInsertProduct) => AxiosPromise<ApiResponse>;
   updateProduct: (updateProductRequest: ProductMngRequestUpdateProduct) => AxiosPromise<ApiResponse>;
   updateProductDet: (updateProductDetRequest: ProductMngRequestUpdateProductDet) => AxiosPromise<ApiResponse>;
-  deleteProduct: (updateProductDetRequest: ProductMngRequestDeleteProduct) => AxiosPromise<ApiResponse>;
-  deleteProductDet: (updateProductDetRequest: ProductMngRequestDeleteProductDet) => AxiosPromise<ApiResponse>;
-
+  deleteProduct: (deleteProductRequest: ProductMngRequestDeleteProduct) => AxiosPromise<ApiResponse>;
+  deleteProductDet: (deleteProductDetRequest: ProductMngRequestDeleteProductDet) => AxiosPromise<ApiResponse>;
 }
 
 type ProductMngStateOfAll = ProductMngState & ProductMngApiState;
