@@ -2,17 +2,19 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import {
-    ApiResponse,
-    ApiResponseListCodeDropDown,
-    PartnerCodeControllerApiSelectPartnerCodePagingRequest,
-    PartnerCodeControllerApiSelectDropdownByPartnerCodeUpperRequest,
-    PageObject,
-    PartnerCodeRequestDelete,
-    ApiResponseListPartnerCodeResponseLowerSelect,
-    PartnerCodeResponseLowerSelect,
-    PartnerCodeRequestCreate,
-    ApiResponseListPartnerCodeDropDown,
-    PartnerCodeRequestSoftDelete, ProductContentListResponseProductContent, PartnerCodeResponsePaging,
+  ApiResponse,
+  ApiResponseListCodeDropDown,
+  PartnerCodeControllerApiSelectPartnerCodePagingRequest,
+  PartnerCodeControllerApiSelectDropdownByPartnerCodeUpperRequest,
+  PageObject,
+  PartnerCodeRequestDelete,
+  ApiResponseListPartnerCodeResponseLowerSelect,
+  PartnerCodeResponseLowerSelect,
+  PartnerCodeRequestCreate,
+  ApiResponseListPartnerCodeDropDown,
+  PartnerCodeRequestSoftDelete,
+  ProductContentListResponseProductContent,
+  PartnerCodeResponsePaging,
 } from '../generated';
 import { AxiosPromise } from 'axios';
 import { authApi } from '../libs';
@@ -21,9 +23,9 @@ import { StateCreator } from 'zustand';
 type ModalType = 'PARTNER_CODE_OPEN';
 
 interface ModalState {
-    type: ModalType;
-    active: boolean;
-    stored_temporary?: Partial<PartnerCodeResponsePaging>;
+  type: ModalType;
+  active: boolean;
+  stored_temporary?: Partial<PartnerCodeResponsePaging>;
 }
 
 interface PartnerCodeState {
@@ -52,26 +54,26 @@ const initialStateCreator: StateCreator<PartnerCodeState & PartnerCodeApiState, 
   return {
     modals: { type: 'PARTNER_CODE_OPEN', active: false, stored_temporary: undefined },
     openModal: (type: any, stored_temp: any) => {
-        set((state) => ({
-            modals: {
-                type,
-                active: true,
-                stored_temporary: stored_temp,
-            },
-        }));
+      set((state) => ({
+        modals: {
+          type,
+          active: true,
+          stored_temporary: stored_temp,
+        },
+      }));
     },
     closeModal: (type) => {
-        set((state) => ({
-            modals: {
-                type,
-                active: false,
-                stored_temporary: undefined,
-            },
-        }));
+      set((state) => ({
+        modals: {
+          type,
+          active: false,
+          stored_temporary: undefined,
+        },
+      }));
     },
     paging: {
-    curPage: 1,
-    pageRowCount: 20,
+      curPage: 1,
+      pageRowCount: 20,
     },
     setPaging: (pageObject) => {
       set((state) => ({
