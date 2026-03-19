@@ -196,6 +196,7 @@ const LoginClient = () => {
     if (result?.error) {
       return toastError(result.error);
     }
+    console.log('===> result : ', result);
   };
 
   // 아이디, 비밀번호 정상 입력시
