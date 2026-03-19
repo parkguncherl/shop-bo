@@ -57,15 +57,9 @@ interface ProductContentShowPopProps {
  * */
 const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
-  const [updateProduct] = useProductMngStore((s) => [s.updateProduct]);
-
-  /** 검색 필터 */
-  const [filters, onChangeFilters] = useFilters<ProductMngRequestProductDetInfoFilter>({
-    prodId: undefined,
-  });
+  const [updateProductDet] = useProductMngStore((s) => [s.updateProductDet]);
 
   /** 팝업 내부 local state */
-  const [openModConf, setOpenAddConf] = useState<{ open: boolean; stored?: ProductMngRequestUpdateProduct }>({ open: false });
   const [productDetInfoList, setProductDetInfoList] = useState<ProductMngResponseProductDetInfo[]>([]);
 
   const RefForGrid = useRef<TunedGridRef<ProductMngResponseProductDetInfo>>(null);
@@ -82,19 +76,51 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
         cellStyle: GridSetting.CellStyle.CENTER,
         suppressHeaderMenuButton: true,
       },
-      { field: 'productDetColor', headerName: '컬러', minWidth: 140, suppressHeaderMenuButton: true },
-      { field: 'productDetSize', headerName: '사이즈', minWidth: 140, suppressHeaderMenuButton: true },
+      { field: 'productDetColor', headerName: '컬러', minWidth: 80, maxWidth: 100, suppressHeaderMenuButton: true, onCellValueChanged: (event) => {
+        if (event.data.id) {
+          updateProductDetMutate({
+            id: event.data.id,
+            productDetColor: event.newValue,
+          })
+        } else {
+          console.error('상품상세정보 식별자를 확인할 수 없음')
+        }
+        } },
+      { field: 'productDetSize', headerName: '사이즈', minWidth: 80, maxWidth: 100, suppressHeaderMenuButton: true },
       {
         field: 'skuDiscountRate',
         headerName: '스큐단위 할인율',
-        minWidth: 120,
-        maxWidth: 120,
+        minWidth: 80,
+        maxWidth: 100,
+        suppressHeaderMenuButton: true,
+        cellStyle: GridSetting.CellStyle.CENTER,
+      },
+      {
+        field: 'productDetCntn',
+        headerName: '상세내용',
+        minWidth: 230,
+        maxWidth: 230,
         suppressHeaderMenuButton: true,
         cellStyle: GridSetting.CellStyle.CENTER,
       },
     ],
-    [],
+    [productInfo],
   );
+
+  const { mutate: updateProductDetMutate } = useMutation(updateProductDet, {
+    onSuccess: async (e) => {
+      try {
+        if (e.data.resultCode === 200) {
+          toastSuccess('수정되었습니다.');
+          productDetInfosRefetch();
+        } else {
+          toastError(`컨텐츠 저장 도중 문제 발생 (${e.data.resultMessage})`);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+  });
 
   /** 상품상세정보 목록 조회 */
   const {
@@ -107,27 +133,23 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
     queryFn: () =>
       authApi.get('/productMng/productDetInfoList', {
         params: {
-          ...filters,
+          prodId: productInfo?.id,
         },
       }),
     refetchOnMount: 'always',
-    enabled: open && filters.prodId != undefined,
+    enabled: open && productInfo?.id != undefined,
   });
 
   useEffect(() => {
     if (isProductDetInfosSuccess) {
       const { resultCode, body, resultMessage } = productDetInfos.data;
       if (resultCode === 200) {
-        setProductDetInfoList(body);
+        setProductDetInfoList(body || []);
       } else {
         toastError(resultMessage);
       }
     }
   }, [productDetInfos, isProductDetInfosSuccess]);
-
-  useEffect(() => {
-    onChangeFilters('prodId', productInfo?.id);
-  }, [productInfo]);
 
   /** 검색 버튼 클릭 시 */
   const search = async () => {
@@ -141,7 +163,7 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
   return (
     <div className="imgPopBox">
       <PopupLayout
-        width={650}
+        width={600}
         open={open}
         isEscClose={true}
         title={productInfo?.prodNm + ' 의 상품상세 목록'}
@@ -190,25 +212,6 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
           </div>
         </PopupContent>
       </PopupLayout>
-      <ConfirmModal
-        open={openModConf.open}
-        title={'저장 하시겠습니까?'}
-        confirmText={'저장'}
-        onConfirm={() => {
-          if (openModConf.stored) {
-            console.log('openModConf.stored: ', openModConf.stored);
-            // todo
-          } else {
-            toastError('저장하고자 하는 입력 결과를 찾을 수 없습니다.');
-            console.error('저장하고자 하는 입력 결과를 찾을 수 없습니다.');
-          }
-        }}
-        onClose={() => {
-          setOpenAddConf({
-            open: false,
-          });
-        }}
-      />
     </div>
   );
 };
