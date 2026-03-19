@@ -94,8 +94,6 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
   const {
     handleSubmit,
     control,
-    getValues,
-    setValue,
     reset,
     clearErrors,
     //formState: { errors, isValid },
@@ -238,7 +236,6 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
                 <button
                   className="btn btn_blue"
                   onClick={() => {
-                    // todo
                     handleSubmit(onValid, onInvalid)(); // 함수를 반환하므로 다음과 같이, 호출하여야
                   }}
                 >

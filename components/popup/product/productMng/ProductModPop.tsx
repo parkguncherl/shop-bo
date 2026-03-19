@@ -241,7 +241,7 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
       </PopupLayout>
       <ConfirmModal
         open={openModConf.open}
-        title={'저장 하시겠습니까?'}
+        title={`${openModConf.stored?.prodNm} 을(를) 작성하신 값으로 수정 하시겠습니까?`}
         confirmText={'저장'}
         onConfirm={() => {
           if (openModConf.stored) {

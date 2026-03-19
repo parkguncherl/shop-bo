@@ -4,7 +4,6 @@ import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import {
   ApiResponse,
-  ProductContentListResponseProductContent,
   ProductMngRequestDeleteProduct,
   ProductMngRequestDeleteProductDet,
   ProductMngRequestInsertProduct,
@@ -14,19 +13,19 @@ import {
 import { AxiosPromise } from 'axios';
 import { authApi } from '../../libs';
 
-type ModalType = 'IMG_UPLOAD' | 'PROD_INFO_ADD' | 'PROD_DET_INFO_ADD' | 'PROD_MOD' | 'PROD_DET_INFO';
+type ModalType = 'IMG_UPLOAD' | 'PROD_INFO_ADD' | 'PROD_DET_INFO_ADD' | 'PROD_MOD' | 'PROD_DET_INFO' | 'PROD_DEL';
 
 interface ModalState {
   type: ModalType;
   active: boolean;
-  stored_temporary?: Partial<ProductContentListResponseProductContent>;
+  stored_temporary?: unknown;
 }
 
 interface ProductMngState {
   // paging: PageObject;
   // setPaging: (pagingInfo: PageObject | undefined) => void;
   modals: ModalState;
-  openModal: (type: ModalType, stored_temp?: Partial<ProductContentListResponseProductContent>) => void;
+  openModal: (type: ModalType, stored_temp?: unknown) => void;
   closeModal: (type: ModalType) => void;
 }
 

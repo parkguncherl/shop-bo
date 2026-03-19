@@ -6,11 +6,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { authApi } from '../../../../libs';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import { ConfirmModal } from '../../../ConfirmModal';
-import {
-  ProductMngRequestDeleteProductDet,
-  ProductMngResponseProductDetInfo,
-  ProductMngResponseProductInfo,
-} from '../../../../generated';
+import { ProductMngRequestDeleteProductDet, ProductMngResponseProductDetInfo, ProductMngResponseProductInfo } from '../../../../generated';
 import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
 import TunedGrid, { TunedGridRef } from '../../../grid/TunedGrid';
 import { PopupSearchBox, PopupSearchType } from '../../content';
@@ -42,8 +38,7 @@ export interface ProductModFields {
 
 interface ProductContentShowPopProps {
   open: boolean;
-  onClose: () => void;
-  onUpdated?: () => void;
+  onClose: (updated: boolean) => void;
   productInfo?: ProductMngResponseProductInfo;
 }
 
@@ -53,7 +48,7 @@ interface ProductContentShowPopProps {
  * Date: 2026/03/18
  * Author: park junsung
  * */
-const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContentShowPopProps) => {
+const ProductModPop = ({ open, onClose, productInfo }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
   const [updateProductDet, deleteProductDet] = useProductMngStore((s) => [s.updateProductDet, s.deleteProductDet]);
 
@@ -62,9 +57,8 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
   const [selectedRowsData, setSelectedRowsData] = useState<ProductMngResponseProductDetInfo | undefined>(undefined);
   const [openModConf, setOpenAddConf] = useState<{ open: boolean; stored?: ProductMngRequestDeleteProductDet }>({ open: false });
 
-
-
   const RefForGrid = useRef<TunedGridRef<ProductMngResponseProductDetInfo>>(null);
+  const flagAboutUpdatedOrNot = useRef(false);
 
   /** 컬럼 설정 */
   const columnDefs = useMemo<ColDef<ProductMngResponseProductDetInfo>[]>(
@@ -78,7 +72,8 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
         cellStyle: GridSetting.CellStyle.CENTER,
         suppressHeaderMenuButton: true,
       },
-      { field: 'productDetColor',
+      {
+        field: 'productDetColor',
         headerName: '컬러',
         minWidth: 80,
         maxWidth: 100,
@@ -89,13 +84,14 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
             updateProductDetMutate({
               id: event.data.id,
               productDetColor: event.newValue,
-            })
+            });
           } else {
-            console.error('상품상세정보 식별자를 확인할 수 없음')
+            console.error('상품상세정보 식별자를 확인할 수 없음');
           }
-        }
+        },
       },
-      { field: 'productDetSize',
+      {
+        field: 'productDetSize',
         headerName: '사이즈',
         minWidth: 80,
         maxWidth: 100,
@@ -106,11 +102,11 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
             updateProductDetMutate({
               id: event.data.id,
               productDetSize: event.newValue,
-            })
+            });
           } else {
-            console.error('상품상세정보 식별자를 확인할 수 없음')
+            console.error('상품상세정보 식별자를 확인할 수 없음');
           }
-        }
+        },
       },
       {
         field: 'skuDiscountRate',
@@ -125,11 +121,11 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
             updateProductDetMutate({
               id: event.data.id,
               skuDiscountRate: event.newValue,
-            })
+            });
           } else {
-            console.error('상품상세정보 식별자를 확인할 수 없음')
+            console.error('상품상세정보 식별자를 확인할 수 없음');
           }
-        }
+        },
       },
       {
         field: 'productDetCntn',
@@ -144,11 +140,11 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
             updateProductDetMutate({
               id: event.data.id,
               productDetCntn: event.newValue,
-            })
+            });
           } else {
-            console.error('상품상세정보 식별자를 확인할 수 없음')
+            console.error('상품상세정보 식별자를 확인할 수 없음');
           }
-        }
+        },
       },
     ],
     [productInfo],
@@ -160,7 +156,7 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
         if (e.data.resultCode === 200) {
           toastSuccess('수정되었습니다.');
           await productDetInfosRefetch();
-          if (onUpdated) onUpdated();
+          flagAboutUpdatedOrNot.current = true;
         } else {
           toastError(`컨텐츠 저장 도중 문제 발생 (${e.data.resultMessage})`);
         }
@@ -176,7 +172,7 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
         if (e.data.resultCode === 200) {
           toastSuccess('삭제되었습니다.');
           await productDetInfosRefetch();
-          if (onUpdated) onUpdated();
+          flagAboutUpdatedOrNot.current = true;
         } else {
           toastError(`컨텐츠 저장 도중 문제 발생 (${e.data.resultMessage})`);
         }
@@ -215,23 +211,35 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
     }
   }, [productDetInfos, isProductDetInfosSuccess]);
 
-  /** 검색 버튼 클릭 시 */
-  const search = async () => {
-    await onSearch();
+  const commonOnCloseCallback = () => {
+    if (onClose) onClose(flagAboutUpdatedOrNot.current);
   };
 
-  const onSearch = async () => {
-    await productDetInfosRefetch();
-  };
+  // /** 검색 버튼 클릭 시 */
+  // const search = async () => {
+  //   await onSearch();
+  // };
+  //
+  // const onSearch = async () => {
+  //   await productDetInfosRefetch();
+  // };
+
+  useEffect(() => {
+    if (!open) {
+      // 닫힘 시점
+      RefForGrid.current?.api.deselectAll(); // 셀렉션 초기화
+      flagAboutUpdatedOrNot.current = false; // 업데이트 여부 플래그 초기화
+    }
+  }, [open]);
 
   return (
     <div className="imgPopBox">
       <PopupLayout
-        width={600}
+        width={580}
         open={open}
         isEscClose={true}
         title={productInfo?.prodNm + ' 의 상품상세 목록'}
-        onClose={onClose}
+        onClose={commonOnCloseCallback}
         footer={
           <PopupFooter>
             <div className="btnArea between">
@@ -245,23 +253,22 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
                         open: true,
                         stored: {
                           id: selectedRowsData?.id,
-                        }
-                      })
+                        },
+                      });
                     } else {
                       console.error('삭제하고자 하는 상품상세의 식별자를 찾을 수 없음');
                     }
                   }}
                 >
-                  {`${(productInfo == undefined || selectedRowsData == undefined) ? '삭제할 상세정보 선택' : (productInfo?.prodNm || '') + ' ' + selectedRowsData?.productDetColor + ' 을 삭제'}`}
+                  {`${
+                    productInfo == undefined || selectedRowsData == undefined
+                      ? '삭제할 상세정보 선택'
+                      : (productInfo?.prodNm || '') + ' ' + selectedRowsData?.productDetColor + ' 을(를) 삭제'
+                  }`}
                 </button>
               </div>
               <div className="right">
-                <button
-                  className="btn"
-                  onClick={() => {
-                    onClose();
-                  }}
-                >
+                <button className="btn" onClick={commonOnCloseCallback}>
                   닫기
                 </button>
               </div>
@@ -305,7 +312,7 @@ const ProductModPop = ({ open, onClose, onUpdated, productInfo }: ProductContent
       </PopupLayout>
       <ConfirmModal
         open={openModConf.open}
-        title={'저장 하시겠습니까?'}
+        title={(productInfo?.prodNm || '') + ' ' + selectedRowsData?.productDetColor + ' 을(를) 삭제 하시겠습니까?'}
         confirmText={'저장'}
         onConfirm={() => {
           if (openModConf.stored) {

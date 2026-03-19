@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Search, Table, Title } from '../../../../components';
+import { Search, Table, Title, toastSuccess } from '../../../../components';
 import {
   ProductMngRequestProductDetInfoFilter,
   ProductMngRequestProductInfoFilter,
@@ -11,7 +11,7 @@ import {
 import { CellClickedEvent, ColDef, ICellEditorParams } from 'ag-grid-community';
 import { TableHeader, toastError } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
 import { useAgGridApi } from '../../../../hooks';
 import { authApi } from '../../../../libs';
@@ -27,6 +27,7 @@ import ProductModPop from '../../../../components/popup/product/productMng/Produ
 import ProductDetInfoPop from '../../../../components/popup/product/productMng/ProductDetInfoPop';
 import { usePartnerCodeStore } from '../../../../stores/usePartnerCodeStore';
 import { PartnerCodePop } from '../../../../components/popup/system/PartnerCodePop';
+import { ConfirmModal } from '../../../../components/ConfirmModal';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
@@ -41,10 +42,6 @@ interface targetedFileSetInfo extends Omit<SrcEnumeratorProps, 'title' | 'srcInf
   fileInfos: targetedFileSetsElementInfo[];
 }
 
-// interface MngProductInfo extends ProductMngResponseProductInfo {
-//   representedProdColor?: string;
-// }
-
 /** 시스템 - 상품관리 페이지 */
 const ProductMng = () => {
   /** Grid Api */
@@ -55,7 +52,7 @@ const ProductMng = () => {
   const [getFileUrl, selectFileList] = useCommonStore((s) => [s.getFileUrl, s.selectFileList]);
 
   /** 상품관리 스토어 - State */
-  const [modals, openModal, closeModal] = useProductMngStore((s) => [s.modals, s.openModal, s.closeModal]);
+  const [modals, openModal, closeModal, deleteProduct] = useProductMngStore((s) => [s.modals, s.openModal, s.closeModal, s.deleteProduct]);
   const [partnerCodeModals, partnerCodeOpenModal, partnerCodeCloseModal] = usePartnerCodeStore((s) => [s.modals, s.openModal, s.closeModal]);
   /** 검색 필터 */
   const [filters, onChangeFilters] = useFilters<ProductMngRequestProductInfoFilter>({
@@ -73,6 +70,22 @@ const ProductMng = () => {
   const [targetedFileSetInfo, setTargetedFileSetInfo] = useState<targetedFileSetInfo | undefined>(undefined);
 
   const [selectedRowsData, setSelectedRowsData] = useState<ProductMngResponseProductInfo | undefined>(undefined);
+
+  const { mutate: deleteProductMutate } = useMutation(deleteProduct, {
+    onSuccess: async (e) => {
+      try {
+        if (e.data.resultCode === 200) {
+          toastSuccess('삭제되었습니다.');
+          closeModal('PROD_DEL');
+          await productInfosRefetch();
+        } else {
+          toastError(`컨텐츠 삭제 도중 문제 발생 (${e.data.resultMessage})`);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+  });
 
   /** 상품정보 목록 조회 */
   const {
@@ -103,12 +116,7 @@ const ProductMng = () => {
   }, [productInfos, isProductInfosSuccess]);
 
   /** 상품상세정보 목록 조회 */
-  const {
-    data: productDetInfos,
-    isSuccess: isProductDetInfosSuccess,
-    // isLoading: isProductDetInfosLoading,
-    // refetch: productDetInfosRefetch,
-  } = useQuery({
+  const { data: productDetInfos, isSuccess: isProductDetInfosSuccess } = useQuery({
     queryKey: ['/productMng/productDetInfoList', detFilters.prodDetColor],
     queryFn: () =>
       authApi.get('/productMng/productDetInfoList', {
@@ -273,7 +281,6 @@ const ProductMng = () => {
   const onCellClickedCallBack = async (event: CellClickedEvent<ProductMngResponseProductInfo>) => {
     const cellsColField = event.column.getColDef().field;
 
-    //if (cellsColField == ) todo
     // 대표이미지 이하 4개의 컬럼 중 하나를 클릭하는 경우 동작
     if (cellsColField && ['repFileIdCnt', 'detailFileIdCnt', 'sizeFileIdCnt', 'etcFileIdCnt'].includes(cellsColField)) {
       setProductInfoList(productInfos?.data.body || []); // query cached 된 값으로 초기화(색상 목록과의 상호작용으로 어떠한 색상이 선택되어 있는 경우에 대한 초기화 동작)
@@ -460,7 +467,11 @@ const ProductMng = () => {
                     className={`btn ${selectedRowsData != undefined && selectedRowsData.prodDetCnt == 0 && 'btn_blue'}`}
                     disabled={selectedRowsData == undefined || selectedRowsData.prodDetCnt != 0}
                     onClick={() => {
-                      // todo
+                      if (selectedRowsData && selectedRowsData.id) {
+                        openModal('PROD_DEL', selectedRowsData);
+                      } else {
+                        console.error('선택된 상품에 대응하는 식별자를 찾을 수 없음');
+                      }
                     }}
                   >
                     {`${
@@ -604,11 +615,11 @@ const ProductMng = () => {
       />
       <ProductDetInfoPop
         open={modals.active && modals.type == 'PROD_DET_INFO'}
-        onClose={() => {
+        onClose={(updated) => {
           closeModal(modals.type);
-        }}
-        onUpdated={() => {
-          productInfosRefetch();
+          if (updated) {
+            productInfosRefetch();
+          }
         }}
         productInfo={selectedRowsData}
       />
@@ -618,6 +629,24 @@ const ProductMng = () => {
         activated={partnerCodeModals?.type === 'PARTNER_CODE_OPEN' && partnerCodeModals.active}
         codeName={PARTNER_CODE.categories.name}
         onCloseRequestEmerged={() => partnerCodeCloseModal('PARTNER_CODE_OPEN')}
+      />
+      <ConfirmModal
+        open={modals.active && modals.type == 'PROD_DEL'}
+        title={`${(modals.stored_temporary as ProductMngResponseProductInfo | undefined)?.prodNm} 을(를) 삭제 하시겠습니까?`}
+        confirmText={'저장'}
+        onConfirm={() => {
+          if (modals.stored_temporary) {
+            deleteProductMutate({
+              id: (modals.stored_temporary as ProductMngResponseProductInfo).id,
+            });
+          } else {
+            toastError('저장하고자 하는 입력 결과를 찾을 수 없습니다.');
+            console.error('저장하고자 하는 입력 결과를 찾을 수 없습니다.');
+          }
+        }}
+        onClose={() => {
+          closeModal('PROD_DEL');
+        }}
       />
     </div>
   );
