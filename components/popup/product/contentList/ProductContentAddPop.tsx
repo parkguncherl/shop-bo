@@ -12,7 +12,7 @@ import { useMutation } from '@tanstack/react-query';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '../../../../libs';
 import { toastError, toastSuccess } from '../../../ToastMessage';
-import { Formatter, RegExpression } from '../../../../libs/const';
+import { Formatter } from '../../../../libs/const';
 import { ConfirmModal } from '../../../ConfirmModal';
 import FormCombineParagraphs, { EnhancedTextAreasMode, FileInfo } from '../../../form/FormCombineParagraphs';
 import { useProductContentListStore } from '../../../../stores/product/useProductContentListStore';
@@ -30,7 +30,6 @@ interface ProductContentShowPopProps {
  * */
 const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
-  //const [getFileUrl, selectFileList] = useCommonStore((s) => [s.getFileUrl, s.selectFileList]);
   const [insertProductContents] = useProductContentListStore((s) => [s.insertProductContents]);
 
   /** 팝업 내부 local state */
@@ -42,7 +41,7 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
     handleSubmit,
     control,
     getValues,
-    formState: { errors, isValid },
+    //formState: { errors, isValid },
   } = useForm<ProductContentsFields>({
     resolver: yupResolver(YupSchema.ProductContentsRequest()),
     mode: 'onChange',
@@ -99,17 +98,6 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
               uploadFiles: uniqueFileList,
             },
     });
-
-    // console.log('uniqueFileList: ', uniqueFileList);
-    // console.log('joinedFileInfoIncludedContent: ', joinedFileInfoIncludedContent);
-
-    //const combinedRegex = new RegExp(`${RegExpression.ProductContent.imgToken.source}|${RegExpression.ProductContent.carriageReturn.source}`, 'g');
-
-    // const contentElements = joinedFileInfoIncludedContent.split(RegExpression.ProductContent.carriageReturn).filter((value) => value != '');
-    // console.log('contentElements: ', contentElements);
-
-    // console.log(fileInfoIncludedContent.replace(/<<IMG\|[^>]+>>/g, '').replace(/\\n/g, '\n'));
-    //console.log('fileInfoLists: ', uniqueFileList);
   };
 
   // 유효하지 않은 경우
