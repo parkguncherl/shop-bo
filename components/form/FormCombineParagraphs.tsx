@@ -163,9 +163,6 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
   const bottomTextArea = useRef<HTMLTextAreaElement | null>(null);
 
   /** 이하 지역 상태는 반드시 배열의 불변성을 유지할 것 */
-  // const [perContentStatusList, setPerContentStatusList] = useState<PerContentStatus[]>([{ id: 1, init: true }]); // 각 컨텐츠 요소에 일대일로 대응하는 상태 정보 목록
-  // const [unFrozenElementId, setUnFrozenElementId] = useState<number>(-1); // 최하단 영역 이외 편집 가능한 영역 지정(by Id), -1인 경우 최하단 영역 이외 frozen(편집 가능 속성을 회수), 해당 상태를 통해 현재 상호작용 중인 영역을 유추할수 있음(-1 인 경우 최하단, 아닐 시 id에 대응되는 최하단 이외 영역)
-
   const [contentElementStatus, dispatchContentElementStatus] = useReducer(contentElementStatusReducer, {
     unFrozenElementId: -1,
     perContentStatusList: [{ id: 1, init: true }],
@@ -195,20 +192,6 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
     }
   }, [contentElementStatus.unFrozenElementId, value]);
 
-  // useEffect(() => {
-  //   setPerContentStatusList((prevState) => {
-  //     return prevState.map((prevContentElement) => {
-  //       if (prevContentElement.id == unFrozenElementId && prevContentElement.init) {
-  //         return {
-  //           ...prevContentElement,
-  //           init: false, // 상호작용이 최초로 일어난 경우 init false, 이후 기존에 랜더링되어진 레거시 상태로 취급
-  //         };
-  //       }
-  //       return prevContentElement;
-  //     });
-  //   });
-  // }, [unFrozenElementId]);
-
   useEffect(() => {
     if (Array.isArray(error)) {
       const errorStat = (error || []) as FieldErrorForContentElement[];
@@ -227,31 +210,6 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
       }
     }
   }, [error]);
-
-  // useEffect(() => {
-  //   /** rhf value 에 따라 각 content status 동기화 */
-  //   if (!value || value.length === 0) {
-  //     // rhf controlled value 초기값 할당
-  //     controlChange([{ id: 1, partialContent: '', init: true }]);
-  //   } else {
-  //     if (value.length > perContentStatusList) {
-  //       // 기존 State가 포함하지 않는 value 에 대응하는 state element 추가
-  //       setPerContentStatusList((prevState) => {
-  //         const notIncluded: ContentElement = value.filter((val: ContentElement) => !prevState.map((prev) => prev.id).includes(val.id))[0];
-  //         return [
-  //           ...prevState,
-  //           {
-  //             id: notIncluded.id,
-  //             init: true, // 최초 정의 시 init true (상호작용 이전 상태)
-  //           },
-  //         ];
-  //       });
-  //     } else if (value.length < perContentStatusList) {
-  //       // 제거된 content 제거
-  //       setPerContentStatusList((prevState) => prevState.filter((prev) => value.filter((val: ContentElement) => val.id == prev.id).length == 1));
-  //     }
-  //   }
-  // }, [value]);
 
   useEffect(() => {
     if (!value || value.length === 0) {
@@ -276,22 +234,6 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
       }),
     );
   };
-
-  // /** 주어진 id에 대응하는 init 상태를 false 로 변환 */
-  // const flipInitStatusToFalseById = (id: number) => {
-  //   setPerContentStatusList((prevState) =>
-  //     prevState.map((prev) => {
-  //       if (prev.id == id) {
-  //         return {
-  //           ...prev,
-  //           init: false,
-  //         };
-  //       } else {
-  //         return prev;
-  //       }
-  //     }),
-  //   );
-  // };
 
   const getPerContentStatusById = (id: number): { id: number; init: boolean } | undefined => {
     return contentElementStatus.perContentStatusList.filter((perContentStatus) => perContentStatus.id == id)[0];
@@ -376,7 +318,6 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
               id: i == value.length - 1 ? -1 : modifiedContentElements.length, // 최하단 영역에서의 이벤트인 경우(i == prevState.length - 1 이 true) -1, 이외 id에 해당하는 값(바로 위에서 push 동작이 이루어진 관계로 modifiedContentElements.length) 할당
             },
           });
-          //setUnFrozenElementId(i == value.length - 1 ? -1 : modifiedContentElements.length); // 최하단 영역에서의 이벤트인 경우(i == prevState.length - 1 이 true) -1, 이외 id에 해당하는 값(바로 위에서 push 동작이 이루어진 관계로 modifiedContentElements.length) 할당
         } else {
           // 이외의 경우에는 id 동기화(파일 첨부 영역 이후부터는 기존의 value.length 와 불일치가 발생하니 이를 통해 자연스럽게 첨부된 길이만큼 하위 인덱스에 해당하는 배열 요소로 배치됨)
           modifiedContentElements.push({
@@ -525,7 +466,6 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
                                   bottomTextArea.current?.focus(); // 최하단 영역으로 포커싱
                                 } else {
                                   changeContentElementByTargetValue(e.target, contentElement);
-                                  //flipInitStatusToFalseById(contentElement.id);
                                   dispatchContentElementStatus({
                                     type: 'flipInitToFalse',
                                     payload: {
@@ -566,7 +506,6 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
                         <div
                           className={`per_img_element ${getPerContentStatusById(contentElement.id)?.init ? '' : 'frozen'}`}
                           onClick={() => {
-                            //setUnFrozenElementId(contentElement.id);
                             dispatchContentElementStatus({
                               type: 'focus',
                               payload: {
@@ -602,7 +541,6 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
                               type={'text'}
                               readOnly={true}
                               onFocus={() => {
-                                //setUnFrozenElementId(contentElement.id); // 해당 영역 unFrozen(편집 가능)
                                 dispatchContentElementStatus({
                                   type: 'focus',
                                   payload: {
@@ -679,7 +617,6 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
                                 type={'text'}
                                 onChange={(e) => {
                                   changeContentElementByTargetValue(e.target, contentElement);
-                                  //flipInitStatusToFalseById(contentElement.id);
                                   dispatchContentElementStatus({
                                     type: 'flipInitToFalse',
                                     payload: {
@@ -691,7 +628,6 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
                                 onPaste={(e) => onPasteEventHandler(e, contentElement)}
                                 autoSize={autoSize}
                                 onFocus={() => {
-                                  //setUnFrozenElementId(-1);
                                   dispatchContentElementStatus({
                                     type: 'focus',
                                     payload: {
@@ -761,7 +697,6 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
                                       bottomTextArea.current?.focus(); // 최하단 영역으로 포커싱
                                     } else {
                                       changeContentElementByTargetValue(e.target, contentElement);
-                                      //flipInitStatusToFalseById(contentElement.id);
                                       dispatchContentElementStatus({
                                         type: 'flipInitToFalse',
                                         payload: {
@@ -802,7 +737,6 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
                             <div
                               className={`per_img_element ${getPerContentStatusById(contentElement.id)?.init ? '' : 'frozen'}`}
                               onClick={() => {
-                                //setUnFrozenElementId(contentElement.id);
                                 dispatchContentElementStatus({
                                   type: 'focus',
                                   payload: {
@@ -838,7 +772,6 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
                                   type={'text'}
                                   readOnly={true}
                                   onFocus={() => {
-                                    //setUnFrozenElementId(contentElement.id); // 해당 영역 unFrozen(편집 가능)
                                     dispatchContentElementStatus({
                                       type: 'focus',
                                       payload: {
