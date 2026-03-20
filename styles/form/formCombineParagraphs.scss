@@ -117,7 +117,7 @@
 
       .per_img_element {
         display: grid;
-        grid-template-rows: auto 25px;
+        grid-template-rows: auto 35px;
         @include wrapper-prev;
 
         .img_wrapper {
@@ -126,7 +126,7 @@
 
         .img_title_wrapper {
           display: flex;
-          flex-direction: row;
+          align-items: center;
           padding: 2px 4px;
 
           p {

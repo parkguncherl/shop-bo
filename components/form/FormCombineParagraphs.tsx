@@ -136,7 +136,7 @@ function contentElementStatusReducer(state: ContentElementStatusState, action: C
 
 /**
  * components/form/FormCombineParagraphs.tsx
- * 최종 수정일 및 수정자: 26-02-25, park junsung
+ * 최종 수정일 및 수정자: 26-03-20, park junsung
  * */
 const FormCombineParagraphs = <TForm extends FieldValues>({
   control,
@@ -498,7 +498,19 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
                               <img src={contentElement.fileInfo.fileSrcUrl} />
                             </div>
                           )}
-                          <div className={'img_title_wrapper'}>{contentElement.fileInfo.file?.name && <p>{contentElement.fileInfo.file.name}</p>}</div>
+                          <div className={'img_title_wrapper'}>
+                            <div className={'btnArea between'}>
+                              {contentElement.fileInfo.file?.name && <p>{contentElement.fileInfo.file.name}</p>}
+                              <button
+                                className="btn btn_blue"
+                                onClick={() => {
+                                  controlChange([...value.filter((prev: ContentElement) => prev.id != contentElement.id)]); // 지움 동작
+                                }}
+                              >
+                                {'지움'}
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       ) : (
                         <div className={'per_textArea_element'}>
@@ -722,7 +734,19 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
                                   <img src={contentElement.fileInfo.fileSrcUrl} />
                                 </div>
                               )}
-                              <div className={'img_title_wrapper'}>{contentElement.fileInfo.file?.name && <p>{contentElement.fileInfo.file.name}</p>}</div>
+                              <div className={'img_title_wrapper'}>
+                                <div className={'btnArea between'}>
+                                  {contentElement.fileInfo.file?.name && <p>{contentElement.fileInfo.file.name}</p>}
+                                  <button
+                                    className="btn btn_blue"
+                                    onClick={() => {
+                                      controlChange([...value.filter((prev: ContentElement) => prev.id != contentElement.id)]); // 지움 동작
+                                    }}
+                                  >
+                                    {'지움'}
+                                  </button>
+                                </div>
+                              </div>
                             </div>
                           ) : (
                             <div className={'per_textArea_element'}>
