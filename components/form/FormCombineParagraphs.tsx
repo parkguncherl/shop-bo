@@ -239,10 +239,7 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
                 });
               });
 
-              // modifiedContentElements.push({
-              //   id: modifiedContentElements.length + 1,
-              // });
-              modifiedContentElements.push({ id: modifiedContentElements.length + 1, partialContent: '', init: true });
+              modifiedContentElements.push({ id: modifiedContentElements.length + 1, partialContent: '', init: true }); // id를 최하단 영역에 맞추어 할당하며 나머지 값은 최하단 요소에 적합토록 할당
             }
           } else {
             /** 최하단 이외 영역에서 첨부 발생한 경우, 최하단 영역에서 내용이 부재한 경우의 동작과 동일 */
