@@ -96,4 +96,28 @@
       height: 35px;
     }
   }
+
+  & .ant-modal-footer {
+    .popupFooter {
+      display: flex;
+      justify-content: flex-end;
+
+      & .left {
+        display: none;
+      }
+
+      & .right {
+        display: flex;
+        gap: 10px;
+      }
+
+      &.between {
+        justify-content: space-between;
+        & .left {
+          display: flex;
+          gap: 10px;
+        }
+      }
+    }
+  }
 }

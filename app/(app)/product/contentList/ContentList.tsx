@@ -251,7 +251,7 @@ const ContentList = () => {
                 }
               }}
             >
-              {'수정'}
+              {'삭제'}
             </button>
           </div>
           <div className="right">

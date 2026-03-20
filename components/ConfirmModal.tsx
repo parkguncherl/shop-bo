@@ -160,7 +160,7 @@ export function ConfirmModal<FT extends FieldValues>({
       open={open}
       title={''}
       width={width ?? 400}
-      className={`${className} confirm`}
+      className={`${className} popUpGroup confirm`}
       footer={
         <PopupFooter>
           <div className="left">
