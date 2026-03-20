@@ -69,7 +69,7 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
 
   /** 이하 지역 상태는 반드시 배열의 불변성을 유지할 것 */
   const [perContentStatusList, setPerContentStatusList] = useState<PerContentStatus[]>([{ id: 1, init: true }]); // 각 컨텐츠 요소에 일대일로 대응하는 상태 정보 목록
-  const [unFrozenElementId, setUnFrozenElementId] = useState<number>(-1); // 최하단 영역 이외 편집 가능한 영역 지정(by Id), -1인 경우 최하단 영역 이외 frozen(편집 가능 속성을 회수)
+  const [unFrozenElementId, setUnFrozenElementId] = useState<number>(-1); // 최하단 영역 이외 편집 가능한 영역 지정(by Id), -1인 경우 최하단 영역 이외 frozen(편집 가능 속성을 회수), 해당 상태를 통해 현재 상호작용 중인 영역을 유추할수 있음(-1 인 경우 최하단, 아닐 시 id에 대응되는 최하단 이외 영역)
   const [boxHeight, setBoxHeight] = useState(0); // textArea(div box 의 컨텐츠) 높이에 따라 동기화
 
   const [innerErrorState, setInnerErrorState] = useState<FieldErrorForContentElement[]>([]); // contentElements 의 순서와 대응되므로, 배열 index 기준으로 error가 발생한 contentElement 를 찾을 수 있음
@@ -219,7 +219,6 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
                 id: modifiedContentElements.length + 1,
               });
             } else {
-              // todo
               /** 내용 잔존(첨부 영역(이미지가 첨부되어지는 영역)을 하단으로 밀어냄) */
 
               // 기존 상태 영속을 위한 추가 동작
