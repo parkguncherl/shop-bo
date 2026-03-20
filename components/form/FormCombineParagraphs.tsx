@@ -195,32 +195,85 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
       const modifiedContentElements: ContentElement[] = [];
       for (let i = 0; i < value.length; i++) {
         if (contentElementOnTriggeredArea.id == value[i].id) {
-          // 대상 영역
-          files.forEach((file) => {
-            modifiedContentElements.push({
-              id: modifiedContentElements.length + 1,
-              fileInfo: {
-                file: file,
-                fileSrcUrl: URL.createObjectURL(file),
-              } as FileInfo,
-            });
-          });
+          /** 대상 영역(첨부 동작 촉발된 영역) */
 
-          // 기존 상태 영속을 위한 추가 동작
-          modifiedContentElements.push({
-            ...value[i],
-            id: modifiedContentElements.length + 1,
-          });
+          if (contentElementOnTriggeredArea.id == value.length) {
+            /** 최하단 영역에서 첨부 발생한 경우 */
+            if (contentElementOnTriggeredArea.partialContent == undefined || contentElementOnTriggeredArea.partialContent.trim() == '') {
+              /** 내용 부재(입력 영역(공란 영역)을 하단으로 밀어냄) */
+
+              // 파일 요소가 선행함
+              files.forEach((file) => {
+                modifiedContentElements.push({
+                  id: modifiedContentElements.length + 1,
+                  fileInfo: {
+                    file: file,
+                    fileSrcUrl: URL.createObjectURL(file),
+                  } as FileInfo,
+                });
+              });
+
+              // 기존 상태 영속을 위한 추가 동작(파일 첨부 영역 push 이후로 push)
+              modifiedContentElements.push({
+                ...value[i],
+                id: modifiedContentElements.length + 1,
+              });
+            } else {
+              // todo
+              /** 내용 잔존(첨부 영역(이미지가 첨부되어지는 영역)을 하단으로 밀어냄) */
+
+              // 기존 상태 영속을 위한 추가 동작
+              modifiedContentElements.push({
+                ...value[i],
+                id: modifiedContentElements.length + 1,
+              });
+
+              // 파일 요소가 이후 추가됨
+              files.forEach((file) => {
+                modifiedContentElements.push({
+                  id: modifiedContentElements.length + 1,
+                  fileInfo: {
+                    file: file,
+                    fileSrcUrl: URL.createObjectURL(file),
+                  } as FileInfo,
+                });
+              });
+
+              // modifiedContentElements.push({
+              //   id: modifiedContentElements.length + 1,
+              // });
+              modifiedContentElements.push({ id: modifiedContentElements.length + 1, partialContent: '', init: true });
+            }
+          } else {
+            /** 최하단 이외 영역에서 첨부 발생한 경우, 최하단 영역에서 내용이 부재한 경우의 동작과 동일 */
+
+            // 파일 요소가 선행함
+            files.forEach((file) => {
+              modifiedContentElements.push({
+                id: modifiedContentElements.length + 1,
+                fileInfo: {
+                  file: file,
+                  fileSrcUrl: URL.createObjectURL(file),
+                } as FileInfo,
+              });
+            });
+
+            // 기존 상태 영속을 위한 추가 동작(파일 첨부 영역 push 이후로 push)
+            modifiedContentElements.push({
+              ...value[i],
+              id: modifiedContentElements.length + 1,
+            });
+          }
           setUnFrozenElementId(i == value.length - 1 ? -1 : modifiedContentElements.length); // 최하단 영역에서의 이벤트인 경우(i == prevState.length - 1 이 true) -1, 이외 id에 해당하는 값(바로 위에서 push 동작이 이루어진 관계로 modifiedContentElements.length) 할당
         } else {
-          // 이외의 경우에는 id 동기화
+          // 이외의 경우에는 id 동기화(파일 첨부 영역 이후부터는 기존의 value.length 와 불일치가 발생하니 이를 통해 자연스럽게 첨부된 길이만큼 하위 인덱스에 해당하는 배열 요소로 배치됨)
           modifiedContentElements.push({
             ...value[i],
             id: modifiedContentElements.length + 1,
           });
         }
       }
-      controlChange(modifiedContentElements);
+      controlChange(modifiedContentElements); // 동기화
     }
   };
 
