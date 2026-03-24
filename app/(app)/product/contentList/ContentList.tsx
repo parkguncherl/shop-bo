@@ -18,6 +18,7 @@ import { AlertMessage, Placeholder, RegExpression } from '../../../../libs/const
 import ProductContentShowPop from '../../../../components/popup/product/contentList/ProductContentShowPop';
 import ProductContentAddPop from '../../../../components/popup/product/contentList/ProductContentAddPop';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
+import ProductAddPop from '../../../../components/popup/product/contentList/ProductAddPop';
 
 /** 상품관리 - 상품컨텐츠 목록 페이지 */
 const ContentList = () => {
@@ -258,10 +259,10 @@ const ContentList = () => {
             <button
               className={'btn btn_blue'}
               onClick={() => {
-                // todo
+                openModal('ADD_PROD');
               }}
             >
-              {'임시'}
+              {'상품추가'}
             </button>
           </div>
         </div>
@@ -277,6 +278,7 @@ const ContentList = () => {
         }}
       />
       <ProductContentShowPop open={modals.type == 'SHOW' && modals.active} productContentData={modals.stored_temporary} onClose={() => closeModal('SHOW')} />
+      <ProductAddPop open={modals.type == 'ADD_PROD' && modals.active} onClose={() => closeModal('ADD_PROD')} />
       <ConfirmModal
         open={modals.type == 'DEL_CONF' && modals.active}
         title={`'${(modals.stored_temporary as ProductContentListResponseProductContent | undefined)?.newsTitle}' 컨텐츠를 삭제 하시겠습니까?`}
