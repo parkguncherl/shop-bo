@@ -116,7 +116,7 @@ type TunedGridProps<P, PO extends DefaultPagingOptions> =
  * keyForBeingPressed 인자로 들어온 키에 해당하는 키가 눌린 상태로 화살표 이동할 시 다중 행 선택이 이루어짐
  * ArrowDown, ArrowUp 키는 본 요소 내부에서 사용되므로 외부에서 이벤트 리스너를 던질 시 유의하여야 함
  * */
-const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ ref, ...props }: TunedGridProps<P, PO>) => {
+const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ ref, pagingDeps = [], rowData, ...props }: TunedGridProps<P, PO>) => {
   const defaultGridOption: GridOptions = {
     rowHeight: 28,
     //localeText: AG_CHARTS_LOCALE_KO_KR,
@@ -238,6 +238,14 @@ const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ 
   };
 
   const onGridReady = (event: GridReadyEvent) => {
+    if (props.pagingOptions) {
+      if (props.pagingOptions.pagingStrategy == 'add') {
+        if (controlledRowData.length > 0) {
+          setControlledRowData([]);
+        }
+      }
+    }
+
     /** 개인화된 컬럼 설정 불러오는 영역 */
     if (!props.preventPersonalizedColumnSetting && props.gridId) {
       selectGridColumnState(props.gridId).then((result) => {
@@ -529,14 +537,14 @@ const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ 
         if (api != undefined) {
           // api 존재 확인으로 그리드 마운트 이후 시점임을 보장(onGridReady 호출 이후)
           if (controlledRowData.length > 0) {
-            api.applyTransaction({ add: props.rowData }); // controlledRowData 를 동기화하여 리랜더링을 유발하여 스크롤을 무효화하는 대신 api를 통한 추가를 사용하여 스크롤 무호화 없이 자연스레 추가
+            api.applyTransaction({ add: rowData }); // controlledRowData 를 동기화하여 리랜더링을 유발하여 스크롤을 무효화하는 대신 api를 통한 추가를 사용하여 스크롤 무호화 없이 자연스레 추가
           } else {
-            setControlledRowData(props.rowData || []); // 최초 controlledRowData 할당
+            setControlledRowData(rowData || []); // 최초 controlledRowData 할당
           }
         }
       }
     }
-  }, [props.rowData]);
+  }, [rowData]);
 
   /** pagingOption 변경에 따른 동기화 */
   useEffect(() => {
@@ -573,7 +581,7 @@ const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ 
         from: 'depsChanging',
       });
     }
-  }, [props.pagingDeps]);
+  }, [...pagingDeps]); // 배열 자체가 아닌 내부 요소들을 전개해서 등록(이를 통해 리 랜더링 시의 부수 효과로 hook 이 동작하는 걸 방지)
 
   return (
     <div className={`ag-theme-alpine ${props.className}`} onWheel={props.onWheel} onKeyDown={onKeyDown} onKeyUp={onKeyUp} tabIndex={-1}>
@@ -582,7 +590,7 @@ const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ 
         columnDefs={columnDefs.map(withCommonKeyboardSuppress)} // React 상태컬럼 방향키로 헤더까지 안올라가게 수정 2025-08-27
         headerHeight={props.headerHeight ? props.headerHeight : 35}
         onGridReady={onGridReady}
-        rowData={controlledRowData.length > 0 ? controlledRowData : props.rowData}
+        rowData={controlledRowData.length > 0 ? controlledRowData : rowData}
         gridOptions={{
           ...defaultGridOption,
           ...props.gridOptions,
@@ -590,7 +598,7 @@ const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ 
         onColumnHeaderClicked={onColumnHeaderClicked}
         components={gridComponents}
         onCellKeyDown={(event) => {
-          onCellKeyDown(event, props.columnDefs, props.colIndexForSuppressKeyEvent, props.rowData);
+          onCellKeyDown(event, props.columnDefs, props.colIndexForSuppressKeyEvent, rowData);
         }}
         ref={gridRef}
         onCellClicked={onCellClicked}
