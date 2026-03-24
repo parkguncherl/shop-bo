@@ -54,6 +54,11 @@ export interface copiedRowPastedEvent<P> {
   pastedRowNodes: IRowNode<P>[];
 }
 
+/** custom api 인터페이스*/
+export interface PagingInitializationEvent {
+  from: 'api' | 'depsChanging'; // 페이징 초기화 요청의 출처
+}
+
 /** api 인터페이스 */
 export interface TunedGridApi<P> {
   onTouchedByBottom?: () =>
@@ -64,6 +69,7 @@ export interface TunedGridApi<P> {
   onSelectedRowCopied?: (event: selectedRowCopiedEvent<P>) => void;
   onCopiedRowNodePasted?: (event: copiedRowPastedEvent<P>) => void;
   onWheel?: (event: React.WheelEvent<HTMLDivElement>) => void;
+  onInitializePaging?: (event: PagingInitializationEvent) => void;
 }
 /** 인자 목록 */
 export interface TunedGridOptions<P, PO> extends GridOptions<P> {
@@ -137,32 +143,6 @@ const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ 
   /** 참조 및 외부 노출 ref 속성 실 구현 */
   const gridRef = useRef<AgGridReact>(null);
 
-  /** 참조를 통해 외부로 노출되는 영역을 정의함 */
-  useImperativeHandle<AgGridReact<P>, TunedGridRef<P>>(ref, () => {
-    const grid = gridRef.current as AgGridReact<P>;
-
-    return Object.assign<AgGridReact<P>, customGridRefs<P>>(grid ?? {}, {
-      // 이하 TunedGrid 에서 노출코자 하는 기타 속성 및 api 목록
-      customs: {
-        api: {
-          // todo
-          // initializePagingStatus: () => {
-          //   // 현재 진행 중인 페이징 동작을 TunedGrid 하에서 초기화(비활성화와 유사한 부분이 다수 존재하나 이는 페이징 동작을 계속하리라 여기어 작성되었다는 점을 유념하여야 한다)
-          //   if (props.pagingOptions) {
-          //     // 각 전략별로 컴포넌트 수준에서 적절한 초기화 동작 수행
-          //     if (props.pagingOptions.pagingStrategy == 'add') {
-          //       const pagingOptions = props.pagingOptions as addPagingOptions;
-          //       setControlledRowData([]);
-          //     } else if (props.pagingOptions.pagingStrategy == 'other') {
-          //       const pagingOptions = props.pagingOptions as otherPagingOptions;
-          //     }
-          //   }
-          // },
-        },
-      },
-    });
-  });
-
   /** 기존 키에 관한 정보 저장(여기서는 arrowDown, arrowUp) */
   const prevEventKey = useRef<string | undefined>(undefined);
 
@@ -178,6 +158,36 @@ const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ 
 
   /** 최하단 도달 시점에 이벤트를 트리거할지 결정하는 분기 참조 */
   const isReachedEventTriggerAllowed = useRef(true);
+
+  /** 참조를 통해 외부로 노출되는 영역을 정의함 */
+  useImperativeHandle<AgGridReact<P>, TunedGridRef<P>>(ref, () => {
+    const grid = gridRef.current as AgGridReact<P>;
+
+    return Object.assign<AgGridReact<P>, customGridRefs<P>>(grid ?? {}, {
+      // 이하 TunedGrid 에서 노출코자 하는 기타 속성 및 api 목록
+      customs: {
+        api: {
+          // todo
+          initializePagingStatus: () => {
+            // 현재 진행 중인 페이징 동작을 TunedGrid 하에서 초기화(비활성화와 유사한 부분이 다수 존재하나 이는 페이징 동작을 계속하리라 여기어 작성되었다는 점을 유념하여야 한다)
+            if (props.pagingOptions) {
+              // 각 전략별로 컴포넌트 수준에서 적절한 초기화 동작 수행
+              if (props.pagingOptions.pagingStrategy == 'add') {
+                setControlledRowData([]);
+              }
+            }
+
+            // 페이징 초기화 발생 시점 콜백 호출
+            if (props.onInitializePaging) {
+              props.onInitializePaging({
+                from: 'api',
+              });
+            }
+          },
+        },
+      },
+    });
+  });
 
   /** cell click 이벤트를 외부 값과 동기화 */
   const onCellClicked = (event: CellClickedEvent<P>) => {
@@ -554,6 +564,14 @@ const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ 
         // add 전략에서는 의존 배열 변경 시점에 페이징 초기화 동작 수행
         setControlledRowData([]);
       }
+    }
+
+    // 페이징 초기화 발생 시점 콜백 호출
+    /** onInitializePaging 콜백은 의존 배열 변경에 따른 내부 동작이 모두 호출된 이후에 호출됨을 보장함 */
+    if (props.onInitializePaging) {
+      props.onInitializePaging({
+        from: 'depsChanging',
+      });
     }
   }, [props.pagingDeps]);
 
