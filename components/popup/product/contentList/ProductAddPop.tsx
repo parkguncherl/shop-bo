@@ -5,43 +5,38 @@ import { PopupLayout } from '../../PopupLayout';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { authApi } from '../../../../libs';
 import { toastError, toastSuccess } from '../../../ToastMessage';
-import {
-  PageObject,
-  ProductContentListRequestProductInfoListFilter,
-  ProductContentListResponseProductInfo,
-  ProductMngResponseProductDetInfo,
-  ProductMngResponseProductInfo,
-} from '../../../../generated';
+import { FileDet, PageObject, ProductContentListRequestProductInfoListFilter, ProductContentListResponseProductInfo } from '../../../../generated';
 import TunedGrid, { AddPagingOptions, TunedGridRef } from '../../../grid/TunedGrid';
 import { PopupSearchBox, PopupSearchType } from '../../content';
 import CustomGridLoading from '../../../CustomGridLoading';
 import CustomNoRowsOverlay from '../../../CustomNoRowsOverlay';
 import { GridSetting } from '../../../../libs/ag-grid';
-import { ColDef } from 'ag-grid-community';
+import { ColDef, SelectionChangedEvent } from 'ag-grid-community';
 import useFilters from '../../../../hooks/useFilters';
 import { Search } from '../../../content';
 import { AlertMessage } from '../../../../libs/const';
 import { Utils } from '../../../../libs/utils';
+import ImgPreviewBox, { ImgPreviewFileDet } from '../../../content/ImgPreviewBox';
+import { useCommonStore } from '../../../../stores';
 
 interface ProductContentShowPopProps {
   open: boolean;
   onClose: () => void;
-  productInfo?: ProductMngResponseProductInfo;
 }
 
 /**
- * components/popup/product/productMng/ProductModPop.tsx
- * desc: 상품정보 수정 팝업
- * Date: 2026/03/18
+ * components/popup/product/contentList/ProductAddPop.tsx
+ * desc: 상품추가 팝업
+ * Date: 2026/03/24
  * Author: park junsung
  * */
-const ProductModPop = ({ open, onClose, productInfo }: ProductContentShowPopProps) => {
+const ProductAddPop = ({ open, onClose }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
-  //const [updateProductDet, deleteProductDet] = useProductMngStore((s) => [s.updateProductDet, s.deleteProductDet]);
+  const [getFileUrl, getFileList] = useCommonStore((s) => [s.getFileUrl, s.getFileList]);
 
   /** 팝업 내부 local state */
-  const [productInfoList, setProductInfoList] = useState<ProductMngResponseProductDetInfo[]>([]);
-  const [lastProductInfo, setLastProductInfo] = useState<ProductMngResponseProductDetInfo | undefined>(undefined);
+  const [productInfoList, setProductInfoList] = useState<ProductContentListResponseProductInfo[]>([]);
+  const [lastProductInfo, setLastProductInfo] = useState<ProductContentListResponseProductInfo | undefined>(undefined);
 
   const [pagingOption] = useState<AddPagingOptions | undefined>({
     pagingStrategy: 'add',
@@ -51,7 +46,9 @@ const ProductModPop = ({ open, onClose, productInfo }: ProductContentShowPopProp
     pageRowCount: 50,
   });
 
-  const [selectedRowsData, setSelectedRowsData] = useState<ProductMngResponseProductDetInfo | undefined>(undefined);
+  const [imgPreviewBoxOn, setImgPreviewBoxOn] = useState(false);
+  const [resized, setResized] = useState(false);
+  const [imgPreviewFileDetList, setImgPreviewFileDetList] = useState<ImgPreviewFileDet[]>([]);
 
   /** filters, lastInfo's filters*/
   const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<ProductContentListRequestProductInfoListFilter>({
@@ -62,7 +59,7 @@ const ProductModPop = ({ open, onClose, productInfo }: ProductContentShowPopProp
     lastId: undefined,
   });
 
-  const RefForGrid = useRef<TunedGridRef<ProductMngResponseProductDetInfo>>(null);
+  const RefForGrid = useRef<TunedGridRef<ProductContentListResponseProductInfo>>(null);
 
   /** 컬럼 설정 */
   const columnDefs = useMemo<ColDef<ProductContentListResponseProductInfo>[]>(
@@ -212,7 +209,7 @@ const ProductModPop = ({ open, onClose, productInfo }: ProductContentShowPopProp
             </PopupSearchType>
           </PopupSearchBox>
           <div className="mt10">
-            <TunedGrid<ProductMngResponseProductDetInfo>
+            <TunedGrid<ProductContentListResponseProductInfo>
               columnDefs={columnDefs}
               rowData={productInfoList}
               loadingOverlayComponent={CustomGridLoading}
@@ -257,10 +254,11 @@ const ProductModPop = ({ open, onClose, productInfo }: ProductContentShowPopProp
               }}
             />
           </div>
+          <ImgPreviewBox open={imgPreviewBoxOn} resized={resized} onReSizeReq={() => setResized(!resized)} fileDetList={imgPreviewFileDetList} />
         </PopupContent>
       </PopupLayout>
     </div>
   );
 };
 
-export default ProductModPop;
+export default ProductAddPop;

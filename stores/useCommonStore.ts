@@ -52,6 +52,7 @@ interface CommonApiState {
   fileDownloadBlob: (commonRequest: CommonRequestFileDownload) => any;
   deleteFile: (commonRequest: any) => AxiosPromise<ApiResponse>;
   getFileUrl: (fileKey: string) => Promise<string>;
+  getFileList: (fileId: number) => AxiosPromise<ApiResponse>;
   selectGridColumnState: (uri: string) => AxiosPromise<ApiResponse>;
   updateGridColumnState: (gridRequest: GridRequest) => AxiosPromise<ApiResponse>;
   // initGridColumnState: (gridRequest: GridRequest) => AxiosPromise<ApiResponse>;
@@ -189,6 +190,9 @@ const initialStateCreator: StateCreator<CommonState & CommonApiState, any> = (se
           }
         });
       }
+    },
+    getFileList: (fileId: number) => {
+      return authApi.get(`/common/file/${fileId}`);
     },
     selectGridColumnState: (uri) => {
       return authApi.get('/common/grid-column', {
