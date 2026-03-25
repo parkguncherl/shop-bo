@@ -24,7 +24,7 @@ interface Props {
 
 export const PopupLayout = ({
   children,
-  isEscClose,
+  isEscClose = true,
   isSubPopUpOpened,
   open,
   title,
@@ -41,6 +41,7 @@ export const PopupLayout = ({
 }: Props) => {
   const el = useRef<HTMLDivElement | null>(null);
   const draggleRef = useRef<any>();
+  const escCloseIsEnabled = useRef(true);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [bounds, setBounds] = useState({
     left: 0,
@@ -52,7 +53,6 @@ export const PopupLayout = ({
   /** esc 닫힘 동작 사용 가능 여부 */
 
   const onStart = (_e: any, uiData: any) => {
-    // eslint-disable-next-line no-unsafe-optional-chaining
     const { clientWidth, clientHeight } = window?.document?.documentElement;
     const targetRect = draggleRef?.current?.getBoundingClientRect();
     if (!disabled) {
@@ -87,8 +87,10 @@ export const PopupLayout = ({
     if (open && onClose) {
       const escKeyClose = (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
-          if (isEscClose) {
-            onClose();
+          if (escCloseIsEnabled.current) {
+            if (isEscClose) {
+              onClose();
+            }
           }
         }
       };
@@ -100,6 +102,11 @@ export const PopupLayout = ({
       };
     }
   }, [open]);
+
+  useEffect(() => {
+    // 분기 역할을 하는 ref 동기화
+    escCloseIsEnabled.current = isEscClose;
+  }, [isEscClose]);
 
   //==============================
   // confirm 관련
