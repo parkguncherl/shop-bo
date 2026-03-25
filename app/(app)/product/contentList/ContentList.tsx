@@ -25,6 +25,7 @@ import ProductContentAddPop from '../../../../components/popup/product/contentLi
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import ProductAddPop from '../../../../components/popup/product/contentList/ProductAddPop';
 import { CustomSwitch } from '../../../../components/CustomSwitch';
+import ImgPreviewBox, { ImgPreviewFileDet } from '../../../../components/content/ImgPreviewBox';
 
 /** 상품관리 - 상품컨텐츠 목록 페이지 */
 const ContentList = () => {
@@ -32,7 +33,7 @@ const ContentList = () => {
   const { onGridReady } = useAgGridApi();
 
   /** 공통 스토어 - State */
-  const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
+  const [upMenuNm, menuNm, getFileUrl, getFileList] = useCommonStore((s) => [s.upMenuNm, s.menuNm, s.getFileUrl, s.getFileList]);
 
   /** 코드관리 스토어 - State */
   const [paging, setPaging, modals, openModal, closeModal, deleteProductContents] = useProductContentListStore((s) => [
@@ -117,6 +118,12 @@ const ContentList = () => {
   const [pagingOption] = useState<AddPagingOptions | undefined>({
     pagingStrategy: 'add',
   });
+
+  const [selectedRowsData, setSelectedRowsData] = useState<ProductContentListResponseProductContent | undefined>(undefined);
+
+  const [imgPreviewBoxOn, setImgPreviewBoxOn] = useState(false);
+  const [resized, setResized] = useState(false);
+  const [imgPreviewFileDetList, setImgPreviewFileDetList] = useState<ImgPreviewFileDet[]>([]);
 
   /** filters, lastInfo's filters*/
   const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<ProductContentListRequestProductContentListFilter>({
@@ -268,6 +275,10 @@ const ContentList = () => {
                 enableClickSelection: true,
               }}
               onRowDoubleClicked={(e) => openModal('SHOW', e.data)}
+              onSelectionChanged={(event) => {
+                const selectedRows = event.api.getSelectedRows();
+                setSelectedRowsData(selectedRows.length > 0 ? selectedRows[0] : undefined);
+              }}
               pagingOptions={pagingOption}
               pagingDeps={[filters]}
               onTouchedByBottom={() => {
@@ -318,7 +329,11 @@ const ContentList = () => {
                 <button
                   className={'btn btn_blue'}
                   onClick={() => {
-                    openModal('ADD_PROD');
+                    if (selectedRowsData) {
+                      openModal('ADD_PROD');
+                    } else {
+                      toastError('상품을 추가할 본 컨텐츠 선택 후 다시 시도하십시요.');
+                    }
                   }}
                 >
                   {'상품추가'}
@@ -336,12 +351,12 @@ const ContentList = () => {
               checkedLabel={'켜기'}
               uncheckedLabel={'끄기'}
               onChange={(e, value) => {
-                // todo setImgPreviewBoxOn(value);
+                setImgPreviewBoxOn(value);
               }}
             />
           </Search>
           <Table>
-            <TableHeader count={((paging.curPage || 1) - 1) * (paging.pageRowCount || 0) + productContentList.length} search={search}></TableHeader>
+            <TableHeader count={contentsProductInfoList.length} search={search}></TableHeader>
             <TunedGrid<ProductContentListResponseProductContent>
               headerHeight={35}
               ref={rightGridRef}
@@ -389,6 +404,7 @@ const ContentList = () => {
                 </button>
               </div>
             </div>
+            <ImgPreviewBox open={imgPreviewBoxOn} resized={resized} onReSizeReq={() => setResized(!resized)} fileDetList={imgPreviewFileDetList} />
           </Table>
         </div>
       </div>
@@ -403,7 +419,7 @@ const ContentList = () => {
         }}
       />
       <ProductContentShowPop open={modals.type == 'SHOW' && modals.active} productContentData={modals.stored_temporary} onClose={() => closeModal('SHOW')} />
-      <ProductAddPop open={modals.type == 'ADD_PROD' && modals.active} onClose={() => closeModal('ADD_PROD')} />
+      <ProductAddPop open={modals.type == 'ADD_PROD' && modals.active} onClose={() => closeModal('ADD_PROD')} selectedContent={selectedRowsData} />
       <ConfirmModal
         open={modals.type == 'DEL_CONF' && modals.active}
         title={`'${(modals.stored_temporary as ProductContentListResponseProductContent | undefined)?.newsTitle}' 컨텐츠를 삭제 하시겠습니까?`}

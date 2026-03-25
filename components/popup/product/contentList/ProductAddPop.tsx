@@ -5,23 +5,28 @@ import { PopupLayout } from '../../PopupLayout';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { authApi } from '../../../../libs';
 import { toastError, toastSuccess } from '../../../ToastMessage';
-import { FileDet, PageObject, ProductContentListRequestProductInfoListFilter, ProductContentListResponseProductInfo } from '../../../../generated';
+import {
+  PageObject,
+  ProductContentListRequestProductInfoListFilter,
+  ProductContentListResponseProductContent,
+  ProductContentListResponseProductInfo,
+} from '../../../../generated';
 import TunedGrid, { AddPagingOptions, TunedGridRef } from '../../../grid/TunedGrid';
 import { PopupSearchBox, PopupSearchType } from '../../content';
 import CustomGridLoading from '../../../CustomGridLoading';
 import CustomNoRowsOverlay from '../../../CustomNoRowsOverlay';
 import { GridSetting } from '../../../../libs/ag-grid';
-import { ColDef, SelectionChangedEvent } from 'ag-grid-community';
+import { ColDef } from 'ag-grid-community';
 import useFilters from '../../../../hooks/useFilters';
 import { Search } from '../../../content';
 import { AlertMessage } from '../../../../libs/const';
 import { Utils } from '../../../../libs/utils';
-import ImgPreviewBox, { ImgPreviewFileDet } from '../../../content/ImgPreviewBox';
 import { useCommonStore } from '../../../../stores';
 
 interface ProductContentShowPopProps {
   open: boolean;
   onClose: () => void;
+  selectedContent?: ProductContentListResponseProductContent;
 }
 
 /**
@@ -30,9 +35,9 @@ interface ProductContentShowPopProps {
  * Date: 2026/03/24
  * Author: park junsung
  * */
-const ProductAddPop = ({ open, onClose }: ProductContentShowPopProps) => {
+const ProductAddPop = ({ open, onClose, selectedContent }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
-  const [getFileUrl, getFileList] = useCommonStore((s) => [s.getFileUrl, s.getFileList]);
+  //const [getFileUrl, getFileList] = useCommonStore((s) => [s.getFileUrl, s.getFileList]);
 
   /** 팝업 내부 local state */
   const [productInfoList, setProductInfoList] = useState<ProductContentListResponseProductInfo[]>([]);
@@ -45,10 +50,6 @@ const ProductAddPop = ({ open, onClose }: ProductContentShowPopProps) => {
     curPage: 1,
     pageRowCount: 50,
   });
-
-  const [imgPreviewBoxOn, setImgPreviewBoxOn] = useState(false);
-  const [resized, setResized] = useState(false);
-  const [imgPreviewFileDetList, setImgPreviewFileDetList] = useState<ImgPreviewFileDet[]>([]);
 
   /** filters, lastInfo's filters*/
   const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<ProductContentListRequestProductInfoListFilter>({
@@ -98,22 +99,6 @@ const ProductAddPop = ({ open, onClose }: ProductContentShowPopProps) => {
         cellStyle: GridSetting.CellStyle.LEFT,
       },
       {
-        field: 'productDetColor',
-        headerName: '컬러',
-        minWidth: 80,
-        maxWidth: 100,
-        suppressHeaderMenuButton: true,
-        cellStyle: GridSetting.CellStyle.LEFT,
-      },
-      {
-        field: 'productDetSize',
-        headerName: '사이즈',
-        minWidth: 80,
-        maxWidth: 100,
-        suppressHeaderMenuButton: true,
-        cellStyle: GridSetting.CellStyle.LEFT,
-      },
-      {
         field: 'sellAmt',
         headerName: '가격',
         minWidth: 120,
@@ -125,6 +110,23 @@ const ProductAddPop = ({ open, onClose }: ProductContentShowPopProps) => {
     ],
     [],
   );
+
+  /** 닫힘 공통 핸들러 */
+  const onCloseCommonCallBack = () => {
+    if (onClose) {
+      onClose();
+    } else {
+      console.error('닫힘 동작을 사용할 수 없음');
+    }
+
+    // 초기화 동작
+    setProductInfoList([]);
+    setLastProductInfo(undefined);
+    setPaging({
+      ...paging,
+      curPage: 1,
+    });
+  };
 
   /** 상품상세정보 목록 조회 */
   const {
@@ -144,7 +146,7 @@ const ProductAddPop = ({ open, onClose }: ProductContentShowPopProps) => {
         },
       }),
     refetchOnMount: 'always',
-    enabled: open,
+    enabled: open && selectedContent != undefined,
   });
 
   useEffect(() => {
@@ -164,6 +166,15 @@ const ProductAddPop = ({ open, onClose }: ProductContentShowPopProps) => {
     }
   }, [productDetInfos, isProductDetInfosSuccess]);
 
+  useEffect(() => {
+    if (open) {
+      if (selectedContent == undefined) {
+        toastError('대응되는 상품컨텐츠를 찾을 수 없습니다.');
+        console.error('상품컨텐츠 정보 전달 여부 점검!');
+      }
+    }
+  }, [open]);
+
   /** 검색 버튼 클릭 시 */
   const search = async () => {
     await onSearch();
@@ -180,13 +191,13 @@ const ProductAddPop = ({ open, onClose }: ProductContentShowPopProps) => {
         open={open}
         isEscClose={true}
         title={'신규 상품추가'}
-        onClose={onClose}
+        onClose={onCloseCommonCallBack}
         footer={
           <PopupFooter>
             <div className="btnArea between">
               <div className="left"></div>
               <div className="right">
-                <button className="btn" onClick={onClose}>
+                <button className="btn" onClick={onCloseCommonCallBack}>
                   닫기
                 </button>
               </div>
@@ -254,7 +265,6 @@ const ProductAddPop = ({ open, onClose }: ProductContentShowPopProps) => {
               }}
             />
           </div>
-          <ImgPreviewBox open={imgPreviewBoxOn} resized={resized} onReSizeReq={() => setResized(!resized)} fileDetList={imgPreviewFileDetList} />
         </PopupContent>
       </PopupLayout>
     </div>
