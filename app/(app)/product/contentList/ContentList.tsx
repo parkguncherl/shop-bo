@@ -2,7 +2,12 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Search, Table, Title, toastSuccess } from '../../../../components';
-import { ProductContentListRequestProductContentListFilter, ProductContentListResponseProductContent } from '../../../../generated';
+import {
+  ProductContentListRequestContentsProductInfoListFilter,
+  ProductContentListRequestProductContentListFilter,
+  ProductContentListResponseContentProductInfo,
+  ProductContentListResponseProductContent,
+} from '../../../../generated';
 import { ColDef } from 'ag-grid-community';
 import { TableHeader, toastError } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
@@ -19,6 +24,7 @@ import ProductContentShowPop from '../../../../components/popup/product/contentL
 import ProductContentAddPop from '../../../../components/popup/product/contentList/ProductContentAddPop';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import ProductAddPop from '../../../../components/popup/product/contentList/ProductAddPop';
+import { CustomSwitch } from '../../../../components/CustomSwitch';
 
 /** 상품관리 - 상품컨텐츠 목록 페이지 */
 const ContentList = () => {
@@ -39,6 +45,7 @@ const ContentList = () => {
   ]);
 
   const gridRef = useRef<TunedGridRef<ProductContentListResponseProductContent>>(null);
+  const rightGridRef = useRef<TunedGridRef<ProductContentListResponseProductContent>>(null);
 
   /** 컬럼 설정 - 권한 컬럼 포함 */
   const [columnDefs] = useState<ColDef<ProductContentListResponseProductContent | { no: number }>[]>([
@@ -71,8 +78,41 @@ const ContentList = () => {
     },
   ]);
 
+  /** 컬럼 설정 - 권한 컬럼 포함 */
+  const [rightColumnDefs] = useState<ColDef<ProductContentListResponseContentProductInfo | { no: number }>[]>([
+    {
+      field: 'no',
+      headerName: 'NO',
+      minWidth: 50,
+      maxWidth: 50,
+      valueGetter: (params) => (params.node ? (params.node.rowIndex ?? 0) + 1 : ''),
+      cellStyle: GridSetting.CellStyle.CENTER,
+      suppressHeaderMenuButton: true,
+    },
+    { field: 'prodNm', headerName: '상품명', minWidth: 130, maxWidth: 200, suppressHeaderMenuButton: true },
+    { field: 'productDetColor', headerName: '컬러', minWidth: 100, maxWidth: 120, suppressHeaderMenuButton: true },
+    {
+      field: 'productDetSize',
+      headerName: '사이즈',
+      minWidth: 100,
+      maxWidth: 100,
+      suppressHeaderMenuButton: true,
+      cellStyle: GridSetting.CellStyle.CENTER,
+    },
+    {
+      field: 'prodDetTpNm',
+      headerName: '소분류',
+      minWidth: 120,
+      maxWidth: 120,
+      suppressHeaderMenuButton: true,
+      cellStyle: GridSetting.CellStyle.CENTER,
+    },
+  ]);
+
   const [productContentList, setProductContentList] = useState<ProductContentListResponseProductContent[]>([]);
   const [lastProductContent, setLastProductContent] = useState<ProductContentListResponseProductContent | undefined>(undefined); // 다음 페이징 동작에서 사용할 마지막 행의 정보(last row's info)
+
+  const [contentsProductInfoList, setContentsProductInfoList] = useState<ProductContentListResponseContentProductInfo[]>([]);
 
   const [pagingOption] = useState<AddPagingOptions | undefined>({
     pagingStrategy: 'add',
@@ -85,6 +125,12 @@ const ContentList = () => {
   const [lastInfos, onChangelastInfos, onlastInfosReset] = useFilters<ProductContentListRequestProductContentListFilter>({
     lastId: undefined,
   });
+
+  /** filters, lastInfo's filters*/
+  const [filtersForContentsProduct, onChangeFiltersForContentsProduct, onFiltersForContentsProductReset] =
+    useFilters<ProductContentListRequestContentsProductInfoListFilter>({
+      contentsId: undefined,
+    });
 
   // lastInfos, paging.curPage 디바운스 처리하여 그리드 내부 페이징 상태 초기화 시 실행 순서를 보장토록 함
   const debouncedCurPage = useDebounce(paging.curPage?.toString() || '', 500); // 0.5초 대기 todo 디바운싱 상태가 원하는 경우에 업데이트되는지 확인하며 페이징 동작 손보기
@@ -133,23 +179,6 @@ const ContentList = () => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   if (!pagingOption) return;
-  //   const fetchData = async () => {
-  //     if (paging.curPage === 1) {
-  //       // 본 시점에 초기화 동작 수행
-  //
-  //       // 1. 그리드 상태 초기화 (Promise 반환 시 기다림)
-  //       await gridRef.current?.customs.api.initializePagingStatus();
-  //
-  //       // 2. 필터 초기화
-  //       onlastInfosReset();
-  //     }
-  //   };
-  //
-  //   //fetchData();
-  // }, [paging.curPage]);
-
   /** 상품컨텐츠 페이징 목록 조회 */
   const {
     data: productContentListResponse,
@@ -188,85 +217,181 @@ const ContentList = () => {
     }
   }, [productContentListResponse, isProductContentListResponseSuccess]);
 
+  /** 상품컨텐츠 페이징 목록 조회 */
+  const {
+    data: contentsProductInfoListResponse,
+    isSuccess: isContentsProductInfoListResponseSuccess,
+    isLoading: isContentsProductInfoListResponseLoading,
+    refetch: contentsProductInfoListRefetch,
+  } = useQuery({
+    queryKey: ['/productContentList/contentsProductInfoList', filtersForContentsProduct.contentsId],
+    queryFn: () =>
+      authApi.get('/productContentList/contentsProductInfoList', {
+        params: {
+          ...filtersForContentsProduct,
+        },
+      }),
+    enabled: filtersForContentsProduct.contentsId != undefined,
+  });
+
+  useEffect(() => {
+    if (isContentsProductInfoListResponseSuccess) {
+      const { resultCode, body, resultMessage } = contentsProductInfoListResponse.data;
+      if (resultCode === 200) {
+        setContentsProductInfoList(body || []);
+      } else {
+        toastError(resultMessage);
+      }
+    }
+  }, [contentsProductInfoListResponse, isContentsProductInfoListResponseSuccess]);
+
   return (
     <div>
-      <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} />
-      <Search className="type_2">
-        <Search.Input title={'컨텐츠 제목'} name={'newsTitle'} placeholder={Placeholder.Input} value={filters.newsTitle} onChange={onChangeFilters} />
-      </Search>
-      <Table>
-        <TableHeader count={((paging.curPage || 1) - 1) * (paging.pageRowCount || 0) + productContentList.length} search={search}></TableHeader>
-        <TunedGrid<ProductContentListResponseProductContent>
-          headerHeight={35}
-          ref={gridRef}
-          onGridReady={onGridReady}
-          loading={isProductContentListResponseLoading}
-          rowData={productContentList}
-          columnDefs={columnDefs}
-          defaultColDef={defaultColDef}
-          rowSelection={{
-            mode: 'singleRow',
-            enableClickSelection: true,
-          }}
-          onRowDoubleClicked={(e) => openModal('SHOW', e.data)}
-          pagingOptions={pagingOption}
-          pagingDeps={[filters]}
-          onTouchedByBottom={() => {
-            if (pagingOption) {
-              // 페이징 관련 동작 처리 영역
-              if (lastProductContent != undefined) {
-                onChangelastInfos('lastId', lastProductContent.id);
-                setPaging({
-                  ...paging,
-                  curPage: paging.curPage ? paging.curPage + 1 : 1,
-                });
-              } else {
-                if (paging.curPage != 1) {
-                  toastSuccess(AlertMessage.LastDataHasBeenReached);
+      <div className="layoutBox">
+        <div className={'layout60'}>
+          <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} />
+          <Search className="type_2">
+            <Search.Input title={'컨텐츠 제목'} name={'newsTitle'} placeholder={Placeholder.Input} value={filters.newsTitle} onChange={onChangeFilters} />
+          </Search>
+          <Table>
+            <TableHeader count={((paging.curPage || 1) - 1) * (paging.pageRowCount || 0) + productContentList.length} search={search}></TableHeader>
+            <TunedGrid<ProductContentListResponseProductContent>
+              headerHeight={35}
+              ref={gridRef}
+              onGridReady={onGridReady}
+              loading={isProductContentListResponseLoading}
+              rowData={productContentList}
+              columnDefs={columnDefs}
+              defaultColDef={defaultColDef}
+              rowSelection={{
+                mode: 'singleRow',
+                enableClickSelection: true,
+              }}
+              onRowDoubleClicked={(e) => openModal('SHOW', e.data)}
+              pagingOptions={pagingOption}
+              pagingDeps={[filters]}
+              onTouchedByBottom={() => {
+                if (pagingOption) {
+                  // 페이징 관련 동작 처리 영역
+                  if (lastProductContent != undefined) {
+                    onChangelastInfos('lastId', lastProductContent.id);
+                    setPaging({
+                      ...paging,
+                      curPage: paging.curPage ? paging.curPage + 1 : 1,
+                    });
+                  } else {
+                    if (paging.curPage != 1) {
+                      toastSuccess(AlertMessage.LastDataHasBeenReached);
+                    }
+                  }
                 }
-              }
-            }
-            return {
-              pausedMilliseconds: 1000,
-            };
-          }}
-        />
-        <div className="btnArea between">
-          <div className="left">
-            <button
-              className={'btn btn_blue'}
-              onClick={() => {
-                openModal('ADD');
+                return {
+                  pausedMilliseconds: 1000,
+                };
               }}
-            >
-              {'신규'}
-            </button>
-            <button
-              className={'btn btn_blue'}
-              onClick={() => {
-                const selectedRows = gridRef.current?.api.getSelectedRows();
-                if (selectedRows && selectedRows.length > 0) {
-                  openModal('DEL_CONF', selectedRows[0]);
-                } else {
-                  toastError('하나의 행을 선택한 후 재시도하십시요.');
-                }
-              }}
-            >
-              {'삭제'}
-            </button>
-          </div>
-          <div className="right">
-            <button
-              className={'btn btn_blue'}
-              onClick={() => {
-                openModal('ADD_PROD');
-              }}
-            >
-              {'상품추가'}
-            </button>
-          </div>
+            />
+            <div className="btnArea between">
+              <div className="left">
+                <button
+                  className={'btn btn_blue'}
+                  onClick={() => {
+                    openModal('ADD');
+                  }}
+                >
+                  {'신규'}
+                </button>
+                <button
+                  className={'btn btn_blue'}
+                  onClick={() => {
+                    const selectedRows = gridRef.current?.api.getSelectedRows();
+                    if (selectedRows && selectedRows.length > 0) {
+                      openModal('DEL_CONF', selectedRows[0]);
+                    } else {
+                      toastError('하나의 행을 선택한 후 재시도하십시요.');
+                    }
+                  }}
+                >
+                  {'삭제'}
+                </button>
+              </div>
+              <div className="right">
+                <button
+                  className={'btn btn_blue'}
+                  onClick={() => {
+                    openModal('ADD_PROD');
+                  }}
+                >
+                  {'상품추가'}
+                </button>
+              </div>
+            </div>
+          </Table>
         </div>
-      </Table>
+        <div className={'layout40'}>
+          <Title title={'연결상품목록'} detail={true} />
+          <Search className="type_2">
+            <CustomSwitch
+              title={'이미지보기'}
+              name={'imgShow'}
+              checkedLabel={'켜기'}
+              uncheckedLabel={'끄기'}
+              onChange={(e, value) => {
+                // todo setImgPreviewBoxOn(value);
+              }}
+            />
+          </Search>
+          <Table>
+            <TableHeader count={((paging.curPage || 1) - 1) * (paging.pageRowCount || 0) + productContentList.length} search={search}></TableHeader>
+            <TunedGrid<ProductContentListResponseProductContent>
+              headerHeight={35}
+              ref={rightGridRef}
+              onGridReady={onGridReady}
+              rowData={contentsProductInfoList}
+              columnDefs={rightColumnDefs}
+              defaultColDef={defaultColDef}
+              rowSelection={{
+                mode: 'singleRow',
+                enableClickSelection: true,
+              }}
+              onRowDoubleClicked={(e) => openModal('SHOW', e.data)}
+              pagingOptions={pagingOption}
+              pagingDeps={[filters]}
+              onTouchedByBottom={() => {
+                if (pagingOption) {
+                  // 페이징 관련 동작 처리 영역
+                  if (lastProductContent != undefined) {
+                    onChangelastInfos('lastId', lastProductContent.id);
+                    setPaging({
+                      ...paging,
+                      curPage: paging.curPage ? paging.curPage + 1 : 1,
+                    });
+                  } else {
+                    if (paging.curPage != 1) {
+                      toastSuccess(AlertMessage.LastDataHasBeenReached);
+                    }
+                  }
+                }
+                return {
+                  pausedMilliseconds: 1000,
+                };
+              }}
+            />
+            <div className="btnArea between">
+              <div className="left"></div>
+              <div className="right">
+                <button
+                  className={'btn btn_blue'}
+                  onClick={() => {
+                    // todo
+                  }}
+                >
+                  {'미사용'}
+                </button>
+              </div>
+            </div>
+          </Table>
+        </div>
+      </div>
       <ProductContentAddPop
         open={modals.type == 'ADD' && modals.active}
         onClose={(closeRes) => {
