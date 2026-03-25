@@ -35,7 +35,7 @@ interface ProductContentShowPopProps {
 /**
  * components/popup/product/contentList/ProductAddPop.tsx
  * desc: 상품추가 팝업
- * Date: 2026/03/24
+ * Date: 2026/03/25
  * Author: park junsung
  * */
 const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductContentShowPopProps) => {
@@ -226,6 +226,11 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
     }
   }, [open]);
 
+  useEffect(() => {
+    // 상품컨텐츠 식별 값 동기화
+    onChangeFilters('contentsId', selectedContent?.id ? selectedContent.id : undefined);
+  }, [selectedContent]);
+
   /** 검색 버튼 클릭 시 */
   const search = async () => {
     await onSearch();
@@ -240,7 +245,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
       <PopupLayout
         width={650}
         open={open}
-        isEscClose={true}
+        isEscClose={!modalsStatus.active}
         title={'신규 상품추가'}
         onClose={onCloseCommonCallBack}
         footer={
@@ -302,7 +307,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
               ref={RefForGrid}
               loading={isProductDetInfosLoading}
               rowSelection={{
-                mode: 'singleRow',
+                mode: 'multiRow',
                 enableClickSelection: true,
               }}
               onSelectionChanged={(event) => {
@@ -343,8 +348,8 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
             open={modalsStatus.active && modalsStatus.type == 'ADD_CONTENTS_PRODUCTS'}
             title={`${
               (modalsStatus.stored_temporary || []).length > 1
-                ? (modalsStatus.stored_temporary || [])[0].prodNm + ' 이외 ' + ((modalsStatus.stored_temporary || []).length - 1).toString() + '개의 상품을'
-                : (modalsStatus.stored_temporary || [])[0].prodNm + ' 을(를)'
+                ? (modalsStatus.stored_temporary || [])[0]?.prodNm + ' 이외 ' + ((modalsStatus.stored_temporary || []).length - 1).toString() + '개의 상품을'
+                : (modalsStatus.stored_temporary || [])[0]?.prodNm + ' 을(를)'
             } 연결상품으로 추가 하시겠습니까?`}
             confirmText={'저장'}
             onConfirm={() => {
