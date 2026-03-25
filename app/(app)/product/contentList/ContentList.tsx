@@ -311,6 +311,8 @@ const ContentList = () => {
               onSelectionChanged={(event) => {
                 const selectedRows = event.api.getSelectedRows();
                 setSelectedRowsData(selectedRows.length > 0 ? selectedRows[0] : undefined);
+
+                onChangeFiltersForContentsProduct('contentsId', selectedRows.length > 0 ? selectedRows[0].id : undefined);
               }}
               pagingOptions={pagingOption}
               pagingDeps={[filters]}
@@ -403,27 +405,6 @@ const ContentList = () => {
               }}
               onRowDoubleClicked={(e) => openModal('SHOW', e.data)}
               onSelectionChanged={onSelectionChangedByRigSideGrid}
-              pagingOptions={pagingOption}
-              pagingDeps={[filters]}
-              onTouchedByBottom={() => {
-                if (pagingOption) {
-                  // 페이징 관련 동작 처리 영역
-                  if (lastProductContent != undefined) {
-                    onChangelastInfos('lastId', lastProductContent.id);
-                    setPaging({
-                      ...paging,
-                      curPage: paging.curPage ? paging.curPage + 1 : 1,
-                    });
-                  } else {
-                    if (paging.curPage != 1) {
-                      toastSuccess(AlertMessage.LastDataHasBeenReached);
-                    }
-                  }
-                }
-                return {
-                  pausedMilliseconds: 1000,
-                };
-              }}
             />
             <div className="btnArea between">
               <div className="left"></div>
