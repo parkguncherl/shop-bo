@@ -3,12 +3,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Search, Table, Title, toastSuccess } from '../../../../components';
 import {
+  FileDet,
   ProductContentListRequestContentsProductInfoListFilter,
   ProductContentListRequestProductContentListFilter,
   ProductContentListResponseContentProductInfo,
   ProductContentListResponseProductContent,
 } from '../../../../generated';
-import { ColDef } from 'ag-grid-community';
+import { ColDef, SelectionChangedEvent } from 'ag-grid-community';
 import { TableHeader, toastError } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -26,6 +27,7 @@ import { ConfirmModal } from '../../../../components/ConfirmModal';
 import ProductAddPop from '../../../../components/popup/product/contentList/ProductAddPop';
 import { CustomSwitch } from '../../../../components/CustomSwitch';
 import ImgPreviewBox, { ImgPreviewFileDet } from '../../../../components/content/ImgPreviewBox';
+import { Utils } from '../../../../libs/utils';
 
 /** 상품관리 - 상품컨텐츠 목록 페이지 */
 const ContentList = () => {
@@ -90,16 +92,7 @@ const ContentList = () => {
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
     },
-    { field: 'prodNm', headerName: '상품명', minWidth: 130, maxWidth: 200, suppressHeaderMenuButton: true },
-    { field: 'productDetColor', headerName: '컬러', minWidth: 100, maxWidth: 120, suppressHeaderMenuButton: true },
-    {
-      field: 'productDetSize',
-      headerName: '사이즈',
-      minWidth: 100,
-      maxWidth: 100,
-      suppressHeaderMenuButton: true,
-      cellStyle: GridSetting.CellStyle.CENTER,
-    },
+    { field: 'prodNm', headerName: '상품명', minWidth: 130, maxWidth: 200, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.LEFT },
     {
       field: 'prodDetTpNm',
       headerName: '소분류',
@@ -107,6 +100,15 @@ const ContentList = () => {
       maxWidth: 120,
       suppressHeaderMenuButton: true,
       cellStyle: GridSetting.CellStyle.CENTER,
+    },
+    {
+      field: 'sellAmt',
+      headerName: '판매가',
+      minWidth: 160,
+      maxWidth: 160,
+      suppressHeaderMenuButton: true,
+      cellStyle: GridSetting.CellStyle.CENTER,
+      valueFormatter: (params) => Utils.setComma(params.value),
     },
   ]);
 
@@ -150,6 +152,38 @@ const ContentList = () => {
 
   const onSearch = async () => {
     await productContentListResponseRefetch();
+  };
+
+  /** row선택 이벤트 (이미지) */
+  const onSelectionChangedByRigSideGrid = (e: SelectionChangedEvent) => {
+    const selectedRows: ProductContentListResponseContentProductInfo[] = e.api.getSelectedRows();
+    if (selectedRows.length > 0) {
+      const selectedRow = selectedRows[0];
+      if (selectedRow.repFileId) {
+        getFileList(selectedRow.repFileId).then(async (result) => {
+          const { resultCode, body, resultMessage } = result.data;
+          if (resultCode == 200) {
+            // 각 파일의 URL
+            if (body != undefined) {
+              const fileDetList: ImgPreviewFileDet[] = [];
+              await Promise.all(
+                (body as FileDet[]).map(async (file: FileDet) => {
+                  if (file.sysFileNm == undefined) {
+                    return;
+                  }
+                  fileDetList.push({ ...file, url: await getFileUrl(file.sysFileNm) });
+                }),
+              );
+              setImgPreviewFileDetList(fileDetList);
+            }
+          } else {
+            toastError(`이미지 정보 조회 도중 문제가 발생하였습니다: ${resultMessage}`);
+          }
+        });
+      } else {
+        setImgPreviewFileDetList([]); // 초기화
+      }
+    }
   };
 
   const { mutate: deleteProductContentsMutate } = useMutation(deleteProductContents, {
@@ -212,7 +246,6 @@ const ContentList = () => {
       if (resultCode === 200) {
         const perPagesRowCnt = paging.pageRowCount as number;
         if (perPagesRowCnt) {
-          console.log('body.rows: ', body.rows);
           setProductContentList((body.rows || []).slice(0, perPagesRowCnt));
           setLastProductContent((body.rows || [])[perPagesRowCnt]);
         } else {
@@ -228,7 +261,7 @@ const ContentList = () => {
   const {
     data: contentsProductInfoListResponse,
     isSuccess: isContentsProductInfoListResponseSuccess,
-    isLoading: isContentsProductInfoListResponseLoading,
+    // isLoading: isContentsProductInfoListResponseLoading,
     refetch: contentsProductInfoListRefetch,
   } = useQuery({
     queryKey: ['/productContentList/contentsProductInfoList', filtersForContentsProduct.contentsId],
@@ -255,7 +288,7 @@ const ContentList = () => {
   return (
     <div>
       <div className="layoutBox">
-        <div className={'layout60'}>
+        <div className={'layout70'}>
           <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} />
           <Search className="type_2">
             <Search.Input title={'컨텐츠 제목'} name={'newsTitle'} placeholder={Placeholder.Input} value={filters.newsTitle} onChange={onChangeFilters} />
@@ -342,7 +375,7 @@ const ContentList = () => {
             </div>
           </Table>
         </div>
-        <div className={'layout40'}>
+        <div className={'layout30'}>
           <Title title={'연결상품목록'} detail={true} />
           <Search className="type_2">
             <CustomSwitch
@@ -369,6 +402,7 @@ const ContentList = () => {
                 enableClickSelection: true,
               }}
               onRowDoubleClicked={(e) => openModal('SHOW', e.data)}
+              onSelectionChanged={onSelectionChangedByRigSideGrid}
               pagingOptions={pagingOption}
               pagingDeps={[filters]}
               onTouchedByBottom={() => {
@@ -419,7 +453,15 @@ const ContentList = () => {
         }}
       />
       <ProductContentShowPop open={modals.type == 'SHOW' && modals.active} productContentData={modals.stored_temporary} onClose={() => closeModal('SHOW')} />
-      <ProductAddPop open={modals.type == 'ADD_PROD' && modals.active} onClose={() => closeModal('ADD_PROD')} selectedContent={selectedRowsData} />
+      <ProductAddPop
+        open={modals.type == 'ADD_PROD' && modals.active}
+        onClose={() => closeModal('ADD_PROD')}
+        selectedContent={selectedRowsData}
+        onSuccess={() => {
+          closeModal('ADD_PROD');
+          contentsProductInfoListRefetch();
+        }}
+      />
       <ConfirmModal
         open={modals.type == 'DEL_CONF' && modals.active}
         title={`'${(modals.stored_temporary as ProductContentListResponseProductContent | undefined)?.newsTitle}' 컨텐츠를 삭제 하시겠습니까?`}

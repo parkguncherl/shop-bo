@@ -6,6 +6,7 @@ import {
   ApiResponse,
   PageObject,
   ProductContentListRequestDeleteProductContents,
+  ProductContentListRequestInsertContentsProduct,
   ProductContentListResponseProductContent,
   ProductContentsRequestInsertProductContents,
 } from '../../generated';
@@ -31,6 +32,7 @@ interface ProductContentListState {
 interface ProductContentListApiState {
   insertProductContents: (productContentsRequestInsertProductContents: ProductContentsRequestInsertProductContents) => AxiosPromise<ApiResponse>;
   deleteProductContents: (productContentListRequestDeleteProductContents: ProductContentListRequestDeleteProductContents) => AxiosPromise<ApiResponse>;
+  insertContentsProductList: (productContentListRequestInsertContentsProduct: ProductContentListRequestInsertContentsProduct[]) => AxiosPromise<ApiResponse>;
 }
 
 type ProductContentListStateOfAll = ProductContentListState & ProductContentListApiState;
@@ -84,6 +86,9 @@ const initialStateCreator: StateCreator<ProductContentListStateOfAll> = (set, ge
     },
     deleteProductContents: (productContentListRequestDeleteProductContents) => {
       return authApi.patch('/productContentList/deleteProductContents', productContentListRequestDeleteProductContents);
+    },
+    insertContentsProductList: (productContentListRequestInsertContentsProduct) => {
+      return authApi.put('/productContentList/insertContentsProductList', productContentListRequestInsertContentsProduct);
     },
   };
 };
