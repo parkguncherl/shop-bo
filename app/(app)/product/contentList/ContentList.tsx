@@ -94,6 +94,14 @@ const ContentList = () => {
     },
     { field: 'prodNm', headerName: '상품명', minWidth: 130, maxWidth: 200, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.LEFT },
     {
+      field: 'prodTpNm',
+      headerName: '분류',
+      minWidth: 120,
+      maxWidth: 120,
+      suppressHeaderMenuButton: true,
+      cellStyle: GridSetting.CellStyle.CENTER,
+    },
+    {
       field: 'prodDetTpNm',
       headerName: '소분류',
       minWidth: 120,
@@ -102,13 +110,37 @@ const ContentList = () => {
       cellStyle: GridSetting.CellStyle.CENTER,
     },
     {
+      field: 'prodColors',
+      headerName: '칼라',
+      minWidth: 120,
+      maxWidth: 120,
+      suppressHeaderMenuButton: true,
+      cellStyle: GridSetting.CellStyle.LEFT,
+    },
+    {
+      field: 'prodSizes',
+      headerName: '사이즈',
+      minWidth: 120,
+      maxWidth: 120,
+      suppressHeaderMenuButton: true,
+      cellStyle: GridSetting.CellStyle.LEFT,
+    },
+    {
       field: 'sellAmt',
       headerName: '판매가',
       minWidth: 160,
       maxWidth: 160,
       suppressHeaderMenuButton: true,
       cellStyle: GridSetting.CellStyle.CENTER,
-      valueFormatter: (params) => Utils.setComma(params.value),
+      cellRenderer: 'NUMBER_COMMA',
+    },
+    {
+      field: 'discountRate',
+      headerName: '할인율',
+      minWidth: 80,
+      maxWidth: 80,
+      suppressHeaderMenuButton: true,
+      cellStyle: GridSetting.CellStyle.RIGHT,
     },
   ]);
 
@@ -288,7 +320,7 @@ const ContentList = () => {
   return (
     <div>
       <div className="layoutBox">
-        <div className={'layout70'}>
+        <div className={'layout30'}>
           <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} />
           <Search className="type_2">
             <Search.Input title={'컨텐츠 제목'} name={'newsTitle'} placeholder={Placeholder.Input} value={filters.newsTitle} onChange={onChangeFilters} />
@@ -311,7 +343,6 @@ const ContentList = () => {
               onSelectionChanged={(event) => {
                 const selectedRows = event.api.getSelectedRows();
                 setSelectedRowsData(selectedRows.length > 0 ? selectedRows[0] : undefined);
-
                 onChangeFiltersForContentsProduct('contentsId', selectedRows.length > 0 ? selectedRows[0].id : undefined);
               }}
               pagingOptions={pagingOption}
@@ -335,6 +366,7 @@ const ContentList = () => {
                   pausedMilliseconds: 1000,
                 };
               }}
+              className={'default check'}
             />
             <div className="btnArea between">
               <div className="left">
@@ -377,7 +409,7 @@ const ContentList = () => {
             </div>
           </Table>
         </div>
-        <div className={'layout30'}>
+        <div className={'layout70'}>
           <Title title={'연결상품목록'} detail={true} />
           <Search className="type_2">
             <CustomSwitch
@@ -405,6 +437,7 @@ const ContentList = () => {
               }}
               onRowDoubleClicked={(e) => openModal('SHOW', e.data)}
               onSelectionChanged={onSelectionChangedByRigSideGrid}
+              className={'default check'}
             />
             <div className="btnArea between">
               <div className="left"></div>

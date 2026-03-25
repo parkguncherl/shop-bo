@@ -199,9 +199,7 @@ export const SkuSearchPop = (props: skuSearchPopProps) => {
         headerName: '빈블러', // 센터재고
         maxWidth: 55,
         minWidth: 55,
-        valueFormatter: (params) => {
-          return Utils.setComma(params.value);
-        },
+        cellRenderer: 'NUMBER_COMMA',
         cellStyle: GridSetting.CellStyle.CENTER,
         suppressHeaderMenuButton: true,
       },
@@ -210,9 +208,7 @@ export const SkuSearchPop = (props: skuSearchPopProps) => {
         headerName: '출고중',
         maxWidth: 55,
         minWidth: 55,
-        valueFormatter: (params) => {
-          return Utils.setComma(params.value);
-        },
+        cellRenderer: 'NUMBER_COMMA',
         cellStyle: GridSetting.CellStyle.CENTER,
         suppressHeaderMenuButton: true,
       },
@@ -221,9 +217,7 @@ export const SkuSearchPop = (props: skuSearchPopProps) => {
         headerName: '실재고',
         maxWidth: 55,
         minWidth: 55,
-        valueFormatter: (params) => {
-          return Utils.setComma(params.value);
-        },
+        cellRenderer: 'NUMBER_COMMA',
         cellStyle: (params) => {
           return {
             ...GridSetting.CellStyle.CENTER,
@@ -237,9 +231,7 @@ export const SkuSearchPop = (props: skuSearchPopProps) => {
         headerName: '매장', // 매장재고
         maxWidth: 55,
         minWidth: 55,
-        valueFormatter: (params) => {
-          return Utils.setComma(params.value);
-        },
+        cellRenderer: 'NUMBER_COMMA',
         cellStyle: GridSetting.CellStyle.CENTER,
         suppressHeaderMenuButton: true,
       },

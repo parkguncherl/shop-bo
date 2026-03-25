@@ -91,8 +91,8 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
         suppressHeaderMenuButton: true,
       },
       {
-        field: 'partnerNm',
-        headerName: '매장',
+        field: 'prodNm',
+        headerName: '상품명',
         minWidth: 160,
         maxWidth: 200,
         suppressHeaderMenuButton: true,
@@ -100,17 +100,33 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
       },
       {
         field: 'prodTpNm',
-        headerName: '구분',
+        headerName: '분류',
         minWidth: 100,
         maxWidth: 100,
         suppressHeaderMenuButton: true,
         cellStyle: GridSetting.CellStyle.CENTER,
       },
       {
-        field: 'prodNm',
-        headerName: '상품명',
-        minWidth: 160,
-        maxWidth: 200,
+        field: 'prodDetTpNm',
+        headerName: '소분류',
+        minWidth: 120,
+        maxWidth: 120,
+        suppressHeaderMenuButton: true,
+        cellStyle: GridSetting.CellStyle.CENTER,
+      },
+      {
+        field: 'prodColors',
+        headerName: '칼라',
+        minWidth: 120,
+        maxWidth: 120,
+        suppressHeaderMenuButton: true,
+        cellStyle: GridSetting.CellStyle.LEFT,
+      },
+      {
+        field: 'prodSizes',
+        headerName: '사이즈',
+        minWidth: 120,
+        maxWidth: 120,
         suppressHeaderMenuButton: true,
         cellStyle: GridSetting.CellStyle.LEFT,
       },
@@ -121,7 +137,15 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
         maxWidth: 160,
         suppressHeaderMenuButton: true,
         cellStyle: GridSetting.CellStyle.CENTER,
-        valueFormatter: (params) => Utils.setComma(params.value),
+        cellRenderer: 'NUMBER_COMMA',
+      },
+      {
+        field: 'discountRate',
+        headerName: '할인율',
+        minWidth: 80,
+        maxWidth: 80,
+        suppressHeaderMenuButton: true,
+        cellStyle: GridSetting.CellStyle.RIGHT,
       },
     ],
     [],
@@ -243,7 +267,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
   return (
     <div className="imgPopBox">
       <PopupLayout
-        width={650}
+        width={950}
         open={open}
         isEscClose={!modalsStatus.active}
         title={'신규 상품추가'}
@@ -342,6 +366,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
                 });
                 onlastInfosReset();
               }}
+              className={'default check'}
             />
           </div>
           <ConfirmModal

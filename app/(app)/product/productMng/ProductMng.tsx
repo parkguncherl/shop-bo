@@ -236,7 +236,7 @@ const ProductMng = () => {
         maxWidth: 80,
         suppressHeaderMenuButton: true,
         cellStyle: GridSetting.CellStyle.RIGHT,
-        valueFormatter: (params) => Utils.setComma(Math.round(params.value)),
+        cellRenderer: 'NUMBER_COMMA',
       },
       {
         field: 'sellAmt',
@@ -245,7 +245,7 @@ const ProductMng = () => {
         maxWidth: 80,
         suppressHeaderMenuButton: true,
         cellStyle: GridSetting.CellStyle.RIGHT,
-        valueFormatter: (params) => Utils.setComma(Math.round(params.value)),
+        cellRenderer: 'NUMBER_COMMA',
       },
       { field: 'repFileIdCnt', headerName: '대표이미지', minWidth: 80, maxWidth: 80, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
       {
