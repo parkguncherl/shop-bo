@@ -226,6 +226,10 @@ export const TabMenu = ({ ref }: Props) => {
     setTranslateXValue(Math.max(-maxTranslateX + divWidth, newValue)); // 최소값을 -maxTranslateX + divWidth로 제한
   };
 
+  const closeContextMenu = () => {
+    setContextMenu({ ...contextMenu, visible: false });
+  };
+
   // 모든탭 닫기
   const closeAllTabs = () => {
     // 로컬 스토리지에서 히스토리 제거
@@ -272,22 +276,6 @@ export const TabMenu = ({ ref }: Props) => {
     regFavoritesAllMutate({ menuUris: historyArray });
   };
 
-  // useImperativeHandle 추가
-  useImperativeHandle(ref, () => ({
-    closeAllTabs,
-    closeOtherTabs,
-  }));
-
-  // 우클릭 전체 닫기 이벤트
-  const handleContextMenu = (event: React.MouseEvent) => {
-    event.preventDefault();
-    setContextMenu({ visible: true, x: event.clientX, y: event.clientY });
-  };
-
-  const closeContextMenu = () => {
-    setContextMenu({ ...contextMenu, visible: false });
-  };
-
   // 현재 탭을 제외한 다른 모든 탭 닫기
   const closeOtherTabs = () => {
     if (activeIndex !== null) {
@@ -302,6 +290,19 @@ export const TabMenu = ({ ref }: Props) => {
       closeAllTabs();
     }
   };
+
+  // useImperativeHandle 추가
+  useImperativeHandle(ref, () => ({
+    closeAllTabs,
+    closeOtherTabs,
+  }));
+
+  // 우클릭 전체 닫기 이벤트
+  const handleContextMenu = (event: React.MouseEvent) => {
+    event.preventDefault();
+    setContextMenu({ visible: true, x: event.clientX, y: event.clientY });
+  };
+
   // 현재 탭의 오른쪽에 있는 모든 탭 닫기
   const closeRightTabs = () => {
     if (activeIndex !== null) {
@@ -385,11 +386,11 @@ export const TabMenu = ({ ref }: Props) => {
                 list={list}
                 setList={setList}
                 animation={200} // 드래그 애니메이션
-                multiDrag
-                swap
                 forceFallback
                 onStart={(event: any) => dragStart(event)}
                 onEnd={(event: any) => dragEnd(event)}
+                delay={200} // ✅ 200ms 이상 눌러야 드래그 시작
+                delayOnTouchOnly={false} // ✅ 마우스도 동일하게 적용
               >
                 {list.map((item, index) => {
                   // 조건에 따라 클래스 설정
