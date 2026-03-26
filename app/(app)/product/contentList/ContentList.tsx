@@ -9,7 +9,7 @@ import {
   ProductContentListResponseContentProductInfo,
   ProductContentListResponseProductContent,
 } from '../../../../generated';
-import { ColDef, SelectionChangedEvent } from 'ag-grid-community';
+import { ColDef, RowDragEndEvent, SelectionChangedEvent } from 'ag-grid-community';
 import { TableHeader, toastError } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -37,13 +37,14 @@ const ContentList = () => {
   const [upMenuNm, menuNm, getFileUrl, getFileList] = useCommonStore((s) => [s.upMenuNm, s.menuNm, s.getFileUrl, s.getFileList]);
 
   /** 코드관리 스토어 - State */
-  const [paging, setPaging, modals, openModal, closeModal, deleteProductContents] = useProductContentListStore((s) => [
+  const [paging, setPaging, modals, openModal, closeModal, deleteProductContents, updateContentsProductSeq] = useProductContentListStore((s) => [
     s.paging,
     s.setPaging,
     s.modals,
     s.openModal,
     s.closeModal,
     s.deleteProductContents,
+    s.updateContentsProductSeq,
   ]);
 
   const gridRef = useRef<TunedGridRef<ProductContentListResponseProductContent>>(null);
@@ -90,6 +91,7 @@ const ContentList = () => {
       valueGetter: (params) => (params.node ? (params.node.rowIndex ?? 0) + 1 : ''),
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
+      rowDrag: true,
     },
     { field: 'prodNm', headerName: '상품명', minWidth: 130, maxWidth: 200, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.LEFT },
     {
@@ -213,6 +215,136 @@ const ContentList = () => {
         });
       } else {
         setImgPreviewFileDetList([]); // 초기화
+      }
+    }
+  };
+
+  // const onRowDragMoveHandler = (event: RowDragMoveEvent<ProductContentListResponseContentProductInfo>) => {
+  //   const movingNode = event.node;
+  //   const overNode = event.overNode;
+  //
+  //   if (movingNode.id && overNode?.id && movingNode.id != overNode?.id) {
+  //     // 유의미한 드래깅이 발생한 경우
+  //     const movingData = movingNode.data;
+  //     const overData = overNode?.data;
+  //
+  //     console.log('movingData, overData: ', movingData?.prodNm, overData?.prodNm);
+  //
+  //     if (movingData && overData) {
+  //       const fromIndex = contentsProductInfoList.indexOf(movingData);
+  //       const toIndex = contentsProductInfoList.indexOf(overData);
+  //
+  //       console.log('moveInArray(contentsProductInfoList, fromIndex, toIndex): ', moveInArray(contentsProductInfoList, fromIndex, toIndex));
+  //       function moveInArray(prevArr: any[], fromIndex: number, toIndex: number) {
+  //         const element = prevArr[fromIndex];
+  //         prevArr.splice(fromIndex, 1);
+  //         prevArr.splice(toIndex, 0, element);
+  //
+  //         return prevArr;
+  //       }
+  //     }
+  //   }
+  // };
+
+  /** row 드래그 이벤트 */
+  const onRowDragEndHandler = async (event: RowDragEndEvent) => {
+    const movingNode = event.node;
+    const overNode = event.overNode;
+
+    if (movingNode.id && overNode?.id && movingNode.id != overNode?.id) {
+      // 유의미한 드래깅이 발생한 경우
+      const movingData = movingNode.data;
+      const overData = overNode?.data;
+
+      if (movingData && overData) {
+        const fromIndex = contentsProductInfoList.indexOf(movingData);
+        const toIndex = contentsProductInfoList.indexOf(overData);
+
+        const fromContentsProductSeq = contentsProductInfoList[fromIndex].contentsProductSeq;
+        const toContentsProductSeq = contentsProductInfoList[toIndex].contentsProductSeq;
+
+        if (fromIndex == toIndex) {
+          toastError('동일한 영역에 드래깅 할 수 없습니다.');
+          return; // 이 경우 이후 동작이 무의미하므로
+        }
+        if (!filtersForContentsProduct.contentsId) {
+          console.error('연결상품 식별자를 찾을 수 없음');
+          return;
+        }
+        const seqUpdReqsResult = await updateContentsProductSeq({
+          contentsId: filtersForContentsProduct.contentsId,
+          fromSeq: fromContentsProductSeq,
+          toSeq: toContentsProductSeq,
+        });
+
+        const { resultCode, resultMessage } = seqUpdReqsResult.data;
+
+        if (resultCode == 200) {
+          contentsProductInfoListRefetch(); // 연결상품목록 refetch
+        } else {
+          console.error(resultMessage);
+          toastError('재정렬 과정에서 문제가 발생하였습니다.');
+        }
+
+        // 정렬 함수
+        //     function moveInArray(prevArr: ProductContentListResponseContentProductInfo[], fromIndex: number, toIndex: number) {
+        //       if (fromIndex > toIndex) {
+        //         // 위로 이동
+        //         const newlyAlignedArr = [];
+        //         for (let i = 0; i < prevArr.length; i++) {
+        //           if (i == fromIndex) {
+        //             // 이동하고자 하는 대상
+        //             newlyAlignedArr.push({
+        //               ...prevArr[i],
+        //               contentsProductSeq: prevArr[toIndex].contentsProductSeq,
+        //             });
+        //           } else if (i >= toIndex && i <= fromIndex) {
+        //             // from, to 사이에 존재하는 객체들
+        //             newlyAlignedArr.push({
+        //               ...prevArr[i],
+        //               contentsProductSeq: (prevArr[i].contentsProductSeq as number) + 1, // 하단으로 한칸씩 이동
+        //             });
+        //           } else {
+        //             // 그 외
+        //             newlyAlignedArr.push(prevArr[i]);
+        //           }
+        //         }
+        //
+        //         newlyAlignedArr.sort((a, b) => {
+        //           return (a.contentsProductSeq as number) - (b.contentsProductSeq as number);
+        //         });
+        //
+        //         return newlyAlignedArr;
+        //       }
+        //       if (toIndex > fromIndex) {
+        //         // 아래로 이동
+        //         const newlyAlignedArr = [];
+        //         for (let i = 0; i < prevArr.length; i++) {
+        //           if (i == fromIndex) {
+        //             // 이동하고자 하는 대상
+        //             newlyAlignedArr.push({
+        //               ...prevArr[i],
+        //               contentsProductSeq: prevArr[toIndex].contentsProductSeq,
+        //             });
+        //           } else if (i >= fromIndex && i <= toIndex) {
+        //             // from, to 사이에 존재하는 객체들
+        //             newlyAlignedArr.push({
+        //               ...prevArr[i],
+        //               contentsProductSeq: (prevArr[i].contentsProductSeq as number) - 1, // 상단으로 한칸씩 이동
+        //             });
+        //           } else {
+        //             // 그 외
+        //             newlyAlignedArr.push(prevArr[i]);
+        //           }
+        //         }
+        //
+        //         newlyAlignedArr.sort((a, b) => {
+        //           return (a.contentsProductSeq as number) - (b.contentsProductSeq as number);
+        //         });
+        //         return newlyAlignedArr;
+        //       }
+        //     }
+        //   }
       }
     }
   };
@@ -423,7 +555,7 @@ const ContentList = () => {
           </Search>
           <Table>
             <TableHeader count={contentsProductInfoList.length} search={search}></TableHeader>
-            <TunedGrid<ProductContentListResponseProductContent>
+            <TunedGrid<ProductContentListResponseContentProductInfo>
               headerHeight={35}
               ref={rightGridRef}
               onGridReady={onGridReady}
@@ -437,6 +569,7 @@ const ContentList = () => {
               onRowDoubleClicked={(e) => openModal('SHOW', e.data)}
               onSelectionChanged={onSelectionChangedByRigSideGrid}
               className={'default check'}
+              onRowDragEnd={onRowDragEndHandler}
             />
             <div className="btnArea between">
               <div className="left"></div>

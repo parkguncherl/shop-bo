@@ -7,6 +7,7 @@ import {
   PageObject,
   ProductContentListRequestDeleteProductContents,
   ProductContentListRequestInsertContentsProduct,
+  ProductContentListRequestUpdateContentsProductSeq,
   ProductContentListResponseProductContent,
   ProductContentsRequestInsertProductContents,
 } from '../../generated';
@@ -33,6 +34,7 @@ interface ProductContentListApiState {
   insertProductContents: (productContentsRequestInsertProductContents: ProductContentsRequestInsertProductContents) => AxiosPromise<ApiResponse>;
   deleteProductContents: (productContentListRequestDeleteProductContents: ProductContentListRequestDeleteProductContents) => AxiosPromise<ApiResponse>;
   insertContentsProductList: (productContentListRequestInsertContentsProduct: ProductContentListRequestInsertContentsProduct[]) => AxiosPromise<ApiResponse>;
+  updateContentsProductSeq: (productContentListRequestUpdateContentsProductSeq: ProductContentListRequestUpdateContentsProductSeq) => AxiosPromise<ApiResponse>;
 }
 
 type ProductContentListStateOfAll = ProductContentListState & ProductContentListApiState;
@@ -89,6 +91,9 @@ const initialStateCreator: StateCreator<ProductContentListStateOfAll> = (set, ge
     },
     insertContentsProductList: (productContentListRequestInsertContentsProduct) => {
       return authApi.put('/productContentList/insertContentsProductList', productContentListRequestInsertContentsProduct);
+    },
+    updateContentsProductSeq: (productContentListRequestUpdateContentsProductSeq) => {
+      return authApi.patch('/productContentList/updateContentsProductSeq', productContentListRequestUpdateContentsProductSeq);
     },
   };
 };
