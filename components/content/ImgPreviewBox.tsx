@@ -50,7 +50,7 @@ const ImgPreviewBox = ({ open, resized, onReSizeReq, fileDetList = [] }: ImgPrev
           >
             <div className={'wrap'}>
               {fileDetList.map((item, index) => (
-                <SwiperSlide key={item.id}>
+                <SwiperSlide key={index}>
                   <img src={item.url} alt="상품 이미지" />
                 </SwiperSlide>
               ))}
