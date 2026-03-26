@@ -20,14 +20,13 @@ import TunedGrid, { AddPagingOptions, TunedGridRef } from '../../../../component
 import { useProductContentListStore } from '../../../../stores/product/useProductContentListStore';
 import useFilters from '../../../../hooks/useFilters';
 import useDebounce from '../../../../hooks/useDebounce';
-import { AlertMessage, Placeholder, RegExpression } from '../../../../libs/const';
+import { AlertMessage, Placeholder } from '../../../../libs/const';
 import ProductContentShowPop from '../../../../components/popup/product/contentList/ProductContentShowPop';
 import ProductContentAddPop from '../../../../components/popup/product/contentList/ProductContentAddPop';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import ProductAddPop from '../../../../components/popup/product/contentList/ProductAddPop';
 import { CustomSwitch } from '../../../../components/CustomSwitch';
 import ImgPreviewBox, { ImgPreviewFileDet } from '../../../../components/content/ImgPreviewBox';
-import { Utils } from '../../../../libs/utils';
 
 /** 상품관리 - 상품컨텐츠 목록 페이지 */
 const ContentList = () => {

@@ -6,13 +6,11 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { authApi } from '../../../../libs';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import {
-  PageObject,
   ProductContentListRequestProductInfoListFilter,
   ProductContentListResponseProductContent,
   ProductContentListResponseProductInfo,
-  ProductMngResponseProductInfo,
 } from '../../../../generated';
-import TunedGrid, { AddPagingOptions, TunedGridRef } from '../../../grid/TunedGrid';
+import TunedGrid, { TunedGridRef } from '../../../grid/TunedGrid';
 import { PopupSearchBox, PopupSearchType } from '../../content';
 import CustomGridLoading from '../../../CustomGridLoading';
 import CustomNoRowsOverlay from '../../../CustomNoRowsOverlay';
@@ -20,8 +18,6 @@ import { GridSetting } from '../../../../libs/ag-grid';
 import { ColDef } from 'ag-grid-community';
 import useFilters from '../../../../hooks/useFilters';
 import { Search } from '../../../content';
-import { AlertMessage } from '../../../../libs/const';
-import { Utils } from '../../../../libs/utils';
 import { useProductContentListStore } from '../../../../stores/product/useProductContentListStore';
 import { ConfirmModal } from '../../../ConfirmModal';
 
@@ -44,15 +40,17 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
 
   /** 팝업 내부 local state */
   const [productInfoList, setProductInfoList] = useState<ProductContentListResponseProductInfo[]>([]);
-  const [lastProductInfo, setLastProductInfo] = useState<ProductContentListResponseProductInfo | undefined>(undefined);
 
-  const [pagingOption] = useState<AddPagingOptions | undefined>({
-    pagingStrategy: 'add',
-  });
-  const [paging, setPaging] = useState<PageObject>({
-    curPage: 1,
-    pageRowCount: 50,
-  });
+  // todo 페이징 영역 한시적 비활성화
+  // const [lastProductInfo, setLastProductInfo] = useState<ProductContentListResponseProductInfo | undefined>(undefined);
+  //
+  // const [pagingOption] = useState<AddPagingOptions | undefined>({
+  //   pagingStrategy: 'add',
+  // });
+  // const [paging, setPaging] = useState<PageObject>({
+  //   curPage: 1,
+  //   pageRowCount: 50,
+  // });
 
   const [modalsStatus, setModalsStatus] = useState<{
     type: 'ADD_CONTENTS_PRODUCTS';
@@ -69,12 +67,12 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
   /** filters, lastInfo's filters*/
   const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<ProductContentListRequestProductInfoListFilter>({
     prodNm: undefined,
-    contentsId: undefined,
   });
 
-  const [lastInfos, onChangelastInfos, onlastInfosReset] = useFilters<ProductContentListRequestProductInfoListFilter>({
-    lastId: undefined,
-  });
+  // todo 페이징 영역 한시적 비활성화
+  // const [lastInfos, onChangelastInfos, onlastInfosReset] = useFilters<ProductContentListRequestProductInfoListFilter>({
+  //   lastId: undefined,
+  // });
 
   const RefForGrid = useRef<TunedGridRef<ProductContentListResponseProductInfo>>(null);
 
@@ -161,11 +159,13 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
 
     // 초기화 동작
     setProductInfoList([]);
-    setLastProductInfo(undefined);
-    setPaging({
-      ...paging,
-      curPage: 1,
-    });
+
+    // todo 페이징 영역 한시적 비활성화
+    // setLastProductInfo(undefined);
+    // setPaging({
+    //   ...paging,
+    //   curPage: 1,
+    // });
     onFiltersReset();
   };
 
@@ -179,11 +179,14 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
 
     // 초기화 동작
     setProductInfoList([]);
-    setLastProductInfo(undefined);
-    setPaging({
-      ...paging,
-      curPage: 1,
-    });
+
+    // todo 페이징 영역 한시적 비활성화
+    // setLastProductInfo(undefined);
+    // setPaging({
+    //   ...paging,
+    //   curPage: 1,
+    // });
+
     onFiltersReset();
   };
 
@@ -210,31 +213,37 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
     isLoading: isProductDetInfosLoading,
     refetch: productDetInfosRefetch,
   } = useQuery({
-    queryKey: ['/productContentList/productInfoListPaging', filters.contentsId],
+    queryKey: ['/productContentList/productInfoListPaging', selectedContent?.id],
     queryFn: () =>
       authApi.get('/productContentList/productInfoListPaging', {
         params: {
+          // todo 페이징 영역 한시적 비활성화
           //curPage: paging.curPage,
-          pageRowCount: paging.pageRowCount,
+          // pageRowCount: paging.pageRowCount,
+          pageRowCount: 1000,
           ...filters,
-          ...lastInfos,
+          contentsId: selectedContent?.id,
+          //...lastInfos,
         },
       }),
     refetchOnMount: 'always',
-    enabled: open && filters.contentsId != undefined,
+    enabled: open && selectedContent?.id != undefined,
   });
 
   useEffect(() => {
     if (isProductDetInfosSuccess) {
       const { resultCode, body, resultMessage } = productDetInfos.data;
       if (resultCode === 200) {
-        const perPagesRowCnt = paging.pageRowCount as number;
-        if (perPagesRowCnt) {
-          setProductInfoList((body.rows || []).slice(0, perPagesRowCnt));
-          setLastProductInfo((body.rows || [])[perPagesRowCnt]);
-        } else {
-          console.error('pageRowCount 를 찾을 수 없음');
-        }
+        // todo 페이징 영역 한시적 비활성화
+        // const perPagesRowCnt = paging.pageRowCount as number;
+        // if (perPagesRowCnt) {
+        //   setProductInfoList((body.rows || []).slice(0, perPagesRowCnt));
+        //   setLastProductInfo((body.rows || [])[perPagesRowCnt]);
+        // } else {
+        //   console.error('pageRowCount 를 찾을 수 없음');
+        // }
+
+        setProductInfoList(body.rows || []);
       } else {
         toastError(resultMessage);
       }
@@ -249,11 +258,6 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
       }
     }
   }, [open]);
-
-  useEffect(() => {
-    // 상품컨텐츠 식별 값 동기화
-    onChangeFilters('contentsId', selectedContent?.id ? selectedContent.id : undefined);
-  }, [selectedContent]);
 
   /** 검색 버튼 클릭 시 */
   const search = async () => {
@@ -338,34 +342,35 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
                 const selectedRows = event.api.getSelectedRows();
                 setSelectedRowsDataList(selectedRows);
               }}
-              pagingOptions={pagingOption}
-              pagingDeps={[filters]}
-              onTouchedByBottom={() => {
-                if (pagingOption) {
-                  // 페이징 관련 동작 처리 영역
-                  if (lastProductInfo != undefined) {
-                    onChangelastInfos('lastId', lastProductInfo.id);
-                    setPaging({
-                      ...paging,
-                      curPage: paging.curPage ? paging.curPage + 1 : 1,
-                    });
-                  } else {
-                    if (paging.curPage != 1) {
-                      toastSuccess(AlertMessage.LastDataHasBeenReached);
-                    }
-                  }
-                }
-                return {
-                  pausedMilliseconds: 1000,
-                };
-              }}
-              onInitializePaging={() => {
-                setPaging({
-                  curPage: 1,
-                  pageRowCount: 50,
-                });
-                onlastInfosReset();
-              }}
+              // todo 페이징 영역 한시적 비활성화
+              // pagingOptions={pagingOption}
+              // pagingDeps={[filters]}
+              // onTouchedByBottom={() => {
+              //   if (pagingOption) {
+              //     // 페이징 관련 동작 처리 영역
+              //     if (lastProductInfo != undefined) {
+              //       onChangelastInfos('lastId', lastProductInfo.id);
+              //       setPaging({
+              //         ...paging,
+              //         curPage: paging.curPage ? paging.curPage + 1 : 1,
+              //       });
+              //     } else {
+              //       if (paging.curPage != 1) {
+              //         toastSuccess(AlertMessage.LastDataHasBeenReached);
+              //       }
+              //     }
+              //   }
+              //   return {
+              //     pausedMilliseconds: 1000,
+              //   };
+              // }}
+              // onInitializePaging={() => {
+              //   setPaging({
+              //     curPage: 1,
+              //     pageRowCount: 50,
+              //   });
+              //   onlastInfosReset();
+              // }}
               className={'default check'}
             />
           </div>
