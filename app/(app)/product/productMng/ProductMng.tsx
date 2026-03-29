@@ -183,9 +183,9 @@ const ProductMng = () => {
         cellStyle: GridSetting.CellStyle.CENTER,
         suppressHeaderMenuButton: true,
       },
-      { field: 'prodNm', headerName: '상품명', minWidth: 120, maxWidth: 120, suppressHeaderMenuButton: true },
-      { field: 'prodTpNm', headerName: '상품대분류', minWidth: 120, maxWidth: 120, suppressHeaderMenuButton: true },
-      { field: 'prodDetTpNm', headerName: '상품소분류', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
+      { field: 'prodNm', headerName: '품목명', minWidth: 120, maxWidth: 120, suppressHeaderMenuButton: true },
+      { field: 'prodTpNm', headerName: '품목대분류', minWidth: 120, maxWidth: 120, suppressHeaderMenuButton: true },
+      { field: 'prodDetTpNm', headerName: '품목소분류', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
       { field: 'prodSizes', headerName: '크기', minWidth: 130, maxWidth: 130, suppressHeaderMenuButton: true },
       {
         field: 'prodColors',
@@ -391,7 +391,7 @@ const ProductMng = () => {
     <div>
       <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} />
       <Search className="type_2">
-        <Search.Input title={'상품명'} name={'prodNm'} placeholder={Placeholder.Input} value={filters.prodNm} onChange={onChangeFilters} onEnter={onSearch} />
+        <Search.Input title={'품목명'} name={'prodNm'} placeholder={Placeholder.Input} value={filters.prodNm} onChange={onChangeFilters} onEnter={onSearch} />
       </Search>
       <Table>
         <div className="tblPreview">
@@ -424,7 +424,7 @@ const ProductMng = () => {
                       partnerCodeOpenModal('PARTNER_CODE_OPEN');
                     }}
                   >
-                    상품카테고리 추가
+                    품목카테고리 추가
                   </button>
                 </div>
                 <div className="right">

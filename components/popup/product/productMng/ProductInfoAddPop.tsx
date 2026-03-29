@@ -78,7 +78,7 @@ interface ProductContentShowPopProps {
 
 /**
  * components/popup/product/productMng/ProductInfoAddPop.tsx
- * desc: 상품정보 추가 팝업
+ * desc: 품목정보 추가 팝업
  * Date: 2026/03/17
  * Author: park junsung
  * */
@@ -89,7 +89,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
   /** 팝업 내부 local state */
   const [openAddConf, setOpenAddConf] = useState<{ open: boolean; stored?: ProductMngRequestInsertProduct }>({ open: false });
 
-  /** 상품 내용 입력 서식 */
+  /** 품목 내용 입력 서식 */
   const {
     handleSubmit,
     control,
@@ -107,7 +107,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
     },
   });
 
-  /** 상품컨텐츠 추가 요청 처리 동작 캐싱 */
+  /** 품목컨텐츠 추가 요청 처리 동작 캐싱 */
   const { mutate: insertProductInfoMutate } = useMutation(insertProductInfo, {
     onSuccess: async (e) => {
       try {
@@ -139,11 +139,11 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
   // 입력이 유효한 경우
   const onValid: SubmitHandler<ProductInfoCreateFields> = (data, event) => {
     if (productInfo && !productInfo.id) {
-      console.error('상품정보는 전달되었으나 유효한 식별자를 찾을 수 없음');
+      console.error('품목정보는 전달되었으나 유효한 식별자를 찾을 수 없음');
       return;
     }
     if (productInfo?.id) {
-      // 상품상세정보만 추가하는 경우
+      // 품목상세정보만 추가하는 경우
       const insertProductInfoReqObj: ProductMngRequestInsertProduct = {
         id: productInfo.id,
 
@@ -161,7 +161,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
         stored: insertProductInfoReqObj,
       });
     } else {
-      // id 부재 --> 상품정보 또한 추가
+      // id 부재 --> 품목정보 또한 추가
       let insertProductInfoReqObj: ProductMngRequestInsertProduct = {
         ...data.product,
         makeYmd: dayjs(data.product?.makeYmd).format('YYYY-MM-DD'), // localDate 형식에 적합하도록 변환
@@ -214,7 +214,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
         width={900}
         open={open}
         isEscClose={true}
-        title={productInfo?.id ? productInfo?.prodNm + ' 이하 상세정보 추가' : '상품정보 추가'}
+        title={productInfo?.id ? productInfo?.prodNm + ' 이하 상세정보 추가' : '품목정보 추가'}
         onClose={onClose}
         footer={
           <PopupFooter>
@@ -246,13 +246,13 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
         <PopupContent>
           <PopupFormBox className={''}>
             {!productInfo?.id && (
-              <PopupFormGroup title={'상품정보'}>
+              <PopupFormGroup title={'품목정보'}>
                 <PopupFormType className={'type2'}>
-                  <FormInput<ProductInfoCreateFields> control={control} name={'product.prodNm'} label={'상품명'} placeholder={'제목'} />
-                  <FormDropDown<ProductInfoCreateFields> control={control} name={'product.prodTp'} title={'상품유형'} codeUpper={'90010'} />
+                  <FormInput<ProductInfoCreateFields> control={control} name={'product.prodNm'} label={'품목명'} placeholder={'제목'} />
+                  <FormDropDown<ProductInfoCreateFields> control={control} name={'product.prodTp'} title={'품목유형'} codeUpper={'90010'} />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
-                  <FormDropDown<ProductInfoCreateFields> control={control} name={'product.prodDetTp'} title={'상품상세유형'} codeUpper={'90011'} />
+                  <FormDropDown<ProductInfoCreateFields> control={control} name={'product.prodDetTp'} title={'품목상세유형'} codeUpper={'90011'} />
                   <FormInput<ProductInfoCreateFields> control={control} name={'product.composition'} label={'혼용율'} />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
@@ -284,25 +284,20 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
                 <FormInput<ProductInfoCreateFields>
                   control={control}
                   name={'productDet.productDetSize'}
-                  label={'상품상세 사이즈'}
+                  label={'품목 사이즈'}
                   inputType={'label'}
-                  placeholder={'(상세)사이즈'}
+                  placeholder={'사이즈'}
                 />
                 <FormInput<ProductInfoCreateFields>
                   control={control}
                   name={'productDet.productDetColor'}
-                  label={'상품상세 컬러'}
+                  label={'품목 컬러'}
                   inputType={'label'}
-                  placeholder={'(상세)컬러'}
+                  placeholder={'컬러'}
                 />
               </PopupFormType>
               <PopupFormType className={'type2'}>
-                <FormInput<ProductInfoCreateFields>
-                  control={control}
-                  name={'productDet.skuDiscountRate'}
-                  label={'스큐 할인율'}
-                  placeholder={'스큐단위 할인율'}
-                />
+                <FormInput<ProductInfoCreateFields> control={control} name={'productDet.skuDiscountRate'} label={'품목 할인율'} placeholder={'품목 할인율'} />
                 <FormDropDown<ProductInfoCreateFields>
                   control={control}
                   name={'productDet.sleepYn'}

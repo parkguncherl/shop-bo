@@ -27,7 +27,7 @@ interface ProductContentShowPopProps {
  * Date: 2026/03/18
  * Author: park junsung
  * */
-const ProductModPop = ({ open, onClose, productInfo }: ProductContentShowPopProps) => {
+const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
   const [updateProductDet, deleteProductDet] = useProductMngStore((s) => [s.updateProductDet, s.deleteProductDet]);
 
@@ -311,4 +311,4 @@ const ProductModPop = ({ open, onClose, productInfo }: ProductContentShowPopProp
   );
 };
 
-export default ProductModPop;
+export default ProductDetInfoPop;

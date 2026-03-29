@@ -48,7 +48,7 @@ interface ProductContentShowPopProps {
 
 /**
  * components/popup/product/productMng/ProductModPop.tsx
- * desc: 상품정보 수정 팝업
+ * desc: 품목정보 수정 팝업
  * Date: 2026/03/18
  * Author: park junsung
  * */
@@ -59,7 +59,7 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
   /** 팝업 내부 local state */
   const [openModConf, setOpenAddConf] = useState<{ open: boolean; stored?: ProductMngRequestUpdateProduct }>({ open: false });
 
-  /** 상품 내용 입력 서식 */
+  /** 품목 내용 입력 서식 */
   const {
     handleSubmit,
     control,
@@ -116,7 +116,7 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
   // 입력이 유효한 경우
   const onValid: SubmitHandler<ProductModFields> = (data, event) => {
     if (productInfo && !productInfo.id) {
-      console.error('상품정보는 전달되었으나 유효한 식별자를 찾을 수 없음');
+      console.error('품목정보는 전달되었으나 유효한 식별자를 찾을 수 없음');
       return;
     }
     let updateProductInfoReqObj: ProductMngRequestUpdateProduct = {
@@ -167,7 +167,7 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
         width={900}
         open={open}
         isEscClose={true}
-        title={'오리지널 상품명(' + productInfo?.prodNm + ') 의 정보를 수정'}
+        title={'오리지널 품목명(' + productInfo?.prodNm + ') 의 정보를 수정'}
         onClose={onClose}
         footer={
           <PopupFooter>
@@ -198,13 +198,13 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
       >
         <PopupContent>
           <PopupFormBox className={''}>
-            <PopupFormGroup title={'상품정보'}>
+            <PopupFormGroup title={'품목정보'}>
               <PopupFormType className={'type2'}>
-                <FormInput<ProductModFields> control={control} name={'prodNm'} label={'상품명'} placeholder={'제목'} />
-                <FormDropDown<ProductModFields> control={control} name={'prodTp'} title={'상품유형'} codeUpper={'90010'} />
+                <FormInput<ProductModFields> control={control} name={'prodNm'} label={'품목명'} placeholder={'제목'} />
+                <FormDropDown<ProductModFields> control={control} name={'prodTp'} title={'품목유형'} codeUpper={'90010'} />
               </PopupFormType>
               <PopupFormType className={'type2'}>
-                <FormDropDown<ProductModFields> control={control} name={'prodDetTp'} title={'상품상세유형'} codeUpper={'90011'} />
+                <FormDropDown<ProductModFields> control={control} name={'prodDetTp'} title={'품목상세유형'} codeUpper={'90011'} />
                 <FormInput<ProductModFields> control={control} name={'composition'} label={'혼용율'} />
               </PopupFormType>
               <PopupFormType className={'type2'}>

@@ -24,7 +24,7 @@ interface ProductContentShowPopProps {
 
 /**
  * components/popup/product/contentList/ProductContentAddPop.tsx
- * desc: 상품컨텐츠 추가 팝업
+ * desc: 품목컨텐츠 추가 팝업
  * Date: 2026/02/19
  * Author: park junsung
  * */
@@ -36,7 +36,7 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
   const [displayMode, setDisplayMode] = useState<EnhancedTextAreasMode>('edit');
   const [openAddConf, setOpenAddConf] = useState(false);
 
-  /** 상품 내용 입력 서식 */
+  /** 품목 내용 입력 서식 */
   const {
     handleSubmit,
     control,
@@ -47,7 +47,7 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
     mode: 'onChange',
   });
 
-  /** 상품컨텐츠 추가 요청 처리 동작 캐싱 */
+  /** 품목컨텐츠 추가 요청 처리 동작 캐싱 */
   const { mutate: insertProductContentsMutate } = useMutation(insertProductContents, {
     onSuccess: async (e) => {
       try {
@@ -115,7 +115,7 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
         width={900}
         open={open}
         isEscClose={true}
-        title={'상품컨텐츠 미리보기'}
+        title={'품목컨텐츠 미리보기'}
         onClose={onClose}
         footer={
           <PopupFooter>

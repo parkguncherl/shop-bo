@@ -21,7 +21,7 @@ interface ProductContentShowPopProps {
 
 /**
  * components/popup/product/contentList/ProductContentShowPop.tsx
- * desc: 상품컨텐츠 출력 팝업
+ * desc: 품목컨텐츠 출력 팝업
  * Date: 2026/02/24
  * Author: park junsung
  * */
@@ -93,7 +93,7 @@ const ProductContentShowPop = ({ open, productContentData, onClose }: ProductCon
         width={900}
         open={open}
         isEscClose={true}
-        title={'상품컨텐츠 미리보기'}
+        title={'품목컨텐츠 미리보기'}
         onClose={onClose}
         footer={
           <PopupFooter>

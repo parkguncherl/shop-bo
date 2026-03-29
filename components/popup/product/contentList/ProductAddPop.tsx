@@ -30,7 +30,7 @@ interface ProductContentShowPopProps {
 
 /**
  * components/popup/product/contentList/ProductAddPop.tsx
- * desc: 상품추가 팝업
+ * desc: 품목추가 팝업
  * Date: 2026/03/25
  * Author: park junsung
  * */
@@ -90,7 +90,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
       },
       {
         field: 'prodNm',
-        headerName: '상품명',
+        headerName: '품목명',
         minWidth: 160,
         maxWidth: 200,
         suppressHeaderMenuButton: true,
@@ -190,7 +190,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
     onFiltersReset();
   };
 
-  /** 연결상품 추가 요청 처리 동작 캐싱 */
+  /** 연결품목 추가 요청 처리 동작 캐싱 */
   const { mutate: insertContentsProductListMutate } = useMutation(insertContentsProductList, {
     onSuccess: async (e) => {
       try {
@@ -198,7 +198,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
           toastSuccess('저장되었습니다.');
           onSuccessCommonCallBack();
         } else {
-          toastError(`연결상품 저장 도중 문제 발생 (${e.data.resultMessage})`);
+          toastError(`연결품목 저장 도중 문제 발생 (${e.data.resultMessage})`);
         }
       } catch (e) {
         console.log(e);
@@ -206,7 +206,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
     },
   });
 
-  /** 상품상세정보 목록 조회 */
+  /** 품목상세정보 목록 조회 */
   const {
     data: productDetInfos,
     isSuccess: isProductDetInfosSuccess,
@@ -253,8 +253,8 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
   useEffect(() => {
     if (open) {
       if (selectedContent == undefined) {
-        toastError('대응되는 상품컨텐츠를 찾을 수 없습니다.');
-        console.error('상품컨텐츠 정보 전달 여부 점검!');
+        toastError('대응되는 품목컨텐츠를 찾을 수 없습니다.');
+        console.error('품목컨텐츠 정보 전달 여부 점검!');
       }
     }
   }, [open]);
@@ -274,7 +274,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
         width={950}
         open={open}
         isEscClose={!modalsStatus.active}
-        title={'신규 상품추가'}
+        title={'신규 품목추가'}
         onClose={onCloseCommonCallBack}
         footer={
           <PopupFooter>
@@ -289,12 +289,12 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
                   className="btn btn_blue"
                   onClick={() => {
                     if (selectedRowsDataList.length == 0) {
-                      toastError('추가하고자 하는 상품을 하나 이상 선택하십시요.');
+                      toastError('추가하고자 하는 품목을 하나 이상 선택하십시요.');
                       return;
                     }
 
                     if (selectedContent == undefined) {
-                      toastError('대응되는 상품컨텐츠를 선택 후 재시도하십시요.');
+                      toastError('대응되는 품목컨텐츠를 선택 후 재시도하십시요.');
                       return;
                     }
 
@@ -316,7 +316,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
           <PopupSearchBox>
             <PopupSearchType className={'type_2'}>
               <Search.Input
-                title={'상품명'}
+                title={'품목명'}
                 name={'prodNm'}
                 placeholder={'키워드 입력 후 엔터키 클릭'}
                 value={filters.prodNm}
@@ -378,14 +378,14 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
             open={modalsStatus.active && modalsStatus.type == 'ADD_CONTENTS_PRODUCTS'}
             title={`${
               (modalsStatus.stored_temporary || []).length > 1
-                ? (modalsStatus.stored_temporary || [])[0]?.prodNm + ' 이외 ' + ((modalsStatus.stored_temporary || []).length - 1).toString() + '개의 상품을'
+                ? (modalsStatus.stored_temporary || [])[0]?.prodNm + ' 이외 ' + ((modalsStatus.stored_temporary || []).length - 1).toString() + '개의 품목을'
                 : (modalsStatus.stored_temporary || [])[0]?.prodNm + ' 을(를)'
-            } 연결상품으로 추가 하시겠습니까?`}
+            } 연결품목으로 추가 하시겠습니까?`}
             confirmText={'저장'}
             onConfirm={() => {
               if (!selectedContent?.id) {
-                toastError('대응되는 상품컨텐츠를 찾을 수 없습니다.');
-                console.error('상품컨텐츠 정보 전달 여부 점검!');
+                toastError('대응되는 품목컨텐츠를 찾을 수 없습니다.');
+                console.error('품목컨텐츠 정보 전달 여부 점검!');
                 return;
               }
               insertContentsProductListMutate(
