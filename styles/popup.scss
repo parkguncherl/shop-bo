@@ -103,7 +103,8 @@
       justify-content: flex-end;
 
       & .left {
-        display: none;
+        display: flex;
+        gap: 10px;
       }
 
       & .right {

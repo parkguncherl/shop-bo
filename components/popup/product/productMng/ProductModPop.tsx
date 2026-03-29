@@ -167,7 +167,7 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
         width={900}
         open={open}
         isEscClose={true}
-        title={'오리지널 품목명(' + productInfo?.prodNm + ') 의 정보를 수정'}
+        title={'[' + productInfo?.prodNm + '] 의 정보를 수정'}
         onClose={onClose}
         footer={
           <PopupFooter>

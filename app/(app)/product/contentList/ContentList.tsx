@@ -280,7 +280,7 @@ const ContentList = () => {
         const { resultCode, resultMessage } = seqUpdReqsResult.data;
 
         if (resultCode == 200) {
-          contentsProductInfoListRefetch(); // 연결상품목록 refetch
+          contentsProductInfoListRefetch(); // 연결품목목록 refetch
         } else {
           console.error(resultMessage);
           toastError('재정렬 과정에서 문제가 발생하였습니다.');
@@ -541,7 +541,7 @@ const ContentList = () => {
           </Table>
         </div>
         <div className={'layout70'}>
-          <Title title={'연결상품목록'} detail={true} />
+          <Title title={'연결품목목록'} detail={true} />
           <Search className="type_2">
             <CustomSwitch
               title={'이미지보기'}

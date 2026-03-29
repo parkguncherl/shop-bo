@@ -51,7 +51,7 @@ const ProductMng = () => {
   const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
   const [getFileUrl, selectFileList] = useCommonStore((s) => [s.getFileUrl, s.selectFileList]);
 
-  /** 상품관리 스토어 - State */
+  /** 품목관리 스토어 - State */
   const [modals, openModal, closeModal, deleteProduct] = useProductMngStore((s) => [s.modals, s.openModal, s.closeModal, s.deleteProduct]);
   const [partnerCodeModals, partnerCodeOpenModal, partnerCodeCloseModal] = usePartnerCodeStore((s) => [s.modals, s.openModal, s.closeModal]);
   /** 검색 필터 */
@@ -87,7 +87,7 @@ const ProductMng = () => {
     },
   });
 
-  /** 상품정보 목록 조회 */
+  /** 품목정보 목록 조회 */
   const {
     data: productInfos,
     isSuccess: isProductInfosSuccess,
@@ -115,7 +115,7 @@ const ProductMng = () => {
     }
   }, [productInfos, isProductInfosSuccess]);
 
-  /** 상품상세정보 목록 조회 */
+  /** 품목상세정보 목록 조회 */
   const { data: productDetInfos, isSuccess: isProductDetInfosSuccess } = useQuery({
     queryKey: ['/productMng/productDetInfoList', detFilters.prodDetColor],
     queryFn: () =>
@@ -177,16 +177,59 @@ const ProductMng = () => {
       {
         field: 'no',
         headerName: 'NO',
-        minWidth: 70,
-        maxWidth: 80,
+        minWidth: 35,
+        maxWidth: 35,
         valueGetter: (params) => (params.node ? (params.node.rowIndex ?? 0) + 1 : ''),
         cellStyle: GridSetting.CellStyle.CENTER,
         suppressHeaderMenuButton: true,
       },
       { field: 'prodNm', headerName: '품목명', minWidth: 120, maxWidth: 120, suppressHeaderMenuButton: true },
-      { field: 'prodTpNm', headerName: '품목대분류', minWidth: 120, maxWidth: 120, suppressHeaderMenuButton: true },
-      { field: 'prodDetTpNm', headerName: '품목소분류', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
-      { field: 'prodSizes', headerName: '크기', minWidth: 130, maxWidth: 130, suppressHeaderMenuButton: true },
+      { field: 'prodDetTpNm', headerName: '소분류', minWidth: 100, maxWidth: 120, suppressHeaderMenuButton: true },
+      {
+        field: 'isSpring',
+        headerName: '봄',
+        minWidth: 35,
+        maxWidth: 35,
+        suppressHeaderMenuButton: true,
+        cellStyle: GridSetting.CellStyle.CENTER,
+        valueFormatter: (params) => {
+          return params.value ? '■' : '□';
+        },
+      },
+      {
+        field: 'isSummer',
+        headerName: '여름',
+        minWidth: 35,
+        maxWidth: 35,
+        suppressHeaderMenuButton: true,
+        cellStyle: GridSetting.CellStyle.CENTER,
+        valueFormatter: (params) => {
+          return params.value ? '■' : '□';
+        },
+      },
+      {
+        field: 'isWinter',
+        headerName: '가을',
+        minWidth: 35,
+        maxWidth: 35,
+        suppressHeaderMenuButton: true,
+        cellStyle: GridSetting.CellStyle.CENTER,
+        valueFormatter: (params) => {
+          return params.value ? '■' : '□';
+        },
+      },
+      {
+        field: 'isWinter',
+        headerName: '겨울',
+        minWidth: 35,
+        maxWidth: 35,
+        suppressHeaderMenuButton: true,
+        cellStyle: GridSetting.CellStyle.CENTER,
+        valueFormatter: (params) => {
+          return params.value ? '■' : '□';
+        },
+      },
+      { field: 'prodSizes', headerName: '크기', minWidth: 100, maxWidth: 120, suppressHeaderMenuButton: true },
       {
         field: 'prodColors',
         headerName: '색상',
@@ -227,7 +270,6 @@ const ProductMng = () => {
         },
         suppressHeaderMenuButton: true,
       },
-      { field: 'composition', headerName: '혼용율', minWidth: 120, maxWidth: 120, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
       { field: 'makeYmd', headerName: '출시일', minWidth: 100, maxWidth: 100, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
       {
         field: 'orgAmt',
@@ -415,6 +457,7 @@ const ProductMng = () => {
                 }}
                 popupParent={typeof document !== 'undefined' ? document.body : undefined} // ag grid 내장 드롭다운 사용 시 그리드가 사라지는 현상을 방지하기 위하여 document.body 영역을 popup의 부모 요소로 명시 박근철 수정
                 onCellClicked={onCellClickedCallBack}
+                className={'default check'}
               />
               <div className="btnArea between">
                 <div className="left">
@@ -434,7 +477,7 @@ const ProductMng = () => {
                       openModal('PROD_INFO_ADD');
                     }}
                   >
-                    상품추가
+                    품목추가
                   </button>
                   <button
                     className={`btn ${selectedRowsData != undefined && 'btn_blue'}`}
@@ -443,7 +486,7 @@ const ProductMng = () => {
                       openModal('PROD_DET_INFO_ADD');
                     }}
                   >
-                    {`${selectedRowsData == undefined ? '상세정보 추가할 상품 선택' : '이하 상세정보 추가'}`}
+                    {`${selectedRowsData == undefined ? '상세정보 추가할 품목 선택' : '이하 상세정보 추가'}`}
                   </button>
                   <button
                     className={`btn ${selectedRowsData != undefined && 'btn_blue'}`}
@@ -452,7 +495,7 @@ const ProductMng = () => {
                       openModal('PROD_MOD');
                     }}
                   >
-                    {`${selectedRowsData == undefined ? '수정할 행 선택' : '상품정보 수정'}`}
+                    {`${selectedRowsData == undefined ? '수정할 행 선택' : '품목정보 수정'}`}
                   </button>
                   <button
                     className={`btn ${selectedRowsData != undefined && 'btn_blue'}`}
@@ -461,7 +504,7 @@ const ProductMng = () => {
                       openModal('PROD_DET_INFO');
                     }}
                   >
-                    {`${selectedRowsData == undefined ? '상품 데이터 선택' : '상품상세 목록 출력'}`}
+                    {`${selectedRowsData == undefined ? '품목 데이터 선택' : '품목상세 목록 출력'}`}
                   </button>
                   <button
                     className={`btn ${selectedRowsData != undefined && selectedRowsData.prodDetCnt == 0 && 'btn_blue'}`}
@@ -470,16 +513,16 @@ const ProductMng = () => {
                       if (selectedRowsData && selectedRowsData.id) {
                         openModal('PROD_DEL', selectedRowsData);
                       } else {
-                        console.error('선택된 상품에 대응하는 식별자를 찾을 수 없음');
+                        console.error('선택된 품목에 대응하는 식별자를 찾을 수 없음');
                       }
                     }}
                   >
                     {`${
                       selectedRowsData == undefined
-                        ? '삭제할 상품 선택'
+                        ? '삭제할 품목 선택'
                         : selectedRowsData.prodDetCnt != 0
                         ? selectedRowsData.prodDetCnt + '개의 상세정보가 잔존'
-                        : '선택한 상품 삭제'
+                        : '선택한 품목 삭제'
                     }`}
                   </button>
                 </div>
@@ -625,7 +668,7 @@ const ProductMng = () => {
       />
       <PartnerCodePop
         partnerCodeUpper={PARTNER_CODE.categories.code}
-        title={'상품카테고리관리'}
+        title={'품목카테고리관리'}
         activated={partnerCodeModals?.type === 'PARTNER_CODE_OPEN' && partnerCodeModals.active}
         codeName={PARTNER_CODE.categories.name}
         onCloseRequestEmerged={() => partnerCodeCloseModal('PARTNER_CODE_OPEN')}
