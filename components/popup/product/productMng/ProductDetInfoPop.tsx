@@ -40,7 +40,7 @@ interface ProductContentShowPopProps {
 /**
  * components/popup/product/productMng/ProductModPop.tsx
  * desc: 상품정보 수정 팝업
- * Date: 2026/03/18
+ * Date: 2026/03/30
  * Author: park junsung
  * */
 const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPopProps) => {

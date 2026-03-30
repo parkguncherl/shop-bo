@@ -28,6 +28,7 @@ import ProductDetInfoPop from '../../../../components/popup/product/productMng/P
 import { usePartnerCodeStore } from '../../../../stores/usePartnerCodeStore';
 import { PartnerCodePop } from '../../../../components/popup/system/PartnerCodePop';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
+import ProductForEachCategoryPop from '../../../../components/popup/product/productMng/ProductForEachCategoryPop';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
@@ -54,6 +55,7 @@ const ProductMng = () => {
   /** 품목관리 스토어 - State */
   const [modals, openModal, closeModal, deleteProduct] = useProductMngStore((s) => [s.modals, s.openModal, s.closeModal, s.deleteProduct]);
   const [partnerCodeModals, partnerCodeOpenModal, partnerCodeCloseModal] = usePartnerCodeStore((s) => [s.modals, s.openModal, s.closeModal]);
+
   /** 검색 필터 */
   const [filters, onChangeFilters] = useFilters<ProductMngRequestProductInfoFilter>({
     prodNm: undefined,
@@ -469,6 +471,14 @@ const ProductMng = () => {
                   >
                     품목카테고리 추가
                   </button>
+                  <button
+                    className={'btn btn_blue'}
+                    onClick={() => {
+                      openModal('PROD_BY_CATEGORY');
+                    }}
+                  >
+                    카테고리별상품
+                  </button>
                 </div>
                 <div className="right">
                   <button
@@ -674,6 +684,7 @@ const ProductMng = () => {
         codeName={PARTNER_CODE.categories.name}
         onCloseRequestEmerged={() => partnerCodeCloseModal('PARTNER_CODE_OPEN')}
       />
+      <ProductForEachCategoryPop open={modals.type == 'PROD_BY_CATEGORY' && modals.active} onClose={() => closeModal('PROD_BY_CATEGORY')} />
       <ConfirmModal
         open={modals.active && modals.type == 'PROD_DEL'}
         title={`${(modals.stored_temporary as ProductMngResponseProductInfo | undefined)?.prodNm} 을(를) 삭제 하시겠습니까?`}
