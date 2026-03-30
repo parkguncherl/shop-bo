@@ -82,6 +82,7 @@ interface ProductContentShowPopProps {
  * Date: 2026/03/17
  * Author: park junsung
  * */
+// todo 현재 상세정보 추가 영역은 그리드를 통한 상세 목록으로 마이그레이션이 진행 중, 이후 해당 form 을 통한 추가 영역이 전적으로 불필요하다 판단될 시 조건부 영역 제거, 간소화
 const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
   const [insertProductInfo] = useProductMngStore((s) => [s.insertProductInfo]);

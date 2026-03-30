@@ -38,6 +38,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
 
   const RefForGrid = useRef<TunedGridRef<ProductMngResponseProductDetInfo>>(null);
   const flagAboutUpdatedOrNot = useRef(false);
+  const flagAboutIsOnWritingOrNot = useRef(false); // 신규 작성중 여부
 
   const { mutate: updateProductDetMutate } = useMutation(updateProductDet, {
     onSuccess: async (e) => {
@@ -89,7 +90,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
         minWidth: 80,
         maxWidth: 100,
         suppressHeaderMenuButton: true,
-        editable: true,
+        editable: (params) => (flagAboutIsOnWritingOrNot.current ? params.data?.id == undefined : true),
         onCellValueChanged: (event) => {
           if (event.data.id) {
             updateProductDetMutate({
@@ -97,7 +98,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
               productDetColor: event.newValue,
             });
           } else {
-            console.error('상품상세정보 식별자를 확인할 수 없음');
+            // 신규 작성 영역 todo
           }
         },
       },
@@ -107,7 +108,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
         minWidth: 80,
         maxWidth: 100,
         suppressHeaderMenuButton: true,
-        editable: true,
+        editable: (params) => (flagAboutIsOnWritingOrNot.current ? params.data?.id == undefined : true),
         onCellValueChanged: (event) => {
           if (event.data.id) {
             updateProductDetMutate({
@@ -115,7 +116,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
               productDetSize: event.newValue,
             });
           } else {
-            console.error('상품상세정보 식별자를 확인할 수 없음');
+            // 신규 작성 영역 todo
           }
         },
       },
@@ -125,7 +126,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
         minWidth: 50,
         maxWidth: 70,
         suppressHeaderMenuButton: true,
-        editable: true,
+        editable: (params) => (flagAboutIsOnWritingOrNot.current ? params.data?.id == undefined : true),
         cellStyle: GridSetting.CellStyle.CENTER,
         onCellValueChanged: (event) => {
           if (event.data.id) {
@@ -134,7 +135,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
               skuDiscountRate: event.newValue,
             });
           } else {
-            console.error('상품상세정보 식별자를 확인할 수 없음');
+            // 신규 작성 영역 todo
           }
         },
       },
@@ -144,7 +145,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
         minWidth: 230,
         maxWidth: 230,
         suppressHeaderMenuButton: true,
-        editable: true,
+        editable: (params) => (flagAboutIsOnWritingOrNot.current ? params.data?.id == undefined : true),
         cellStyle: GridSetting.CellStyle.LEFT,
         onCellValueChanged: (event) => {
           if (event.data.id) {
@@ -153,7 +154,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
               productDetCntn: event.newValue,
             });
           } else {
-            console.error('상품상세정보 식별자를 확인할 수 없음');
+            // 신규 작성 영역 todo
           }
         },
       },
@@ -192,24 +193,12 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
 
   const commonOnCloseCallback = () => {
     if (onClose) onClose(flagAboutUpdatedOrNot.current);
+
+    // 닫힘 시점 초기화 동작
+    RefForGrid.current?.api.deselectAll(); // 셀렉션 초기화
+    flagAboutUpdatedOrNot.current = false; // 업데이트 여부 플래그 초기화
+    flagAboutIsOnWritingOrNot.current = false; // 작성 중 여부 플래그 초기화
   };
-
-  // /** 검색 버튼 클릭 시 */
-  // const search = async () => {
-  //   await onSearch();
-  // };
-  //
-  // const onSearch = async () => {
-  //   await productDetInfosRefetch();
-  // };
-
-  useEffect(() => {
-    if (!open) {
-      // 닫힘 시점
-      RefForGrid.current?.api.deselectAll(); // 셀렉션 초기화
-      flagAboutUpdatedOrNot.current = false; // 업데이트 여부 플래그 초기화
-    }
-  }, [open]);
 
   return (
     <div className="imgPopBox">
@@ -223,6 +212,20 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
           <PopupFooter>
             <div className="btnArea between">
               <div className="left">
+                <button
+                  className={`btn ${productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length == 0 ? 'btn_blue' : ''}`}
+                  disabled={productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length != 0}
+                  onClick={() => {
+                    if (productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length == 0) {
+                      flagAboutIsOnWritingOrNot.current = true; // 플래그 동기화
+                      setProductDetInfoList((prevState) => [...prevState, {}]); // 신규 행 추가
+                    } else {
+                      console.log('비정상 콜백 호출!');
+                    }
+                  }}
+                >
+                  {productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length == 0 ? '신규 작성' : '작성중..'}
+                </button>
                 <button
                   className={`btn ${productInfo != undefined && selectedRowsData != undefined && 'btn_blue'}`}
                   disabled={productInfo == undefined || selectedRowsData == undefined}
@@ -279,6 +282,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
               loading={isProductDetInfosLoading}
               rowSelection={{
                 mode: 'singleRow',
+                isRowSelectable: (rowNode) => !!(rowNode.data && rowNode.data.id != undefined),
                 enableClickSelection: true,
               }}
               onSelectionChanged={(event) => {

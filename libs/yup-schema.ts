@@ -299,6 +299,8 @@ export const YupSchema = {
           // isWinter: yup.string().notRequired(),
         });
       }),
+
+      // todo
       productDet: yup
         .object({
           //productDetSeq: yup.number().required(),

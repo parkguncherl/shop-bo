@@ -479,15 +479,15 @@ const ProductMng = () => {
                   >
                     품목추가
                   </button>
-                  <button
-                    className={`btn ${selectedRowsData != undefined && 'btn_blue'}`}
-                    disabled={selectedRowsData == undefined}
-                    onClick={() => {
-                      openModal('PROD_DET_INFO_ADD');
-                    }}
-                  >
-                    {`${selectedRowsData == undefined ? '상세정보 추가할 품목 선택' : '이하 상세정보 추가'}`}
-                  </button>
+                  {/*<button*/}
+                  {/*  className={`btn ${selectedRowsData != undefined && 'btn_blue'}`}*/}
+                  {/*  disabled={selectedRowsData == undefined}*/}
+                  {/*  onClick={() => {*/}
+                  {/*    openModal('PROD_DET_INFO_ADD');*/}
+                  {/*  }}*/}
+                  {/*>*/}
+                  {/*  {`${selectedRowsData == undefined ? '상세정보 추가할 품목 선택' : '상세정보'}`}*/}
+                  {/*</button>*/}
                   <button
                     className={`btn ${selectedRowsData != undefined && 'btn_blue'}`}
                     disabled={selectedRowsData == undefined}
@@ -631,7 +631,8 @@ const ProductMng = () => {
         }}
       />
       <ProductInfoAddPop
-        open={modals.active && (modals.type == 'PROD_INFO_ADD' || modals.type == 'PROD_DET_INFO_ADD')}
+        //open={modals.active && (modals.type == 'PROD_INFO_ADD' || modals.type == 'PROD_DET_INFO_ADD')}
+        open={modals.active && modals.type == 'PROD_INFO_ADD'}
         onClose={() => {
           closeModal(modals.type);
         }}
@@ -641,7 +642,7 @@ const ProductMng = () => {
           productInfosRefetch();
           onDetFiltersReset();
         }}
-        productInfo={modals.type == 'PROD_DET_INFO_ADD' ? selectedRowsData : undefined}
+        //productInfo={modals.type == 'PROD_DET_INFO_ADD' ? selectedRowsData : undefined} todo
       />
       <ProductModPop
         open={modals.active && modals.type == 'PROD_MOD'}
