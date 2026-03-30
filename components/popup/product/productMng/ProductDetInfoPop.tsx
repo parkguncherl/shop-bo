@@ -3,10 +3,15 @@ import { PopupFooter } from '../../PopupFooter';
 import { PopupContent } from '../../PopupContent';
 import { PopupLayout } from '../../PopupLayout';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { authApi } from '../../../../libs';
+import { authApi, YupSchema } from '../../../../libs';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import { ConfirmModal } from '../../../ConfirmModal';
-import { ProductMngRequestDeleteProductDet, ProductMngResponseProductDetInfo, ProductMngResponseProductInfo } from '../../../../generated';
+import {
+  ProductMngRequestDeleteProductDet,
+  ProductMngRequestInsertProductDet,
+  ProductMngResponseProductDetInfo,
+  ProductMngResponseProductInfo,
+} from '../../../../generated';
 import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
 import TunedGrid, { TunedGridRef } from '../../../grid/TunedGrid';
 import { PopupSearchBox, PopupSearchType } from '../../content';
@@ -14,6 +19,17 @@ import CustomGridLoading from '../../../CustomGridLoading';
 import CustomNoRowsOverlay from '../../../CustomNoRowsOverlay';
 import { GridSetting } from '../../../../libs/ag-grid';
 import { ColDef } from 'ag-grid-community';
+import { GlobalError, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+
+export interface ProductDetInsertFields extends ProductMngRequestInsertProductDet {
+  // productDetSeq: number;
+  // productDetSize: string;
+  // productDetColor: string;
+  // skuDiscountRate: number;
+  // //fileId?: number;
+  // sleepYn: string;
+}
 
 interface ProductContentShowPopProps {
   open: boolean;
@@ -39,6 +55,35 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
   const RefForGrid = useRef<TunedGridRef<ProductMngResponseProductDetInfo>>(null);
   const flagAboutUpdatedOrNot = useRef(false);
   const flagAboutIsOnWritingOrNot = useRef(false); // 신규 작성중 여부
+
+  const tunedGridWrapperRef = useRef(null);
+
+  // handleSubmit(onValid, onInvalid)(); // 함수를 반환하므로 다음과 같이, 호출하여야
+  /** 품목 내용 입력 서식 */
+  const {
+    handleSubmit,
+    reset,
+    clearErrors,
+    setValue,
+    formState: { errors },
+  } = useForm<ProductDetInsertFields>({
+    resolver: yupResolver(YupSchema.InsertProductDetRequest()),
+    mode: 'onChange',
+    defaultValues: {
+      skuDiscountRate: 0,
+      sleepYn: 'N',
+    },
+  });
+
+  /** 입력 시점 적절치 못한 값이 전달된 경우 사용자에게 에러를 출력하는 영역 */
+  useEffect(() => {
+    const fieldsRelatedWithErr = Object.keys(errors);
+    if (fieldsRelatedWithErr.length > 0) {
+      // @ts-ignore
+      const targetErr = errors[fieldsRelatedWithErr[0]] as GlobalError;
+      toastError(targetErr.message);
+    }
+  }, [errors]);
 
   const { mutate: updateProductDetMutate } = useMutation(updateProductDet, {
     onSuccess: async (e) => {
@@ -98,7 +143,8 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
               productDetColor: event.newValue,
             });
           } else {
-            // 신규 작성 영역 todo
+            // 신규 작성 영역
+            setValue('productDetColor', event.newValue, { shouldValidate: true });
           }
         },
       },
@@ -116,7 +162,8 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
               productDetSize: event.newValue,
             });
           } else {
-            // 신규 작성 영역 todo
+            // 신규 작성 영역
+            setValue('productDetSize', event.newValue, { shouldValidate: true });
           }
         },
       },
@@ -129,21 +176,26 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
         editable: (params) => (flagAboutIsOnWritingOrNot.current ? params.data?.id == undefined : true),
         cellStyle: GridSetting.CellStyle.CENTER,
         onCellValueChanged: (event) => {
+          if (isNaN(Number(event.newValue)) || Number(event.newValue) < 0 || Number(event.newValue) > 100) {
+            toastError('유효한 값을 입력하십시요.');
+            return;
+          }
           if (event.data.id) {
             updateProductDetMutate({
               id: event.data.id,
               skuDiscountRate: event.newValue,
             });
           } else {
-            // 신규 작성 영역 todo
+            // 신규 작성 영역
+            setValue('skuDiscountRate', event.newValue, { shouldValidate: true });
           }
         },
       },
       {
         field: 'productDetCntn',
         headerName: '상세내용',
-        minWidth: 230,
-        maxWidth: 230,
+        minWidth: 180,
+        maxWidth: 200,
         suppressHeaderMenuButton: true,
         editable: (params) => (flagAboutIsOnWritingOrNot.current ? params.data?.id == undefined : true),
         cellStyle: GridSetting.CellStyle.LEFT,
@@ -154,12 +206,38 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
               productDetCntn: event.newValue,
             });
           } else {
-            // 신규 작성 영역 todo
+            // 신규 작성 영역
+            console.log('productDetCntn', event.newValue);
+            setValue('productDetCntn', event.newValue, { shouldValidate: true });
+          }
+        },
+      },
+      {
+        field: 'sleepYn',
+        headerName: '휴면여부',
+        minWidth: 70,
+        maxWidth: 90,
+        suppressHeaderMenuButton: true,
+        editable: (params) => (flagAboutIsOnWritingOrNot.current ? params.data?.id == undefined : true),
+        cellStyle: GridSetting.CellStyle.CENTER,
+        cellEditor: 'agSelectCellEditor',
+        cellEditorParams: {
+          values: ['Y', 'N'],
+        },
+        onCellValueChanged: (event) => {
+          if (event.data.id) {
+            updateProductDetMutate({
+              id: event.data.id,
+              sleepYn: event.newValue,
+            });
+          } else {
+            // 신규 작성 영역
+            setValue('sleepYn', event.newValue, { shouldValidate: true });
           }
         },
       },
     ],
-    [updateProductDetMutate],
+    [updateProductDetMutate, setValue],
   );
 
   /** 상품상세정보 목록 조회 */
@@ -198,12 +276,16 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
     RefForGrid.current?.api.deselectAll(); // 셀렉션 초기화
     flagAboutUpdatedOrNot.current = false; // 업데이트 여부 플래그 초기화
     flagAboutIsOnWritingOrNot.current = false; // 작성 중 여부 플래그 초기화
+
+    // rhf
+    reset();
+    clearErrors();
   };
 
   return (
     <div className="imgPopBox">
       <PopupLayout
-        width={580}
+        width={620}
         open={open}
         isEscClose={true}
         title={productInfo?.prodNm + ' 의 상품상세 목록'}
@@ -218,7 +300,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
                   onClick={() => {
                     if (productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length == 0) {
                       flagAboutIsOnWritingOrNot.current = true; // 플래그 동기화
-                      setProductDetInfoList((prevState) => [...prevState, {}]); // 신규 행 추가
+                      setProductDetInfoList((prevState) => [...prevState, {}]); // 신규 행 추가(이후부터는 rhf 관할)
                     } else {
                       console.log('비정상 콜백 호출!');
                     }
@@ -272,17 +354,22 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
               {/*/>*/}
             </PopupSearchType>
           </PopupSearchBox>
-          <div className="mt10">
+          <div
+            className="mt10"
+            style={{ position: 'relative' }} // relative 설정 필수
+            ref={tunedGridWrapperRef}
+          >
             <TunedGrid<ProductMngResponseProductDetInfo>
               columnDefs={columnDefs}
               rowData={productDetInfoList}
+              popupParent={tunedGridWrapperRef.current}
               loadingOverlayComponent={CustomGridLoading}
               noRowsOverlayComponent={CustomNoRowsOverlay}
               ref={RefForGrid}
               loading={isProductDetInfosLoading}
               rowSelection={{
                 mode: 'singleRow',
-                isRowSelectable: (rowNode) => !!(rowNode.data && rowNode.data.id != undefined),
+                isRowSelectable: (rowNode) => !flagAboutIsOnWritingOrNot.current, // 신규 작성 시점에는 행 선택 제한
                 enableClickSelection: true,
               }}
               onSelectionChanged={(event) => {

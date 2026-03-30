@@ -9,6 +9,7 @@ import { LoginVerificationFields } from '../app/(auth)/login/LoginClient';
 import { ProductContentsFields } from '../app/(app)/product/Contents/ProductContents';
 import { ProductInfoCreateFields } from '../components/popup/product/productMng/ProductInfoAddPop';
 import { ProductModFields } from '../components/popup/product/productMng/ProductModPop';
+import { ProductDetInsertFields } from '../components/popup/product/productMng/ProductDetInfoPop';
 
 export interface MenuRequestParams {
   menuCd?: string;
@@ -270,37 +271,58 @@ export const YupSchema = {
         }),
     }) as yup.ObjectSchema<ProductContentsFields>,
 
-  InsertProductInfoRequest: (productId?: number): yup.ObjectSchema<ProductInfoCreateFields> =>
+  //InsertProductInfoRequest: (productId?: number): yup.ObjectSchema<ProductInfoCreateFields> =>
+  InsertProductInfoRequest: (): yup.ObjectSchema<ProductInfoCreateFields> =>
     yup.object({
-      product: yup.lazy(() => {
-        // 1. id가 있으면 (수정 모드): 모든 필드를 선택사항으로 변경
-        if (productId) {
-          return yup.object().notRequired().nullable();
-        }
+      // todo 마이그레이션 이후 이하가 무의미하다 여길 시 삭제
+      // product: yup.lazy(() => {
+      //   // 1. id가 있으면 (수정 모드): 모든 필드를 선택사항으로 변경
+      //   if (productId) {
+      //     return yup.object().notRequired().nullable();
+      //   }
+      //
+      //   // 2. id가 없으면 (신규 등록): 기존의 엄격한 필수 스키마 적용
+      //   return yup.object({
+      //     prodNm: yup.string().required('상품명은 필수값입니다!'),
+      //     prodTp: yup.string().required('상품유형은 필수값입니다!'),
+      //     prodDetTp: yup.string().required('상품상세유형은 필수값입니다!'),
+      //     composition: yup.string().required('혼용율은 필수값입니다!'),
+      //     // repFileId: yup.number().notRequired(),
+      //     // detailFileId: yup.number().notRequired(),
+      //     // sizeFileId: yup.number().notRequired(),
+      //     // etcFileId: yup.number().notRequired(),
+      //     makeYmd: yup.string().required('제조일자는 필수값입니다!'),
+      //     orgAmt: yup.number().typeError('원가는 숫자만 입력 가능합니다.').notRequired(),
+      //     sellAmt: yup.number().typeError('판매가는 숫자만 입력 가능합니다.').notRequired(),
+      //     discountRate: yup.number().typeError('할인율은 숫자만 입력 가능합니다.').notRequired(),
+      //     weather: yup.array().of(yup.string()).min(1, '최소 하나의 계절 유형을 선택하십시요.').required('계절 유형은 필수값입니다!'),
+      //     // isSpring: yup.string().notRequired(),
+      //     // isSummer: yup.string().notRequired(),
+      //     // isAutumn: yup.string().notRequired(),
+      //     // isWinter: yup.string().notRequired(),
+      //   });
+      // }),
 
-        // 2. id가 없으면 (신규 등록): 기존의 엄격한 필수 스키마 적용
-        return yup.object({
-          prodNm: yup.string().required('상품명은 필수값입니다!'),
-          prodTp: yup.string().required('상품유형은 필수값입니다!'),
-          prodDetTp: yup.string().required('상품상세유형은 필수값입니다!'),
-          composition: yup.string().required('혼용율은 필수값입니다!'),
-          // repFileId: yup.number().notRequired(),
-          // detailFileId: yup.number().notRequired(),
-          // sizeFileId: yup.number().notRequired(),
-          // etcFileId: yup.number().notRequired(),
-          makeYmd: yup.string().required('제조일자는 필수값입니다!'),
-          orgAmt: yup.number().typeError('원가는 숫자만 입력 가능합니다.').notRequired(),
-          sellAmt: yup.number().typeError('판매가는 숫자만 입력 가능합니다.').notRequired(),
-          discountRate: yup.number().typeError('할인율은 숫자만 입력 가능합니다.').notRequired(),
-          weather: yup.array().of(yup.string()).min(1, '최소 하나의 계절 유형을 선택하십시요.').required('계절 유형은 필수값입니다!'),
-          // isSpring: yup.string().notRequired(),
-          // isSummer: yup.string().notRequired(),
-          // isAutumn: yup.string().notRequired(),
-          // isWinter: yup.string().notRequired(),
-        });
+      product: yup.object({
+        prodNm: yup.string().required('상품명은 필수값입니다!'),
+        prodTp: yup.string().required('상품유형은 필수값입니다!'),
+        prodDetTp: yup.string().required('상품상세유형은 필수값입니다!'),
+        composition: yup.string().required('혼용율은 필수값입니다!'),
+        // repFileId: yup.number().notRequired(),
+        // detailFileId: yup.number().notRequired(),
+        // sizeFileId: yup.number().notRequired(),
+        // etcFileId: yup.number().notRequired(),
+        makeYmd: yup.string().required('제조일자는 필수값입니다!'),
+        orgAmt: yup.number().typeError('원가는 숫자만 입력 가능합니다.').notRequired(),
+        sellAmt: yup.number().typeError('판매가는 숫자만 입력 가능합니다.').notRequired(),
+        discountRate: yup.number().typeError('할인율은 숫자만 입력 가능합니다.').notRequired(),
+        weather: yup.array().of(yup.string()).min(1, '최소 하나의 계절 유형을 선택하십시요.').required('계절 유형은 필수값입니다!'),
+        // isSpring: yup.string().notRequired(),
+        // isSummer: yup.string().notRequired(),
+        // isAutumn: yup.string().notRequired(),
+        // isWinter: yup.string().notRequired(),
       }),
 
-      // todo
       productDet: yup
         .object({
           //productDetSeq: yup.number().required(),
@@ -333,4 +355,15 @@ export const YupSchema = {
       // isAutumn: yup.string().notRequired(),
       // isWinter: yup.string().notRequired(),
     }) as yup.ObjectSchema<ProductModFields>,
+
+  InsertProductDetRequest: (): yup.ObjectSchema<ProductDetInsertFields> =>
+    yup.object({
+      //productDetSeq: yup.number().required(),
+      productDetSize: yup.string().required('(상품상세)사이즈는 필수값입니다!'),
+      productDetColor: yup.string().required('(상품상세)컬러는 필수값입니다!'),
+      skuDiscountRate: yup.number().typeError('스큐 단위 할인율은 숫자만 입력 가능합니다.').required('스큐 단위 할인율은 필수값입니다!'),
+      //fileId: yup.number().notRequired(),
+      sleepYn: yup.string().required('휴면 여부는 필수값입니다!'),
+      productDetCntn: yup.string(),
+    }) as yup.ObjectSchema<ProductDetInsertFields>,
 };

@@ -98,7 +98,8 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
     clearErrors,
     //formState: { errors, isValid },
   } = useForm<ProductInfoCreateFields>({
-    resolver: yupResolver(YupSchema.InsertProductInfoRequest(productInfo?.id)),
+    // resolver: yupResolver(YupSchema.InsertProductInfoRequest(productInfo?.id)), todo
+    resolver: yupResolver(YupSchema.InsertProductInfoRequest()),
     mode: 'onChange',
     defaultValues: {
       productDet: {
