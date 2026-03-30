@@ -19,7 +19,7 @@ import CustomGridLoading from '../../../CustomGridLoading';
 import CustomNoRowsOverlay from '../../../CustomNoRowsOverlay';
 import { GridSetting } from '../../../../libs/ag-grid';
 import { ColDef } from 'ag-grid-community';
-import { GlobalError, useForm } from 'react-hook-form';
+import { GlobalError, SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 export interface ProductDetInsertFields extends ProductMngRequestInsertProductDet {
@@ -45,12 +45,15 @@ interface ProductContentShowPopProps {
  * */
 const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
-  const [updateProductDet, deleteProductDet] = useProductMngStore((s) => [s.updateProductDet, s.deleteProductDet]);
+  const [updateProductDet, deleteProductDet, insertProductDet] = useProductMngStore((s) => [s.updateProductDet, s.deleteProductDet, s.insertProductDet]);
 
   /** 팝업 내부 local state */
   const [productDetInfoList, setProductDetInfoList] = useState<ProductMngResponseProductDetInfo[]>([]);
   const [selectedRowsData, setSelectedRowsData] = useState<ProductMngResponseProductDetInfo | undefined>(undefined);
-  const [openModConf, setOpenAddConf] = useState<{ open: boolean; stored?: ProductMngRequestDeleteProductDet }>({ open: false });
+
+  // 컨펌 팝업
+  const [openDelConf, setOpenDelConf] = useState<{ open: boolean; stored?: ProductMngRequestDeleteProductDet }>({ open: false });
+  const [openAddConf, setOpenAddConf] = useState<{ open: boolean; stored?: ProductDetInsertFields }>({ open: false });
 
   const RefForGrid = useRef<TunedGridRef<ProductMngResponseProductDetInfo>>(null);
   const flagAboutUpdatedOrNot = useRef(false);
@@ -58,7 +61,6 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
 
   const tunedGridWrapperRef = useRef(null);
 
-  // handleSubmit(onValid, onInvalid)(); // 함수를 반환하므로 다음과 같이, 호출하여야
   /** 품목 내용 입력 서식 */
   const {
     handleSubmit,
@@ -94,7 +96,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
           await productDetInfosRefetch();
           flagAboutUpdatedOrNot.current = true;
         } else {
-          toastError(`컨텐츠 저장 도중 문제 발생 (${e.data.resultMessage})`);
+          toastError(`수정 도중 문제 발생 (${e.data.resultMessage})`);
         }
       } catch (e) {
         console.log(e);
@@ -110,7 +112,29 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
           await productDetInfosRefetch();
           flagAboutUpdatedOrNot.current = true;
         } else {
-          toastError(`컨텐츠 저장 도중 문제 발생 (${e.data.resultMessage})`);
+          toastError(`삭제 도중 문제 발생 (${e.data.resultMessage})`);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+  });
+
+  const { mutate: insertProductDetMutate } = useMutation(insertProductDet, {
+    onSuccess: async (e) => {
+      try {
+        if (e.data.resultCode === 200) {
+          toastSuccess('신규 데이터가 추가되었습니다.');
+
+          // 초기화 동작
+          flagAboutIsOnWritingOrNot.current = false;
+          await productDetInfosRefetch();
+
+          // rhf 초기화
+          reset();
+          clearErrors();
+        } else {
+          toastError(`추가 도중 문제 발생 (${e.data.resultMessage})`);
         }
       } catch (e) {
         console.log(e);
@@ -318,9 +342,27 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
     flagAboutUpdatedOrNot.current = false; // 업데이트 여부 플래그 초기화
     flagAboutIsOnWritingOrNot.current = false; // 작성 중 여부 플래그 초기화
 
-    // rhf
+    // rhf 초기화
     reset();
     clearErrors();
+  };
+
+  // 입력이 유효한 경우
+  const onValid: SubmitHandler<ProductDetInsertFields> = (data, event) => {
+    setOpenAddConf({
+      open: true,
+      stored: data,
+    });
+  };
+
+  // 유효하지 않은 경우
+  const onInvalid: SubmitErrorHandler<ProductDetInsertFields> = (errors, event) => {
+    const fieldsRelatedWithErr = Object.keys(errors);
+    if (fieldsRelatedWithErr.length > 0) {
+      // @ts-ignore
+      const targetErr = errors[fieldsRelatedWithErr[0]] as GlobalError;
+      toastError(targetErr.message);
+    }
   };
 
   return (
@@ -328,7 +370,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
       <PopupLayout
         width={620}
         open={open}
-        isEscClose={true}
+        isEscClose={!(openAddConf.open || openDelConf.open)}
         title={productInfo?.prodNm + ' 의 상품상세 목록'}
         onClose={commonOnCloseCallback}
         footer={
@@ -345,7 +387,12 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
                       flagAboutIsOnWritingOrNot.current = true; // 플래그 동기화
                       setProductDetInfoList((prevState) => [...prevState, {}]); // 신규 행 추가(이후부터는 rhf 관할)
                     } else {
-                      console.log('비정상 콜백 호출!');
+                      // 신규 작성
+                      if (isValid) {
+                        handleSubmit(onValid, onInvalid)(); // 함수를 반환하므로 다음과 같이, 호출하여야
+                      } else {
+                        console.error('유효하지 않은 요청');
+                      }
                     }
                   }}
                 >
@@ -356,7 +403,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
                   disabled={productInfo == undefined || selectedRowsData == undefined}
                   onClick={() => {
                     if (selectedRowsData?.id) {
-                      setOpenAddConf({
+                      setOpenDelConf({
                         open: true,
                         stored: {
                           id: selectedRowsData?.id,
@@ -424,12 +471,35 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
         </PopupContent>
       </PopupLayout>
       <ConfirmModal
-        open={openModConf.open}
+        open={openDelConf.open}
         title={(productInfo?.prodNm || '') + ' ' + selectedRowsData?.productDetColor + ' 을(를) 삭제 하시겠습니까?'}
+        confirmText={'삭제'}
+        onConfirm={() => {
+          if (openDelConf.stored) {
+            deleteProductDetMutate({
+              id: openDelConf.stored.id,
+            });
+          } else {
+            toastError('삭제하고자 하는 입력 결과를 찾을 수 없습니다.');
+            console.error('삭제하고자 하는 입력 결과를 찾을 수 없습니다.');
+          }
+        }}
+        onClose={() => {
+          setOpenDelConf({
+            open: false,
+          });
+        }}
+      />
+      <ConfirmModal
+        open={openAddConf.open}
+        title={'신규 상품상세 정보로 저장하시겠습니까?'}
         confirmText={'저장'}
         onConfirm={() => {
-          if (openModConf.stored) {
-            deleteProductDetMutate(openModConf.stored);
+          if (openAddConf.stored) {
+            insertProductDetMutate({
+              ...openAddConf.stored,
+              productId: productInfo?.id,
+            });
           } else {
             toastError('저장하고자 하는 입력 결과를 찾을 수 없습니다.');
             console.error('저장하고자 하는 입력 결과를 찾을 수 없습니다.');

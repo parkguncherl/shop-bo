@@ -7,6 +7,7 @@ import {
   ProductMngRequestDeleteProduct,
   ProductMngRequestDeleteProductDet,
   ProductMngRequestInsertProduct,
+  ProductMngRequestInsertProductDet,
   ProductMngRequestUpdateProduct,
   ProductMngRequestUpdateProductDet,
 } from '../../generated';
@@ -31,6 +32,7 @@ interface ProductMngState {
 
 interface ProductMngApiState {
   insertProductInfo: (insertProductInfoRequest: ProductMngRequestInsertProduct) => AxiosPromise<ApiResponse>;
+  insertProductDet: (insertProductDetRequest: ProductMngRequestInsertProductDet) => AxiosPromise<ApiResponse>;
   updateProduct: (updateProductRequest: ProductMngRequestUpdateProduct) => AxiosPromise<ApiResponse>;
   updateProductDet: (updateProductDetRequest: ProductMngRequestUpdateProductDet) => AxiosPromise<ApiResponse>;
   deleteProduct: (deleteProductRequest: ProductMngRequestDeleteProduct) => AxiosPromise<ApiResponse>;
@@ -74,6 +76,9 @@ const initialStateCreator: StateCreator<ProductMngStateOfAll> = (set, get, api) 
     },
     insertProductInfo: (insertProductInfoRequest) => {
       return authApi.put('/productMng/insertProductInfo', insertProductInfoRequest);
+    },
+    insertProductDet: (insertProductDetRequest) => {
+      return authApi.put('/productMng/insertProductDet', insertProductDetRequest);
     },
     updateProduct: (updateProductRequest) => {
       return authApi.patch('/productMng/updateProduct', updateProductRequest);
