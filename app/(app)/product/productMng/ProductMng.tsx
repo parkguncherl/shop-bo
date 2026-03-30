@@ -659,9 +659,9 @@ const ProductMng = () => {
       />
       <ProductDetInfoPop
         open={modals.active && modals.type == 'PROD_DET_INFO'}
-        onClose={(updated) => {
+        onClose={(modHasBeenDone) => {
           closeModal(modals.type);
-          if (updated) {
+          if (modHasBeenDone) {
             productInfosRefetch();
           }
         }}

@@ -33,7 +33,7 @@ export interface ProductDetInsertFields extends ProductMngRequestInsertProductDe
 
 interface ProductContentShowPopProps {
   open: boolean;
-  onClose: (updated: boolean) => void;
+  onClose: (modHasBeenDone: boolean) => void; // 인자로 삭제, 수정, 추가가 일어난 상태인지를 전달
   productInfo?: ProductMngResponseProductInfo;
 }
 
@@ -56,8 +56,9 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
   const [openAddConf, setOpenAddConf] = useState<{ open: boolean; stored?: ProductDetInsertFields }>({ open: false });
 
   const RefForGrid = useRef<TunedGridRef<ProductMngResponseProductDetInfo>>(null);
-  const flagAboutUpdatedOrNot = useRef(false);
+
   const flagAboutIsOnWritingOrNot = useRef(false); // 신규 작성중 여부
+  const flagWhetherModHasBeenDoneOrNot = useRef(false); // 삭제, 수정, 추가 동작이 해당 참조 초기화 이후 일어났는지 여부
 
   const tunedGridWrapperRef = useRef(null);
 
@@ -93,8 +94,9 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('수정되었습니다.');
+          flagWhetherModHasBeenDoneOrNot.current = true; // 이벤트 발생에 따른 동기화
+
           await productDetInfosRefetch();
-          flagAboutUpdatedOrNot.current = true;
         } else {
           toastError(`수정 도중 문제 발생 (${e.data.resultMessage})`);
         }
@@ -109,8 +111,9 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('삭제되었습니다.');
+          flagWhetherModHasBeenDoneOrNot.current = true; // 이벤트 발생에 따른 동기화
+
           await productDetInfosRefetch();
-          flagAboutUpdatedOrNot.current = true;
         } else {
           toastError(`삭제 도중 문제 발생 (${e.data.resultMessage})`);
         }
@@ -125,6 +128,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('신규 데이터가 추가되었습니다.');
+          flagWhetherModHasBeenDoneOrNot.current = true; // 이벤트 발생에 따른 동기화
 
           // 초기화 동작
           flagAboutIsOnWritingOrNot.current = false;
@@ -335,12 +339,12 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
   }, [productDetInfos, isProductDetInfosSuccess]);
 
   const commonOnCloseCallback = () => {
-    if (onClose) onClose(flagAboutUpdatedOrNot.current);
+    if (onClose) onClose(flagWhetherModHasBeenDoneOrNot.current);
 
     // 닫힘 시점 초기화 동작
     RefForGrid.current?.api.deselectAll(); // 셀렉션 초기화
-    flagAboutUpdatedOrNot.current = false; // 업데이트 여부 플래그 초기화
     flagAboutIsOnWritingOrNot.current = false; // 작성 중 여부 플래그 초기화
+    flagWhetherModHasBeenDoneOrNot.current = false; // 삭제, 수정, 추가 동작 발생 여부 초기화
 
     // rhf 초기화
     reset();
