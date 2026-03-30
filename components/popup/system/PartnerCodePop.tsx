@@ -14,8 +14,8 @@ import { ConfirmModal } from '../../ConfirmModal';
 import useFilters from '../../../hooks/useFilters';
 import TunedGrid, { TunedGridRef } from '../../grid/TunedGrid';
 import { usePausedEventQueue } from '../../../customFn/pausedEventsQueue';
-import {usePartnerCodeStore} from "../../../stores/usePartnerCodeStore";
-import {useSession} from "next-auth/react";
+import { usePartnerCodeStore } from '../../../stores/usePartnerCodeStore';
+import { useSession } from 'next-auth/react';
 
 interface Props {
   partnerCodeUpper: string;
@@ -106,12 +106,30 @@ export const PartnerCodePop = ({ partnerCodeUpper, activated, title, codeName, o
       suppressHeaderMenuButton: true,
     },
     {
-      headerName: codeName,
+      headerName: '명칭',
       field: 'codeNm',
       sortable: true,
       width: 100,
       editable: true,
       cellStyle: GridSetting.CellStyle.LEFT,
+      suppressHeaderMenuButton: true,
+    },
+    {
+      headerName: '유형',
+      field: 'codeEtc',
+      sortable: true,
+      width: 100,
+      editable: true,
+      cellStyle: GridSetting.CellStyle.CENTER,
+      suppressHeaderMenuButton: true,
+    },
+    {
+      headerName: '순서',
+      field: 'codeOrder',
+      sortable: true,
+      width: 50,
+      editable: true,
+      cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
     },
     {
