@@ -65,7 +65,8 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
     reset,
     clearErrors,
     setValue,
-    formState: { errors },
+    getValues,
+    formState: { errors, isValid },
   } = useForm<ProductDetInsertFields>({
     resolver: yupResolver(YupSchema.InsertProductDetRequest()),
     mode: 'onChange',
@@ -147,6 +148,14 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
             setValue('productDetColor', event.newValue, { shouldValidate: true });
           }
         },
+        valueFormatter: (params) => {
+          if (!params.data || params.data.id) {
+            return params.value;
+          } else {
+            // 신규 작성 영역
+            return getValues('productDetColor');
+          }
+        },
       },
       {
         field: 'productDetSize',
@@ -164,6 +173,14 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
           } else {
             // 신규 작성 영역
             setValue('productDetSize', event.newValue, { shouldValidate: true });
+          }
+        },
+        valueFormatter: (params) => {
+          if (!params.data || params.data.id) {
+            return params.value;
+          } else {
+            // 신규 작성 영역
+            return getValues('productDetSize');
           }
         },
       },
@@ -190,6 +207,14 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
             setValue('skuDiscountRate', event.newValue, { shouldValidate: true });
           }
         },
+        valueFormatter: (params) => {
+          if (!params.data || params.data.id) {
+            return params.value;
+          } else {
+            // 신규 작성 영역
+            return getValues('skuDiscountRate');
+          }
+        },
       },
       {
         field: 'productDetCntn',
@@ -209,6 +234,14 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
             // 신규 작성 영역
             console.log('productDetCntn', event.newValue);
             setValue('productDetCntn', event.newValue, { shouldValidate: true });
+          }
+        },
+        valueFormatter: (params) => {
+          if (!params.data || params.data.id) {
+            return params.value;
+          } else {
+            // 신규 작성 영역
+            return getValues('productDetCntn');
           }
         },
       },
@@ -235,9 +268,17 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
             setValue('sleepYn', event.newValue, { shouldValidate: true });
           }
         },
+        valueFormatter: (params) => {
+          if (!params.data || params.data.id) {
+            return params.value;
+          } else {
+            // 신규 작성 영역
+            return getValues('sleepYn');
+          }
+        },
       },
     ],
-    [updateProductDetMutate, setValue],
+    [updateProductDetMutate, setValue, getValues],
   );
 
   /** 상품상세정보 목록 조회 */
@@ -295,8 +336,10 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
             <div className="btnArea between">
               <div className="left">
                 <button
-                  className={`btn ${productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length == 0 ? 'btn_blue' : ''}`}
-                  disabled={productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length != 0}
+                  className={`btn ${
+                    productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length != 0 ? (isValid ? 'btn_blue' : '') : 'btn_blue'
+                  }`}
+                  disabled={productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length != 0 ? !isValid : false}
                   onClick={() => {
                     if (productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length == 0) {
                       flagAboutIsOnWritingOrNot.current = true; // 플래그 동기화
@@ -306,7 +349,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
                     }
                   }}
                 >
-                  {productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length == 0 ? '신규 작성' : '작성중..'}
+                  {productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length == 0 ? '신규 작성' : isValid ? '제출' : '작성중..'}
                 </button>
                 <button
                   className={`btn ${productInfo != undefined && selectedRowsData != undefined && 'btn_blue'}`}
