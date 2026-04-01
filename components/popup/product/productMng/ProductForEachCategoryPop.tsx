@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { PopupFooter } from '../../PopupFooter';
 import { PopupContent } from '../../PopupContent';
 import { PopupLayout } from '../../PopupLayout';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { authApi } from '../../../../libs';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import {
@@ -25,6 +25,7 @@ import { Search } from '../../../content';
 import { PARTNER_CODE } from '../../../../libs/const';
 import { usePartnerCodeStore } from '../../../../stores/usePartnerCodeStore';
 import { ConfirmModal } from '../../../ConfirmModal';
+import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
 
 interface ConfirmModalProps {
   type: 'ADD_TO_CATEGORY' | 'DEL_FROM_CATEGORY';
@@ -34,7 +35,7 @@ interface ConfirmModalProps {
 
 interface ConfForAddToCategory extends ConfirmModalProps {
   type: 'ADD_TO_CATEGORY';
-  stored_temporary?: ProductMngResponseProductInfo;
+  stored_temporary?: ProductMngResponseProductInfo & { categoryId: number };
 }
 
 interface ConfForDelFromCategory extends ConfirmModalProps {
@@ -55,7 +56,11 @@ interface ProductContentShowPopProps {
  * */
 const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
-  //const [updateProductDet, deleteProductDet, insertProductDet] = useProductMngStore((s) => [s.updateProductDet, s.deleteProductDet, s.insertProductDet]);
+  const [insertCategoryProduct, deleteCategoryProduct] = useProductMngStore((s) => [
+    s.insertCategoryProduct,
+    //s.updateCategoryProduct,
+    s.deleteCategoryProduct,
+  ]);
   const { selectLowerPartnerCodeByCodeUpper } = usePartnerCodeStore();
 
   /** 팝업 내부 local state */
@@ -78,10 +83,11 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
   const RefForRightGrid = useRef<TunedGridRef<ProductMngResponseProductInfo>>(null);
 
   /** 검색 필터 */
-  const [filtersForProdInfoByCategory, onChangeFiltersForProdInfoByCategory] = useFilters<ProductMngRequestCategoryProductInfoFilter>({
-    categoryId: undefined,
-  });
-  const [filtersForProdInfoList, onChangeFiltersForProdInfoList] = useFilters<ProductMngRequestProductInfoFilter>({
+  const [filtersForProdInfoByCategory, onChangeFiltersForProdInfoByCategory, filtersForProdInfoByCategoryReset] =
+    useFilters<ProductMngRequestCategoryProductInfoFilter>({
+      categoryId: undefined,
+    });
+  const [filtersForProdInfoList, onChangeFiltersForProdInfoList, filtersForProdInfoListReset] = useFilters<ProductMngRequestProductInfoFilter>({
     prodNm: undefined,
   });
 
@@ -160,14 +166,54 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
     [],
   );
 
+  const { mutate: insertCategoryProductMutate } = useMutation(insertCategoryProduct, {
+    onSuccess: (e) => {
+      try {
+        if (e.data.resultCode === 200) {
+          toastSuccess('추가되었습니다.');
+          setModalsStatus((prevState) => {
+            return {
+              ...prevState,
+              active: false,
+              stored_temporary: undefined,
+            };
+          });
+          productInfosByCategoryRefetch();
+        } else {
+          toastError(`컨텐츠 추가 도중 문제 발생 (${e.data.resultMessage})`);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+  });
+
+  const { mutate: deleteCategoryProductMutate } = useMutation(deleteCategoryProduct, {
+    onSuccess: (e) => {
+      try {
+        if (e.data.resultCode === 200) {
+          toastSuccess('삭제되었습니다.');
+          setModalsStatus((prevState) => {
+            return {
+              ...prevState,
+              active: false,
+              stored_temporary: undefined,
+            };
+          });
+          productInfosByCategoryRefetch();
+        } else {
+          toastError(`컨텐츠 삭제 도중 문제 발생 (${e.data.resultMessage})`);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+  });
+
   /** 하위코드 목록 조회 */
-  const {
-    data: categories,
-    isSuccess: isCategoriesSuccess,
-    refetch: categoriesRefetch,
-  } = useQuery({
+  const { data: categories, isSuccess: isCategoriesSuccess } = useQuery({
     queryFn: () => selectLowerPartnerCodeByCodeUpper(PARTNER_CODE.categories.code),
-    enabled: true,
+    enabled: open,
   });
 
   useEffect(() => {
@@ -241,6 +287,9 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
 
   const commonOnCloseCallback = () => {
     if (onClose) onClose();
+
+    filtersForProdInfoByCategoryReset();
+    filtersForProdInfoListReset();
   };
 
   /** 검색 버튼 클릭 시 */
@@ -258,7 +307,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
       <PopupLayout
         width={900}
         open={open}
-        isEscClose={true}
+        isEscClose={!modalsStatus.active}
         title={'키테고리별 상품'}
         onClose={commonOnCloseCallback}
         footer={
@@ -267,7 +316,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
               <div className="left">
                 <button
                   className={`btn ${selectedProductInfoByCategory != undefined && filtersForProdInfoByCategory.categoryId && 'btn_blue'}`}
-                  disabled={selectedProductInfoByCategory == undefined || filtersForProdInfoByCategory.categoryId == undefined}
+                  disabled={selectedProductInfoByCategory == undefined || !filtersForProdInfoByCategory.categoryId}
                   onClick={() => {
                     setModalsStatus({
                       type: 'DEL_FROM_CATEGORY',
@@ -300,25 +349,28 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                   }`}
                 </button>
                 <button
-                  className={`btn ${selectedProductInfo != undefined && filtersForProdInfoByCategory.categoryId != undefined && 'btn_blue'}`}
-                  disabled={selectedProductInfo == undefined || filtersForProdInfoByCategory.categoryId == undefined}
+                  className={`btn ${selectedProductInfo != undefined && filtersForProdInfoByCategory.categoryId && 'btn_blue'}`}
+                  disabled={selectedProductInfo == undefined || !filtersForProdInfoByCategory.categoryId}
                   onClick={() => {
                     setModalsStatus({
                       type: 'ADD_TO_CATEGORY',
                       active: true,
-                      stored_temporary: selectedProductInfo,
+                      stored_temporary: {
+                        ...selectedProductInfo,
+                        categoryId: filtersForProdInfoByCategory.categoryId,
+                      },
                     });
                   }}
                 >
                   {`${
-                    selectedProductInfo != undefined && filtersForProdInfoByCategory.categoryId != undefined
+                    selectedProductInfo != undefined && filtersForProdInfoByCategory.categoryId
                       ? selectedProductInfo.prodNm?.slice(0, 7) +
                         ((selectedProductInfo.prodNm || '').length > 7 ? '..' : '') +
-                        '을(를)' +
+                        ' 을(를) ' +
                         (lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||
                           '알수 없는 카테고리') +
                         ' 의 상품으로 추가 '
-                      : '카테고리 추가'
+                      : '카테고리 선택 후 추가'
                   }`}
                 </button>
               </div>
@@ -412,8 +464,15 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
         onConfirm={() => {
           if (modalsStatus.type == 'DEL_FROM_CATEGORY') {
             // 카테고리로부터 제거
+            deleteCategoryProductMutate({
+              id: modalsStatus.stored_temporary?.id, // 이때의 id는 categoryProduct 의 id
+            });
           } else {
             // 카테고리로 추가
+            insertCategoryProductMutate({
+              categoryId: modalsStatus.stored_temporary?.categoryId,
+              productId: modalsStatus.stored_temporary?.id,
+            });
           }
         }}
         onClose={() => {
