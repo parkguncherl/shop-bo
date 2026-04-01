@@ -7,7 +7,9 @@ import { authApi } from '../../../../libs';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import {
   PartnerCodeResponseLowerSelect,
+  ProductMngRequestCategoryProductInfoFilter,
   ProductMngRequestProductInfoFilter,
+  ProductMngResponseCategoryProductInfo,
   ProductMngResponseProductDetInfo,
   ProductMngResponseProductInfo,
 } from '../../../../generated';
@@ -39,20 +41,25 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
   const { selectLowerPartnerCodeByCodeUpper } = usePartnerCodeStore();
 
   /** 팝업 내부 local state */
-  const [productInfoListByCategory, setProductInfoListByCategory] = useState<ProductMngResponseProductInfo[]>([]);
+  const [productInfoListByCategory, setProductInfoListByCategory] = useState<ProductMngResponseCategoryProductInfo[]>([]);
   const [productInfoList, setProductInfoList] = useState<ProductMngResponseProductInfo[]>([]);
 
   const [lowerPartnerCodeList, setLowerPartnerCodeList] = useState<PartnerCodeResponseLowerSelect[]>([]);
 
-  const RefForGrid = useRef<TunedGridRef<ProductMngResponseProductDetInfo>>(null);
+  /** 참조(ref) */
+  const RefForLeftGrid = useRef<TunedGridRef<ProductMngResponseCategoryProductInfo>>(null);
+  const RefForRightGrid = useRef<TunedGridRef<ProductMngResponseProductInfo>>(null);
 
   /** 검색 필터 */
-  const [commonFilters, onChangeCommonFilters] = useFilters<ProductMngRequestProductInfoFilter>({
+  const [filtersForProdInfoByCategory, onChangeFiltersForProdInfoByCategory] = useFilters<ProductMngRequestCategoryProductInfoFilter>({
+    categoryId: undefined,
+  });
+  const [filtersForProdInfoList, onChangeFiltersForProdInfoList] = useFilters<ProductMngRequestProductInfoFilter>({
     prodNm: undefined,
   });
 
   /** 컬럼 설정 */
-  const columnDefsOnLeft = useMemo<ColDef<ProductMngResponseProductInfo>[]>(
+  const columnDefsOnLeft = useMemo<ColDef<ProductMngResponseCategoryProductInfo>[]>(
     () => [
       {
         field: 'no',
@@ -147,21 +154,22 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
     }
   }, [categories, isCategoriesSuccess]);
 
-  /** 품목정보 목록 조회 */
+  /** 카테고리 연결상품정보 목록 조회 */
   const {
     data: productInfosByCategory,
     isSuccess: isProductInfosByCategorySuccess,
     isLoading: isProductInfosByCategoryLoading,
     refetch: productInfosByCategoryRefetch,
   } = useQuery({
-    queryKey: ['/productMng/productInfoList'],
+    queryKey: ['/productMng/categoryProductInfoList', filtersForProdInfoByCategory.categoryId],
     queryFn: () =>
-      authApi.get('/productMng/productInfoList', {
+      authApi.get('/productMng/categoryProductInfoList', {
         params: {
-          ...commonFilters,
+          ...filtersForProdInfoByCategory,
         },
       }),
     refetchOnMount: 'always',
+    enabled: open,
   });
 
   useEffect(() => {
@@ -175,7 +183,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
     }
   }, [productInfosByCategory, isProductInfosByCategorySuccess]);
 
-  /** 품목정보 목록 조회 */
+  /** 전체상품정보 */
   const {
     data: productInfos,
     isSuccess: isProductInfosSuccess,
@@ -186,10 +194,11 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
     queryFn: () =>
       authApi.get('/productMng/productInfoList', {
         params: {
-          ...commonFilters,
+          ...filtersForProdInfoList,
         },
       }),
     refetchOnMount: 'always',
+    enabled: open,
   });
 
   useEffect(() => {
@@ -243,26 +252,26 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
             <PopupSearchType className={'type_1'}>
               <Search.DropDown
                 title={'카테고리'}
-                name={'useYn'}
+                name={'categoryId'}
                 defaultOptions={lowerPartnerCodeList.map((lowerPartnerCode, index) => {
                   return {
                     key: index,
                     label: lowerPartnerCode.codeNm,
-                    value: lowerPartnerCode.codeCd,
+                    value: lowerPartnerCode.id, // 카테고리 연결상품 조회에서는 categoryId 를 사용하므로 이와 같이 할당한다.
                   };
                 })}
-                value={''}
-                placeholder={'카테고리 선택'}
-                onChange={() => {}}
+                value={filtersForProdInfoByCategory.categoryId}
+                onChange={onChangeFiltersForProdInfoByCategory}
+                dropDownStyle={{ width: '280px' }}
               />
               <Search.Input
                 title={'상품명'}
                 name={'prodNm'}
                 placeholder={'키워드 입력 후 엔터키 클릭'}
-                value={commonFilters.prodNm}
+                value={filtersForProdInfoList.prodNm}
                 onEnter={search}
-                onChange={onChangeCommonFilters}
-                filters={commonFilters}
+                onChange={onChangeFiltersForProdInfoList}
+                filters={filtersForProdInfoList}
               />
             </PopupSearchType>
           </PopupSearchBox>
@@ -274,7 +283,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                   rowData={productInfoListByCategory}
                   loadingOverlayComponent={CustomGridLoading}
                   noRowsOverlayComponent={CustomNoRowsOverlay}
-                  ref={RefForGrid}
+                  ref={RefForLeftGrid}
                   loading={isProductInfosByCategoryLoading}
                   // rowSelection={{
                   //   mode: 'singleRow',
@@ -289,8 +298,9 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                   rowData={productInfoList}
                   loadingOverlayComponent={CustomGridLoading}
                   noRowsOverlayComponent={CustomNoRowsOverlay}
-                  ref={RefForGrid}
+                  ref={RefForRightGrid}
                   loading={isProductInfosLoading}
+                  onRowClicked={(e) => console.log(e.data)}
                   // rowSelection={{
                   //   mode: 'singleRow',
                   //   isRowSelectable: true,
