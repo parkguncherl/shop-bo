@@ -7,6 +7,7 @@ import { authApi } from '../../../../libs';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import {
   PartnerCodeResponseLowerSelect,
+  ProductContentListResponseProductInfo,
   ProductMngRequestCategoryProductInfoFilter,
   ProductMngRequestProductInfoFilter,
   ProductMngResponseCategoryProductInfo,
@@ -23,6 +24,23 @@ import useFilters from '../../../../hooks/useFilters';
 import { Search } from '../../../content';
 import { PARTNER_CODE } from '../../../../libs/const';
 import { usePartnerCodeStore } from '../../../../stores/usePartnerCodeStore';
+import { ConfirmModal } from '../../../ConfirmModal';
+
+interface ConfirmModalProps {
+  type: 'ADD_TO_CATEGORY' | 'DEL_FROM_CATEGORY';
+  active: boolean;
+  stored_temporary?: unknown;
+}
+
+interface ConfForAddToCategory extends ConfirmModalProps {
+  type: 'ADD_TO_CATEGORY';
+  stored_temporary?: ProductMngResponseProductInfo;
+}
+
+interface ConfForDelFromCategory extends ConfirmModalProps {
+  type: 'DEL_FROM_CATEGORY';
+  stored_temporary?: ProductMngResponseCategoryProductInfo;
+}
 
 interface ProductContentShowPopProps {
   open: boolean;
@@ -43,6 +61,11 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
   /** 팝업 내부 local state */
   const [productInfoListByCategory, setProductInfoListByCategory] = useState<ProductMngResponseCategoryProductInfo[]>([]);
   const [productInfoList, setProductInfoList] = useState<ProductMngResponseProductInfo[]>([]);
+  const [modalsStatus, setModalsStatus] = useState<ConfForAddToCategory | ConfForDelFromCategory>({
+    type: 'ADD_TO_CATEGORY',
+    active: false,
+    stored_temporary: undefined,
+  });
 
   // 각각 좌, 우측 선택된 행의 상태
   const [selectedProductInfoByCategory, setSelectedProductInfoByCategory] = useState<ProductMngResponseCategoryProductInfo | undefined>(undefined);
@@ -246,7 +269,11 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                   className={`btn ${selectedProductInfoByCategory != undefined && filtersForProdInfoByCategory.categoryId && 'btn_blue'}`}
                   disabled={selectedProductInfoByCategory == undefined || filtersForProdInfoByCategory.categoryId == undefined}
                   onClick={() => {
-                    //openModal('PROD_DET_INFO');
+                    setModalsStatus({
+                      type: 'DEL_FROM_CATEGORY',
+                      active: true,
+                      stored_temporary: selectedProductInfoByCategory,
+                    });
                   }}
                 >
                   {`${
@@ -276,7 +303,11 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                   className={`btn ${selectedProductInfo != undefined && filtersForProdInfoByCategory.categoryId != undefined && 'btn_blue'}`}
                   disabled={selectedProductInfo == undefined || filtersForProdInfoByCategory.categoryId == undefined}
                   onClick={() => {
-                    //openModal('PROD_DET_INFO');
+                    setModalsStatus({
+                      type: 'ADD_TO_CATEGORY',
+                      active: true,
+                      stored_temporary: selectedProductInfo,
+                    });
                   }}
                 >
                   {`${
@@ -370,6 +401,31 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
           </div>
         </PopupContent>
       </PopupLayout>
+      <ConfirmModal
+        open={modalsStatus.active && (modalsStatus.type == 'ADD_TO_CATEGORY' || modalsStatus.type == 'DEL_FROM_CATEGORY')}
+        title={
+          modalsStatus.type == 'DEL_FROM_CATEGORY'
+            ? modalsStatus.stored_temporary?.prodNm + ' 을 해당 카테고리의 상품 목록에서 삭제하시겠습니까?'
+            : modalsStatus.stored_temporary?.prodNm + ' 을 해당 카테고리의 상품 목록으로 추가하시겠습니까?'
+        }
+        confirmText={'확인'}
+        onConfirm={() => {
+          if (modalsStatus.type == 'DEL_FROM_CATEGORY') {
+            // 카테고리로부터 제거
+          } else {
+            // 카테고리로 추가
+          }
+        }}
+        onClose={() => {
+          setModalsStatus((prevState) => {
+            return {
+              ...prevState,
+              active: false,
+              stored_temporary: undefined,
+            };
+          });
+        }}
+      />
     </div>
   );
 };
