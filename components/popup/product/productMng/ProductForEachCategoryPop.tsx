@@ -44,6 +44,10 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
   const [productInfoListByCategory, setProductInfoListByCategory] = useState<ProductMngResponseCategoryProductInfo[]>([]);
   const [productInfoList, setProductInfoList] = useState<ProductMngResponseProductInfo[]>([]);
 
+  // 각각 좌, 우측 선택된 행의 상태
+  const [selectedProductInfoByCategory, setSelectedProductInfoByCategory] = useState<ProductMngResponseCategoryProductInfo | undefined>(undefined);
+  const [selectedProductInfo, setSelectedProductInfo] = useState<ProductMngResponseProductInfo | undefined>(undefined);
+
   const [lowerPartnerCodeList, setLowerPartnerCodeList] = useState<PartnerCodeResponseLowerSelect[]>([]);
 
   /** 참조(ref) */
@@ -237,7 +241,56 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
         footer={
           <PopupFooter>
             <div className="btnArea between">
-              <div className="left"></div>
+              <div className="left">
+                <button
+                  className={`btn ${selectedProductInfoByCategory != undefined && filtersForProdInfoByCategory.categoryId && 'btn_blue'}`}
+                  disabled={selectedProductInfoByCategory == undefined || filtersForProdInfoByCategory.categoryId == undefined}
+                  onClick={() => {
+                    //openModal('PROD_DET_INFO');
+                  }}
+                >
+                  {`${
+                    selectedProductInfoByCategory != undefined && filtersForProdInfoByCategory.categoryId
+                      ? (lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||
+                          '알수 없는 카테고리') +
+                        ' 에 해당하는 ' +
+                        selectedProductInfoByCategory.prodNm?.slice(0, 7) +
+                        ((selectedProductInfoByCategory.prodNm || '').length > 7 ? '..' : '') +
+                        ' 을 삭제'
+                      : filtersForProdInfoByCategory.categoryId
+                      ? (
+                          lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||
+                          '알수 없음'
+                        ).slice(0, 5) +
+                        ((
+                          lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||
+                          '알수 없는 카테고리'
+                        ).length > 5
+                          ? '..'
+                          : '') +
+                        ' 내에서 삭제할 상품 선택'
+                      : '카테고리 선택'
+                  }`}
+                </button>
+                <button
+                  className={`btn ${selectedProductInfo != undefined && filtersForProdInfoByCategory.categoryId != undefined && 'btn_blue'}`}
+                  disabled={selectedProductInfo == undefined || filtersForProdInfoByCategory.categoryId == undefined}
+                  onClick={() => {
+                    //openModal('PROD_DET_INFO');
+                  }}
+                >
+                  {`${
+                    selectedProductInfo != undefined && filtersForProdInfoByCategory.categoryId != undefined
+                      ? selectedProductInfo.prodNm?.slice(0, 7) +
+                        ((selectedProductInfo.prodNm || '').length > 7 ? '..' : '') +
+                        '을(를)' +
+                        (lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||
+                          '알수 없는 카테고리') +
+                        ' 의 상품으로 추가 '
+                      : '카테고리 추가'
+                  }`}
+                </button>
+              </div>
               <div className="right">
                 <button className="btn" onClick={commonOnCloseCallback}>
                   닫기
@@ -285,11 +338,14 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                   noRowsOverlayComponent={CustomNoRowsOverlay}
                   ref={RefForLeftGrid}
                   loading={isProductInfosByCategoryLoading}
-                  // rowSelection={{
-                  //   mode: 'singleRow',
-                  //   isRowSelectable: true,
-                  //   enableClickSelection: true,
-                  // }}
+                  rowSelection={{
+                    mode: 'singleRow',
+                    enableClickSelection: true,
+                  }}
+                  onSelectionChanged={(event) => {
+                    const selectedRows = event.api.getSelectedRows();
+                    setSelectedProductInfoByCategory(selectedRows.length > 0 ? selectedRows[0] : undefined);
+                  }}
                 />
               </div>
               <div className={'layout50'}>
@@ -300,12 +356,14 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                   noRowsOverlayComponent={CustomNoRowsOverlay}
                   ref={RefForRightGrid}
                   loading={isProductInfosLoading}
-                  onRowClicked={(e) => console.log(e.data)}
-                  // rowSelection={{
-                  //   mode: 'singleRow',
-                  //   isRowSelectable: true,
-                  //   enableClickSelection: true,
-                  // }}
+                  rowSelection={{
+                    mode: 'singleRow',
+                    enableClickSelection: true,
+                  }}
+                  onSelectionChanged={(event) => {
+                    const selectedRows = event.api.getSelectedRows();
+                    setSelectedProductInfo(selectedRows.length > 0 ? selectedRows[0] : undefined);
+                  }}
                 />
               </div>
             </div>
