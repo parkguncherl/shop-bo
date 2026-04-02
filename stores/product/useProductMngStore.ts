@@ -4,12 +4,15 @@ import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import {
   ApiResponse,
+  ProductMngRequestDeleteCategoryProduct,
   ProductMngRequestDeleteProduct,
   ProductMngRequestDeleteProductDet,
   ProductMngRequestInsertProduct,
   ProductMngRequestInsertProductDet,
+  ProductMngRequestUpdateCategoryProduct,
   ProductMngRequestUpdateProduct,
   ProductMngRequestUpdateProductDet,
+  ProductMngRequestInsertCategoryProduct,
 } from '../../generated';
 import { AxiosPromise } from 'axios';
 import { authApi } from '../../libs';
@@ -37,6 +40,10 @@ interface ProductMngApiState {
   updateProductDet: (updateProductDetRequest: ProductMngRequestUpdateProductDet) => AxiosPromise<ApiResponse>;
   deleteProduct: (deleteProductRequest: ProductMngRequestDeleteProduct) => AxiosPromise<ApiResponse>;
   deleteProductDet: (deleteProductDetRequest: ProductMngRequestDeleteProductDet) => AxiosPromise<ApiResponse>;
+
+  insertCategoryProduct: (insertCategoryProductRequest: ProductMngRequestInsertCategoryProduct) => AxiosPromise<ApiResponse>;
+  updateCategoryProduct: (updateCategoryProductRequest: ProductMngRequestUpdateCategoryProduct) => AxiosPromise<ApiResponse>;
+  deleteCategoryProduct: (deleteCategoryProductRequest: ProductMngRequestDeleteCategoryProduct) => AxiosPromise<ApiResponse>;
 }
 
 type ProductMngStateOfAll = ProductMngState & ProductMngApiState;
@@ -91,6 +98,16 @@ const initialStateCreator: StateCreator<ProductMngStateOfAll> = (set, get, api) 
     },
     deleteProductDet: (deleteProductDetRequest) => {
       return authApi.patch('/productMng/deleteProductDet', deleteProductDetRequest);
+    },
+
+    insertCategoryProduct: (deleteProductDetRequest) => {
+      return authApi.patch('/productMng/insertCategoryProduct', deleteProductDetRequest);
+    },
+    updateCategoryProduct: (deleteProductDetRequest) => {
+      return authApi.patch('/productMng/updateCategoryProduct', deleteProductDetRequest);
+    },
+    deleteCategoryProduct: (deleteProductDetRequest) => {
+      return authApi.patch('/productMng/deleteCategoryProduct', deleteProductDetRequest);
     },
   };
 };
