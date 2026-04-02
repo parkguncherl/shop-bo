@@ -13,6 +13,7 @@ import {
   ProductMngRequestUpdateProduct,
   ProductMngRequestUpdateProductDet,
   ProductMngRequestInsertCategoryProduct,
+  ProductMngRequestUpdateCategoryProductSeq,
 } from '../../generated';
 import { AxiosPromise } from 'axios';
 import { authApi } from '../../libs';
@@ -44,6 +45,8 @@ interface ProductMngApiState {
   insertCategoryProduct: (insertCategoryProductRequest: ProductMngRequestInsertCategoryProduct) => AxiosPromise<ApiResponse>;
   updateCategoryProduct: (updateCategoryProductRequest: ProductMngRequestUpdateCategoryProduct) => AxiosPromise<ApiResponse>;
   deleteCategoryProduct: (deleteCategoryProductRequest: ProductMngRequestDeleteCategoryProduct) => AxiosPromise<ApiResponse>;
+
+  updateCategoryProductSeq: (productMngRequestUpdateCategoryProductSeq: ProductMngRequestUpdateCategoryProductSeq) => AxiosPromise<ApiResponse>;
 }
 
 type ProductMngStateOfAll = ProductMngState & ProductMngApiState;
@@ -108,6 +111,10 @@ const initialStateCreator: StateCreator<ProductMngStateOfAll> = (set, get, api) 
     },
     deleteCategoryProduct: (deleteProductDetRequest) => {
       return authApi.patch('/productMng/deleteCategoryProduct', deleteProductDetRequest);
+    },
+
+    updateCategoryProductSeq: (productMngRequestUpdateCategoryProductSeq) => {
+      return authApi.patch('/productMng/updateCategoryProductSeq', productMngRequestUpdateCategoryProductSeq);
     },
   };
 };

@@ -18,7 +18,7 @@ import { PopupSearchBox, PopupSearchType } from '../../content';
 import CustomGridLoading from '../../../CustomGridLoading';
 import CustomNoRowsOverlay from '../../../CustomNoRowsOverlay';
 import { GridSetting } from '../../../../libs/ag-grid';
-import { ColDef } from 'ag-grid-community';
+import { ColDef, RowDragEndEvent } from 'ag-grid-community';
 import useFilters from '../../../../hooks/useFilters';
 import { Search } from '../../../content';
 import { PARTNER_CODE } from '../../../../libs/const';
@@ -55,9 +55,9 @@ interface ProductContentShowPopProps {
  * */
 const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
-  const [insertCategoryProduct, deleteCategoryProduct] = useProductMngStore((s) => [
+  const [insertCategoryProduct, updateCategoryProductSeq, deleteCategoryProduct] = useProductMngStore((s) => [
     s.insertCategoryProduct,
-    //s.updateCategoryProduct,
+    s.updateCategoryProductSeq,
     s.deleteCategoryProduct,
   ]);
   const { selectLowerPartnerCodeByCodeUpper } = usePartnerCodeStore();
@@ -102,6 +102,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
         valueGetter: (params) => (params.node ? (params.node.rowIndex ?? 0) + 1 : ''),
         cellStyle: GridSetting.CellStyle.CENTER,
         suppressHeaderMenuButton: true,
+        rowDrag: true,
       },
       {
         field: 'categoryNm',
@@ -313,6 +314,49 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
     productInfosWithExclusionRefetch();
   };
 
+  /** row 드래그 이벤트 */
+  const onRowDragEndHandler = async (event: RowDragEndEvent) => {
+    const movingNode = event.node;
+    const overNode = event.overNode;
+
+    if (movingNode.id && overNode?.id && movingNode.id != overNode?.id) {
+      // 유의미한 드래깅이 발생한 경우
+      const movingData = movingNode.data;
+      const overData = overNode?.data;
+
+      if (movingData && overData) {
+        const fromIndex = productInfoListByCategory.indexOf(movingData);
+        const toIndex = productInfoListByCategory.indexOf(overData);
+
+        const fromSeq = productInfoListByCategory[fromIndex].seq;
+        const toSeq = productInfoListByCategory[toIndex].seq;
+
+        if (fromIndex == toIndex) {
+          toastError('동일한 영역에 드래깅 할 수 없습니다.');
+          return; // 이 경우 이후 동작이 무의미하므로
+        }
+        if (!filtersForProdInfoByCategory.categoryId) {
+          toastError('카테고리 선택 후 다시 시도하십시요.');
+          return;
+        }
+        const seqUpdReqsResult = await updateCategoryProductSeq({
+          categoryId: filtersForProdInfoByCategory.categoryId,
+          fromSeq: fromSeq,
+          toSeq: toSeq,
+        });
+
+        const { resultCode, resultMessage } = seqUpdReqsResult.data;
+
+        if (resultCode == 200) {
+          productInfosByCategoryRefetch(); // refetch
+        } else {
+          console.error(resultMessage);
+          toastError('재정렬 과정에서 문제가 발생하였습니다.');
+        }
+      }
+    }
+  };
+
   return (
     <div className="imgPopBox">
       <PopupLayout
@@ -442,6 +486,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                     const selectedRows = event.api.getSelectedRows();
                     setSelectedProductInfoByCategory(selectedRows.length > 0 ? selectedRows[0] : undefined);
                   }}
+                  onRowDragEnd={onRowDragEndHandler}
                 />
               </div>
               <div className={'layout50'}>
