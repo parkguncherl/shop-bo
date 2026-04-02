@@ -71,6 +71,13 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
         suppressHeaderMenuButton: true,
       },
       {
+        field: 'categoryNm',
+        headerName: '카테고리',
+        minWidth: 80,
+        maxWidth: 100,
+        suppressHeaderMenuButton: true,
+      },
+      {
         field: 'prodNm',
         headerName: '상품명',
         minWidth: 80,
@@ -83,6 +90,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
         minWidth: 120,
         maxWidth: 140,
         suppressHeaderMenuButton: true,
+        cellStyle: GridSetting.CellStyle.LEFT,
       },
       {
         field: 'prodColors',
@@ -90,7 +98,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
         minWidth: 140,
         maxWidth: 160,
         suppressHeaderMenuButton: true,
-        cellStyle: GridSetting.CellStyle.CENTER,
+        cellStyle: GridSetting.CellStyle.LEFT,
       },
     ],
     [],
@@ -229,7 +237,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
   return (
     <div className="imgPopBox">
       <PopupLayout
-        width={900}
+        width={1000}
         open={open}
         isEscClose={true}
         title={'키테고리별 상품'}
