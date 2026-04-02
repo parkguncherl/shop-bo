@@ -7,12 +7,11 @@ import { authApi } from '../../../../libs';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import {
   PartnerCodeResponseLowerSelect,
-  ProductContentListResponseProductInfo,
   ProductMngRequestCategoryProductInfoFilter,
-  ProductMngRequestProductInfoFilter,
   ProductMngResponseCategoryProductInfo,
   ProductMngResponseProductDetInfo,
   ProductMngResponseProductInfo,
+  ProductMngRequestProductInfoWithExclusionFilter,
 } from '../../../../generated';
 import TunedGrid, { TunedGridRef } from '../../../grid/TunedGrid';
 import { PopupSearchBox, PopupSearchType } from '../../content';
@@ -51,7 +50,7 @@ interface ProductContentShowPopProps {
 /**
  * components/popup/product/productMng/ProductForEachCategoryPop.tsx
  * desc: 카테고리별 상품 팝업
- * Date: 2026/03/30
+ * Date: 2026/04/02
  * Author: park junsung
  * */
 const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps) => {
@@ -87,9 +86,10 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
     useFilters<ProductMngRequestCategoryProductInfoFilter>({
       categoryId: undefined,
     });
-  const [filtersForProdInfoList, onChangeFiltersForProdInfoList, filtersForProdInfoListReset] = useFilters<ProductMngRequestProductInfoFilter>({
-    prodNm: undefined,
-  });
+  const [filtersForProdInfoListWithExclusion, onChangeFiltersForProdInfoListWithExclusion, filtersForProdInfoListWithExclusionReset] =
+    useFilters<ProductMngRequestProductInfoWithExclusionFilter>({
+      prodNm: undefined,
+    });
 
   /** 컬럼 설정 */
   const columnDefsOnLeft = useMemo<ColDef<ProductMngResponseCategoryProductInfo>[]>(
@@ -258,16 +258,17 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
 
   /** 전체상품정보 */
   const {
-    data: productInfos,
-    isSuccess: isProductInfosSuccess,
-    isLoading: isProductInfosLoading,
-    refetch: productInfosRefetch,
+    data: productInfosWithExclusion,
+    isSuccess: isProductInfosWithExclusionSuccess,
+    isLoading: isProductInfosWithExclusionLoading,
+    refetch: productInfosWithExclusionRefetch,
   } = useQuery({
-    queryKey: ['/productMng/productInfoList'],
+    queryKey: ['/productMng/prodInfoListWithExclusion', filtersForProdInfoByCategory.categoryId],
     queryFn: () =>
-      authApi.get('/productMng/productInfoList', {
+      authApi.get('/productMng/prodInfoListWithExclusion', {
         params: {
-          ...filtersForProdInfoList,
+          ...filtersForProdInfoListWithExclusion,
+          categoryId: filtersForProdInfoByCategory.categoryId,
         },
       }),
     refetchOnMount: 'always',
@@ -275,21 +276,21 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
   });
 
   useEffect(() => {
-    if (isProductInfosSuccess) {
-      const { resultCode, body, resultMessage } = productInfos.data;
+    if (isProductInfosWithExclusionSuccess) {
+      const { resultCode, body, resultMessage } = productInfosWithExclusion.data;
       if (resultCode === 200) {
         setProductInfoList(body || []);
       } else {
         toastError(resultMessage);
       }
     }
-  }, [productInfos, isProductInfosSuccess]);
+  }, [productInfosWithExclusion, isProductInfosWithExclusionSuccess]);
 
   const commonOnCloseCallback = () => {
     if (onClose) onClose();
 
     filtersForProdInfoByCategoryReset();
-    filtersForProdInfoListReset();
+    filtersForProdInfoListWithExclusionReset();
   };
 
   /** 검색 버튼 클릭 시 */
@@ -299,7 +300,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
 
   const onSearch = () => {
     productInfosByCategoryRefetch();
-    productInfosRefetch();
+    productInfosWithExclusionRefetch();
   };
 
   return (
@@ -404,10 +405,10 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                 title={'상품명'}
                 name={'prodNm'}
                 placeholder={'키워드 입력 후 엔터키 클릭'}
-                value={filtersForProdInfoList.prodNm}
+                value={filtersForProdInfoListWithExclusion.prodNm}
                 onEnter={search}
-                onChange={onChangeFiltersForProdInfoList}
-                filters={filtersForProdInfoList}
+                onChange={onChangeFiltersForProdInfoListWithExclusion}
+                filters={filtersForProdInfoListWithExclusion}
               />
             </PopupSearchType>
           </PopupSearchBox>
@@ -438,7 +439,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                   loadingOverlayComponent={CustomGridLoading}
                   noRowsOverlayComponent={CustomNoRowsOverlay}
                   ref={RefForRightGrid}
-                  loading={isProductInfosLoading}
+                  loading={isProductInfosWithExclusionLoading}
                   rowSelection={{
                     mode: 'singleRow',
                     enableClickSelection: true,
