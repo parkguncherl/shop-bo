@@ -187,6 +187,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
             };
           });
           productInfosByCategoryRefetch();
+          productInfosWithExclusionRefetch();
         } else {
           toastError(`컨텐츠 추가 도중 문제 발생 (${e.data.resultMessage})`);
         }
@@ -209,6 +210,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
             };
           });
           productInfosByCategoryRefetch();
+          productInfosWithExclusionRefetch();
         } else {
           toastError(`컨텐츠 삭제 도중 문제 발생 (${e.data.resultMessage})`);
         }
@@ -334,28 +336,29 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                     });
                   }}
                 >
-                  {`${
-                    selectedProductInfoByCategory != undefined && filtersForProdInfoByCategory.categoryId
-                      ? (lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||
-                          '알수 없는 카테고리') +
-                        ' 에 해당하는 ' +
-                        selectedProductInfoByCategory.prodNm?.slice(0, 7) +
-                        ((selectedProductInfoByCategory.prodNm || '').length > 7 ? '..' : '') +
-                        ' 을 삭제'
-                      : filtersForProdInfoByCategory.categoryId
-                      ? (
-                          lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||
-                          '알수 없음'
-                        ).slice(0, 5) +
-                        ((
-                          lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||
-                          '알수 없는 카테고리'
-                        ).length > 5
-                          ? '..'
-                          : '') +
-                        ' 내에서 삭제할 상품 선택'
-                      : '카테고리 선택'
-                  }`}
+                  {/*{`${*/}
+                  {/*  selectedProductInfoByCategory != undefined && filtersForProdInfoByCategory.categoryId*/}
+                  {/*    ? (lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||*/}
+                  {/*        '알수 없는 카테고리') +*/}
+                  {/*      ' 에 해당하는 ' +*/}
+                  {/*      selectedProductInfoByCategory.prodNm?.slice(0, 7) +*/}
+                  {/*      ((selectedProductInfoByCategory.prodNm || '').length > 7 ? '..' : '') +*/}
+                  {/*      ' 을 삭제'*/}
+                  {/*    : filtersForProdInfoByCategory.categoryId*/}
+                  {/*    ? (*/}
+                  {/*        lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||*/}
+                  {/*        '알수 없음'*/}
+                  {/*      ).slice(0, 5) +*/}
+                  {/*      ((*/}
+                  {/*        lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||*/}
+                  {/*        '알수 없는 카테고리'*/}
+                  {/*      ).length > 5*/}
+                  {/*        ? '..'*/}
+                  {/*        : '') +*/}
+                  {/*      ' 내에서 삭제할 상품 선택'*/}
+                  {/*    : '카테고리 선택'*/}
+                  {/*}`}*/}
+                  {'카테고리에서 삭제'}
                 </button>
                 <button
                   className={`btn ${selectedProductInfo != undefined && filtersForProdInfoByCategory.categoryId && 'btn_blue'}`}
@@ -371,16 +374,17 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                     });
                   }}
                 >
-                  {`${
-                    selectedProductInfo != undefined && filtersForProdInfoByCategory.categoryId
-                      ? selectedProductInfo.prodNm?.slice(0, 7) +
-                        ((selectedProductInfo.prodNm || '').length > 7 ? '..' : '') +
-                        ' 을(를) ' +
-                        (lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||
-                          '알수 없는 카테고리') +
-                        ' 의 상품으로 추가 '
-                      : '카테고리 선택 후 추가'
-                  }`}
+                  {/*{`${*/}
+                  {/*  selectedProductInfo != undefined && filtersForProdInfoByCategory.categoryId*/}
+                  {/*    ? selectedProductInfo.prodNm?.slice(0, 7) +*/}
+                  {/*      ((selectedProductInfo.prodNm || '').length > 7 ? '..' : '') +*/}
+                  {/*      ' 을(를) ' +*/}
+                  {/*      (lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||*/}
+                  {/*        '알수 없는 카테고리') +*/}
+                  {/*      ' 의 상품으로 추가 '*/}
+                  {/*    : '카테고리 선택 후 추가'*/}
+                  {/*}`}*/}
+                  {'카테고리에 추가'}
                 </button>
               </div>
               <div className="right">
@@ -474,7 +478,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
           if (modalsStatus.type == 'DEL_FROM_CATEGORY') {
             // 카테고리로부터 제거
             deleteCategoryProductMutate({
-              id: modalsStatus.stored_temporary?.id, // 이때의 id는 categoryProduct 의 id
+              id: modalsStatus.stored_temporary?.categoryProductId, // 이때의 id는 카테고리 연결상품정보 아이디(PK)
             });
           } else {
             // 카테고리로 추가
