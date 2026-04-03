@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Search, Table, Title } from '../../../../components';
 import { Pagination, TableHeader, toastError } from '../../../../components';
 import { ContactControllerApiSelectContactPagingRequest, ContactResponsePaging } from '../../../../generated';
@@ -9,16 +9,17 @@ import { useQuery } from '@tanstack/react-query';
 import { useCommonStore, useContactState } from '../../../../stores';
 import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
 import { AccessLogDeatilPop } from '../../../../components/popup/system/accessLog';
-import { useAgGridApi } from '../../../../hooks';
 import useFilters from '../../../../hooks/useFilters';
 import { DefaultOptions, Placeholder } from '../../../../libs/const';
 import { authApi } from '../../../../libs';
-import { AgGridReact } from 'ag-grid-react';
+import TunedGrid, { TunedGridRef } from '../../../../components/grid/TunedGrid';
+import CustomGridLoading from '../../../../components/CustomGridLoading';
+import CustomNoRowsOverlay from '../../../../components/CustomNoRowsOverlay';
 
 const AccessLog = () => {
   /** Grid Api */
-  const { gridApi, gridColumnApi, onGridReady } = useAgGridApi();
-
+  const nowPage = 'wms_accessLog'; // filter 저장 2025-01-21
+  const gridRef = useRef<TunedGridRef<ContactResponsePaging>>(null);
   /** 공통 스토어 - State */
   const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
 
@@ -207,17 +208,19 @@ const AccessLog = () => {
       <Table>
         <TableHeader count={paging.totalRowCount || 0} paging={paging} setPaging={setPaging} search={search}></TableHeader>
         <div className={'ag-theme-alpine wmsDefault'}>
-          <AgGridReact
-            headerHeight={24}
-            onGridReady={onGridReady}
-            loading={isLoading}
+          <TunedGrid
+            ref={gridRef}
+            rowSelection={{
+              mode: 'singleRow',
+              enableClickSelection: true,
+            }}
             rowData={(response?.data?.body?.rows as ContactResponsePaging[]) || []}
-            gridOptions={{ rowHeight: 28 }}
             columnDefs={columnDefs}
             defaultColDef={defaultColDef}
             paginationPageSize={paging.pageRowCount}
-            rowSelection={'single'}
             onRowDoubleClicked={onRowClicked}
+            loadingOverlayComponent={CustomGridLoading}
+            noRowsOverlayComponent={CustomNoRowsOverlay}
           />
         </div>
         <Pagination pageObject={paging} setPaging={setPaging} />
