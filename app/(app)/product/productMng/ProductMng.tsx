@@ -187,50 +187,7 @@ const ProductMng = () => {
       },
       { field: 'prodNm', headerName: '품목명', minWidth: 120, maxWidth: 120, suppressHeaderMenuButton: true },
       { field: 'prodDetTpNm', headerName: '소분류', minWidth: 100, maxWidth: 120, suppressHeaderMenuButton: true },
-      {
-        field: 'isSpring',
-        headerName: '봄',
-        minWidth: 35,
-        maxWidth: 35,
-        suppressHeaderMenuButton: true,
-        cellStyle: GridSetting.CellStyle.CENTER,
-        valueFormatter: (params) => {
-          return params.value ? '■' : '□';
-        },
-      },
-      {
-        field: 'isSummer',
-        headerName: '여름',
-        minWidth: 35,
-        maxWidth: 35,
-        suppressHeaderMenuButton: true,
-        cellStyle: GridSetting.CellStyle.CENTER,
-        valueFormatter: (params) => {
-          return params.value ? '■' : '□';
-        },
-      },
-      {
-        field: 'isWinter',
-        headerName: '가을',
-        minWidth: 35,
-        maxWidth: 35,
-        suppressHeaderMenuButton: true,
-        cellStyle: GridSetting.CellStyle.CENTER,
-        valueFormatter: (params) => {
-          return params.value ? '■' : '□';
-        },
-      },
-      {
-        field: 'isWinter',
-        headerName: '겨울',
-        minWidth: 35,
-        maxWidth: 35,
-        suppressHeaderMenuButton: true,
-        cellStyle: GridSetting.CellStyle.CENTER,
-        valueFormatter: (params) => {
-          return params.value ? '■' : '□';
-        },
-      },
+      { field: 'season', headerName: '계절', minWidth: 100, maxWidth: 120, suppressHeaderMenuButton: true },
       { field: 'prodSizes', headerName: '크기', minWidth: 100, maxWidth: 120, suppressHeaderMenuButton: true },
       {
         field: 'prodColors',
@@ -464,7 +421,7 @@ const ProductMng = () => {
               <div className="btnArea between">
                 <div className="left">
                   <button
-                    className={'btn btn_blue'}
+                    className={'btn btnGray'}
                     onClick={() => {
                       partnerCodeOpenModal('PARTNER_CODE_OPEN');
                     }}
@@ -472,7 +429,7 @@ const ProductMng = () => {
                     품목카테고리 추가
                   </button>
                   <button
-                    className={'btn btn_blue'}
+                    className={'btn btnGray'}
                     onClick={() => {
                       openModal('PROD_BY_CATEGORY');
                     }}
@@ -482,7 +439,7 @@ const ProductMng = () => {
                 </div>
                 <div className="right">
                   <button
-                    className={'btn btn_blue'}
+                    className={'btn btnBlue'}
                     onClick={() => {
                       openModal('PROD_INFO_ADD');
                     }}
@@ -499,7 +456,7 @@ const ProductMng = () => {
                   {/*  {`${selectedRowsData == undefined ? '상세정보 추가할 품목 선택' : '상세정보'}`}*/}
                   {/*</button>*/}
                   <button
-                    className={`btn ${selectedRowsData != undefined && 'btn_blue'}`}
+                    className={`btn ${selectedRowsData != undefined && 'btnBlue'}`}
                     disabled={selectedRowsData == undefined}
                     onClick={() => {
                       openModal('PROD_MOD');
@@ -508,7 +465,7 @@ const ProductMng = () => {
                     {`${selectedRowsData == undefined ? '수정할 행 선택' : '품목정보 수정'}`}
                   </button>
                   <button
-                    className={`btn ${selectedRowsData != undefined && 'btn_blue'}`}
+                    className={`btn ${selectedRowsData != undefined && 'btnBlue'}`}
                     disabled={selectedRowsData == undefined}
                     onClick={() => {
                       openModal('PROD_DET_INFO');
