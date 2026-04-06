@@ -19,7 +19,6 @@ import TunedGrid from '../../../../components/grid/TunedGrid';
 import useFilters from '../../../../hooks/useFilters';
 import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
 import { PARTNER_CODE, Placeholder } from '../../../../libs/const';
-import { Utils } from '../../../../libs/utils';
 import SrcEnumerator, { SrcElement, SrcEnumeratorProps } from '../../../../components/layout/product/productMng/SrcEnumerator';
 import { FileUploadPop } from '../../../../components/popup/common';
 import ProductInfoAddPop from '../../../../components/popup/product/productMng/ProductInfoAddPop';
@@ -293,17 +292,15 @@ const ProductMng = () => {
       //   return;
       // }
 
-      if (!event.data?.repFileId) {
-        // 유효한 fileId를 찾을 수 없는 경우 초기화 동작 이하가 무의미하므로 return
-        setTargetedFileSetInfo(undefined);
-        return;
-      }
       if (cellsColField == 'repFileIdCnt') {
-        if (!event.data?.repFileId) {
-          toastError('file 식별자를 찾을 수 없음');
+        if (targetedFileSetInfo?.fileId == event.data?.repFileId) {
+          // 불필요한 수정(이미 동일한 fileId 이므로)
           return;
         }
-        if (targetedFileSetInfo?.fileId == event.data?.repFileId) {
+
+        if (!event.data?.repFileId) {
+          // 유효한 fileId를 찾을 수 없는 경우 초기화 동작 이하가 무의미하므로 return
+          setTargetedFileSetInfo(undefined);
           return;
         }
         setTargetedFileSetInfo({
@@ -322,11 +319,14 @@ const ProductMng = () => {
           }),
         });
       } else if (cellsColField == 'detailFileIdCnt') {
-        if (!event.data?.detailFileId) {
-          toastError('file 식별자를 찾을 수 없음');
+        if (targetedFileSetInfo?.fileId == event.data?.detailFileId) {
+          // 불필요한 수정(이미 동일한 fileId 이므로)
           return;
         }
-        if (targetedFileSetInfo?.fileId == event.data?.detailFileId) {
+
+        if (!event.data?.detailFileId) {
+          // 유효한 fileId를 찾을 수 없는 경우 초기화 동작 이하가 무의미하므로 return
+          setTargetedFileSetInfo(undefined);
           return;
         }
         setTargetedFileSetInfo({
@@ -345,11 +345,14 @@ const ProductMng = () => {
           }),
         });
       } else if (cellsColField == 'sizeFileIdCnt') {
-        if (!event.data?.sizeFileId) {
-          toastError('file 식별자를 찾을 수 없음');
+        if (targetedFileSetInfo?.fileId == event.data?.sizeFileId) {
+          // 불필요한 수정(이미 동일한 fileId 이므로)
           return;
         }
-        if (targetedFileSetInfo?.fileId == event.data?.sizeFileId) {
+
+        if (!event.data?.sizeFileId) {
+          // 유효한 fileId를 찾을 수 없는 경우 초기화 동작 이하가 무의미하므로 return
+          setTargetedFileSetInfo(undefined);
           return;
         }
         setTargetedFileSetInfo({
@@ -368,11 +371,14 @@ const ProductMng = () => {
           }),
         });
       } else if (cellsColField == 'etcFileIdCnt') {
-        if (!event.data?.etcFileId) {
-          toastError('file 식별자를 찾을 수 없음');
+        if (targetedFileSetInfo?.fileId == event.data?.etcFileId) {
+          // 불필요한 수정(이미 동일한 fileId 이므로)
           return;
         }
-        if (targetedFileSetInfo?.fileId == event.data?.etcFileId) {
+
+        if (!event.data?.etcFileId) {
+          // 유효한 fileId를 찾을 수 없는 경우 초기화 동작 이하가 무의미하므로 return
+          setTargetedFileSetInfo(undefined);
           return;
         }
         setTargetedFileSetInfo({
