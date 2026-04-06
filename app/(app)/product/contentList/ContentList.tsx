@@ -150,10 +150,6 @@ const ContentList = () => {
 
   const [contentsProductInfoList, setContentsProductInfoList] = useState<ProductContentListResponseContentProductInfo[]>([]);
 
-  const [pagingOption] = useState<AddPagingOptions | undefined>({
-    pagingStrategy: 'add',
-  });
-
   const [selectedRowsData, setSelectedRowsData] = useState<ProductContentListResponseProductContent | undefined>(undefined);
 
   const [imgPreviewBoxOn, setImgPreviewBoxOn] = useState(false);
@@ -163,9 +159,6 @@ const ContentList = () => {
   /** filters, lastInfo's filters*/
   const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<ProductContentListRequestProductContentListFilter>({
     newsTitle: undefined,
-  });
-  const [lastInfos, onChangelastInfos, onlastInfosReset] = useFilters<ProductContentListRequestProductContentListFilter>({
-    lastId: undefined,
   });
 
   /** filters, lastInfo's filters*/
@@ -354,14 +347,8 @@ const ContentList = () => {
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('컨텐츠가 정상 삭제되었습니다.');
+          productContentListResponseRefetch();
           closeModal('DEL_CONF');
-
-          setPaging({
-            ...paging,
-            curPage: 1,
-          });
-          onlastInfosReset();
-          onFiltersReset();
         } else {
           toastError(`컨텐츠 삭제 도중 문제 발생 (${e.data.resultMessage})`);
         }
@@ -370,18 +357,6 @@ const ContentList = () => {
       }
     },
   });
-
-  useEffect(() => {
-    // spa 수준에서 페이지 이동 시(해당 csc 관점에서 최초 랜더링) 필요한 동작
-    return () => {
-      // 언마운트 시 paging 전역 상태 초기화하여 추후 재방문 시 상태 오염으로 인한 오동작 방지, 페이징 관련 초기화 동작도 수행
-      setPaging({
-        ...paging,
-        curPage: 1,
-      });
-      onChangelastInfos('lastId', undefined);
-    };
-  }, []);
 
   /** 상품컨텐츠 페이징 목록 조회 */
   const {
@@ -397,7 +372,6 @@ const ContentList = () => {
           //curPage: paging.curPage,
           pageRowCount: paging.pageRowCount,
           ...filters,
-          ...lastInfos,
         },
       }),
     refetchOnMount: 'always',
@@ -476,27 +450,7 @@ const ContentList = () => {
                 setSelectedRowsData(selectedRows.length > 0 ? selectedRows[0] : undefined);
                 onChangeFiltersForContentsProduct('contentsId', selectedRows.length > 0 ? selectedRows[0].id : undefined);
               }}
-              pagingOptions={pagingOption}
               pagingDeps={[filters]}
-              onTouchedByBottom={() => {
-                if (pagingOption) {
-                  // 페이징 관련 동작 처리 영역
-                  if (lastProductContent != undefined) {
-                    onChangelastInfos('lastId', lastProductContent.id);
-                    setPaging({
-                      ...paging,
-                      curPage: paging.curPage ? paging.curPage + 1 : 1,
-                    });
-                  } else {
-                    if (paging.curPage != 1) {
-                      toastSuccess(AlertMessage.LastDataHasBeenReached);
-                    }
-                  }
-                }
-                return {
-                  pausedMilliseconds: 1000,
-                };
-              }}
               className={'default check'}
             />
             <div className="btnArea between">
