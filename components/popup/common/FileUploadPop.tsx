@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { PopupContent } from '../PopupContent';
 import { PopupFooter } from '../PopupFooter';
 import { authApi } from '../../../libs';
@@ -31,6 +31,9 @@ interface FileUploadPopProps {
 
 export const FileUploadPop = ({ open, onClose, onSuccess, onlyImg = false, fileId, limOnImg, imageFileWidth, imageFileHeight }: FileUploadPopProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const generatedId = useId();
+  const uniqueId = `fileInp-${generatedId}`;
 
   /** 상태 관리 - 배열로 변경 */
   const [files, setFiles] = useState<UploadFile[]>([]);
@@ -158,8 +161,6 @@ export const FileUploadPop = ({ open, onClose, onSuccess, onlyImg = false, fileI
         toastError('업로드 중 오류가 발생했습니다.');
       });
   };
-
-  const uniqueId = `fileInp-${Math.random().toString(36).slice(2, 11)}`;
 
   return (
     <PopupLayout
