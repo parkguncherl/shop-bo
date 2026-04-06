@@ -287,8 +287,14 @@ const ProductMng = () => {
       setProductInfoList(productInfos?.data.body || []); // query cached 된 값으로 초기화(색상 목록과의 상호작용으로 어떠한 색상이 선택되어 있는 경우에 대한 초기화 동작)
       onDetFiltersReset(); // 상세정보 필터 또한 초기화
 
-      if (event.data && (event.data[cellsColField as keyof ProductMngResponseProductInfo] as number) == 0) {
-        // 카운트된 이미지 개수가 0인경우 초기화 동작 이하가 무의미하므로 return
+      // if (event.data && (event.data[cellsColField as keyof ProductMngResponseProductInfo] as number) == 0) {
+      //   // 카운트된 이미지 개수가 0인경우 초기화 동작 이하가 무의미하므로 return
+      //   setTargetedFileSetInfo(undefined);
+      //   return;
+      // }
+
+      if (!event.data?.repFileId) {
+        // 유효한 fileId를 찾을 수 없는 경우 초기화 동작 이하가 무의미하므로 return
         setTargetedFileSetInfo(undefined);
         return;
       }
