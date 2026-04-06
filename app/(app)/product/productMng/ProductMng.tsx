@@ -553,7 +553,7 @@ const ProductMng = () => {
                       <div className="left"></div>
                       <div className="right">
                         <button
-                          className={'btn btn_blue'}
+                          className={'btn btnBlue'}
                           onClick={() => {
                             openModal('IMG_UPLOAD');
                           }}

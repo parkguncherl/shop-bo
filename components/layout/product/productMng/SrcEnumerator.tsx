@@ -56,7 +56,7 @@ const EnumElement = ({ srcElement, toUpperReqHandler, oneStepMovementReqHandler 
             <div className={'btnArea between'}>
               <div className={'left'}>
                 {toUpperReqHandler && (
-                  <button className={'btn btn_blue'} onClick={(e) => toUpperReqHandler({ ...e, srcElement: srcElement })}>
+                  <button className={'btn btnBlue'} onClick={(e) => toUpperReqHandler({ ...e, srcElement: srcElement })}>
                     맨 위로
                   </button>
                 )}
@@ -64,10 +64,10 @@ const EnumElement = ({ srcElement, toUpperReqHandler, oneStepMovementReqHandler 
               <div className={'right'}>
                 {oneStepMovementReqHandler && (
                   <>
-                    <button className={'btn btn_blue'} onClick={(e) => oneStepMovementReqHandler({ ...e, srcElement: srcElement, direction: 'up' })}>
+                    <button className={'btn btnBlue'} onClick={(e) => oneStepMovementReqHandler({ ...e, srcElement: srcElement, direction: 'up' })}>
                       위로
                     </button>
-                    <button className={'btn btn_blue'} onClick={(e) => oneStepMovementReqHandler({ ...e, srcElement: srcElement, direction: 'down' })}>
+                    <button className={'btn'} onClick={(e) => oneStepMovementReqHandler({ ...e, srcElement: srcElement, direction: 'down' })}>
                       아래로
                     </button>
                   </>
