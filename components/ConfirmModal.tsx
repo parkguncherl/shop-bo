@@ -65,7 +65,7 @@ export function ConfirmModal<FT extends FieldValues>({
   const {
     formState: { errors, isValid },
   } = useForm<any>({
-    resolver: yupResolver(YupSchema.RetailRegRequest()), // 완료
+    //resolver: yupResolver(YupSchema.RetailRegRequest()), // 완료
     defaultValues: {
       compPrnCd: 'B',
       remainYn: 'Y',
