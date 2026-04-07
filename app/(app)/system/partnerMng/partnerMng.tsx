@@ -1,3 +1,4 @@
+'use client';
 /**
  화주정보
  /wms/system/partnerMng
