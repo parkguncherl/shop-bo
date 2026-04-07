@@ -53,6 +53,7 @@ const UserModPop = () => {
       belongNm: '',
       deptNm: '',
       positionNm: '',
+      useYn: 'Y',
       partnerId: 0, // authCd <= 399 조건 충족할 시 요청 과정에서 세션으로부터 추출한 partnerId 사용됨
     },
     mode: 'onSubmit',
