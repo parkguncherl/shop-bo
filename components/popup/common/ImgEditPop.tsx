@@ -12,13 +12,10 @@ export interface ImgProps {
 interface ImgEditPopProps {
   open: boolean;
   onClose: () => void;
-  onEditingEnded?: () => void; // 에디팅 완료 후 사용자가 저장(수정)을 희망할 시
+  //onEditingEnded?: () => void; // 에디팅 완료 후 사용자가 저장(수정)을 희망할 시
   imgProps?: ImgProps;
 }
-interface URLImageProps extends Konva.ImageConfig {
-  // src: string;
-  // scale?: number;
-}
+interface URLImageProps extends Konva.ImageConfig {}
 
 interface ImageRepInfo {
   image: HTMLImageElement;
@@ -28,28 +25,18 @@ interface ImageRepInfo {
   y: number;
 }
 
-//{ src, scale, ...rest }
 const URLImage = ({ ...rest }: URLImageProps) => {
-  //const [image] = useImage(rest.image, 'anonymous'); // cors 방지 차원에서 anonymous
   return <Image {...rest} />;
 };
 
-const ImgEditPop = ({ open, onClose, onEditingEnded, imgProps }: ImgEditPopProps) => {
+const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
   const topWrapperRef = useRef<HTMLDivElement>(null);
 
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  //const [scale, setScale] = useState(1);
   const [imageRepInfo, setImageRepInfo] = useState<ImageRepInfo | undefined>(undefined);
 
   useEffect(() => {
     // 이미지 정보 변경 시점에 필요한 초기화(혹은 동기화) 동작
-    // if (topWrapperRef.current) {
-    //   setDimensions({
-    //     width: topWrapperRef.current.offsetWidth,
-    //     height: topWrapperRef.current.offsetHeight,
-    //   });
-    // }
-
     if (imgProps && imgProps.imgSrc) {
       const image = new window.Image();
       image.src = imgProps.imgSrc;
@@ -69,7 +56,7 @@ const ImgEditPop = ({ open, onClose, onEditingEnded, imgProps }: ImgEditPopProps
         const heightRatio = stageHeight / image.height;
 
         // 2. contain 방식: 둘 중 더 작은 비율을 선택
-        const newScale = Math.min(widthRatio, heightRatio);
+        const newScale = Math.min(widthRatio, heightRatio); // 비율(scale)
 
         // 3. 실질적인 너비와 높이 구하기
         const finalWidth = image.width * newScale;
@@ -79,7 +66,6 @@ const ImgEditPop = ({ open, onClose, onEditingEnded, imgProps }: ImgEditPopProps
         const x = (stageWidth - finalWidth) / 2;
         const y = (stageHeight - finalHeight) / 2;
 
-        //setScale(newScale); // 비율 동기화
         setImageRepInfo({
           image: image,
           width: finalWidth,
