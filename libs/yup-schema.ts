@@ -1,7 +1,6 @@
 // C:\work\shop-frontend\libs\yup-schema.ts
 
 import * as yup from 'yup';
-import { DropDownOption } from '../types/DropDownOptions';
 import { AccountRequestCreateFields, AccountRequestUnLockFields, AccountRequestUpdateFields } from '../components/popup/system/accountMng';
 import { CodeRequestCreateFields, CodeRequestUpdateFields } from '../components/popup/system/codeMng';
 import { MenuFormData, MenuRequestCreateFields } from '../components/popup/system/menuMng';
@@ -10,16 +9,13 @@ import { ProductContentsFields } from '../app/(app)/product/Contents/ProductCont
 import { ProductInfoCreateFields } from '../components/popup/product/productMng/ProductInfoAddPop';
 import { ProductModFields } from '../components/popup/product/productMng/ProductModPop';
 import { ProductDetInsertFields } from '../components/popup/product/productMng/ProductDetInfoPop';
+import { UserRequestCreateUseYn } from '../generated';
 
 export interface MenuRequestParams {
   menuCd?: string;
   upMenuCd?: string;
   menuUriTitle?: string;
 }
-
-type RetailRequestCreateFields = RetailRequestCreate & {
-  workingDays: DropDownOption[];
-};
 
 export const YupSchema = {
   LoginVerificationRequest: (params: LoginVerificationFields) =>
@@ -68,67 +64,40 @@ export const YupSchema = {
     }) as yup.ObjectSchema<MenuFormData>,
   AccountRequest: (): yup.ObjectSchema<AccountRequestCreateFields> =>
     yup.object({
-      loginId: yup
-        .string()
-        .required('ID(e-mail 또는 ID)을 입력하세요.' || '')
-        .max(100, '100자 이내로 입력하세요.' || ''),
-      //.matches(/^[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i, '유효한 이메일 양식이 아닙니다.' || ''),
-      userNm: yup
-        .string()
-        .required('이름을 입력하세요.' || '')
-        .max(30, '30자 이내로 입력하세요.' || ''),
+      loginId: yup.string().required('ID(e-mail 또는 ID)을 입력하세요.').max(100, '100자 이내로 입력하세요.'),
+      //.matches(/^[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i, '유효한 이메일 양식이 아닙니다.'),
+      userNm: yup.string().required('이름을 입력하세요.').max(30, '30자 이내로 입력하세요.'),
       phoneNo: yup
         .string()
-        .required('휴대전화 번호를 입력하세요.' || '')
-        .min(10, '10~11자리로 - 없이 입력하세요.' || '')
-        .max(11, '10~11자리로 - 없이 입력하세요.' || '')
-        .matches(/^[0-9*]+$/, '휴대전화 번호 양식에 맞게 입력하세요.' || ''),
-      authCd: yup.string().required('권한을 선택하세요.' || ''),
-      useYn: yup.string().required('상태를 선택하세요.' || ''),
-      belongNm: yup
-        .string()
-        .notRequired()
-        .max(30, '30자 이내로 입력하세요.' || ''),
-      deptNm: yup
-        .string()
-        .notRequired()
-        .max(30, '30자 이내로 입력하세요.' || ''),
-      positionNm: yup
-        .string()
-        .notRequired()
-        .max(30, '30자 이내로 입력하세요.' || ''),
+        .required('휴대전화 번호를 입력하세요.')
+        .min(10, '10~11자리로 - 없이 입력하세요.')
+        .max(11, '10~11자리로 - 없이 입력하세요.')
+        .matches(/^[0-9*]+$/, '휴대전화 번호 양식에 맞게 입력하세요.'),
+      authCd: yup.string().required('권한을 선택하세요.'),
+      useYn: yup
+        .mixed<UserRequestCreateUseYn>()
+        .oneOf(Object.values(UserRequestCreateUseYn) as UserRequestCreateUseYn[])
+        .required('상태를 선택하세요.'),
+      belongNm: yup.string().notRequired().max(30, '30자 이내로 입력하세요.'),
+      deptNm: yup.string().notRequired().max(30, '30자 이내로 입력하세요.'),
+      positionNm: yup.string().notRequired().max(30, '30자 이내로 입력하세요.'),
     }) as yup.ObjectSchema<AccountRequestCreateFields>,
   AccountRequestForUpdate: (): yup.ObjectSchema<AccountRequestUpdateFields> =>
     yup.object({
-      loginId: yup
-        .string()
-        .required('ID(e-mail 또는 ID)을 입력하세요.' || '')
-        .max(100, '100자 이내로 입력하세요.' || ''),
-      //.matches(/^[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i, '유효한 이메일 양식이 아닙니다.' || ''),
-      userNm: yup
-        .string()
-        .required('이름을 입력하세요.' || '')
-        .max(30, '30자 이내로 입력하세요.' || ''),
+      loginId: yup.string().required('ID(e-mail 또는 ID)을 입력하세요.').max(100, '100자 이내로 입력하세요.'),
+      //.matches(/^[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i, '유효한 이메일 양식이 아닙니다.'),
+      userNm: yup.string().required('이름을 입력하세요.').max(30, '30자 이내로 입력하세요.'),
       phoneNo: yup
         .string()
-        .required('휴대전화 번호를 입력하세요.' || '')
-        .min(10, '10~11자리로 - 없이 입력하세요.' || '')
-        .max(11, '10~11자리로 - 없이 입력하세요.' || '')
-        .matches(/^[0-9*]+$/, '휴대전화 번호 양식에 맞게 입력하세요.' || ''),
-      authCd: yup.string().required('권한을 선택하세요.' || ''),
-      useYn: yup.string().required('상태를 선택하세요.' || ''),
-      belongNm: yup
-        .string()
-        .notRequired()
-        .max(30, '30자 이내로 입력하세요.' || ''),
-      deptNm: yup
-        .string()
-        .notRequired()
-        .max(30, '30자 이내로 입력하세요.' || ''),
-      positionNm: yup
-        .string()
-        .notRequired()
-        .max(30, '30자 이내로 입력하세요.' || ''),
+        .required('휴대전화 번호를 입력하세요.')
+        .min(10, '10~11자리로 - 없이 입력하세요.')
+        .max(11, '10~11자리로 - 없이 입력하세요.')
+        .matches(/^[0-9*]+$/, '휴대전화 번호 양식에 맞게 입력하세요.'),
+      authCd: yup.string().required('권한을 선택하세요.'),
+      useYn: yup.string().required('상태를 선택하세요.'),
+      belongNm: yup.string().notRequired().max(30, '30자 이내로 입력하세요.'),
+      deptNm: yup.string().notRequired().max(30, '30자 이내로 입력하세요.'),
+      positionNm: yup.string().notRequired().max(30, '30자 이내로 입력하세요.'),
     }) as yup.ObjectSchema<AccountRequestUpdateFields>,
 
   AccountUnLockRequest: (): yup.ObjectSchema<AccountRequestUnLockFields> =>
@@ -196,39 +165,6 @@ export const YupSchema = {
       reModpassword: yup.string().required('변경 비밀번호 확인을 입력하세요.'),
       //.matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,24}$/, '올바르지 않은 비밀번호입니다.'),
     }),
-
-  RetailRegRequest: (): yup.ObjectSchema<RetailRequestCreateFields> =>
-    yup
-      .object({
-        sellerNm: yup.string().required('판매처명을 입력하세요').max(30, '30자 이내'),
-        compNm: yup.string().notRequired(),
-        compNo: yup.string().notRequired(),
-        ceoNm: yup.string().notRequired(),
-        ceoTelNo: yup.string().notRequired(),
-        personNm: yup.string().notRequired(),
-        personTelNo: yup.string().notRequired(),
-        sellerAddr: yup.string().notRequired(),
-        snsId: yup.string().notRequired(),
-        gubun1: yup.string().notRequired(),
-        gubun2: yup.string().notRequired(),
-        etcScrCntn: yup.string().notRequired(),
-        etcChitCntn: yup.string().notRequired(),
-        compPrnCd: yup.string().notRequired(),
-        remainYn: yup.string().notRequired(),
-        vatYn: yup.string().notRequired(),
-        regYmd: yup.string().notRequired(),
-        workingDays: yup
-          .array()
-          .of(
-            yup.object({
-              key: yup.number().required(),
-              value: yup.string().required(),
-              label: yup.string().required(),
-            }),
-          )
-          .notRequired(),
-      })
-      .noUnknown(false) as yup.ObjectSchema<RetailRequestCreateFields>,
 
   ProductContentsRequest: (): yup.ObjectSchema<ProductContentsFields> =>
     yup.object({

@@ -41,7 +41,7 @@ const UserModPop = () => {
     reset,
     formState: { errors, isValid },
     clearErrors,
-  } = useForm<UserRequestCreateFields>({
+  } = useForm<UserRequestCreateFields, any, UserRequestCreateFields>({
     resolver: yupResolver(YupSchema.AccountRequest()), // 완료
     defaultValues: {
       loginId: '',
