@@ -28,7 +28,7 @@ import { usePartnerCodeStore } from '../../../../stores/usePartnerCodeStore';
 import { PartnerCodePop } from '../../../../components/popup/system/PartnerCodePop';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import ProductForEachCategoryPop from '../../../../components/popup/product/productMng/ProductForEachCategoryPop';
-import ImgEditPop from '../../../../components/popup/common/ImgEditPop';
+import ImgEditPop, { ImgProps } from '../../../../components/popup/common/ImgEditPop';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
@@ -70,6 +70,7 @@ const ProductMng = () => {
   const [productDetInfo, setProductDetInfo] = useState<ProductMngResponseProductDetInfo | undefined>(undefined); // prodId + prodDetColor 조합으로 조회된 결과는 고유하리라 기대되니 배열이 아닌 단일 객체로 관리
 
   const [targetedFileSetInfo, setTargetedFileSetInfo] = useState<targetedFileSetInfo | undefined>(undefined);
+  const [targetedImgInfoForEdit, setTargetedImgInfoForEdit] = useState<ImgProps | undefined>(undefined);
 
   const [selectedRowsData, setSelectedRowsData] = useState<ProductMngResponseProductInfo | undefined>(undefined);
 
@@ -559,7 +560,10 @@ const ProductMng = () => {
                     setTargetedFileSetInfo(refreshedTargetedFileSetInfo);
                   },
                   onImgDoubleClick: (event) => {
-                    console.log('event: ', event.srcElement);
+                    setTargetedImgInfoForEdit({
+                      seq: event.srcElement.fileSeq,
+                      imgSrc: event.srcElement.fileSrc,
+                    });
                   },
                 }}
               >
@@ -676,12 +680,13 @@ const ProductMng = () => {
           closeModal('PROD_DEL');
         }}
       />
-      {/*<ImgEditPop*/}
-      {/*  open={true}*/}
-      {/*  onClose={() => {*/}
-      {/*    //*/}
-      {/*  }}*/}
-      {/*/>*/}
+      <ImgEditPop
+        open={targetedImgInfoForEdit != undefined}
+        onClose={() => {
+          setTargetedImgInfoForEdit(undefined);
+        }}
+        imgProps={targetedImgInfoForEdit}
+      />
     </div>
   );
 };
