@@ -18,6 +18,7 @@ export interface SrcEnumeratorProps {
   callBack?: {
     onToUpperReqSuccess?: (srcElement: SrcElement) => void;
     onToUpperReqFailure?: (srcElement: SrcElement, resultMessage?: string) => void;
+    onImgDoubleClick?: (event: onImgDoubleClickEvent) => void;
   };
 
   children?: React.ReactNode;
@@ -26,6 +27,7 @@ interface EnumElementProps {
   srcElement?: SrcElement;
   toUpperReqHandler?: (event: ToUpperReqEvent) => void;
   oneStepMovementReqHandler?: (event: OneStepMovementReqEvent) => void;
+  onImgDoubleClick?: (event: onImgDoubleClickEvent) => void;
 }
 
 interface ToUpperReqEvent extends React.MouseEvent<HTMLButtonElement, MouseEvent> {
@@ -35,14 +37,22 @@ interface OneStepMovementReqEvent extends React.MouseEvent<HTMLButtonElement, Mo
   srcElement: SrcElement;
   direction: 'up' | 'down';
 }
+interface onImgDoubleClickEvent extends React.MouseEvent<HTMLDivElement, MouseEvent> {
+  srcElement: SrcElement;
+}
 
-const EnumElement = ({ srcElement, toUpperReqHandler, oneStepMovementReqHandler }: EnumElementProps) => {
+const EnumElement = ({ srcElement, toUpperReqHandler, oneStepMovementReqHandler, onImgDoubleClick }: EnumElementProps) => {
   return (
     <div className={'enumElement'}>
       <div className={'element_container'}>
         <div className={'element_wrapper'}>
           {srcElement?.fileSrc ? (
-            <div className={'img_wrapper'}>
+            <div
+              className={'img_wrapper'}
+              onDoubleClick={(e) => {
+                if (onImgDoubleClick) onImgDoubleClick({ ...e, srcElement: srcElement });
+              }}
+            >
               <img src={srcElement.fileSrc} />
             </div>
           ) : (
@@ -173,6 +183,7 @@ const SrcEnumerator = ({ srcInfo, title, callBack, children }: SrcEnumeratorProp
                     : undefined
                 }
                 oneStepMovementReqHandler={oneStepMovementReqEmerged}
+                onImgDoubleClick={callBack?.onImgDoubleClick}
               />
             ))}
         </div>

@@ -1,0 +1,13 @@
+@charset "UTF-8";
+/*******************************
+  imgEditPop.scss
+  이미지 편집 팝업 css
+********************************/
+
+.imgEditPop {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-height: 400px;
+}

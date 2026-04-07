@@ -4,6 +4,8 @@
   팝업 css
 ********************************/
 
+@use "./popup/common/imgEditPop";
+
 .popUpGroup {
   padding: 0;
   & .ant-modal-content {

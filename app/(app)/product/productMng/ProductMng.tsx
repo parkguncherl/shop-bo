@@ -28,6 +28,7 @@ import { usePartnerCodeStore } from '../../../../stores/usePartnerCodeStore';
 import { PartnerCodePop } from '../../../../components/popup/system/PartnerCodePop';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import ProductForEachCategoryPop from '../../../../components/popup/product/productMng/ProductForEachCategoryPop';
+import ImgEditPop from '../../../../components/popup/common/ImgEditPop';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
@@ -557,6 +558,9 @@ const ProductMng = () => {
                     const refreshedTargetedFileSetInfo = await targetedFileSetInfoRefreshFn(targetedFileSetInfo);
                     setTargetedFileSetInfo(refreshedTargetedFileSetInfo);
                   },
+                  onImgDoubleClick: (event) => {
+                    console.log('event: ', event.srcElement);
+                  },
                 }}
               >
                 <div className="btnArea between">
@@ -672,6 +676,12 @@ const ProductMng = () => {
           closeModal('PROD_DEL');
         }}
       />
+      {/*<ImgEditPop*/}
+      {/*  open={true}*/}
+      {/*  onClose={() => {*/}
+      {/*    //*/}
+      {/*  }}*/}
+      {/*/>*/}
     </div>
   );
 };
