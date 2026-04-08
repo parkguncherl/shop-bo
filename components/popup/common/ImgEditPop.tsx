@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { PopupFooter } from '../PopupFooter';
 import { PopupContent } from '../PopupContent';
 import { PopupLayout } from '../PopupLayout';
-import { Layer, Stage, Image } from 'react-konva';
+import { Layer, Stage, Image, Line } from 'react-konva';
 import Konva from 'konva';
 
 export interface ImgProps {
@@ -15,7 +15,7 @@ interface ImgEditPopProps {
   //onEditingEnded?: () => void; // 에디팅 완료 후 사용자가 저장(수정)을 희망할 시
   imgProps?: ImgProps;
 }
-interface URLImageProps extends Konva.ImageConfig {}
+//interface URLImageProps extends Konva.ImageConfig {}
 
 interface ImageRepInfo {
   image: HTMLImageElement;
@@ -25,7 +25,7 @@ interface ImageRepInfo {
   y: number;
 }
 
-const URLImage = ({ ...rest }: URLImageProps) => {
+const URLImage = ({ ...rest }: Konva.ImageConfig) => {
   return <Image {...rest} />;
 };
 
@@ -81,6 +81,36 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
     if (onClose) onClose();
   };
 
+  const [tool, setTool] = React.useState('pen');
+  const [lines, setLines] = useState<any[]>([]);
+  const isDrawing = useRef(false);
+
+  const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
+    isDrawing.current = true;
+    const pos = e.target.getStage().getPointerPosition();
+    setLines([...lines, { tool, points: [pos.x, pos.y] }]);
+  };
+
+  const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
+    // no drawing - skipping
+    if (!isDrawing.current) {
+      return;
+    }
+    const stage = e.target.getStage();
+    const point = stage.getPointerPosition();
+    let lastLine = lines[lines.length - 1];
+    // add point
+    lastLine.points = lastLine.points.concat([point.x, point.y]);
+
+    // replace last
+    lines.splice(lines.length - 1, 1, lastLine);
+    setLines(lines.concat());
+  };
+
+  const handleMouseUp = () => {
+    isDrawing.current = false;
+  };
+
   return (
     <div className="imgPopBox">
       <PopupLayout
@@ -99,9 +129,36 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
       >
         <PopupContent>
           <div className={'imgEditPop'} ref={topWrapperRef}>
-            <Stage {...(dimensions as any)}>
+            <Stage
+              {...(dimensions as any)}
+              // width={dimensions.width}
+              // height={dimensions.height}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseup={handleMouseUp}
+            >
               <Layer>
-                <URLImage {...imageRepInfo} />
+                <URLImage
+                  image={imageRepInfo?.image}
+                  width={imageRepInfo?.width}
+                  height={imageRepInfo?.height}
+                  x={imageRepInfo?.x}
+                  y={imageRepInfo?.y}
+                  // filters={[Konva.Filters.Blur]}
+                  // blurRadius={10}
+                />
+                {lines.map((line, i) => (
+                  <Line
+                    key={i}
+                    points={line.points}
+                    stroke="#df4b26"
+                    strokeWidth={5}
+                    tension={0.5}
+                    lineCap="round"
+                    lineJoin="round"
+                    globalCompositeOperation={line.tool === 'eraser' ? 'destination-out' : 'source-over'}
+                  />
+                ))}
               </Layer>
             </Stage>
           </div>
