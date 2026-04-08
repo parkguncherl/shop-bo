@@ -18,9 +18,9 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt',
     // maxAge(seconds) = 2시간 (만료)
     //maxAge: 1 * 60 * 60 * 2,
-    maxAge: 7 * 24 * 60 * 60, //1 주일
+    maxAge: 6 * 24 * 60 * 60, //6일
     // updateAge(seconds) = 30분 (갱신)
-    updateAge: 1 * 60 * 30,
+    updateAge: 60 * 30,
   },
   secret: process.env.NEXT_PUBLIC_SMART_API_ENDPOINT,
   providers: [
@@ -90,7 +90,7 @@ export const authOptions: NextAuthOptions = {
       if (params.trigger === 'update') {
         params.token.user.partnerId = params.session.user.partnerId;
         //params.token.user.partnerNm = params.session.user.partnerNm;
-        params.token.user.workYmd = params.session.user.workYmd;
+        //params.token.user.workYmd = params.session.user.workYmd;
         //params.token.user.workLogisId = params.session.user.workLogisId;
         //params.token.user.workLogisNm = params.session.user.workLogisNm;
         params.token.user.isPageAuth = params.session.user.isPageAuth;
