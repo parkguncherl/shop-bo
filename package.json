@@ -74,6 +74,7 @@
     "react-hook-form": "^7.41.1",
     "react-i18next": "^12.1.4",
     "react-konva": "^19.2.3",
+    "react-konva-utils": "^2.0.0",
     "react-select": "^5.8.1",
     "react-sortablejs": "^6.1.4",
     "react-to-print": "^2.14.12",

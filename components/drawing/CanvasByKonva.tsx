@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Layer, Stage, Image, Line, Text } from 'react-konva';
+import { Layer, Stage, Image, Line, Text, Transformer } from 'react-konva';
 import Konva from 'konva';
+import { Html } from 'react-konva-utils';
 
 export interface ImgProps {
   imgSrc?: string;
@@ -9,6 +10,28 @@ export interface ImgProps {
 interface CanvasByKonvaProps {
   imgProps?: ImgProps;
   wrapperRef: React.RefObject<HTMLDivElement>; // wrapper 태그의 너비, 높이를 통하여 캔버스 비율이 결정되므로 반드시 전달되어야 함
+}
+
+interface EditableTextProps {
+  text: {
+    textInfo: {
+      content: string;
+      position: {
+        x: number;
+        y: number;
+      };
+    };
+    onMouseDown?: (evt: Konva.KonvaEventObject<MouseEvent>) => void;
+    onDragEnd?: (evt: Konva.KonvaEventObject<DragEvent>) => void;
+    onEditEnd?: () => void;
+  };
+  // editor: any;
+  // transformer: any;
+}
+interface TextEditorProps {
+  textRef: React.RefObject<any>;
+  onClose: () => void;
+  onChange: (value: string) => void;
 }
 
 interface ImageRepInfo {
@@ -21,6 +44,191 @@ interface ImageRepInfo {
 
 const URLImage = ({ ...rest }: Konva.ImageConfig) => {
   return <Image {...rest} />;
+};
+
+const TextArea = ({ textRef, onClose, onChange }: TextEditorProps) => {
+  const [inputValue, setInputValue] = useState('');
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (!textareaRef.current) return;
+    if (!textRef.current) return;
+
+    const textarea = textareaRef.current;
+    //const stage = textRef.current.getStage();
+    const textPosition = textRef.current.position();
+    //const stageBox = stage.container().getBoundingClientRect();
+    const areaPosition = {
+      x: textPosition.x,
+      y: textPosition.y,
+    };
+
+    // Match styles with the text node
+    textarea.value = textRef.current.text();
+    textarea.style.position = 'absolute';
+    textarea.style.top = `${areaPosition.y}px`;
+    textarea.style.left = `${areaPosition.x}px`;
+    textarea.style.width = `${textRef.current.width() - textRef.current.padding() * 2}px`;
+    textarea.style.height = `${textRef.current.height() - textRef.current.padding() * 2 + 5}px`;
+    textarea.style.fontSize = `${textRef.current.fontSize()}px`;
+    textarea.style.border = 'none';
+    textarea.style.padding = '0px';
+    textarea.style.margin = '0px';
+    textarea.style.overflow = 'hidden';
+    textarea.style.background = 'none';
+    textarea.style.outline = 'none';
+    textarea.style.resize = 'none';
+    textarea.style.lineHeight = textRef.current.lineHeight();
+    textarea.style.fontFamily = textRef.current.fontFamily();
+    textarea.style.transformOrigin = 'left top';
+    textarea.style.textAlign = textRef.current.align();
+    textarea.style.color = textRef.current.fill();
+
+    const rotation = textRef.current.rotation();
+    let transform = '';
+    if (rotation) {
+      transform += `rotateZ(${rotation}deg)`;
+    }
+    textarea.style.transform = transform;
+
+    textarea.style.height = 'auto';
+    textarea.style.height = `${textarea.scrollHeight + 3}px`;
+
+    textarea.focus();
+
+    // const handleOutsideClick = (e) => {
+    //   if (e.target !== textarea) {
+    //     onChange(textarea.value);
+    //     onClose();
+    //   }
+    // };
+
+    // // Add event listeners
+    // const handleKeyDown = (e) => {
+    //   if (e.key === 'Enter' && !e.shiftKey) {
+    //     e.preventDefault();
+    //     onChange(inputValue);
+    //     onClose();
+    //   }
+    //   if (e.key === 'Escape') {
+    //     onClose();
+    //   }
+    // };
+    //
+    // const handleInput = () => {
+    //   const scale = textRef.current.getAbsoluteScale().x;
+    //   textarea.style.width = `${textRef.current.width() * scale}px`;
+    //   textarea.style.height = 'auto';
+    //   textarea.style.height = `${textarea.scrollHeight + textRef.current.fontSize()}px`;
+    // };
+
+    // textarea.addEventListener('keydown', handleKeyDown);
+    // textarea.addEventListener('input', handleInput);
+    //
+    // return () => {
+    //   textarea.removeEventListener('keydown', handleKeyDown);
+    //   textarea.removeEventListener('input', handleInput);
+    // };
+  }, []);
+
+  // Add event listeners
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      onChange(inputValue);
+      onClose();
+    }
+    if (e.key === 'Escape') {
+      onClose();
+    }
+  };
+
+  const handleInput = () => {
+    if (textareaRef.current) {
+      const scale = textRef.current.getAbsoluteScale().x;
+      textareaRef.current.style.width = `${textRef.current.width() * scale}px`;
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight + textRef.current.fontSize()}px`;
+    }
+  };
+
+  return (
+    <textarea
+      ref={textareaRef}
+      style={{
+        minHeight: '1em',
+        position: 'absolute',
+      }}
+      onBlur={() => {
+        onChange(inputValue);
+        onClose();
+      }}
+      onChange={(e) => setInputValue(e.target.value)}
+      onKeyDown={handleKeyDown}
+      onInput={handleInput}
+    />
+  );
+};
+
+const TextEditor = (props: TextEditorProps) => {
+  // Konva stage 내에 DOM element를 랜더링하기 위해 react-konva-utils 의 Html 을 사용한다.
+  return (
+    <Html>
+      <TextArea {...props} />
+    </Html>
+  );
+};
+
+const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd } }: EditableTextProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [text, setText] = useState('Some text here');
+
+  const textRef = useRef(null);
+  const trRef = useRef(null);
+
+  useEffect(() => {
+    setText(textInfo.content || '');
+  }, [textInfo.content]);
+
+  return (
+    <>
+      <Text
+        //text={textInfo.content}
+        text={text}
+        x={textInfo.position.x}
+        y={textInfo.position.y}
+        draggable
+        onMouseDown={onMouseDown}
+        onDragEnd={onDragEnd}
+        visible={!isEditing}
+        onDblClick={() => {
+          setIsEditing(true);
+        }}
+        ref={textRef}
+      />
+      {isEditing && (
+        <TextEditor
+          textRef={textRef}
+          onChange={(newText) => setText(newText)}
+          onClose={() => {
+            setIsEditing(false);
+            if (onEditEnd) onEditEnd();
+          }}
+        />
+      )}
+      {!isEditing && (
+        <Transformer
+          ref={trRef}
+          enabledAnchors={['middle-left', 'middle-right']}
+          boundBoxFunc={(oldBox, newBox) => ({
+            ...newBox,
+            width: Math.max(30, newBox.width),
+          })}
+        />
+      )}
+    </>
+  );
 };
 
 const CanvasByKonva = ({ imgProps, wrapperRef }: CanvasByKonvaProps) => {
@@ -154,32 +362,62 @@ const CanvasByKonva = ({ imgProps, wrapperRef }: CanvasByKonvaProps) => {
           />
         ))}
         {textInfoList.map((textInfo, index) => (
-          <Text
+          // <Text
+          //   key={index}
+          //   text={textInfo.content}
+          //   x={textInfo.position.x}
+          //   y={textInfo.position.y}
+          //   draggable
+          //   onMouseDown={() => {
+          //     isDraggingText.current = true;
+          //   }}
+          //   onDragEnd={(e: Konva.KonvaEventObject<DragEvent>) => {
+          //     setTextInfoList((prevState) => {
+          //       return prevState.map((prev, prevI) => {
+          //         if (prevI == index) {
+          //           return {
+          //             content: prev.content,
+          //             position: {
+          //               x: e.target.x(),
+          //               y: e.target.y(),
+          //             },
+          //           };
+          //         } else {
+          //           return prev;
+          //         }
+          //       });
+          //     });
+          //     isDraggingText.current = false;
+          //   }}
+          // />
+          <EditableText
             key={index}
-            text={textInfo.content}
-            x={textInfo.position.x}
-            y={textInfo.position.y}
-            draggable
-            onMouseDown={() => {
-              isDraggingText.current = true;
-            }}
-            onDragEnd={(e: Konva.KonvaEventObject<DragEvent>) => {
-              setTextInfoList((prevState) => {
-                return prevState.map((prev, prevI) => {
-                  if (prevI == index) {
-                    return {
-                      content: prev.content,
-                      position: {
-                        x: e.target.x(),
-                        y: e.target.y(),
-                      },
-                    };
-                  } else {
-                    return prev;
-                  }
+            text={{
+              textInfo: textInfo,
+              onMouseDown: () => {
+                isDraggingText.current = true;
+              },
+              onDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => {
+                setTextInfoList((prevState) => {
+                  return prevState.map((prev, prevI) => {
+                    if (prevI == index) {
+                      return {
+                        content: prev.content,
+                        position: {
+                          x: e.target.x(),
+                          y: e.target.y(),
+                        },
+                      };
+                    } else {
+                      return prev;
+                    }
+                  });
                 });
-              });
-              isDraggingText.current = false;
+                isDraggingText.current = false;
+              },
+              onEditEnd: () => {
+                isDraggingText.current = false;
+              },
             }}
           />
         ))}
