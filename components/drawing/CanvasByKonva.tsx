@@ -10,7 +10,6 @@ interface CanvasByKonvaProps {
   imgProps?: ImgProps;
   wrapperRef: React.RefObject<HTMLDivElement>;
 }
-//interface URLImageProps extends Konva.ImageConfig {}
 
 interface ImageRepInfo {
   image: HTMLImageElement;
@@ -71,13 +70,13 @@ const CanvasByKonva = ({ imgProps, wrapperRef }: CanvasByKonvaProps) => {
   }, [imgProps]);
 
   const [tool, setTool] = React.useState('pen');
-  const [lines, setLines] = useState<any[]>([]);
+  const [lines, setLines] = useState<{ tool: string; points: number[] }[]>([]);
   const isDrawing = useRef(false);
 
   const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
     isDrawing.current = true;
     const pos = e.target.getStage().getPointerPosition();
-    setLines([...lines, { tool, points: [pos.x, pos.y] }]);
+    setLines([...lines, { tool, points: [pos.x, pos.y] }]); // 최초 마우스 down 시점에
   };
 
   const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
@@ -87,13 +86,15 @@ const CanvasByKonva = ({ imgProps, wrapperRef }: CanvasByKonvaProps) => {
     }
     const stage = e.target.getStage();
     const point = stage.getPointerPosition();
-    let lastLine = lines[lines.length - 1];
+    let lastLine = { ...lines[lines.length - 1] };
+
     // add point
-    lastLine.points = lastLine.points.concat([point.x, point.y]);
+    lastLine.points = lastLine.points.concat([point.x, point.y]); // 이동에 따른 신규 포인트 추가(concat 으로 병합)
 
     // replace last
-    lines.splice(lines.length - 1, 1, lastLine);
-    setLines(lines.concat());
+    const splicedLines = [...lines];
+    splicedLines.splice(splicedLines.length - 1, 1, lastLine);
+    setLines(splicedLines.concat());
   };
 
   const handleMouseUp = () => {
