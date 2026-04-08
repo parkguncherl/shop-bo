@@ -8,7 +8,7 @@ export interface ImgProps {
 }
 interface CanvasByKonvaProps {
   imgProps?: ImgProps;
-  wrapperRef: React.RefObject<HTMLDivElement>;
+  wrapperRef: React.RefObject<HTMLDivElement>; // wrapper 태그의 너비, 높이를 통하여 캔버스 비율이 결정되므로 반드시 전달되어야 함
 }
 
 interface ImageRepInfo {
@@ -26,6 +26,11 @@ const URLImage = ({ ...rest }: Konva.ImageConfig) => {
 const CanvasByKonva = ({ imgProps, wrapperRef }: CanvasByKonvaProps) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [imageRepInfo, setImageRepInfo] = useState<ImageRepInfo | undefined>(undefined);
+
+  const [tool, setTool] = React.useState('pen');
+  const [lines, setLines] = useState<{ tool: string; points: number[] }[]>([]);
+
+  const isDrawing = useRef(false);
 
   useEffect(() => {
     // 이미지 정보 변경 시점에 필요한 초기화(혹은 동기화) 동작
@@ -68,10 +73,6 @@ const CanvasByKonva = ({ imgProps, wrapperRef }: CanvasByKonvaProps) => {
       };
     }
   }, [imgProps]);
-
-  const [tool, setTool] = React.useState('pen');
-  const [lines, setLines] = useState<{ tool: string; points: number[] }[]>([]);
-  const isDrawing = useRef(false);
 
   const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
     isDrawing.current = true;
