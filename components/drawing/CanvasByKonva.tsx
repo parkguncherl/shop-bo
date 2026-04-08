@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Layer, Stage, Image, Line } from 'react-konva';
+import { Layer, Stage, Image, Line, Text } from 'react-konva';
 import Konva from 'konva';
 
 export interface ImgProps {
@@ -26,11 +26,43 @@ const URLImage = ({ ...rest }: Konva.ImageConfig) => {
 const CanvasByKonva = ({ imgProps, wrapperRef }: CanvasByKonvaProps) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [imageRepInfo, setImageRepInfo] = useState<ImageRepInfo | undefined>(undefined);
+  const [textInfoList, setTextInfoList] = useState<
+    {
+      content: string;
+      position: {
+        x: number;
+        y: number;
+      };
+    }[]
+  >([
+    {
+      content: 'i disappointed on your behavior',
+      position: {
+        x: 50,
+        y: 50,
+      },
+    },
+    {
+      content: 'i disappointed on your behavior',
+      position: {
+        x: 50,
+        y: 60,
+      },
+    },
+    {
+      content: 'i disappointed on your behavior',
+      position: {
+        x: 50,
+        y: 70,
+      },
+    },
+  ]);
 
   const [tool, setTool] = React.useState('pen');
   const [lines, setLines] = useState<{ tool: string; points: number[] }[]>([]);
 
   const isDrawing = useRef(false);
+  const isDraggingText = useRef(false);
 
   useEffect(() => {
     // 이미지 정보 변경 시점에 필요한 초기화(혹은 동기화) 동작
@@ -75,9 +107,12 @@ const CanvasByKonva = ({ imgProps, wrapperRef }: CanvasByKonvaProps) => {
   }, [imgProps]);
 
   const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
-    isDrawing.current = true;
-    const pos = e.target.getStage().getPointerPosition();
-    setLines([...lines, { tool, points: [pos.x, pos.y] }]); // 최초 마우스 down 시점에
+    if (!isDraggingText.current) {
+      // text 드래깅 시점에서 비활성
+      isDrawing.current = true;
+      const pos = e.target.getStage().getPointerPosition();
+      setLines([...lines, { tool, points: [pos.x, pos.y] }]); // 최초 마우스 down 시점에
+    }
   };
 
   const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
@@ -116,6 +151,36 @@ const CanvasByKonva = ({ imgProps, wrapperRef }: CanvasByKonvaProps) => {
             lineCap="round"
             lineJoin="round"
             globalCompositeOperation={line.tool === 'eraser' ? 'destination-out' : 'source-over'}
+          />
+        ))}
+        {textInfoList.map((textInfo, index) => (
+          <Text
+            key={index}
+            text={textInfo.content}
+            x={textInfo.position.x}
+            y={textInfo.position.y}
+            draggable
+            onMouseDown={() => {
+              isDraggingText.current = true;
+            }}
+            onDragEnd={(e: Konva.KonvaEventObject<DragEvent>) => {
+              setTextInfoList((prevState) => {
+                return prevState.map((prev, prevI) => {
+                  if (prevI == index) {
+                    return {
+                      content: prev.content,
+                      position: {
+                        x: e.target.x(),
+                        y: e.target.y(),
+                      },
+                    };
+                  } else {
+                    return prev;
+                  }
+                });
+              });
+              isDraggingText.current = false;
+            }}
           />
         ))}
       </Layer>
