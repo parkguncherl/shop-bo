@@ -53,7 +53,7 @@ const EnumElement = ({ srcElement, toUpperReqHandler, oneStepMovementReqHandler,
                 if (onImgDoubleClick) onImgDoubleClick({ ...e, srcElement: srcElement });
               }}
             >
-              <img src={srcElement.fileSrc} crossOrigin="anonymous" /> {/* 교차 출처 리소스 공유 활성화 차원에서 본 속성(crossOrigin) 적용 */}
+              <img src={srcElement.fileSrc} />
             </div>
           ) : (
             <div className={'unknown_messaging_wrapper'}>
