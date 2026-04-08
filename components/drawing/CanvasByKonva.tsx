@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Layer, Stage, Image, Line, Text, Transformer } from 'react-konva';
 import Konva from 'konva';
 import { Html } from 'react-konva-utils';
+import { Box } from 'konva/lib/shapes/Transformer';
 
 export interface ImgProps {
   imgSrc?: string;
@@ -24,22 +25,31 @@ interface EditableTextProps {
     onMouseDown?: (evt: Konva.KonvaEventObject<MouseEvent>) => void;
     onDragEnd?: (evt: Konva.KonvaEventObject<DragEvent>) => void;
     onEditEnd?: () => void;
+    onChangeByEditor?: (value: string) => void;
   };
   // editor: any;
   // transformer: any;
 }
 interface TextEditorProps {
   textRef: React.RefObject<any>;
-  onClose: () => void;
-  onChange: (value: string) => void;
+  onClose?: () => void;
+  onChange?: (value: string) => void;
 }
 
+// state's types
 interface ImageRepInfo {
   image: HTMLImageElement;
   width: number;
   height: number;
   x: number;
   y: number;
+}
+interface TextInfo {
+  content: string;
+  position: {
+    x: number;
+    y: number;
+  };
 }
 
 const URLImage = ({ ...rest }: Konva.ImageConfig) => {
@@ -136,11 +146,11 @@ const TextArea = ({ textRef, onClose, onChange }: TextEditorProps) => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      onChange(inputValue);
-      onClose();
+      if (onChange) onChange(inputValue);
+      if (onClose) onClose();
     }
     if (e.key === 'Escape') {
-      onClose();
+      if (onClose) onClose();
     }
   };
 
@@ -161,8 +171,8 @@ const TextArea = ({ textRef, onClose, onChange }: TextEditorProps) => {
         position: 'absolute',
       }}
       onBlur={() => {
-        onChange(inputValue);
-        onClose();
+        if (onChange) onChange(inputValue);
+        if (onClose) onClose();
       }}
       onChange={(e) => setInputValue(e.target.value)}
       onKeyDown={handleKeyDown}
@@ -180,22 +190,16 @@ const TextEditor = (props: TextEditorProps) => {
   );
 };
 
-const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd } }: EditableTextProps) => {
+const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onChangeByEditor } }: EditableTextProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [text, setText] = useState('Some text here');
 
   const textRef = useRef(null);
   const trRef = useRef(null);
 
-  useEffect(() => {
-    setText(textInfo.content || '');
-  }, [textInfo.content]);
-
   return (
     <>
       <Text
-        //text={textInfo.content}
-        text={text}
+        text={textInfo.content}
         x={textInfo.position.x}
         y={textInfo.position.y}
         draggable
@@ -210,7 +214,7 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd } }:
       {isEditing && (
         <TextEditor
           textRef={textRef}
-          onChange={(newText) => setText(newText)}
+          onChange={onChangeByEditor}
           onClose={() => {
             setIsEditing(false);
             if (onEditEnd) onEditEnd();
@@ -221,9 +225,9 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd } }:
         <Transformer
           ref={trRef}
           enabledAnchors={['middle-left', 'middle-right']}
-          boundBoxFunc={(oldBox, newBox) => ({
+          boundBoxFunc={(oldBox: Box, newBox: Box) => ({
             ...newBox,
-            width: Math.max(30, newBox.width),
+            width: Math.max(30, (newBox as any).width),
           })}
         />
       )}
@@ -234,15 +238,7 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd } }:
 const CanvasByKonva = ({ imgProps, wrapperRef }: CanvasByKonvaProps) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [imageRepInfo, setImageRepInfo] = useState<ImageRepInfo | undefined>(undefined);
-  const [textInfoList, setTextInfoList] = useState<
-    {
-      content: string;
-      position: {
-        x: number;
-        y: number;
-      };
-    }[]
-  >([
+  const [textInfoList, setTextInfoList] = useState<TextInfo[]>([
     {
       content: 'i disappointed on your behavior',
       position: {
@@ -417,6 +413,20 @@ const CanvasByKonva = ({ imgProps, wrapperRef }: CanvasByKonvaProps) => {
               },
               onEditEnd: () => {
                 isDraggingText.current = false;
+              },
+              onChangeByEditor: (value) => {
+                setTextInfoList((prevState) => {
+                  return prevState.map((prev, prevI) => {
+                    if (prevI == index) {
+                      return {
+                        ...prev,
+                        content: value,
+                      };
+                    } else {
+                      return prev;
+                    }
+                  });
+                });
               },
             }}
           />
