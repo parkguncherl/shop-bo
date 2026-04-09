@@ -66,9 +66,7 @@ const TextArea = ({ textRef, onClose, onChange }: TextEditorProps) => {
     if (!textRef.current) return;
 
     const textarea = textareaRef.current;
-    //const stage = textRef.current.getStage();
     const textPosition = textRef.current.position();
-    //const stageBox = stage.container().getBoundingClientRect();
     const areaPosition = {
       x: textPosition.x,
       y: textPosition.y,
@@ -106,40 +104,6 @@ const TextArea = ({ textRef, onClose, onChange }: TextEditorProps) => {
     textarea.style.height = `${textarea.scrollHeight + 3}px`;
 
     textarea.focus();
-
-    // const handleOutsideClick = (e) => {
-    //   if (e.target !== textarea) {
-    //     onChange(textarea.value);
-    //     onClose();
-    //   }
-    // };
-
-    // // Add event listeners
-    // const handleKeyDown = (e) => {
-    //   if (e.key === 'Enter' && !e.shiftKey) {
-    //     e.preventDefault();
-    //     onChange(inputValue);
-    //     onClose();
-    //   }
-    //   if (e.key === 'Escape') {
-    //     onClose();
-    //   }
-    // };
-    //
-    // const handleInput = () => {
-    //   const scale = textRef.current.getAbsoluteScale().x;
-    //   textarea.style.width = `${textRef.current.width() * scale}px`;
-    //   textarea.style.height = 'auto';
-    //   textarea.style.height = `${textarea.scrollHeight + textRef.current.fontSize()}px`;
-    // };
-
-    // textarea.addEventListener('keydown', handleKeyDown);
-    // textarea.addEventListener('input', handleInput);
-    //
-    // return () => {
-    //   textarea.removeEventListener('keydown', handleKeyDown);
-    //   textarea.removeEventListener('input', handleInput);
-    // };
   }, []);
 
   // Add event listeners
@@ -195,6 +159,12 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onC
 
   const textRef = useRef(null);
   const trRef = useRef(null);
+
+  useEffect(() => {
+    if (trRef.current && textRef.current) {
+      (trRef.current as any).nodes([textRef.current]);
+    }
+  }, [isEditing]);
 
   return (
     <>
@@ -358,34 +328,6 @@ const CanvasByKonva = ({ imgProps, wrapperRef }: CanvasByKonvaProps) => {
           />
         ))}
         {textInfoList.map((textInfo, index) => (
-          // <Text
-          //   key={index}
-          //   text={textInfo.content}
-          //   x={textInfo.position.x}
-          //   y={textInfo.position.y}
-          //   draggable
-          //   onMouseDown={() => {
-          //     isDraggingText.current = true;
-          //   }}
-          //   onDragEnd={(e: Konva.KonvaEventObject<DragEvent>) => {
-          //     setTextInfoList((prevState) => {
-          //       return prevState.map((prev, prevI) => {
-          //         if (prevI == index) {
-          //           return {
-          //             content: prev.content,
-          //             position: {
-          //               x: e.target.x(),
-          //               y: e.target.y(),
-          //             },
-          //           };
-          //         } else {
-          //           return prev;
-          //         }
-          //       });
-          //     });
-          //     isDraggingText.current = false;
-          //   }}
-          // />
           <EditableText
             key={index}
             text={{
