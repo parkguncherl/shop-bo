@@ -4,12 +4,11 @@ import Konva from 'konva';
 import { Html } from 'react-konva-utils';
 import { Box } from 'konva/lib/shapes/Transformer';
 
-export interface ImgProps {
+export interface ImgOnCanvasByKonva {
   imgSrc?: string;
-  //seq?: number; // file seq todo 해당 canvas 는 철저히 편집 동작에 집중하니 해당 인자는 canvas 관할에 맞지 아니함, 외부에서 관리
 }
 interface CanvasByKonvaProps {
-  imgProps?: ImgProps;
+  img?: ImgOnCanvasByKonva;
   wrapperRef: React.RefObject<HTMLDivElement>; // wrapper 태그의 너비, 높이를 통하여 캔버스 비율이 결정되므로 반드시 전달되어야 함
 
   ref?: React.Ref<CanvasByKonvaRef>;
@@ -29,7 +28,6 @@ interface EditableTextProps {
     onEditEnd?: () => void;
     onChangeByEditor?: (value: string) => void;
     enablePreviewMode?: boolean; // 미리보기 활성 switching state
-    textColor?: string;
   };
 }
 interface TextEditorProps {
@@ -164,7 +162,7 @@ const TextEditor = (props: TextEditorProps) => {
 };
 
 /** text 에디팅 동작을 위한 필요 영역이 정의된 고수준 영역 */
-const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onChangeByEditor, enablePreviewMode, textColor } }: EditableTextProps) => {
+const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onChangeByEditor, enablePreviewMode } }: EditableTextProps) => {
   const [status, setStatus] = useState<'editing' | 'transforming' | 'preview'>('transforming'); // 각각 편집, 변환(뒤집기, 늘리기 등의 동작), 미리보기 모드
   const [textWidth, setTextWidth] = useState(200);
 
@@ -219,7 +217,7 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onC
         onTransform={handleTransform}
         width={textWidth}
         fontSize={20}
-        fill={textColor}
+        fill={textInfo.color}
       />
       {status == 'editing' && (
         <TextEditor
@@ -255,7 +253,7 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onC
  * konva를 통한 주어진 이미지 에디팅을 가능하게 하는 StateFul 컴포넌트
  *
  * */
-const CanvasByKonva = ({ imgProps, wrapperRef, ref, tool = 'pen', preview, textColor }: CanvasByKonvaProps) => {
+const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textColor }: CanvasByKonvaProps) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [imageRepInfo, setImageRepInfo] = useState<ImageRepInfo | undefined>(undefined);
   const [textInfoList, setTextInfoList] = useState<TextInfo[]>([]);
@@ -266,7 +264,7 @@ const CanvasByKonva = ({ imgProps, wrapperRef, ref, tool = 'pen', preview, textC
   const isDraggingText = useRef(false);
 
   /** 참조를 통해 외부로 노출되는 영역을 정의함 */
-  useImperativeHandle<unknown, CanvasByKonvaRef>(ref, () => {
+  useImperativeHandle<any, CanvasByKonvaRef>(ref, () => {
     return {
       addNewText: (value) => {
         setTextInfoList((prevState) => {
@@ -288,9 +286,9 @@ const CanvasByKonva = ({ imgProps, wrapperRef, ref, tool = 'pen', preview, textC
 
   useEffect(() => {
     // 이미지 정보 변경 시점에 필요한 초기화(혹은 동기화) 동작
-    if (imgProps && imgProps.imgSrc) {
+    if (img && img.imgSrc) {
       const image = new window.Image();
-      image.src = imgProps.imgSrc;
+      image.src = img.imgSrc;
       image.onload = () => {
         const stageWidth = wrapperRef.current?.offsetWidth || 0;
         const stageHeight = wrapperRef.current?.offsetHeight || 0;
@@ -326,7 +324,7 @@ const CanvasByKonva = ({ imgProps, wrapperRef, ref, tool = 'pen', preview, textC
         });
       };
     }
-  }, [imgProps]);
+  }, [img]);
 
   const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
     if (!isDraggingText.current) {
@@ -381,7 +379,6 @@ const CanvasByKonva = ({ imgProps, wrapperRef, ref, tool = 'pen', preview, textC
             text={{
               textInfo: textInfo,
               enablePreviewMode: preview,
-              textColor: textInfo.color,
               onMouseDown: () => {
                 isDraggingText.current = true;
               },
