@@ -15,7 +15,7 @@ interface CanvasByKonvaProps {
   ref?: React.Ref<CanvasByKonvaRef>;
   tool?: 'pen' | 'eraser';
 }
-interface CanvasByKonvaRef {
+export interface CanvasByKonvaRef {
   addNewText: (value?: string) => void;
 }
 
@@ -229,7 +229,6 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onC
           ref={trRef}
           enabledAnchors={['middle-left', 'middle-right']}
           boundBoxFunc={(oldBox: Box, newBox: Box) => {
-            console.log('(newBox as any).width: ', (newBox as any).width, Math.max(30, (newBox as any).width));
             return {
               ...newBox,
               width: Math.max(30, (newBox as any).width),
@@ -248,29 +247,30 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onC
 const CanvasByKonva = ({ imgProps, wrapperRef, ref, tool = 'pen' }: CanvasByKonvaProps) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [imageRepInfo, setImageRepInfo] = useState<ImageRepInfo | undefined>(undefined);
-  const [textInfoList, setTextInfoList] = useState<TextInfo[]>([
-    {
-      content: 'i disappointed on your behavior',
-      position: {
-        x: 50,
-        y: 50,
-      },
-    },
-    {
-      content: 'i disappointed on your behavior',
-      position: {
-        x: 50,
-        y: 50,
-      },
-    },
-    {
-      content: 'i disappointed on your behavior',
-      position: {
-        x: 50,
-        y: 70,
-      },
-    },
-  ]);
+  const [textInfoList, setTextInfoList] = useState<TextInfo[]>([]);
+  // const [textInfoList, setTextInfoList] = useState<TextInfo[]>([
+  //   {
+  //     content: 'i disappointed on your behavior',
+  //     position: {
+  //       x: 50,
+  //       y: 50,
+  //     },
+  //   },
+  //   {
+  //     content: 'i disappointed on your behavior',
+  //     position: {
+  //       x: 50,
+  //       y: 50,
+  //     },
+  //   },
+  //   {
+  //     content: 'i disappointed on your behavior',
+  //     position: {
+  //       x: 50,
+  //       y: 70,
+  //     },
+  //   },
+  // ]);
 
   const [lines, setLines] = useState<{ tool: string; points: number[] }[]>([]);
 

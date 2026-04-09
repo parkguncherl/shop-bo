@@ -2,7 +2,8 @@ import React, { useRef } from 'react';
 import { PopupFooter } from '../PopupFooter';
 import { PopupContent } from '../PopupContent';
 import { PopupLayout } from '../PopupLayout';
-import CanvasByKonva, { ImgProps } from '../../drawing/CanvasByKonva';
+import CanvasByKonva, { CanvasByKonvaRef, ImgProps } from '../../drawing/CanvasByKonva';
+import { Search } from '../../content';
 
 interface ImgEditPopProps {
   open: boolean;
@@ -13,6 +14,7 @@ interface ImgEditPopProps {
 
 const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
   const topWrapperRef = useRef<HTMLDivElement>(null);
+  const canvasByKonvaRef = useRef<CanvasByKonvaRef>(null);
 
   const onCloseCommon = () => {
     if (onClose) onClose();
@@ -28,15 +30,41 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
         onClose={onCloseCommon}
         footer={
           <PopupFooter>
-            <button className="btn" onClick={onCloseCommon}>
-              닫기
-            </button>
+            <div className="btnArea between">
+              <div className="left">
+                <button
+                  className="btn btnBlue"
+                  onClick={() => {
+                    canvasByKonvaRef.current?.addNewText();
+                  }}
+                >
+                  새로운 글 추가
+                </button>
+              </div>
+              <div className="right">
+                <button className="btn" onClick={onCloseCommon}>
+                  닫기
+                </button>
+              </div>
+            </div>
           </PopupFooter>
         }
       >
         <PopupContent>
+          {/*<Search className="type_1">*/}
+          {/*  <Search.Input*/}
+          {/*    title={' 검색'}*/}
+          {/*    name={'searchKeyword'}*/}
+          {/*    // placeholder={title + ' 입력'}*/}
+          {/*    // value={filters.searchKeyword}*/}
+          {/*    // onChange={onChangeFilters}*/}
+          {/*    // onEnter={() => {*/}
+          {/*    //   partnerCodesRefetch();*/}
+          {/*    // }}*/}
+          {/*  />*/}
+          {/*</Search>*/}
           <div className={'imgEditPop'} ref={topWrapperRef}>
-            <CanvasByKonva wrapperRef={topWrapperRef} imgProps={imgProps} />
+            <CanvasByKonva wrapperRef={topWrapperRef} imgProps={imgProps} ref={canvasByKonvaRef} />
           </div>
         </PopupContent>
       </PopupLayout>
