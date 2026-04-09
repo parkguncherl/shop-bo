@@ -4,9 +4,7 @@ import Konva from 'konva';
 import { Html } from 'react-konva-utils';
 import { Box } from 'konva/lib/shapes/Transformer';
 
-export interface ImgOnCanvasByKonva {
-  imgSrc?: string;
-}
+// CanvasByKonva props interface 및 연관 interface
 interface CanvasByKonvaProps {
   img?: ImgOnCanvasByKonva;
   wrapperRef: React.RefObject<HTMLDivElement>; // wrapper 태그의 너비, 높이를 통하여 캔버스 비율이 결정되므로 반드시 전달되어야 함
@@ -14,12 +12,19 @@ interface CanvasByKonvaProps {
   ref?: React.Ref<CanvasByKonvaRef>;
   tool?: 'pen' | 'eraser';
   preview?: boolean;
-  textColor?: string;
+  textConfig?: {
+    color?: string;
+  };
+  lineConfig?: Omit<Lines, 'tool' | 'points'>;
+}
+export interface ImgOnCanvasByKonva {
+  imgSrc?: string;
 }
 export interface CanvasByKonvaRef {
   addNewText: (value?: string) => void;
 }
 
+// 하위 컴포넌트 props interface
 interface EditableTextProps {
   text: {
     textInfo: TextInfo;
@@ -52,6 +57,12 @@ interface TextInfo {
     y: number;
   };
   color?: string;
+}
+interface Lines {
+  tool: string;
+  points: number[];
+  color?: string;
+  width?: number;
 }
 
 const URLImage = ({ ...rest }: Konva.ImageConfig) => {
@@ -253,12 +264,12 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onC
  * konva를 통한 주어진 이미지 에디팅을 가능하게 하는 StateFul 컴포넌트
  *
  * */
-const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textColor }: CanvasByKonvaProps) => {
+const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig, lineConfig }: CanvasByKonvaProps) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [imageRepInfo, setImageRepInfo] = useState<ImageRepInfo | undefined>(undefined);
   const [textInfoList, setTextInfoList] = useState<TextInfo[]>([]);
 
-  const [lines, setLines] = useState<{ tool: string; points: number[] }[]>([]);
+  const [lines, setLines] = useState<Lines[]>([]);
 
   const isDrawing = useRef(false);
   const isDraggingText = useRef(false);
@@ -271,7 +282,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textColor 
           return [
             ...prevState,
             {
-              color: textColor,
+              color: textConfig?.color,
               content: value ? value : '신규 작성',
               position: {
                 x: 50,
@@ -331,7 +342,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textColor 
       // text 드래깅 시점에서 비활성
       isDrawing.current = true;
       const pos = e.target.getStage().getPointerPosition();
-      setLines([...lines, { tool, points: [pos.x, pos.y] }]); // 최초 마우스 down 시점에
+      setLines([...lines, { tool, points: [pos.x, pos.y], color: lineConfig?.color, width: lineConfig?.width }]); // 최초 마우스 down 시점에
     }
   };
 
@@ -353,20 +364,26 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textColor 
     setLines(splicedLines.concat());
   };
 
+  // 마우스를 놓음
   const handleMouseUp = () => {
     isDrawing.current = false;
   };
 
+  // 마우스 이탈
+  const handleMouseLeave = () => {
+    isDrawing.current = false;
+  };
+
   return (
-    <Stage {...(dimensions as any)} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseup={handleMouseUp}>
+    <Stage {...(dimensions as any)} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseup={handleMouseUp} onMouseLeave={handleMouseLeave}>
       <Layer>
         <URLImage image={imageRepInfo?.image} width={imageRepInfo?.width} height={imageRepInfo?.height} x={imageRepInfo?.x} y={imageRepInfo?.y} />
         {lines.map((line, i) => (
           <Line
             key={i}
             points={line.points}
-            stroke="#df4b26"
-            strokeWidth={5}
+            stroke={line.color || 'black'}
+            strokeWidth={line.width || 5}
             tension={0.5}
             lineCap="round"
             lineJoin="round"

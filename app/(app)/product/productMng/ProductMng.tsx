@@ -28,8 +28,7 @@ import { usePartnerCodeStore } from '../../../../stores/usePartnerCodeStore';
 import { PartnerCodePop } from '../../../../components/popup/system/PartnerCodePop';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import ProductForEachCategoryPop from '../../../../components/popup/product/productMng/ProductForEachCategoryPop';
-import ImgEditPop from '../../../../components/popup/common/ImgEditPop';
-import { ImgProps } from '../../../../components/drawing/CanvasByKonva';
+import ImgEditPop, { ImgProps } from '../../../../components/popup/common/ImgEditPop';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 

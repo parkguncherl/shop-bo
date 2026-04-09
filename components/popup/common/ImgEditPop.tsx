@@ -2,9 +2,14 @@ import React, { useRef, useState } from 'react';
 import { PopupFooter } from '../PopupFooter';
 import { PopupContent } from '../PopupContent';
 import { PopupLayout } from '../PopupLayout';
-import CanvasByKonva, { CanvasByKonvaRef, ImgProps } from '../../drawing/CanvasByKonva';
+import CanvasByKonva, { CanvasByKonvaRef } from '../../drawing/CanvasByKonva';
 import { Search } from '../../content';
+import useFilters from '../../../hooks/useFilters';
 
+export interface ImgProps {
+  imgSrc?: string;
+  seq?: number;
+}
 interface ImgEditPopProps {
   open: boolean;
   onClose: () => void;
@@ -17,7 +22,12 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
   const canvasByKonvaRef = useRef<CanvasByKonvaRef>(null);
 
   const [preview, setPreview] = useState(false);
-  const [textColor, setTextColor] = useState('');
+
+  const [filters, onChangeFilters] = useFilters({
+    textColor: undefined,
+    lineColor: undefined,
+    lineWidth: undefined,
+  });
 
   const onCloseCommon = () => {
     if (onClose) onClose();
@@ -63,11 +73,24 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
         }
       >
         <PopupContent>
-          <Search className="type_1">
-            <Search.Input title={'텍스트 색상'} name={'textColor'} value={textColor} onChange={(name, value) => setTextColor(value.toString())} />
+          <Search className="type_2">
+            <Search.Input title={'텍스트 색상'} name={'textColor'} value={filters.textColor} onChange={onChangeFilters} />
+            <Search.Input title={'줄(라인) 색상'} name={'lineColor'} value={filters.lineColor} onChange={onChangeFilters} />
           </Search>
           <div className={'imgEditPop'} ref={topWrapperRef}>
-            <CanvasByKonva wrapperRef={topWrapperRef} imgProps={imgProps} ref={canvasByKonvaRef} preview={preview} textColor={textColor} />
+            <CanvasByKonva
+              wrapperRef={topWrapperRef}
+              img={imgProps}
+              ref={canvasByKonvaRef}
+              preview={preview}
+              textConfig={{
+                color: filters.textColor,
+              }}
+              lineConfig={{
+                color: filters.lineColor,
+                width: filters.lineWidth,
+              }}
+            />
           </div>
         </PopupContent>
       </PopupLayout>
