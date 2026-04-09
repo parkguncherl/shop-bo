@@ -78,6 +78,7 @@ const URLImage = ({ ...rest }: Konva.ImageConfig) => {
 
 /** 입력 영역 */
 const TextArea = ({ textRef, onClose, onChange, content }: TextEditorProps) => {
+  // todo onChange 중복 호출 문제 바로잡아야!
   const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
@@ -241,7 +242,10 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onC
         <TextEditor
           content={textInfo.content}
           textRef={textRef}
-          onChange={onChangeByEditor}
+          onChange={(value) => {
+            console.log('onChange');
+            onChangeByEditor(value);
+          }}
           onClose={() => {
             setStatus('transforming');
             if (onEditEnd) onEditEnd();
@@ -521,6 +525,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
                 //     }
                 //   });
                 // });
+                console.log('value: ', value);
                 commitTextInfo(
                   textInfoList.map((prev, prevI) => {
                     if (prevI == index) {
