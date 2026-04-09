@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Layer, Stage, Image, Line, Text, Transformer } from 'react-konva';
 import Konva from 'konva';
 import { Html } from 'react-konva-utils';
@@ -11,6 +11,12 @@ export interface ImgProps {
 interface CanvasByKonvaProps {
   imgProps?: ImgProps;
   wrapperRef: React.RefObject<HTMLDivElement>; // wrapper 태그의 너비, 높이를 통하여 캔버스 비율이 결정되므로 반드시 전달되어야 함
+
+  ref?: React.Ref<CanvasByKonvaRef>;
+  tool?: 'pen' | 'eraser';
+}
+interface CanvasByKonvaRef {
+  addNewText: (value?: string) => void;
 }
 
 interface EditableTextProps {
@@ -205,6 +211,7 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onC
         ref={textRef}
         onTransform={handleTransform}
         width={textWidth}
+        fontSize={20}
       />
       {isEditing && (
         <TextEditor
@@ -238,7 +245,7 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onC
  * konva를 통한 주어진 이미지 에디팅을 가능하게 하는 StateFul 컴포넌트
  *
  * */
-const CanvasByKonva = ({ imgProps, wrapperRef }: CanvasByKonvaProps) => {
+const CanvasByKonva = ({ imgProps, wrapperRef, ref, tool = 'pen' }: CanvasByKonvaProps) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [imageRepInfo, setImageRepInfo] = useState<ImageRepInfo | undefined>(undefined);
   const [textInfoList, setTextInfoList] = useState<TextInfo[]>([
@@ -253,7 +260,7 @@ const CanvasByKonva = ({ imgProps, wrapperRef }: CanvasByKonvaProps) => {
       content: 'i disappointed on your behavior',
       position: {
         x: 50,
-        y: 60,
+        y: 50,
       },
     },
     {
@@ -265,11 +272,30 @@ const CanvasByKonva = ({ imgProps, wrapperRef }: CanvasByKonvaProps) => {
     },
   ]);
 
-  const [tool, setTool] = useState('pen'); // todo
   const [lines, setLines] = useState<{ tool: string; points: number[] }[]>([]);
 
   const isDrawing = useRef(false);
   const isDraggingText = useRef(false);
+
+  /** 참조를 통해 외부로 노출되는 영역을 정의함 */
+  useImperativeHandle<unknown, CanvasByKonvaRef>(ref, () => {
+    return {
+      addNewText: (value) => {
+        setTextInfoList((prevState) => {
+          return [
+            ...prevState,
+            {
+              content: value ? value : '신규 작성',
+              position: {
+                x: 50,
+                y: 50,
+              },
+            },
+          ];
+        });
+      },
+    };
+  });
 
   useEffect(() => {
     // 이미지 정보 변경 시점에 필요한 초기화(혹은 동기화) 동작
