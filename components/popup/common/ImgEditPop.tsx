@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { PopupFooter } from '../PopupFooter';
 import { PopupContent } from '../PopupContent';
 import { PopupLayout } from '../PopupLayout';
@@ -15,6 +15,8 @@ interface ImgEditPopProps {
 const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
   const topWrapperRef = useRef<HTMLDivElement>(null);
   const canvasByKonvaRef = useRef<CanvasByKonvaRef>(null);
+
+  const [preview, setPreview] = useState(false);
 
   const onCloseCommon = () => {
     if (onClose) onClose();
@@ -40,6 +42,15 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
                 >
                   새로운 글 추가
                 </button>
+
+                <button
+                  className={'btn ' + (!preview ? 'btnBlue' : '')}
+                  onClick={() => {
+                    setPreview(!preview);
+                  }}
+                >
+                  {!preview ? '미리보기' : '편집'}
+                </button>
               </div>
               <div className="right">
                 <button className="btn" onClick={onCloseCommon}>
@@ -64,7 +75,7 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
           {/*  />*/}
           {/*</Search>*/}
           <div className={'imgEditPop'} ref={topWrapperRef}>
-            <CanvasByKonva wrapperRef={topWrapperRef} imgProps={imgProps} ref={canvasByKonvaRef} />
+            <CanvasByKonva wrapperRef={topWrapperRef} imgProps={imgProps} ref={canvasByKonvaRef} preview={preview} />
           </div>
         </PopupContent>
       </PopupLayout>
