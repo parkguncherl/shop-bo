@@ -27,13 +27,12 @@ interface EditableTextProps {
     onEditEnd?: () => void;
     onChangeByEditor?: (value: string) => void;
   };
-  // editor: any;
-  // transformer: any;
 }
 interface TextEditorProps {
   textRef: React.RefObject<any>;
   onClose?: () => void;
   onChange?: (value: string) => void;
+  content: string;
 }
 
 // state's types
@@ -56,8 +55,13 @@ const URLImage = ({ ...rest }: Konva.ImageConfig) => {
   return <Image {...rest} />;
 };
 
-const TextArea = ({ textRef, onClose, onChange }: TextEditorProps) => {
+/** 입력 영역 */
+const TextArea = ({ textRef, onClose, onChange, content }: TextEditorProps) => {
   const [inputValue, setInputValue] = useState('');
+
+  useEffect(() => {
+    setInputValue(content); // 동기화
+  }, [content]);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -154,17 +158,36 @@ const TextEditor = (props: TextEditorProps) => {
   );
 };
 
+/** text 에디팅 동작을 위한 필요 영역이 정의된 고수준 영역 */
 const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onChangeByEditor } }: EditableTextProps) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [textWidth, setTextWidth] = useState(200);
 
   const textRef = useRef(null);
   const trRef = useRef(null);
 
   useEffect(() => {
-    if (trRef.current && textRef.current) {
-      (trRef.current as any).nodes([textRef.current]);
+    // transformer 활성화를 위하여 랜더링 시점에 text 참조와 연결
+    if (!isEditing) {
+      if (trRef.current && textRef.current) {
+        (trRef.current as any).nodes([textRef.current]);
+      }
     }
   }, [isEditing]);
+
+  const handleTransform = (e: Konva.KonvaEventObject<Event>) => {
+    const node = textRef.current;
+
+    if (node) {
+      const scaleX = (node as any).scaleX();
+      const newWidth = (node as any).width() * scaleX;
+      setTextWidth(newWidth);
+      (node as any).setAttrs({
+        width: newWidth,
+        scaleX: 1,
+      });
+    }
+  };
 
   return (
     <>
@@ -180,9 +203,12 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onC
           setIsEditing(true);
         }}
         ref={textRef}
+        onTransform={handleTransform}
+        width={textWidth}
       />
       {isEditing && (
         <TextEditor
+          content={textInfo.content}
           textRef={textRef}
           onChange={onChangeByEditor}
           onClose={() => {
@@ -195,16 +221,23 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onC
         <Transformer
           ref={trRef}
           enabledAnchors={['middle-left', 'middle-right']}
-          boundBoxFunc={(oldBox: Box, newBox: Box) => ({
-            ...newBox,
-            width: Math.max(30, (newBox as any).width),
-          })}
+          boundBoxFunc={(oldBox: Box, newBox: Box) => {
+            console.log('(newBox as any).width: ', (newBox as any).width, Math.max(30, (newBox as any).width));
+            return {
+              ...newBox,
+              width: Math.max(30, (newBox as any).width),
+            };
+          }}
         />
       )}
     </>
   );
 };
 
+/**
+ * konva를 통한 주어진 이미지 에디팅을 가능하게 하는 StateFul 컴포넌트
+ *
+ * */
 const CanvasByKonva = ({ imgProps, wrapperRef }: CanvasByKonvaProps) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [imageRepInfo, setImageRepInfo] = useState<ImageRepInfo | undefined>(undefined);
@@ -232,7 +265,7 @@ const CanvasByKonva = ({ imgProps, wrapperRef }: CanvasByKonvaProps) => {
     },
   ]);
 
-  const [tool, setTool] = React.useState('pen');
+  const [tool, setTool] = useState('pen'); // todo
   const [lines, setLines] = useState<{ tool: string; points: number[] }[]>([]);
 
   const isDrawing = useRef(false);
