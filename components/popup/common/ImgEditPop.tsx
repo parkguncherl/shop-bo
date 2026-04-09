@@ -17,6 +17,7 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
   const canvasByKonvaRef = useRef<CanvasByKonvaRef>(null);
 
   const [preview, setPreview] = useState(false);
+  const [textColor, setTextColor] = useState('');
 
   const onCloseCommon = () => {
     if (onClose) onClose();
@@ -62,20 +63,11 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
         }
       >
         <PopupContent>
-          {/*<Search className="type_1">*/}
-          {/*  <Search.Input*/}
-          {/*    title={' 검색'}*/}
-          {/*    name={'searchKeyword'}*/}
-          {/*    // placeholder={title + ' 입력'}*/}
-          {/*    // value={filters.searchKeyword}*/}
-          {/*    // onChange={onChangeFilters}*/}
-          {/*    // onEnter={() => {*/}
-          {/*    //   partnerCodesRefetch();*/}
-          {/*    // }}*/}
-          {/*  />*/}
-          {/*</Search>*/}
+          <Search className="type_1">
+            <Search.Input title={'텍스트 색상'} name={'textColor'} value={textColor} onChange={(name, value) => setTextColor(value.toString())} />
+          </Search>
           <div className={'imgEditPop'} ref={topWrapperRef}>
-            <CanvasByKonva wrapperRef={topWrapperRef} imgProps={imgProps} ref={canvasByKonvaRef} preview={preview} />
+            <CanvasByKonva wrapperRef={topWrapperRef} imgProps={imgProps} ref={canvasByKonvaRef} preview={preview} textColor={textColor} />
           </div>
         </PopupContent>
       </PopupLayout>

@@ -6,7 +6,7 @@ import { Box } from 'konva/lib/shapes/Transformer';
 
 export interface ImgProps {
   imgSrc?: string;
-  seq?: number; // file seq
+  //seq?: number; // file seq todo 해당 canvas 는 철저히 편집 동작에 집중하니 해당 인자는 canvas 관할에 맞지 아니함, 외부에서 관리
 }
 interface CanvasByKonvaProps {
   imgProps?: ImgProps;
@@ -15,6 +15,7 @@ interface CanvasByKonvaProps {
   ref?: React.Ref<CanvasByKonvaRef>;
   tool?: 'pen' | 'eraser';
   preview?: boolean;
+  textColor?: string;
 }
 export interface CanvasByKonvaRef {
   addNewText: (value?: string) => void;
@@ -22,18 +23,13 @@ export interface CanvasByKonvaRef {
 
 interface EditableTextProps {
   text: {
-    textInfo: {
-      content: string;
-      position: {
-        x: number;
-        y: number;
-      };
-    };
+    textInfo: TextInfo;
     onMouseDown?: (evt: Konva.KonvaEventObject<MouseEvent>) => void;
     onDragEnd?: (evt: Konva.KonvaEventObject<DragEvent>) => void;
     onEditEnd?: () => void;
     onChangeByEditor?: (value: string) => void;
     enablePreviewMode?: boolean; // 미리보기 활성 switching state
+    textColor?: string;
   };
 }
 interface TextEditorProps {
@@ -57,6 +53,7 @@ interface TextInfo {
     x: number;
     y: number;
   };
+  color?: string;
 }
 
 const URLImage = ({ ...rest }: Konva.ImageConfig) => {
@@ -167,22 +164,12 @@ const TextEditor = (props: TextEditorProps) => {
 };
 
 /** text 에디팅 동작을 위한 필요 영역이 정의된 고수준 영역 */
-const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onChangeByEditor, enablePreviewMode } }: EditableTextProps) => {
-  //const [isEditing, setIsEditing] = useState(false);
+const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onChangeByEditor, enablePreviewMode, textColor } }: EditableTextProps) => {
   const [status, setStatus] = useState<'editing' | 'transforming' | 'preview'>('transforming'); // 각각 편집, 변환(뒤집기, 늘리기 등의 동작), 미리보기 모드
   const [textWidth, setTextWidth] = useState(200);
 
   const textRef = useRef(null);
   const trRef = useRef(null);
-
-  // useEffect(() => {
-  //   // transformer 활성화를 위하여 랜더링 시점에 text 참조와 연결
-  //   if (!isEditing) {
-  //     if (trRef.current && textRef.current) {
-  //       (trRef.current as any).nodes([textRef.current]);
-  //     }
-  //   }
-  // }, [isEditing]);
 
   useEffect(() => {
     // transformer 활성화를 위하여 랜더링 시점에 text 참조와 연결
@@ -224,16 +211,15 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onC
         draggable
         onMouseDown={onMouseDown}
         onDragEnd={onDragEnd}
-        //visible={!isEditing}
         visible={status != 'editing'}
         onDblClick={() => {
-          //setIsEditing(true);
           setStatus('editing');
         }}
         ref={textRef}
         onTransform={handleTransform}
         width={textWidth}
         fontSize={20}
+        fill={textColor}
       />
       {status == 'editing' && (
         <TextEditor
@@ -241,13 +227,12 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onC
           textRef={textRef}
           onChange={onChangeByEditor}
           onClose={() => {
-            //setIsEditing(false);
             setStatus('transforming');
             if (onEditEnd) onEditEnd();
           }}
         />
       )}
-      {status != 'editing' && (
+      {(status == 'transforming' || status == 'preview') && (
         <Transformer
           ref={trRef}
           enabledAnchors={['middle-left', 'middle-right']}
@@ -270,33 +255,10 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onC
  * konva를 통한 주어진 이미지 에디팅을 가능하게 하는 StateFul 컴포넌트
  *
  * */
-const CanvasByKonva = ({ imgProps, wrapperRef, ref, tool = 'pen', preview }: CanvasByKonvaProps) => {
+const CanvasByKonva = ({ imgProps, wrapperRef, ref, tool = 'pen', preview, textColor }: CanvasByKonvaProps) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [imageRepInfo, setImageRepInfo] = useState<ImageRepInfo | undefined>(undefined);
   const [textInfoList, setTextInfoList] = useState<TextInfo[]>([]);
-  // const [textInfoList, setTextInfoList] = useState<TextInfo[]>([
-  //   {
-  //     content: 'i disappointed on your behavior',
-  //     position: {
-  //       x: 50,
-  //       y: 50,
-  //     },
-  //   },
-  //   {
-  //     content: 'i disappointed on your behavior',
-  //     position: {
-  //       x: 50,
-  //       y: 50,
-  //     },
-  //   },
-  //   {
-  //     content: 'i disappointed on your behavior',
-  //     position: {
-  //       x: 50,
-  //       y: 70,
-  //     },
-  //   },
-  // ]);
 
   const [lines, setLines] = useState<{ tool: string; points: number[] }[]>([]);
 
@@ -311,6 +273,7 @@ const CanvasByKonva = ({ imgProps, wrapperRef, ref, tool = 'pen', preview }: Can
           return [
             ...prevState,
             {
+              color: textColor,
               content: value ? value : '신규 작성',
               position: {
                 x: 50,
@@ -418,6 +381,7 @@ const CanvasByKonva = ({ imgProps, wrapperRef, ref, tool = 'pen', preview }: Can
             text={{
               textInfo: textInfo,
               enablePreviewMode: preview,
+              textColor: textInfo.color,
               onMouseDown: () => {
                 isDraggingText.current = true;
               },
@@ -426,7 +390,7 @@ const CanvasByKonva = ({ imgProps, wrapperRef, ref, tool = 'pen', preview }: Can
                   return prevState.map((prev, prevI) => {
                     if (prevI == index) {
                       return {
-                        content: prev.content,
+                        ...prev,
                         position: {
                           x: e.target.x(),
                           y: e.target.y(),
