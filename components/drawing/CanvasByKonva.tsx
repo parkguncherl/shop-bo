@@ -78,8 +78,9 @@ const URLImage = ({ ...rest }: Konva.ImageConfig) => {
 
 /** 입력 영역 */
 const TextArea = ({ textRef, onClose, onChange, content }: TextEditorProps) => {
-  // todo onChange 중복 호출 문제 바로잡아야!
   const [inputValue, setInputValue] = useState('');
+
+  const enterKeyPressed = useRef(false);
 
   useEffect(() => {
     setInputValue(content); // 동기화
@@ -136,6 +137,8 @@ const TextArea = ({ textRef, onClose, onChange, content }: TextEditorProps) => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
+      enterKeyPressed.current = true;
+
       if (onChange) onChange(inputValue);
       if (onClose) onClose();
     }
@@ -161,6 +164,10 @@ const TextArea = ({ textRef, onClose, onChange, content }: TextEditorProps) => {
         position: 'absolute',
       }}
       onBlur={() => {
+        if (enterKeyPressed.current) {
+          enterKeyPressed.current = false; // 결과로 인해 발생한 blur 동작이므로 해당 시점에 플래그 해제
+          return;
+        }
         if (onChange) onChange(inputValue);
         if (onClose) onClose();
       }}
@@ -243,8 +250,7 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onC
           content={textInfo.content}
           textRef={textRef}
           onChange={(value) => {
-            console.log('onChange');
-            onChangeByEditor(value);
+            if (onChangeByEditor) onChangeByEditor(value);
           }}
           onClose={() => {
             setStatus('transforming');
@@ -525,7 +531,6 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
                 //     }
                 //   });
                 // });
-                console.log('value: ', value);
                 commitTextInfo(
                   textInfoList.map((prev, prevI) => {
                     if (prevI == index) {
