@@ -300,6 +300,10 @@ const TransformableImage = ({
 }: TransformableImageProps) => {
   const [status, setStatus] = useState<'transforming' | 'preview'>('transforming'); // 각각 변환(뒤집기, 늘리기 등의 동작), 미리보기 모드
 
+  useEffect(() => {
+    console.log('imgRepInfo: ', imgRepInfo);
+  }, [imgRepInfo]);
+
   const imageRef = useRef(null);
   const trRef = useRef(null);
 
@@ -388,10 +392,6 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
   const [mainImageRepInfo, setMainImageRepInfo] = useState<MainImageRepInfo | undefined>(undefined);
   const [textInfoList, setTextInfoList] = useState<TextInfo[]>([]);
   const [imgRepInfoList, setImgRepInfoList] = useState<ImageRepInfo[]>([]);
-
-  useEffect(() => {
-    console.log('imgRepInfoList: ', imgRepInfoList);
-  }, [imgRepInfoList]);
 
   const [lines, setLines] = useState<Lines[]>([]);
 
@@ -550,7 +550,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
   // 파일 검증 및 추가 공통 로직
   const processFiles = (selectedFiles: File[]) => {
     const validFiles: File[] = [];
-    const addedImgRepInfoList: ImageRepInfo[] = [];
+    const addedImgRepInfoList: ImageRepInfo[] = [...imgRepInfoList];
 
     for (const file of selectedFiles) {
       if (!file.type.startsWith('image/')) {
@@ -562,7 +562,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
 
     for (let i = 0; i < validFiles.length; i++) {
       const image = new window.Image();
-      image.src = URL.createObjectURL(selectedFiles[i]);
+      image.src = URL.createObjectURL(validFiles[i]);
       image.onload = () => {
         const stageWidth = wrapperRef.current?.offsetWidth || 0;
         const stageHeight = wrapperRef.current?.offsetHeight || 0;
@@ -582,12 +582,12 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
         const newScale = Math.min(widthRatio, heightRatio); // 비율(scale)
 
         // 3. 실질적인 너비와 높이 구하기(최초에는 1/5으로 축소)
-        const finalWidth = image.width * newScale * 0.2;
-        const finalHeight = image.height * newScale * 0.2;
+        const finalWidth = image.width * newScale;
+        const finalHeight = image.height * newScale;
 
         // 4. 좌측 상단에서부터 다소 겹치게끔 정의
-        const x = 30 + i * 20;
-        const y = 30;
+        const x = (stageWidth - finalWidth) / 2;
+        const y = (stageHeight - finalHeight) / 2;
 
         // setMainImageRepInfo({
         //   image: image,
@@ -606,11 +606,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
       };
     }
 
-    setImgRepInfoList((prevState) => {
-      const updatedList = [...prevState];
-      updatedList.push(addedImgRepInfoList);
-      return updatedList;
-    });
+    setImgRepInfoList(addedImgRepInfoList);
   };
 
   return (
@@ -708,6 +704,9 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
                 },
               }}
             />
+          ))}
+          {imgRepInfoList.map((imgRepInfo, index) => (
+            <TransformableImage key={index} imgRepInfo={imgRepInfo} />
           ))}
         </Layer>
       </Stage>
