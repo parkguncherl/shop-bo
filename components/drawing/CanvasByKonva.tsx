@@ -25,20 +25,20 @@ export interface CanvasByKonvaRef {
   addNewText: (value?: string) => void;
 }
 interface TransformEventOnImg extends Omit<ImageRepInfo, 'src'> {}
+interface TransformEventOnText extends Omit<TextInfo, 'content' | 'color'> {}
 
 // 하위 컴포넌트 props interface
 interface MainImageProps {
   imgRepInfo: ImageRepInfo;
 }
 interface EditableTextProps {
-  text: {
-    textInfo: TextInfo;
-    onMouseDown?: (evt: Konva.KonvaEventObject<MouseEvent>) => void;
-    onDragEnd?: (evt: Konva.KonvaEventObject<DragEvent>) => void;
-    onEditEnd?: () => void;
-    onChangeByEditor?: (value: string) => void;
-    enablePreviewMode?: boolean; // 미리보기 활성 switching state
-  };
+  textInfo: TextInfo;
+  onMouseDown?: (evt: Konva.KonvaEventObject<MouseEvent>) => void;
+  onDragEnd?: (evt: Konva.KonvaEventObject<DragEvent>) => void;
+  onEditEnd?: () => void;
+  onChangeByEditor?: (value: string) => void;
+  enablePreviewMode?: boolean; // 미리보기 활성 switching state
+  onTransformed?: (evt: TransformEventOnText) => void;
 }
 interface TextEditorProps {
   textRef: React.RefObject<any>;
@@ -55,9 +55,7 @@ interface TransformableImageProps {
 }
 
 // state's types
-interface ImageRepInfo {
-  //image: HTMLImageElement;
-  src: string;
+interface locProps {
   width: number;
   height: number;
   x: number;
@@ -66,12 +64,11 @@ interface ImageRepInfo {
   scaleY: number; // 확대 축소(y축)
   rotation: number; // 회전 핸들 대응
 }
-interface TextInfo {
+interface ImageRepInfo extends locProps {
+  src: string;
+}
+interface TextInfo extends locProps {
   content: string;
-  position: {
-    x: number;
-    y: number;
-  };
   color?: string;
 }
 interface Lines {
@@ -206,9 +203,8 @@ const TextEditor = (props: TextEditorProps) => {
 };
 
 /** text 에디팅 동작을 위한 필요 영역이 정의된 고수준 영역 */
-const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onChangeByEditor, enablePreviewMode } }: EditableTextProps) => {
+const EditableText = ({ textInfo, onMouseDown, onDragEnd, onEditEnd, onChangeByEditor, enablePreviewMode, onTransformed }: EditableTextProps) => {
   const [status, setStatus] = useState<'editing' | 'transforming' | 'preview'>('transforming'); // 각각 편집, 변환(뒤집기, 늘리기 등의 동작), 미리보기 모드
-  const [textWidth, setTextWidth] = useState(200);
 
   const textRef = useRef(null);
   const trRef = useRef(null);
@@ -230,27 +226,18 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onC
     }
   }, [enablePreviewMode]);
 
-  const handleTransform = (e: Konva.KonvaEventObject<Event>) => {
-    const node = textRef.current;
-
-    if (node) {
-      const scaleX = (node as any).scaleX();
-      const newWidth = (node as any).width() * scaleX;
-      setTextWidth(newWidth);
-      (node as any).setAttrs({
-        width: newWidth,
-        scaleX: 1,
-      });
-    }
-  };
-
   return (
     <>
       <Text
         name={'text-with-tr'}
         text={textInfo.content}
-        x={textInfo.position.x}
-        y={textInfo.position.y}
+        x={textInfo.x}
+        y={textInfo.y}
+        width={textInfo?.width}
+        height={textInfo?.height}
+        scaleX={textInfo?.scaleX}
+        scaleY={textInfo?.scaleY}
+        rotation={textInfo?.rotation}
         draggable
         onMouseDown={onMouseDown}
         onDragEnd={onDragEnd}
@@ -259,8 +246,24 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onC
           setStatus('editing');
         }}
         ref={textRef}
-        onTransform={handleTransform}
-        width={textWidth}
+        onTransformEnd={() => {
+          const node = textRef.current as any;
+          const scaleX = node.scaleX();
+          const scaleY = node.scaleY();
+          const rotation = node.rotation();
+
+          if (onTransformed) {
+            onTransformed({
+              x: node.x(),
+              y: node.y(),
+              width: node.width(),
+              height: node.height(),
+              scaleX: scaleX as number,
+              scaleY: scaleY as number,
+              rotation: rotation as number,
+            });
+          }
+        }}
         fontSize={20}
         fill={textInfo.color}
       />
@@ -435,10 +438,13 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
           {
             color: textConfig?.color,
             content: value ? value : '신규 작성',
-            position: {
-              x: 50,
-              y: 50,
-            },
+            x: 50,
+            y: 50,
+            width: value ? value.length * 5 : 200,
+            height: 20,
+            scaleX: 1,
+            scaleY: 1,
+            rotation: 0,
           },
         ]);
       },
@@ -692,40 +698,50 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
           {textInfoList.map((textInfo, index) => (
             <EditableText
               key={index}
-              text={{
-                textInfo: textInfo,
-                enablePreviewMode: preview,
-                onDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => {
-                  commitTextInfo(
-                    textInfoList.map((prev, prevI) => {
-                      if (prevI == index) {
-                        return {
-                          ...prev,
-                          position: {
-                            x: e.target.x(),
-                            y: e.target.y(),
-                          },
-                        };
-                      } else {
-                        return prev;
-                      }
-                    }),
-                  );
-                },
-                onChangeByEditor: (value) => {
-                  commitTextInfo(
-                    textInfoList.map((prev, prevI) => {
-                      if (prevI == index) {
-                        return {
-                          ...prev,
-                          content: value,
-                        };
-                      } else {
-                        return prev;
-                      }
-                    }),
-                  );
-                },
+              textInfo={textInfo}
+              enablePreviewMode={preview}
+              onDragEnd={(e: Konva.KonvaEventObject<DragEvent>) => {
+                commitTextInfo(
+                  textInfoList.map((prev, prevI) => {
+                    if (prevI == index) {
+                      return {
+                        ...prev,
+                        x: e.target.x(),
+                        y: e.target.y(),
+                      };
+                    } else {
+                      return prev;
+                    }
+                  }),
+                );
+              }}
+              onTransformed={(evt) => {
+                commitTextInfo(
+                  textInfoList.map((prev, prevI) => {
+                    if (prevI == index) {
+                      return {
+                        ...prev,
+                        ...evt,
+                      };
+                    } else {
+                      return prev;
+                    }
+                  }),
+                );
+              }}
+              onChangeByEditor={(value) => {
+                commitTextInfo(
+                  textInfoList.map((prev, prevI) => {
+                    if (prevI == index) {
+                      return {
+                        ...prev,
+                        content: value,
+                      };
+                    } else {
+                      return prev;
+                    }
+                  }),
+                );
               }}
             />
           ))}
