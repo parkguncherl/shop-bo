@@ -249,6 +249,7 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onC
   return (
     <>
       <Text
+        name={'text-with-tr'}
         text={textInfo.content}
         x={textInfo.position.x}
         y={textInfo.position.y}
@@ -332,6 +333,7 @@ const TransformableImage = ({
     <>
       <Image
         image={image}
+        name={'img-with-tr'}
         x={imgRepInfo.x}
         y={imgRepInfo.y}
         width={imgRepInfo?.width}
@@ -394,8 +396,8 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
   const [lines, setLines] = useState<Lines[]>([]);
 
   const isDrawing = useRef(false);
-  const isDraggingText = useRef(false);
-  const isDraggingImg = useRef(false);
+  // const isDraggingText = useRef(false);
+  // const isDraggingImg = useRef(false);
 
   const { pushHistory, undo, redo } = useHistory<CanvasSnapshot>({ lines: lines, texts: textInfoList, imgs: imgRepInfoList });
 
@@ -492,17 +494,22 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
       return; // 드로잉 이벤트 차단
     }
 
-    if (!isDraggingText.current || !isDraggingImg.current) {
-      // text, img 드래깅 시점에서 비활성
-      isDrawing.current = true;
-      const pos = e.target.getStage().getPointerPosition();
-      commitLines([...lines, { tool, points: [pos.x, pos.y], color: lineConfig?.color, width: lineConfig?.width }]); // 최초 마우스 down 시점에
+    if (e.target.name() === 'text-with-tr' || e.target.name() === 'img-with-tr') {
+      return; // text, img 드래깅 시점에서 비활성
     }
+
+    isDrawing.current = true;
+    const pos = e.target.getStage().getPointerPosition();
+    commitLines([...lines, { tool, points: [pos.x, pos.y], color: lineConfig?.color, width: lineConfig?.width }]); // 최초 마우스 down 시점에
   };
 
   const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
     if (e.target.name() === 'undo-btn' || e.target.name() === 'redo-btn') {
       return; // 드로잉 이벤트 차단
+    }
+
+    if (e.target.name() === 'text-with-tr' || e.target.name() === 'img-with-tr') {
+      return; // text, img 드래깅 시점에서 비활성
     }
 
     // no drawing - skipping
@@ -528,6 +535,10 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
       return; // 드로잉 이벤트 차단
     }
 
+    if (e.target.name() === 'text-with-tr' || e.target.name() === 'img-with-tr') {
+      return; // text, img 드래깅 시점에서 비활성
+    }
+
     isDrawing.current = false;
   };
 
@@ -535,6 +546,10 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
   const handleMouseLeave = (e: Konva.KonvaEventObject<MouseEvent>) => {
     if (e.target.name() === 'undo-btn' || e.target.name() === 'redo-btn') {
       return; // 드로잉 이벤트 차단
+    }
+
+    if (e.target.name() === 'text-with-tr' || e.target.name() === 'img-with-tr') {
+      return; // text, img 드래깅 시점에서 비활성
     }
 
     isDrawing.current = false;
@@ -545,8 +560,6 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
     if (prev) {
       setTextInfoList(prev.texts);
       setLines(prev.lines);
-
-      console.log('prev.imgsprev.imgsprev.imgsprev.imgs: ', prev.imgs);
       setImgRepInfoList(prev.imgs);
     }
   };
@@ -556,8 +569,6 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
     if (next) {
       setTextInfoList(next.texts);
       setLines(next.lines);
-
-      console.log('next.imgsnext.imgsnext.imgsnext.imgs: ', next.imgs);
       setImgRepInfoList(next.imgs);
     }
   };
@@ -651,9 +662,9 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
               key={index}
               imgRepInfo={imgRepInfo}
               enablePreviewMode={preview}
-              onMouseDown={() => {
-                isDraggingImg.current = true;
-              }}
+              // onMouseDown={() => {
+              //   isDraggingImg.current = true;
+              // }}
               onTransformed={({ width, height, x, y }) => {
                 commitImages(
                   imgRepInfoList.map((prev, prevI) => {
@@ -670,7 +681,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
                     }
                   }),
                 );
-                isDraggingImg.current = false;
+                //isDraggingImg.current = false;
               }}
               onDragEnd={(e: Konva.KonvaEventObject<DragEvent>) => {
                 commitImages(
@@ -686,7 +697,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
                     }
                   }),
                 );
-                isDraggingImg.current = false;
+                //isDraggingImg.current = false;
               }}
             />
           ))}
@@ -708,9 +719,9 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
               text={{
                 textInfo: textInfo,
                 enablePreviewMode: preview,
-                onMouseDown: () => {
-                  isDraggingText.current = true;
-                },
+                // onMouseDown: () => {
+                //   isDraggingText.current = true;
+                // },
                 onDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => {
                   commitTextInfo(
                     textInfoList.map((prev, prevI) => {
@@ -727,10 +738,10 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
                       }
                     }),
                   );
-                  isDraggingText.current = false;
+                  //isDraggingText.current = false;
                 },
                 onEditEnd: () => {
-                  isDraggingText.current = false;
+                  //isDraggingText.current = false;
                 },
                 onChangeByEditor: (value) => {
                   commitTextInfo(
