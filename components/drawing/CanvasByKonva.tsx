@@ -24,6 +24,12 @@ export interface ImgOnCanvasByKonva {
 export interface CanvasByKonvaRef {
   addNewText: (value?: string) => void;
 }
+interface TransformEventOnImg {
+  width: number;
+  height: number;
+  x: number;
+  y: number;
+}
 
 // 하위 컴포넌트 props interface
 interface EditableTextProps {
@@ -46,18 +52,11 @@ interface TransformableImageProps {
   imgRepInfo: ImageRepInfo;
   onMouseDown?: (evt: Konva.KonvaEventObject<MouseEvent>) => void;
   onDragEnd?: (evt: Konva.KonvaEventObject<DragEvent>) => void;
-  onTransformed?: (evt: { width: number; height: number; x: number; y: number }) => void;
+  onTransformed?: (evt: TransformEventOnImg) => void;
   enablePreviewMode?: boolean; // 미리보기 활성 switching state
 }
 
 // state's types
-interface MainImageRepInfo extends ImageRepInfo {
-  // image: HTMLImageElement;
-  // width: number;
-  // height: number;
-  // x: number;
-  // y: number;
-}
 interface ImageRepInfo {
   image: HTMLImageElement;
   width: number;
@@ -84,8 +83,10 @@ interface Lines {
 export interface CanvasSnapshot {
   lines: Lines[];
   texts: TextInfo[];
+  imgs: ImageRepInfo[];
 }
 
+/** 주 이미지 영역 */
 const MainImage = ({ ...rest }: Konva.ImageConfig) => {
   return <Image {...rest} />;
 };
@@ -300,15 +301,11 @@ const TransformableImage = ({
 }: TransformableImageProps) => {
   const [status, setStatus] = useState<'transforming' | 'preview'>('transforming'); // 각각 변환(뒤집기, 늘리기 등의 동작), 미리보기 모드
 
-  useEffect(() => {
-    console.log('imgRepInfo: ', imgRepInfo);
-  }, [imgRepInfo]);
-
   const imageRef = useRef(null);
   const trRef = useRef(null);
 
   useEffect(() => {
-    if (status) {
+    if (status == 'transforming') {
       // transformer 활성화를 위하여 랜더링 시점에 image 참조와 연결
       if (trRef.current && imageRef.current) {
         (trRef.current as any).nodes([imageRef.current]);
@@ -327,6 +324,7 @@ const TransformableImage = ({
   return (
     <>
       <Image
+        image={imgRepInfo.image}
         x={imgRepInfo.x}
         y={imgRepInfo.y}
         width={imgRepInfo?.width}
@@ -335,16 +333,10 @@ const TransformableImage = ({
         onDragEnd={onDragEnd}
         ref={imageRef}
         draggable
-        //visible={status != 'transforming'}
-        visible={false}
         onDblClick={() => {
           setStatus('transforming');
         }}
         onTransformEnd={() => {
-          // transformer is changing scale of the node
-          // and NOT its width or height
-          // but in the store we have only width and height
-          // to match the data better we will reset scale on transform end
           const node = imageRef.current as any;
           const scaleX = node.scaleX();
           const scaleY = node.scaleY();
@@ -363,22 +355,20 @@ const TransformableImage = ({
           }
         }}
       />
-      {(status == 'transforming' || status == 'preview') && (
-        <Transformer
-          ref={trRef}
-          flipEnabled={false}
-          boundBoxFunc={(oldBox: Box, newBox: Box) => {
-            // 리사이징 제한
-            if (Math.abs((newBox as any).width) < 5 || Math.abs((newBox as any).height) < 5) {
-              return oldBox;
-            }
-            return newBox;
-          }}
-          borderEnabled={status == 'preview' ? false : undefined} // 테두리 선 제거
-          anchorSize={status == 'preview' ? 0 : undefined} // 조절 핸들 크기를 0으로 만들어 숨김
-          rotateEnabled={status == 'preview' ? false : undefined} // 회전 핸들 숨김
-        />
-      )}
+      <Transformer
+        ref={trRef}
+        flipEnabled={false}
+        boundBoxFunc={(oldBox: Box, newBox: Box) => {
+          // 리사이징 제한
+          if (Math.abs((newBox as any).width) < 5 || Math.abs((newBox as any).height) < 5) {
+            return oldBox;
+          }
+          return newBox;
+        }}
+        borderEnabled={status == 'preview' ? false : undefined} // 테두리 선 제거
+        anchorSize={status == 'preview' ? 0 : undefined} // 조절 핸들 크기를 0으로 만들어 숨김
+        rotateEnabled={status == 'preview' ? false : undefined} // 회전 핸들 숨김
+      />
     </>
   );
 };
@@ -389,21 +379,23 @@ const TransformableImage = ({
  * */
 const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig, lineConfig }: CanvasByKonvaProps) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const [mainImageRepInfo, setMainImageRepInfo] = useState<MainImageRepInfo | undefined>(undefined);
+
+  const [mainImgRepInfo, setMainImgRepInfo] = useState<ImageRepInfo | undefined>(undefined);
+
   const [textInfoList, setTextInfoList] = useState<TextInfo[]>([]);
   const [imgRepInfoList, setImgRepInfoList] = useState<ImageRepInfo[]>([]);
-
   const [lines, setLines] = useState<Lines[]>([]);
 
   const isDrawing = useRef(false);
   const isDraggingText = useRef(false);
 
-  const { pushHistory, undo, redo } = useHistory<CanvasSnapshot>({ lines: lines, texts: textInfoList });
+  const { pushHistory, undo, redo } = useHistory<CanvasSnapshot>({ lines: lines, texts: textInfoList, imgs: imgRepInfoList });
 
   const commitTextInfo = (textInfos: TextInfo[]) => {
     pushHistory({
       texts: textInfos,
       lines: lines,
+      imgs: imgRepInfoList,
     });
     setTextInfoList(textInfos);
   };
@@ -411,11 +403,19 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
     pushHistory({
       texts: textInfoList,
       lines: linesInfo,
+      imgs: imgRepInfoList,
     });
     setLines(linesInfo);
   };
 
-  const calcImgScaleAndLoc = () => {};
+  const commitImages = (ImageRepInfo: ImageRepInfo[]) => {
+    pushHistory({
+      texts: textInfoList,
+      lines: lines,
+      imgs: ImageRepInfo,
+    });
+    setImgRepInfoList(ImageRepInfo);
+  };
 
   /** 참조를 통해 외부로 노출되는 영역을 정의함 */
   useImperativeHandle<any, CanvasByKonvaRef>(ref, () => {
@@ -467,7 +467,8 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
         const x = (stageWidth - finalWidth) / 2;
         const y = (stageHeight - finalHeight) / 2;
 
-        setMainImageRepInfo({
+        // 최초 set State 이후에도 여전히 최초 요소 자리를 유지하여야(요소 순으로 z indexing)
+        setMainImgRepInfo({
           image: image,
           width: finalWidth,
           height: finalHeight,
@@ -536,6 +537,9 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
     if (prev) {
       setTextInfoList(prev.texts);
       setLines(prev.lines);
+
+      console.log('prev.imgsprev.imgsprev.imgsprev.imgs: ', prev.imgs);
+      setImgRepInfoList(prev.imgs);
     }
   };
 
@@ -544,6 +548,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
     if (next) {
       setTextInfoList(next.texts);
       setLines(next.lines);
+      setImgRepInfoList(next.imgs);
     }
   };
 
@@ -554,7 +559,6 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
 
     for (const file of selectedFiles) {
       if (!file.type.startsWith('image/')) {
-        //toastError(`${file.name}은(는) 이미지 파일이 아닙니다.`);
         return; // 전체 무효
       }
       validFiles.push(file);
@@ -589,13 +593,6 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
         const x = (stageWidth - finalWidth) / 2;
         const y = (stageHeight - finalHeight) / 2;
 
-        // setMainImageRepInfo({
-        //   image: image,
-        //   width: finalWidth,
-        //   height: finalHeight,
-        //   x: x,
-        //   y: y,
-        // });
         addedImgRepInfoList.push({
           image: image,
           width: finalWidth,
@@ -606,7 +603,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
       };
     }
 
-    setImgRepInfoList(addedImgRepInfoList);
+    commitImages(addedImgRepInfoList);
   };
 
   return (
@@ -637,15 +634,31 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
     >
       <Stage {...(dimensions as any)} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseLeave}>
         <Layer>
-          <Text text="undo" name="undo-btn" onClick={handleUndo} />
-          <Text text="redo" name="redo-btn" x={40} onClick={handleRedo} />
-          <MainImage
-            image={mainImageRepInfo?.image}
-            width={mainImageRepInfo?.width}
-            height={mainImageRepInfo?.height}
-            x={mainImageRepInfo?.x}
-            y={mainImageRepInfo?.y}
-          />
+          <MainImage image={mainImgRepInfo?.image} width={mainImgRepInfo?.width} height={mainImgRepInfo?.height} x={mainImgRepInfo?.x} y={mainImgRepInfo?.y} />
+          {imgRepInfoList.map((imgRepInfo, index) => (
+            <TransformableImage
+              key={index}
+              imgRepInfo={imgRepInfo}
+              enablePreviewMode={index == 0 ? true : preview}
+              onTransformed={({ width, height, x, y }) => {
+                commitImages(
+                  imgRepInfoList.map((prev, prevI) => {
+                    if (prevI == index) {
+                      return {
+                        ...prev,
+                        width: width,
+                        height: height,
+                        x: x,
+                        y: y,
+                      };
+                    } else {
+                      return prev;
+                    }
+                  }),
+                );
+              }}
+            />
+          ))}
           {lines.map((line, i) => (
             <Line
               key={i}
@@ -705,9 +718,8 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
               }}
             />
           ))}
-          {imgRepInfoList.map((imgRepInfo, index) => (
-            <TransformableImage key={index} imgRepInfo={imgRepInfo} />
-          ))}
+          <Text text="undo" name="undo-btn" onClick={handleUndo} />
+          <Text text="redo" name="redo-btn" x={40} onClick={handleRedo} />
         </Layer>
       </Stage>
     </div>
