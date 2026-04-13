@@ -395,6 +395,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
 
   const isDrawing = useRef(false);
   const isDraggingText = useRef(false);
+  const isDraggingImg = useRef(false);
 
   const { pushHistory, undo, redo } = useHistory<CanvasSnapshot>({ lines: lines, texts: textInfoList, imgs: imgRepInfoList });
 
@@ -491,8 +492,8 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
       return; // 드로잉 이벤트 차단
     }
 
-    if (!isDraggingText.current) {
-      // text 드래깅 시점에서 비활성
+    if (!isDraggingText.current || !isDraggingImg.current) {
+      // text, img 드래깅 시점에서 비활성
       isDrawing.current = true;
       const pos = e.target.getStage().getPointerPosition();
       commitLines([...lines, { tool, points: [pos.x, pos.y], color: lineConfig?.color, width: lineConfig?.width }]); // 최초 마우스 down 시점에
@@ -555,6 +556,8 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
     if (next) {
       setTextInfoList(next.texts);
       setLines(next.lines);
+
+      console.log('next.imgsnext.imgsnext.imgsnext.imgs: ', next.imgs);
       setImgRepInfoList(next.imgs);
     }
   };
@@ -647,7 +650,10 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
             <TransformableImage
               key={index}
               imgRepInfo={imgRepInfo}
-              enablePreviewMode={index == 0 ? true : preview}
+              enablePreviewMode={preview}
+              onMouseDown={() => {
+                isDraggingImg.current = true;
+              }}
               onTransformed={({ width, height, x, y }) => {
                 commitImages(
                   imgRepInfoList.map((prev, prevI) => {
@@ -664,6 +670,23 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
                     }
                   }),
                 );
+                isDraggingImg.current = false;
+              }}
+              onDragEnd={(e: Konva.KonvaEventObject<DragEvent>) => {
+                commitImages(
+                  imgRepInfoList.map((prev, prevI) => {
+                    if (prevI == index) {
+                      return {
+                        ...prev,
+                        x: e.target.x(),
+                        y: e.target.y(),
+                      };
+                    } else {
+                      return prev;
+                    }
+                  }),
+                );
+                isDraggingImg.current = false;
               }}
             />
           ))}
