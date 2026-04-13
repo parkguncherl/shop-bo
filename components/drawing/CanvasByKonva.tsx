@@ -1,7 +1,7 @@
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Layer, Stage, Image, Line, Text, Transformer } from 'react-konva';
 import Konva from 'konva';
-import { Html } from 'react-konva-utils';
+import { Html, useImage } from 'react-konva-utils';
 import { Box } from 'konva/lib/shapes/Transformer';
 import { useHistory } from '../../hooks/drawing/useHistory';
 
@@ -32,6 +32,9 @@ interface TransformEventOnImg {
 }
 
 // 하위 컴포넌트 props interface
+interface MainImageProps {
+  imgRepInfo: ImageRepInfo;
+}
 interface EditableTextProps {
   text: {
     textInfo: TextInfo;
@@ -58,7 +61,8 @@ interface TransformableImageProps {
 
 // state's types
 interface ImageRepInfo {
-  image: HTMLImageElement;
+  //image: HTMLImageElement;
+  src: string;
   width: number;
   height: number;
   x: number;
@@ -87,8 +91,9 @@ export interface CanvasSnapshot {
 }
 
 /** 주 이미지 영역 */
-const MainImage = ({ ...rest }: Konva.ImageConfig) => {
-  return <Image {...rest} />;
+const MainImage = ({ imgRepInfo }: MainImageProps) => {
+  const [image] = useImage(imgRepInfo.src); // 항상 유효한 HTMLImageElement 보장
+  return <Image image={image} x={imgRepInfo.x} y={imgRepInfo.y} width={imgRepInfo?.width} height={imgRepInfo?.height} />;
 };
 
 /** 입력 영역 */
@@ -299,6 +304,8 @@ const TransformableImage = ({
   onTransformed,
   enablePreviewMode, // 미리보기 활성 switching state
 }: TransformableImageProps) => {
+  const [image] = useImage(imgRepInfo.src); // 항상 유효한 HTMLImageElement 보장
+
   const [status, setStatus] = useState<'transforming' | 'preview'>('transforming'); // 각각 변환(뒤집기, 늘리기 등의 동작), 미리보기 모드
 
   const imageRef = useRef(null);
@@ -324,7 +331,7 @@ const TransformableImage = ({
   return (
     <>
       <Image
-        image={imgRepInfo.image}
+        image={image}
         x={imgRepInfo.x}
         y={imgRepInfo.y}
         width={imgRepInfo?.width}
@@ -469,7 +476,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
 
         // 최초 set State 이후에도 여전히 최초 요소 자리를 유지하여야(요소 순으로 z indexing)
         setMainImgRepInfo({
-          image: image,
+          src: image.src,
           width: finalWidth,
           height: finalHeight,
           x: x,
@@ -594,7 +601,8 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
         const y = (stageHeight - finalHeight) / 2;
 
         addedImgRepInfoList.push({
-          image: image,
+          //image: image,
+          src: image.src,
           width: finalWidth,
           height: finalHeight,
           x: x,
@@ -634,7 +642,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
     >
       <Stage {...(dimensions as any)} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseLeave}>
         <Layer>
-          <MainImage image={mainImgRepInfo?.image} width={mainImgRepInfo?.width} height={mainImgRepInfo?.height} x={mainImgRepInfo?.x} y={mainImgRepInfo?.y} />
+          {mainImgRepInfo && <MainImage imgRepInfo={mainImgRepInfo} />}
           {imgRepInfoList.map((imgRepInfo, index) => (
             <TransformableImage
               key={index}
