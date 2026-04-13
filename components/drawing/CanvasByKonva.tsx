@@ -42,6 +42,13 @@ interface TextEditorProps {
   onChange?: (value: string) => void;
   content: string;
 }
+interface TransformableImageProps {
+  imgRepInfo: ImageRepInfo;
+  onMouseDown?: (evt: Konva.KonvaEventObject<MouseEvent>) => void;
+  onDragEnd?: (evt: Konva.KonvaEventObject<DragEvent>) => void;
+  onTransformed?: (evt: { width: number; height: number; x: number; y: number }) => void;
+  enablePreviewMode?: boolean; // 미리보기 활성 switching state
+}
 
 // state's types
 interface ImageRepInfo {
@@ -72,7 +79,7 @@ export interface CanvasSnapshot {
   texts: TextInfo[];
 }
 
-const URLImage = ({ ...rest }: Konva.ImageConfig) => {
+const MainImage = ({ ...rest }: Konva.ImageConfig) => {
   return <Image {...rest} />;
 };
 
@@ -277,13 +284,101 @@ const EditableText = ({ text: { textInfo, onMouseDown, onDragEnd, onEditEnd, onC
   );
 };
 
+const TransformableImage = ({
+  imgRepInfo,
+  onMouseDown,
+  onDragEnd,
+  onTransformed,
+  enablePreviewMode, // 미리보기 활성 switching state
+}: TransformableImageProps) => {
+  const [status, setStatus] = useState<'transforming' | 'preview'>('transforming'); // 각각 변환(뒤집기, 늘리기 등의 동작), 미리보기 모드
+
+  const imageRef = useRef(null);
+  const trRef = useRef(null);
+
+  useEffect(() => {
+    if (status) {
+      // transformer 활성화를 위하여 랜더링 시점에 image 참조와 연결
+      if (trRef.current && imageRef.current) {
+        (trRef.current as any).nodes([imageRef.current]);
+      }
+    }
+  }, [status]);
+
+  useEffect(() => {
+    if (enablePreviewMode) {
+      setStatus('preview');
+    } else {
+      setStatus('transforming');
+    }
+  }, [enablePreviewMode]);
+
+  return (
+    <>
+      <Image
+        x={imgRepInfo.x}
+        y={imgRepInfo.y}
+        width={imgRepInfo?.width}
+        height={imgRepInfo?.height}
+        onMouseDown={onMouseDown}
+        onDragEnd={onDragEnd}
+        ref={imageRef}
+        draggable
+        //visible={status != 'transforming'}
+        visible={false}
+        onDblClick={() => {
+          setStatus('transforming');
+        }}
+        onTransformEnd={() => {
+          // transformer is changing scale of the node
+          // and NOT its width or height
+          // but in the store we have only width and height
+          // to match the data better we will reset scale on transform end
+          const node = imageRef.current as any;
+          const scaleX = node.scaleX();
+          const scaleY = node.scaleY();
+
+          // we will reset it back
+          node.scaleX(1);
+          node.scaleY(1);
+          if (onTransformed) {
+            onTransformed({
+              x: node.x(),
+              y: node.y(),
+              // set minimal value
+              width: Math.max(5, node.width() * scaleX),
+              height: Math.max(node.height() * scaleY),
+            });
+          }
+        }}
+      />
+      {(status == 'transforming' || status == 'preview') && (
+        <Transformer
+          ref={trRef}
+          flipEnabled={false}
+          boundBoxFunc={(oldBox: Box, newBox: Box) => {
+            // 리사이징 제한
+            if (Math.abs((newBox as any).width) < 5 || Math.abs((newBox as any).height) < 5) {
+              return oldBox;
+            }
+            return newBox;
+          }}
+          borderEnabled={status == 'preview' ? false : undefined} // 테두리 선 제거
+          anchorSize={status == 'preview' ? 0 : undefined} // 조절 핸들 크기를 0으로 만들어 숨김
+          rotateEnabled={status == 'preview' ? false : undefined} // 회전 핸들 숨김
+        />
+      )}
+    </>
+  );
+};
+
 /**
  * konva를 통한 주어진 이미지 에디팅을 가능하게 하는 StateFul 컴포넌트
  *
  * */
 const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig, lineConfig }: CanvasByKonvaProps) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const [imageRepInfo, setImageRepInfo] = useState<ImageRepInfo | undefined>(undefined);
+  const [mainImageRepInfo, setMainImageRepInfo] = useState<ImageRepInfo | undefined>(undefined);
   const [textInfoList, setTextInfoList] = useState<TextInfo[]>([]);
 
   const [lines, setLines] = useState<Lines[]>([]);
@@ -312,19 +407,6 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
   useImperativeHandle<any, CanvasByKonvaRef>(ref, () => {
     return {
       addNewText: (value) => {
-        // setTextInfoList((prevState) => {
-        //   return [
-        //     ...prevState,
-        //     {
-        //       color: textConfig?.color,
-        //       content: value ? value : '신규 작성',
-        //       position: {
-        //         x: 50,
-        //         y: 50,
-        //       },
-        //     },
-        //   ];
-        // });
         commitTextInfo([
           ...textInfoList,
           {
@@ -371,7 +453,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
         const x = (stageWidth - finalWidth) / 2;
         const y = (stageHeight - finalHeight) / 2;
 
-        setImageRepInfo({
+        setMainImageRepInfo({
           image: image,
           width: finalWidth,
           height: finalHeight,
@@ -391,7 +473,6 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
       // text 드래깅 시점에서 비활성
       isDrawing.current = true;
       const pos = e.target.getStage().getPointerPosition();
-      // setLines([...lines, { tool, points: [pos.x, pos.y], color: lineConfig?.color, width: lineConfig?.width }]); // 최초 마우스 down 시점에
       commitLines([...lines, { tool, points: [pos.x, pos.y], color: lineConfig?.color, width: lineConfig?.width }]); // 최초 마우스 down 시점에
     }
   };
@@ -415,7 +496,6 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
     // replace last
     const splicedLines = [...lines];
     splicedLines.splice(splicedLines.length - 1, 1, lastLine);
-    //setLines(splicedLines.concat());
     commitLines(splicedLines.concat());
   };
 
@@ -439,7 +519,6 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
 
   const handleUndo = () => {
     const prev = undo();
-    console.log('prev: ', prev);
     if (prev) {
       setTextInfoList(prev.texts);
       setLines(prev.lines);
@@ -448,7 +527,6 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
 
   const handleRedo = () => {
     const next = redo();
-    console.log('next: ', next);
     if (next) {
       setTextInfoList(next.texts);
       setLines(next.lines);
@@ -460,7 +538,13 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
       <Layer>
         <Text text="undo" name="undo-btn" onClick={handleUndo} />
         <Text text="redo" name="redo-btn" x={40} onClick={handleRedo} />
-        <URLImage image={imageRepInfo?.image} width={imageRepInfo?.width} height={imageRepInfo?.height} x={imageRepInfo?.x} y={imageRepInfo?.y} />
+        <MainImage
+          image={mainImageRepInfo?.image}
+          width={mainImageRepInfo?.width}
+          height={mainImageRepInfo?.height}
+          x={mainImageRepInfo?.x}
+          y={mainImageRepInfo?.y}
+        />
         {lines.map((line, i) => (
           <Line
             key={i}
@@ -483,21 +567,6 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
                 isDraggingText.current = true;
               },
               onDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => {
-                // setTextInfoList((prevState) => {
-                //   return prevState.map((prev, prevI) => {
-                //     if (prevI == index) {
-                //       return {
-                //         ...prev,
-                //         position: {
-                //           x: e.target.x(),
-                //           y: e.target.y(),
-                //         },
-                //       };
-                //     } else {
-                //       return prev;
-                //     }
-                //   });
-                // });
                 commitTextInfo(
                   textInfoList.map((prev, prevI) => {
                     if (prevI == index) {
@@ -519,18 +588,6 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
                 isDraggingText.current = false;
               },
               onChangeByEditor: (value) => {
-                // setTextInfoList((prevState) => {
-                //   return prevState.map((prev, prevI) => {
-                //     if (prevI == index) {
-                //       return {
-                //         ...prev,
-                //         content: value,
-                //       };
-                //     } else {
-                //       return prev;
-                //     }
-                //   });
-                // });
                 commitTextInfo(
                   textInfoList.map((prev, prevI) => {
                     if (prevI == index) {
