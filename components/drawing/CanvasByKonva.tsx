@@ -51,6 +51,13 @@ interface TransformableImageProps {
 }
 
 // state's types
+interface MainImageRepInfo extends ImageRepInfo {
+  // image: HTMLImageElement;
+  // width: number;
+  // height: number;
+  // x: number;
+  // y: number;
+}
 interface ImageRepInfo {
   image: HTMLImageElement;
   width: number;
@@ -378,8 +385,13 @@ const TransformableImage = ({
  * */
 const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig, lineConfig }: CanvasByKonvaProps) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const [mainImageRepInfo, setMainImageRepInfo] = useState<ImageRepInfo | undefined>(undefined);
+  const [mainImageRepInfo, setMainImageRepInfo] = useState<MainImageRepInfo | undefined>(undefined);
   const [textInfoList, setTextInfoList] = useState<TextInfo[]>([]);
+  const [imgRepInfoList, setImgRepInfoList] = useState<ImageRepInfo[]>([]);
+
+  useEffect(() => {
+    console.log('imgRepInfoList: ', imgRepInfoList);
+  }, [imgRepInfoList]);
 
   const [lines, setLines] = useState<Lines[]>([]);
 
@@ -402,6 +414,8 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
     });
     setLines(linesInfo);
   };
+
+  const calcImgScaleAndLoc = () => {};
 
   /** 참조를 통해 외부로 노출되는 영역을 정의함 */
   useImperativeHandle<any, CanvasByKonvaRef>(ref, () => {
@@ -533,79 +547,171 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
     }
   };
 
+  // 파일 검증 및 추가 공통 로직
+  const processFiles = (selectedFiles: File[]) => {
+    const validFiles: File[] = [];
+    const addedImgRepInfoList: ImageRepInfo[] = [];
+
+    for (const file of selectedFiles) {
+      if (!file.type.startsWith('image/')) {
+        //toastError(`${file.name}은(는) 이미지 파일이 아닙니다.`);
+        return; // 전체 무효
+      }
+      validFiles.push(file);
+    }
+
+    for (let i = 0; i < validFiles.length; i++) {
+      const image = new window.Image();
+      image.src = URL.createObjectURL(selectedFiles[i]);
+      image.onload = () => {
+        const stageWidth = wrapperRef.current?.offsetWidth || 0;
+        const stageHeight = wrapperRef.current?.offsetHeight || 0;
+
+        if (wrapperRef.current) {
+          setDimensions({
+            width: stageWidth,
+            height: stageHeight,
+          });
+        }
+
+        // 1. 비율 계산 (비교)
+        const widthRatio = stageWidth / image.width;
+        const heightRatio = stageHeight / image.height;
+
+        // 2. contain 방식: 둘 중 더 작은 비율을 선택
+        const newScale = Math.min(widthRatio, heightRatio); // 비율(scale)
+
+        // 3. 실질적인 너비와 높이 구하기(최초에는 1/5으로 축소)
+        const finalWidth = image.width * newScale * 0.2;
+        const finalHeight = image.height * newScale * 0.2;
+
+        // 4. 좌측 상단에서부터 다소 겹치게끔 정의
+        const x = 30 + i * 20;
+        const y = 30;
+
+        // setMainImageRepInfo({
+        //   image: image,
+        //   width: finalWidth,
+        //   height: finalHeight,
+        //   x: x,
+        //   y: y,
+        // });
+        addedImgRepInfoList.push({
+          image: image,
+          width: finalWidth,
+          height: finalHeight,
+          x: x,
+          y: y,
+        });
+      };
+    }
+
+    setImgRepInfoList((prevState) => {
+      const updatedList = [...prevState];
+      updatedList.push(addedImgRepInfoList);
+      return updatedList;
+    });
+  };
+
   return (
-    <Stage {...(dimensions as any)} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseLeave}>
-      <Layer>
-        <Text text="undo" name="undo-btn" onClick={handleUndo} />
-        <Text text="redo" name="redo-btn" x={40} onClick={handleRedo} />
-        <MainImage
-          image={mainImageRepInfo?.image}
-          width={mainImageRepInfo?.width}
-          height={mainImageRepInfo?.height}
-          x={mainImageRepInfo?.x}
-          y={mainImageRepInfo?.y}
-        />
-        {lines.map((line, i) => (
-          <Line
-            key={i}
-            points={line.points}
-            stroke={line.color || 'black'}
-            strokeWidth={line.width || 5}
-            tension={0.5}
-            lineCap="round"
-            lineJoin="round"
-            globalCompositeOperation={line.tool === 'eraser' ? 'destination-out' : 'source-over'}
+    <div
+      onDragEnter={(e: React.DragEvent<HTMLDivElement>) => {
+        // 브라우저 고유 이벤트 차단
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onDragLeave={(e: React.DragEvent<HTMLDivElement>) => {
+        // 브라우저 고유 이벤트 차단
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onDragOver={(e: React.DragEvent<HTMLDivElement>) => {
+        // 브라우저 고유 이벤트 차단
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onDrop={(e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          processFiles(Array.from(e.dataTransfer.files));
+        }
+      }}
+    >
+      <Stage {...(dimensions as any)} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseLeave}>
+        <Layer>
+          <Text text="undo" name="undo-btn" onClick={handleUndo} />
+          <Text text="redo" name="redo-btn" x={40} onClick={handleRedo} />
+          <MainImage
+            image={mainImageRepInfo?.image}
+            width={mainImageRepInfo?.width}
+            height={mainImageRepInfo?.height}
+            x={mainImageRepInfo?.x}
+            y={mainImageRepInfo?.y}
           />
-        ))}
-        {textInfoList.map((textInfo, index) => (
-          <EditableText
-            key={index}
-            text={{
-              textInfo: textInfo,
-              enablePreviewMode: preview,
-              onMouseDown: () => {
-                isDraggingText.current = true;
-              },
-              onDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => {
-                commitTextInfo(
-                  textInfoList.map((prev, prevI) => {
-                    if (prevI == index) {
-                      return {
-                        ...prev,
-                        position: {
-                          x: e.target.x(),
-                          y: e.target.y(),
-                        },
-                      };
-                    } else {
-                      return prev;
-                    }
-                  }),
-                );
-                isDraggingText.current = false;
-              },
-              onEditEnd: () => {
-                isDraggingText.current = false;
-              },
-              onChangeByEditor: (value) => {
-                commitTextInfo(
-                  textInfoList.map((prev, prevI) => {
-                    if (prevI == index) {
-                      return {
-                        ...prev,
-                        content: value,
-                      };
-                    } else {
-                      return prev;
-                    }
-                  }),
-                );
-              },
-            }}
-          />
-        ))}
-      </Layer>
-    </Stage>
+          {lines.map((line, i) => (
+            <Line
+              key={i}
+              points={line.points}
+              stroke={line.color || 'black'}
+              strokeWidth={line.width || 5}
+              tension={0.5}
+              lineCap="round"
+              lineJoin="round"
+              globalCompositeOperation={line.tool === 'eraser' ? 'destination-out' : 'source-over'}
+            />
+          ))}
+          {textInfoList.map((textInfo, index) => (
+            <EditableText
+              key={index}
+              text={{
+                textInfo: textInfo,
+                enablePreviewMode: preview,
+                onMouseDown: () => {
+                  isDraggingText.current = true;
+                },
+                onDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => {
+                  commitTextInfo(
+                    textInfoList.map((prev, prevI) => {
+                      if (prevI == index) {
+                        return {
+                          ...prev,
+                          position: {
+                            x: e.target.x(),
+                            y: e.target.y(),
+                          },
+                        };
+                      } else {
+                        return prev;
+                      }
+                    }),
+                  );
+                  isDraggingText.current = false;
+                },
+                onEditEnd: () => {
+                  isDraggingText.current = false;
+                },
+                onChangeByEditor: (value) => {
+                  commitTextInfo(
+                    textInfoList.map((prev, prevI) => {
+                      if (prevI == index) {
+                        return {
+                          ...prev,
+                          content: value,
+                        };
+                      } else {
+                        return prev;
+                      }
+                    }),
+                  );
+                },
+              }}
+            />
+          ))}
+        </Layer>
+      </Stage>
+    </div>
   );
 };
 
