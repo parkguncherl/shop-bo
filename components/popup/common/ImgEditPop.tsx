@@ -3,7 +3,6 @@ import { PopupFooter } from '../PopupFooter';
 import { PopupContent } from '../PopupContent';
 import { PopupLayout } from '../PopupLayout';
 import CanvasByKonva, { CanvasByKonvaRef } from '../../drawing/CanvasByKonva';
-import { Search } from '../../content';
 import useFilters from '../../../hooks/useFilters';
 import { CustomColorPicker } from '../../CustomColorPicker';
 
@@ -14,13 +13,15 @@ export interface ImgProps {
 interface ImgEditPopProps {
   open: boolean;
   onClose: () => void;
-  //onEditingEnded?: () => void; // 에디팅 완료 후 사용자가 저장(수정)을 희망할 시
+  //onEditingEnded?: () => void; // 에디팅 완료 후 사용자가 저장(수정)을 희망할 시 todo
   imgProps?: ImgProps;
 }
 
+/** konva 기반 컴포넌트를 통한 이미지 편집 팝업 */
 const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
   const topWrapperRef = useRef<HTMLDivElement>(null);
   const canvasByKonvaRef = useRef<CanvasByKonvaRef>(null);
+  const topSearchWrapperRef = useRef<HTMLDivElement>(null);
 
   const [preview, setPreview] = useState(false);
 
@@ -74,18 +75,33 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
         }
       >
         <PopupContent>
-          <Search className="type_2">
-            <CustomColorPicker
-              title={'텍스트 색상'}
-              name={'textColor'}
-              //color={filters.textColor}
-              onColorChangeCompleted={(name, color) => {
-                onChangeFilters(name, color.hex);
-              }}
-            />
-            {/*<Search.Input title={'텍스트 색상'} name={'textColor'} value={filters.textColor} onChange={onChangeFilters} />*/}
-            <Search.Input title={'줄(라인) 색상'} name={'lineColor'} value={filters.lineColor} onChange={onChangeFilters} />
-          </Search>
+          <div className="searchBox" ref={topSearchWrapperRef}>
+            <div className="searchArea">
+              <div className={'type_2'}>
+                <CustomColorPicker
+                  title={'텍스트 색상'}
+                  name={'textColor'}
+                  color={filters.textColor}
+                  onColorChangeCompleted={(name, color) => {
+                    onChangeFilters(name, color.hex);
+                  }}
+                  wrapperRef={topSearchWrapperRef}
+                />
+                <CustomColorPicker
+                  title={'줄(라인) 색상'}
+                  name={'lineColor'}
+                  color={filters.lineColor}
+                  onColorChangeCompleted={(name, color) => {
+                    onChangeFilters(name, color.hex);
+                  }}
+                  colorPickerCoordinates={{
+                    left: 360,
+                  }}
+                  wrapperRef={topSearchWrapperRef}
+                />
+              </div>
+            </div>
+          </div>
           <div className={'imgEditPop'} ref={topWrapperRef}>
             <CanvasByKonva
               wrapperRef={topWrapperRef}
