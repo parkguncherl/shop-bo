@@ -440,8 +440,8 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
             content: value ? value : '신규 작성',
             x: 50,
             y: 50,
-            width: value ? value.length * 5 : 200,
-            height: 20,
+            width: value ? value.length * 7 : 200,
+            height: value ? (value.length > 10 ? 40 : 20) : 20,
             scaleX: 1,
             scaleY: 1,
             rotation: 0,
@@ -744,6 +744,8 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
                     if (prevI == index) {
                       return {
                         ...prev,
+                        width: value ? value.length * 7 : 200,
+                        height: value ? (value.length > 10 ? 40 : 20) : 20,
                         content: value,
                       };
                     } else {
