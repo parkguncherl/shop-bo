@@ -643,6 +643,15 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
           processFiles(Array.from(e.dataTransfer.files));
         }
       }}
+      tabIndex={0} // 포커싱 가능(paste 동작 가능해짐)
+      onPaste={(e: React.ClipboardEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (e.clipboardData.files && e.clipboardData.files.length > 0) {
+          processFiles(Array.from(e.clipboardData.files));
+        }
+      }}
     >
       <Stage {...(dimensions as any)} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseLeave}>
         <Layer>
