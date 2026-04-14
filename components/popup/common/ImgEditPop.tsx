@@ -5,6 +5,7 @@ import { PopupLayout } from '../PopupLayout';
 import CanvasByKonva, { CanvasByKonvaRef } from '../../drawing/CanvasByKonva';
 import { Search } from '../../content';
 import useFilters from '../../../hooks/useFilters';
+import { CustomColorPicker } from '../../CustomColorPicker';
 
 export interface ImgProps {
   imgSrc?: string;
@@ -74,7 +75,15 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
       >
         <PopupContent>
           <Search className="type_2">
-            <Search.Input title={'텍스트 색상'} name={'textColor'} value={filters.textColor} onChange={onChangeFilters} />
+            <CustomColorPicker
+              title={'텍스트 색상'}
+              name={'textColor'}
+              //color={filters.textColor}
+              onColorChangeCompleted={(name, color) => {
+                onChangeFilters(name, color.hex);
+              }}
+            />
+            {/*<Search.Input title={'텍스트 색상'} name={'textColor'} value={filters.textColor} onChange={onChangeFilters} />*/}
             <Search.Input title={'줄(라인) 색상'} name={'lineColor'} value={filters.lineColor} onChange={onChangeFilters} />
           </Search>
           <div className={'imgEditPop'} ref={topWrapperRef}>
