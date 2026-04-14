@@ -99,24 +99,24 @@ export const CustomColorPicker = ({
           allowClear
         />
       )}
-      <div style={{ zIndex: 10000 }}>
-        {displayColorPicker && <ChromePicker ref={pickerRef} color={selectedColor} onChangeComplete={onChangeCompleteHandler} />}
-      </div>
+      {/*<div style={{ zIndex: 10000 }}>*/}
+      {/*  {displayColorPicker && <ChromePicker ref={pickerRef} color={selectedColor} onChangeComplete={onChangeCompleteHandler} />}*/}
+      {/*</div>*/}
 
-      {/*{createPortal(*/}
-      {/*  <div*/}
-      {/*    style={{*/}
-      {/*      position: 'absolute', // 부모 레이아웃에 영향을 주지 않음 (붕 뜸)*/}
-      {/*      top: '100%', // 버튼 바로 아래서 시작*/}
-      {/*      left: 0,*/}
-      {/*      zIndex: 10000, // 다른 요소보다 위에 표시*/}
-      {/*      marginTop: '5px', // 약간의 간격*/}
-      {/*    }}*/}
-      {/*  >*/}
-      {/*    {displayColorPicker && <ChromePicker ref={pickerRef} color={selectedColor} onChangeComplete={onChangeCompleteHandler} />}*/}
-      {/*  </div>,*/}
-      {/*  document.getElementsByClassName('type_2')[0], // body가 아닌 부모 요소에 직접 삽입*/}
-      {/*)}*/}
+      {createPortal(
+        <div
+          style={{
+            position: 'absolute', // 부모 레이아웃에 영향을 주지 않음 (붕 뜸)
+            top: 160, // 버튼 바로 아래서 시작
+            left: 80,
+            zIndex: 10000, // 다른 요소보다 위에 표시
+            marginTop: '5px', // 약간의 간격
+          }}
+        >
+          {displayColorPicker && <ChromePicker ref={pickerRef} color={selectedColor} onChangeComplete={onChangeCompleteHandler} />}
+        </div>,
+        document.getElementsByClassName('popupContent')[0], // body가 아닌 부모 요소에 직접 삽입
+      )}
     </div>
   );
 };
