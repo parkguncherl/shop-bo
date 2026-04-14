@@ -101,6 +101,7 @@
     "@types/escpos": "^2.5.5",
     "@types/file-saver": "^2.0.7",
     "@types/lodash": "^4.14.191",
+    "@types/react-color": "^3.0.13",
     "@types/serialport": "^8.0.5",
     "@types/sortablejs": "^1.15.8",
     "@types/styled-components": "^5.1.26",
