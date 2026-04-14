@@ -20,7 +20,6 @@ export function useHistory<T>(initialState: T) {
 
   // 스냅샷 저장 (새 액션 발생 시)
   const pushHistory = useCallback((newState: T) => {
-    console.log('historyRef: ', historyRef.current);
     const snapshot = JSON.parse(JSON.stringify(newState)); // 깊은 복사 필수!
 
     // 현재 인덱스 이후의 히스토리 제거 (redo 스택 초기화)
