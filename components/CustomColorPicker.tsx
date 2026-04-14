@@ -79,7 +79,7 @@ export const CustomColorPicker = ({
                 autoComplete={'off'}
                 list={list}
                 onClick={handleClick}
-                onBlur={handleOnBlur}
+                //onBlur={handleOnBlur}
                 allowClear
               />
             </div>
@@ -95,30 +95,27 @@ export const CustomColorPicker = ({
           name={name}
           autoComplete={'off'}
           onClick={handleClick}
-          onBlur={handleOnBlur}
+          //onBlur={handleOnBlur}
           allowClear
         />
       )}
-      <div style={{ position: 'absolute', zIndex: 100000 }}>
+      <div style={{ zIndex: 10000 }}>
         {displayColorPicker && <ChromePicker ref={pickerRef} color={selectedColor} onChangeComplete={onChangeCompleteHandler} />}
       </div>
+
       {/*{createPortal(*/}
-      {/*  <div style={{ position: 'absolute', zIndex: 100000 }}>*/}
+      {/*  <div*/}
+      {/*    style={{*/}
+      {/*      position: 'absolute', // 부모 레이아웃에 영향을 주지 않음 (붕 뜸)*/}
+      {/*      top: '100%', // 버튼 바로 아래서 시작*/}
+      {/*      left: 0,*/}
+      {/*      zIndex: 10000, // 다른 요소보다 위에 표시*/}
+      {/*      marginTop: '5px', // 약간의 간격*/}
+      {/*    }}*/}
+      {/*  >*/}
       {/*    {displayColorPicker && <ChromePicker ref={pickerRef} color={selectedColor} onChangeComplete={onChangeCompleteHandler} />}*/}
       {/*  </div>,*/}
-      {/*  document.getElementsByClassName('searchBox')[0], // searchBox 하위 컴포넌트로 지정*/}
-      {/*)}*/}
-      {/*{displayColorPicker &&*/}
-      {/*  createPortal(*/}
-      {/*    <div style={{ position: 'absolute', width: 400, height: 400, backgroundColor: 'black' }}>*/}
-      {/*      <ChromePicker ref={pickerRef} color={selectedColor} onChangeComplete={onChangeCompleteHandler} />*/}
-      {/*    </div>,*/}
-      {/*    document.body, // DOM의 최외각 하위 컴포넌트로 지정*/}
-      {/*  )}*/}
-      {/*{displayColorPicker && (*/}
-      {/*  <div style={{ position: 'absolute', width: 400, height: 400, zIndex: 10000, backgroundColor: 'black' }}>*/}
-      {/*    <ChromePicker ref={pickerRef} color={selectedColor} onChangeComplete={onChangeCompleteHandler} />*/}
-      {/*  </div>*/}
+      {/*  document.getElementsByClassName('type_2')[0], // body가 아닌 부모 요소에 직접 삽입*/}
       {/*)}*/}
     </div>
   );
