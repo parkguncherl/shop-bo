@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Input } from 'antd';
 import { ChromePicker, ColorResult, Color } from 'react-color';
 import { createPortal } from 'react-dom';
 
 interface Props {
   title?: string;
-  inputStyles?: React.CSSProperties;
   name: string;
-  placeholder?: string;
   pickerRef?: React.RefObject<ChromePicker>;
   wrapperRef?: React.RefObject<HTMLElement>; // react color 엘리먼트를 출력하기 위하여 필요한 상위 wrapper 참조
-  list?: string; // datalist 사용을 위한 속성
   keyDownEvent?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   required?: boolean;
   wrapperClassNames?: string;
@@ -25,12 +21,9 @@ interface Props {
 /** react color 기반으로 input 영역을 활용하여 정의 */
 export const CustomColorPicker = ({
   title,
-  inputStyles,
   name,
-  placeholder,
   pickerRef,
   wrapperRef,
-  list,
   required,
   wrapperClassNames,
   onColorChangeCompleted,
@@ -47,15 +40,6 @@ export const CustomColorPicker = ({
     }
   }, [wrapperRef]);
 
-  // 디바운싱 처리한 외부 업데이트: 300ms 동안 입력이 멈추면 실행 (무거운 연산 방지)
-  // const debouncedOnChange = useMemo(
-  //   () =>
-  //     debounce((newColor: ColorResult) => {
-  //       if (onColorChangeCompleted) onColorChangeCompleted(name, newColor);
-  //     }, 0),
-  //   [onColorChangeCompleted, name],
-  // );
-
   useEffect(() => {
     setSelectedColor(color); // 외부 상태 조작에 대한 동기화
   }, [color]);
@@ -66,7 +50,6 @@ export const CustomColorPicker = ({
 
   const onChangeCompleteHandler = (color: ColorResult) => {
     setSelectedColor(color.hex);
-    //debouncedOnChange(color);
     if (onColorChangeCompleted) onColorChangeCompleted(name, color);
   };
 
@@ -79,34 +62,17 @@ export const CustomColorPicker = ({
             {required && <span className={'req'}>*</span>}
           </dt>
           <dd>
-            <div className={`formBox border ${displayColorPicker ? 'focus' : ''}`}>
-              <Input
-                style={inputStyles}
-                placeholder={placeholder}
-                readOnly={true}
-                type={'text'}
-                value={typeof selectedColor == 'string' ? selectedColor : '기타'}
-                name={name}
-                autoComplete={'off'}
-                list={list}
-                onClick={handleClick}
-                allowClear
-              />
+            <div className={`formBox border`}>
+              <div style={{ width: 100, height: 30, padding: '3px', borderWidth: '5px', borderColor: 'black' }} onClick={handleClick}>
+                <div style={{ width: '100%', height: '100%', backgroundColor: typeof selectedColor == 'string' ? selectedColor : undefined }}></div>
+              </div>
             </div>
           </dd>
         </dl>
       ) : (
-        <Input
-          style={inputStyles}
-          placeholder={placeholder}
-          readOnly={true}
-          type={'text'}
-          value={typeof selectedColor == 'string' ? selectedColor : '기타'}
-          name={name}
-          autoComplete={'off'}
-          onClick={handleClick}
-          allowClear
-        />
+        <div style={{ width: 100, height: 30, padding: '3px', borderWidth: '5px', borderColor: 'black' }} onClick={handleClick}>
+          <div style={{ width: '100%', height: '100%', backgroundColor: typeof selectedColor == 'string' ? selectedColor : undefined }}></div>
+        </div>
       )}
       {portalTarget &&
         createPortal(

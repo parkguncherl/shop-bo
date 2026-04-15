@@ -26,6 +26,11 @@ export interface CanvasByKonvaRef {
 }
 interface TransformEventOnImg extends Omit<ImageRepInfo, 'src'> {}
 interface TransformEventOnText extends Omit<TextInfo, 'content' | 'color'> {}
+interface ChangeEventOnText {
+  width?: number; // 존재할 시 너비, 높이 조정
+  height?: number; // 존재할 시 너비, 높이 조정
+  content?: string; // 존재할 시 값 수정
+}
 
 // 하위 컴포넌트 props interface
 interface MainImageProps {
@@ -36,14 +41,14 @@ interface EditableTextProps {
   onMouseDown?: (evt: Konva.KonvaEventObject<MouseEvent>) => void;
   onDragEnd?: (evt: Konva.KonvaEventObject<DragEvent>) => void;
   onEditEnd?: () => void;
-  onChangeByEditor?: (value: string) => void;
+  onChangeByEditor?: (evt: ChangeEventOnText) => void;
   enablePreviewMode?: boolean; // 미리보기 활성 switching state
   onTransformed?: (evt: TransformEventOnText) => void;
 }
 interface TextEditorProps {
   textRef: React.RefObject<any>;
   onClose?: () => void;
-  onChange?: (value: string) => void;
+  onChange?: (evt: ChangeEventOnText) => void;
   content: string;
 }
 interface TransformableImageProps {
@@ -154,7 +159,11 @@ const TextArea = ({ textRef, onClose, onChange, content }: TextEditorProps) => {
       e.preventDefault();
       enterKeyPressed.current = true;
 
-      if (onChange) onChange(inputValue);
+      if (onChange && textareaRef.current) {
+        onChange({
+          content: inputValue,
+        });
+      }
       if (onClose) onClose();
     }
     if (e.key === 'Escape') {
@@ -162,12 +171,20 @@ const TextArea = ({ textRef, onClose, onChange, content }: TextEditorProps) => {
     }
   };
 
-  const handleInput = () => {
+  const handleInput = (event: React.FormEvent<HTMLTextAreaElement>) => {
+    const eventTarget = event.target as HTMLTextAreaElement;
     if (textareaRef.current) {
-      const scale = textRef.current.getAbsoluteScale().x;
-      textareaRef.current.style.width = `${textRef.current.width() * scale}px`;
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight + textRef.current.fontSize()}px`;
+      const lines = eventTarget.value.split(/\r?\n/); // 줄바꿈 여부에 따라 나눔
+      const maxLength = Math.max(...lines.map((line) => line.length));
+      textareaRef.current.style.width = `${maxLength * 20}px`;
+      textareaRef.current.style.height = `${lines.length * 20}px`;
+
+      if (onChange) {
+        onChange({
+          width: maxLength * 20,
+          height: lines.length * 20,
+        });
+      }
     }
   };
 
@@ -183,8 +200,12 @@ const TextArea = ({ textRef, onClose, onChange, content }: TextEditorProps) => {
           enterKeyPressed.current = false; // 결과로 인해 발생한 blur 동작이므로 해당 시점에 플래그 해제
           return;
         }
-        if (onChange) onChange(inputValue);
-        if (onClose) onClose();
+        if (onChange) {
+          onChange({
+            content: inputValue,
+          });
+        }
+        //if (onClose) onClose();
       }}
       onChange={(e) => setInputValue(e.target.value)}
       onKeyDown={handleKeyDown}
@@ -271,8 +292,8 @@ const EditableText = ({ textInfo, onMouseDown, onDragEnd, onEditEnd, onChangeByE
         <TextEditor
           content={textInfo.content}
           textRef={textRef}
-          onChange={(value) => {
-            if (onChangeByEditor) onChangeByEditor(value);
+          onChange={(evt) => {
+            if (onChangeByEditor) onChangeByEditor(evt);
           }}
           onClose={() => {
             setStatus('transforming');
@@ -643,7 +664,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
           processFiles(Array.from(e.dataTransfer.files));
         }
       }}
-      tabIndex={0} // 포커싱 가능(paste 동작 가능해짐)
+      tabIndex={0} // 포커싱 가능(paste 동작 가능해짐) todo
       onPaste={(e: React.ClipboardEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
@@ -738,15 +759,17 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
                   }),
                 );
               }}
-              onChangeByEditor={(value) => {
+              onChangeByEditor={(evt) => {
                 commitTextInfo(
                   textInfoList.map((prev, prevI) => {
                     if (prevI == index) {
+                      console.log('evt: ', evt);
                       return {
                         ...prev,
-                        width: value ? value.length * 7 : 200,
-                        height: value ? (value.length > 10 ? 40 : 20) : 20,
-                        content: value,
+                        ...evt,
+                        // width: evt.width ? evt.width : prev.width,
+                        // height: evt.height ? evt.height : prev.height,
+                        // content: evt.value ? evt.value : prev.content,
                       };
                     } else {
                       return prev;
