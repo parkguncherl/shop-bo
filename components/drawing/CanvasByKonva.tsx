@@ -205,7 +205,7 @@ const TextArea = ({ textRef, onClose, onChange, content }: TextEditorProps) => {
             content: inputValue,
           });
         }
-        //if (onClose) onClose();
+        if (onClose) onClose();
       }}
       onChange={(e) => setInputValue(e.target.value)}
       onKeyDown={handleKeyDown}
@@ -553,12 +553,12 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
   };
 
   // 마우스를 놓음
-  const handleMouseUp = (e: Konva.KonvaEventObject<MouseEvent>) => {
+  const handleMouseUp = () => {
     isDrawing.current = false;
   };
 
   // 마우스 이탈
-  const handleMouseLeave = (e: Konva.KonvaEventObject<MouseEvent>) => {
+  const handleMouseLeave = () => {
     isDrawing.current = false;
   };
 
@@ -664,7 +664,8 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
           processFiles(Array.from(e.dataTransfer.files));
         }
       }}
-      tabIndex={0} // 포커싱 가능(paste 동작 가능해짐) todo
+      tabIndex={0} // 포커싱 가능(paste 동작 가능해짐)
+      style={{ outline: 'none' }}
       onPaste={(e: React.ClipboardEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
@@ -763,13 +764,9 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
                 commitTextInfo(
                   textInfoList.map((prev, prevI) => {
                     if (prevI == index) {
-                      console.log('evt: ', evt);
                       return {
                         ...prev,
                         ...evt,
-                        // width: evt.width ? evt.width : prev.width,
-                        // height: evt.height ? evt.height : prev.height,
-                        // content: evt.value ? evt.value : prev.content,
                       };
                     } else {
                       return prev;
