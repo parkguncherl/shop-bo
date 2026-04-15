@@ -65,6 +65,21 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
                 >
                   {!preview ? '미리보기' : '편집'}
                 </button>
+                <button
+                  className="btn btnBlue"
+                  onClick={() => {
+                    // const img = new Image();
+                    // // 1. CORS 설정 (toDataURL 에러 방지 핵심)
+                    // img.crossOrigin = 'Anonymous';
+                    //
+                    // img.onload = () => {
+                    //   img.src = canvasByKonvaRef.current.toDataURL({ pixelRatio: 3 }); // 고해상도를 위해 pixelRatio 설정 가능
+                    //   console.log('img.src : ', img.src);
+                    // }; todo
+                  }}
+                >
+                  저장
+                </button>
               </div>
               <div className="right">
                 <button className="btn" onClick={onCloseCommon}>
