@@ -51,7 +51,7 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
                 <button
                   className="btn btnBlue"
                   onClick={() => {
-                    canvasByKonvaRef.current?.addNewText();
+                    canvasByKonvaRef.current?.customs.api.addNewText();
                   }}
                 >
                   새로운 글 추가

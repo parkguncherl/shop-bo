@@ -22,9 +22,14 @@ interface CanvasByKonvaProps {
 export interface ImgOnCanvasByKonva {
   imgSrc?: string;
 }
-export interface CanvasByKonvaRef {
-  addNewText: (value?: string) => void;
-}
+export type CanvasByKonvaRef = Konva.Stage & CanvasByKonvaCustomsRef;
+type CanvasByKonvaCustomsRef = {
+  customs: {
+    api: {
+      addNewText: (value?: string) => void;
+    };
+  };
+};
 interface TransformEventOnImg extends Omit<ImageRepInfo, 'src'> {}
 interface TransformEventOnText extends Omit<TextInfo, 'content' | 'color'> {}
 interface ChangeEventOnText {
@@ -422,6 +427,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
   const [lines, setLines] = useState<Lines[]>([]);
 
   const isDrawing = useRef(false);
+  const stageRef = useRef<Konva.Stage>(null);
 
   const { pushHistory, undo, redo } = useHistory<CanvasSnapshot>({ lines: lines, texts: textInfoList, imgs: imgRepInfoList });
 
@@ -452,25 +458,49 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
   };
 
   /** 참조를 통해 외부로 노출되는 영역을 정의함 */
-  useImperativeHandle<any, CanvasByKonvaRef>(ref, () => {
-    return {
-      addNewText: (value) => {
-        commitTextInfo([
-          ...textInfoList,
-          {
-            color: textConfig?.color,
-            content: value ? value : '신규 작성',
-            x: 50,
-            y: 50,
-            width: value ? value.length * 7 : 200,
-            height: value ? (value.length > 10 ? 40 : 20) : 20,
-            scaleX: 1,
-            scaleY: 1,
-            rotation: 0,
+  useImperativeHandle<Konva.Stage, CanvasByKonvaRef>(ref, () => {
+    // return {
+    //   addNewText: (value) => {
+    //     commitTextInfo([
+    //       ...textInfoList,
+    //       {
+    //         color: textConfig?.color,
+    //         content: value ? value : '신규 작성',
+    //         x: 50,
+    //         y: 50,
+    //         width: value ? value.length * 7 : 200,
+    //         height: value ? (value.length > 10 ? 40 : 20) : 20,
+    //         scaleX: 1,
+    //         scaleY: 1,
+    //         rotation: 0,
+    //       },
+    //     ]);
+    //   },
+    // };
+
+    return Object.assign<Konva.Stage, CanvasByKonvaCustomsRef>(stageRef.current ?? {}, {
+      // 이하 TunedGrid 에서 노출코자 하는 기타 속성 및 api 목록
+      customs: {
+        api: {
+          addNewText: (value) => {
+            commitTextInfo([
+              ...textInfoList,
+              {
+                color: textConfig?.color,
+                content: value ? value : '신규 작성',
+                x: 50,
+                y: 50,
+                width: value ? value.length * 20 : 200,
+                height: 20,
+                scaleX: 1,
+                scaleY: 1,
+                rotation: 0,
+              },
+            ]);
           },
-        ]);
+        },
       },
-    };
+    });
   });
 
   useEffect(() => {
@@ -680,7 +710,14 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
         }
       }}
     >
-      <Stage {...(dimensions as any)} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseLeave}>
+      <Stage
+        {...(dimensions as any)}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
+        ref={stageRef}
+      >
         <Layer>
           {mainImgRepInfo && <MainImage imgRepInfo={mainImgRepInfo} />}
           {imgRepInfoList.map((imgRepInfo, index) => (
