@@ -12,11 +12,12 @@ interface CanvasByKonvaProps {
 
   ref?: React.Ref<CanvasByKonvaRef>;
   tool?: 'pen' | 'eraser';
-  preview?: boolean;
+  preview?: boolean; // 미리보기
   textConfig?: {
     color?: string;
   };
   lineConfig?: Omit<Lines, 'tool' | 'points'>;
+  preventDrawing?: boolean; // 드로잉 비활성화 여부
 }
 export interface ImgOnCanvasByKonva {
   imgSrc?: string;
@@ -411,7 +412,7 @@ const TransformableImage = ({
  * konva를 통한 주어진 이미지 에디팅을 가능하게 하는 StateFul 컴포넌트
  *
  * */
-const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig, lineConfig }: CanvasByKonvaProps) => {
+const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig, lineConfig, preventDrawing }: CanvasByKonvaProps) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   const [mainImgRepInfo, setMainImgRepInfo] = useState<ImageRepInfo | undefined>(undefined);
@@ -520,6 +521,10 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
   }, [img]);
 
   const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
+    if (preventDrawing) {
+      return; // 클라이언트 의사에 따라 드로잉 이벤트 차단
+    }
+
     const targetName: string = e.target.name();
 
     if (targetName === 'undo-btn' || targetName === 'redo-btn') {

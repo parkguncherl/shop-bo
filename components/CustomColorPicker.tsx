@@ -16,6 +16,8 @@ interface Props {
     top?: number;
     left?: number;
   };
+  onColorPickerOpened?: () => void; // picker 열림 시점에 호출
+  onColorPickerClosed?: () => void; // picker 닫힘 시점에 호출
 }
 
 /** react color 기반으로 input 영역을 활용하여 정의 */
@@ -29,6 +31,8 @@ export const CustomColorPicker = ({
   onColorChangeCompleted,
   color,
   colorPickerCoordinates,
+  onColorPickerOpened,
+  onColorPickerClosed,
 }: Props) => {
   const [displayColorPicker, setDisplayColorPicker] = useState<boolean>(false);
   const [selectedColor, setSelectedColor] = useState<Color | undefined>(undefined);
@@ -62,9 +66,11 @@ export const CustomColorPicker = ({
         if (!displayColorPicker && colorDisplayedPlateRef.current?.contains(target)) {
           // 열림(기존 닫힘 상태 and 컬러 출력 영역(colorDisplayedPlate) 영역을 클릭한 경우)
           setDisplayColorPicker(true);
+          if (onColorPickerOpened) onColorPickerOpened();
         } else if (displayColorPicker && !pickerContainerRef.current?.contains(target)) {
           // 닫힘(기존 열림 상태 and picker 컨테이너 영역 이외 영역을 클릭한 경우)
           setDisplayColorPicker(false);
+          if (onColorPickerClosed) onColorPickerClosed();
         }
       }
     };

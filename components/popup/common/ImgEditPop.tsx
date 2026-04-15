@@ -24,6 +24,7 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
   const topSearchWrapperRef = useRef<HTMLDivElement>(null);
 
   const [preview, setPreview] = useState(false);
+  const [colorPickerOpened, setColorPickerOpened] = useState(false);
 
   const [filters, onChangeFilters] = useFilters({
     textColor: undefined,
@@ -86,6 +87,8 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
                     onChangeFilters(name, color.hex);
                   }}
                   wrapperRef={topSearchWrapperRef}
+                  onColorPickerOpened={() => setColorPickerOpened(true)}
+                  onColorPickerClosed={() => setColorPickerOpened(false)}
                 />
                 <CustomColorPicker
                   title={'줄(라인) 색상'}
@@ -115,6 +118,7 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
                 color: filters.lineColor,
                 width: filters.lineWidth,
               }}
+              preventDrawing={colorPickerOpened}
             />
           </div>
         </PopupContent>
