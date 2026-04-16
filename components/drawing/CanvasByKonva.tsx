@@ -4,6 +4,7 @@ import Konva from 'konva';
 import { Html, useImage } from 'react-konva-utils';
 import { Box } from 'konva/lib/shapes/Transformer';
 import { useHistory } from '../../hooks/drawing/useHistory';
+import axios from 'axios';
 
 // CanvasByKonva props interface 및 연관 interface
 interface CanvasByKonvaProps {
@@ -460,6 +461,31 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
     setImgRepInfoList(ImageRepInfo);
   };
 
+  const getCleanKonvaImage = async (presignedUrl: string): Promise<HTMLImageElement | undefined> => {
+    try {
+      // 1. axios로 이미지를 '데이터'로서 가져옵니다.
+      const response = await axios.get(presignedUrl, {
+        responseType: 'blob',
+      });
+
+      // 2. 내 도메인 소속의 임시 URL로 만듭니다. (신분 세탁)
+      const blobUrl = URL.createObjectURL(response.data);
+
+      // 3. Konva용 이미지 객체를 생성합니다.
+      return new Promise((resolve) => {
+        const img = new window.Image();
+        // 내 로컬 데이터이므로 사실 필요 없지만, 안전을 위해 넣어줍니다.
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          resolve(img); // 이제 이 img를 Konva.Image({ image: img })에 넣으세요!
+        };
+        img.src = blobUrl;
+      });
+    } catch (error) {
+      console.error('이미지 로드 실패:', error);
+    }
+  };
+
   /** 참조를 통해 외부로 노출되는 영역을 정의함 */
   useImperativeHandle<Konva.Stage, CanvasByKonvaRef>(ref, () => {
     // return {
@@ -518,53 +544,96 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
   useEffect(() => {
     // 이미지 정보 변경 시점에 필요한 초기화(혹은 동기화) 동작
     if (img && img.imgSrc) {
-      const image = new window.Image();
-      //image.crossOrigin = 'anonymous'; // cors 문제 방지
+      getCleanKonvaImage(img.imgSrc).then((image) => {
+        if (image) {
+          const stageWidth = wrapperRef.current?.offsetWidth || 0;
+          const stageHeight = wrapperRef.current?.offsetHeight || 0;
 
-      // const cacheBuster = img.imgSrc.includes('?') ? `&t=${Date.now()}` : `?t=${Date.now()}`;
-      // image.src = img.imgSrc + cacheBuster;
+          if (wrapperRef.current) {
+            setDimensions({
+              width: stageWidth,
+              height: stageHeight,
+            });
+          }
 
-      image.src = img.imgSrc;
-      image.onload = () => {
-        const stageWidth = wrapperRef.current?.offsetWidth || 0;
-        const stageHeight = wrapperRef.current?.offsetHeight || 0;
+          // 1. 비율 계산 (비교)
+          const widthRatio = stageWidth / image.width;
+          const heightRatio = stageHeight / image.height;
 
-        if (wrapperRef.current) {
-          setDimensions({
-            width: stageWidth,
-            height: stageHeight,
+          // 2. contain 방식: 둘 중 더 작은 비율을 선택
+          const newScale = Math.min(widthRatio, heightRatio); // 비율(scale)
+
+          // 3. 실질적인 너비와 높이 구하기
+          const finalWidth = image.width * newScale;
+          const finalHeight = image.height * newScale;
+
+          // 4. 중앙 정렬을 위한 좌표(x, y) 구하기
+          const x = (stageWidth - finalWidth) / 2;
+          const y = (stageHeight - finalHeight) / 2;
+
+          // 최초 set State 이후에도 여전히 최초 요소 자리를 유지하여야(요소 순으로 z indexing)
+          setMainImgRepInfo({
+            src: image.src,
+            width: finalWidth,
+            height: finalHeight,
+            x: x,
+            y: y,
+
+            scaleX: newScale,
+            scaleY: newScale,
+            rotation: 0,
           });
         }
-
-        // 1. 비율 계산 (비교)
-        const widthRatio = stageWidth / image.width;
-        const heightRatio = stageHeight / image.height;
-
-        // 2. contain 방식: 둘 중 더 작은 비율을 선택
-        const newScale = Math.min(widthRatio, heightRatio); // 비율(scale)
-
-        // 3. 실질적인 너비와 높이 구하기
-        const finalWidth = image.width * newScale;
-        const finalHeight = image.height * newScale;
-
-        // 4. 중앙 정렬을 위한 좌표(x, y) 구하기
-        const x = (stageWidth - finalWidth) / 2;
-        const y = (stageHeight - finalHeight) / 2;
-
-        // 최초 set State 이후에도 여전히 최초 요소 자리를 유지하여야(요소 순으로 z indexing)
-        setMainImgRepInfo({
-          src: image.src,
-          width: finalWidth,
-          height: finalHeight,
-          x: x,
-          y: y,
-
-          scaleX: newScale,
-          scaleY: newScale,
-          rotation: 0,
-        });
-      };
+      });
     }
+    // if (img && img.imgSrc) {
+    //   const image = new window.Image();
+    //
+    //   // const cacheBuster = img.imgSrc.includes('?') ? `&t=${Date.now()}` : `?t=${Date.now()}`;
+    //   // image.src = img.imgSrc + cacheBuster;
+    //
+    //   image.crossOrigin = 'anonymous'; // cors 문제 방지
+    //   image.src = img.imgSrc;
+    //   image.onload = () => {
+    //     const stageWidth = wrapperRef.current?.offsetWidth || 0;
+    //     const stageHeight = wrapperRef.current?.offsetHeight || 0;
+    //
+    //     if (wrapperRef.current) {
+    //       setDimensions({
+    //         width: stageWidth,
+    //         height: stageHeight,
+    //       });
+    //     }
+    //
+    //     // 1. 비율 계산 (비교)
+    //     const widthRatio = stageWidth / image.width;
+    //     const heightRatio = stageHeight / image.height;
+    //
+    //     // 2. contain 방식: 둘 중 더 작은 비율을 선택
+    //     const newScale = Math.min(widthRatio, heightRatio); // 비율(scale)
+    //
+    //     // 3. 실질적인 너비와 높이 구하기
+    //     const finalWidth = image.width * newScale;
+    //     const finalHeight = image.height * newScale;
+    //
+    //     // 4. 중앙 정렬을 위한 좌표(x, y) 구하기
+    //     const x = (stageWidth - finalWidth) / 2;
+    //     const y = (stageHeight - finalHeight) / 2;
+    //
+    //     // 최초 set State 이후에도 여전히 최초 요소 자리를 유지하여야(요소 순으로 z indexing)
+    //     setMainImgRepInfo({
+    //       src: image.src,
+    //       width: finalWidth,
+    //       height: finalHeight,
+    //       x: x,
+    //       y: y,
+    //
+    //       scaleX: newScale,
+    //       scaleY: newScale,
+    //       rotation: 0,
+    //     });
+    //   };
+    // }
   }, [img]);
 
   const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
