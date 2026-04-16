@@ -5,6 +5,7 @@ import { PopupLayout } from '../PopupLayout';
 import CanvasByKonva, { CanvasByKonvaRef } from '../../drawing/CanvasByKonva';
 import useFilters from '../../../hooks/useFilters';
 import { CustomColorPicker } from '../../CustomColorPicker';
+import { toastError } from '../../ToastMessage';
 
 export interface ImgPropsOnEditPop {
   imgFileName?: string;
@@ -68,8 +69,14 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
                 <button
                   className="btn btnBlue"
                   onClick={() => {
-                    const file = canvasByKonvaRef.current.customs.api.exportAsFile();
-                    console.log('file: ', file);
+                    canvasByKonvaRef.current.customs.api.exportAsFile().then((file: File | null) => {
+                      if (file == null) {
+                        toastError('어떠한 수정사항도 없이 저장할 수 없습니다');
+                        return;
+                      }
+
+                      console.log('file: ', file);
+                    });
                   }}
                 >
                   저장

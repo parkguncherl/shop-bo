@@ -5,6 +5,7 @@ import { Html, useImage } from 'react-konva-utils';
 import { Box } from 'konva/lib/shapes/Transformer';
 import { useHistory } from '../../hooks/drawing/useHistory';
 import axios from 'axios';
+import path from 'path';
 
 // CanvasByKonva props interface 및 연관 interface
 interface CanvasByKonvaProps {
@@ -433,7 +434,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
   const isDrawing = useRef(false);
   const stageRef = useRef<Konva.Stage>(null);
 
-  const { pushHistory, undo, redo } = useHistory<CanvasSnapshot>({ lines: lines, texts: textInfoList, imgs: imgRepInfoList });
+  const { pushHistory, undo, redo, getState } = useHistory<CanvasSnapshot>({ lines: lines, texts: textInfoList, imgs: imgRepInfoList });
 
   const commitTextInfo = (textInfos: TextInfo[]) => {
     pushHistory({
@@ -488,27 +489,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
 
   /** 참조를 통해 외부로 노출되는 영역을 정의함 */
   useImperativeHandle<Konva.Stage, CanvasByKonvaRef>(ref, () => {
-    // return {
-    //   addNewText: (value) => {
-    //     commitTextInfo([
-    //       ...textInfoList,
-    //       {
-    //         color: textConfig?.color,
-    //         content: value ? value : '신규 작성',
-    //         x: 50,
-    //         y: 50,
-    //         width: value ? value.length * 7 : 200,
-    //         height: value ? (value.length > 10 ? 40 : 20) : 20,
-    //         scaleX: 1,
-    //         scaleY: 1,
-    //         rotation: 0,
-    //       },
-    //     ]);
-    //   },
-    // };
-
     return Object.assign<Konva.Stage, CanvasByKonvaCustomsRef>(stageRef.current ?? {}, {
-      // 이하 TunedGrid 에서 노출코자 하는 기타 속성 및 api 목록
       customs: {
         api: {
           addNewText: (value) => {
@@ -528,13 +509,23 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
             ]);
           },
           async exportAsFile(fileName) {
-            if (!stageRef.current) return null;
+            if (!stageRef.current) {
+              console.error('stage 참조를 찾을 수 없음');
+              return null;
+            }
+
+            const snapshotsStat = getState();
+            if (snapshotsStat.lines.length == 0 && snapshotsStat.texts.length == 0 && snapshotsStat.imgs.length == 0) return null; // 어떠한 편집 동작도 이루어지지 않은 상태에서는 동작하지 아니함
 
             const dataUrl = stageRef.current.toDataURL({ pixelRatio: 2 });
             const res = await fetch(dataUrl);
             const blob = await res.blob();
 
-            return new File([blob], fileName ? fileName : img?.imgFileName || 'canvas_image', { type: 'image/png' });
+            return new File(
+              [blob],
+              fileName ? fileName : img?.imgFileName ? path.basename(img?.imgFileName, path.extname(img?.imgFileName)) + '_mod_by_konva' : 'canvas_image',
+              { type: 'image/png' },
+            );
           },
         },
       },
