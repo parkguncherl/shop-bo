@@ -54,7 +54,7 @@ const EnumElement = ({ srcElement, toUpperReqHandler, oneStepMovementReqHandler,
                 if (onImgDoubleClick) onImgDoubleClick({ ...e, srcElement: srcElement });
               }}
             >
-              <img src={srcElement.fileSrc} />
+              <img src={srcElement.fileSrc} crossOrigin={'anonymous'} />
             </div>
           ) : (
             <div className={'unknown_messaging_wrapper'}>
