@@ -28,7 +28,7 @@ import { usePartnerCodeStore } from '../../../../stores/usePartnerCodeStore';
 import { PartnerCodePop } from '../../../../components/popup/system/PartnerCodePop';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import ProductForEachCategoryPop from '../../../../components/popup/product/productMng/ProductForEachCategoryPop';
-import ImgEditPop, { ImgProps } from '../../../../components/popup/common/ImgEditPop';
+import ImgEditPop, { ImgPropsOnEditPop } from '../../../../components/popup/common/ImgEditPop';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
@@ -70,7 +70,7 @@ const ProductMng = () => {
   const [productDetInfo, setProductDetInfo] = useState<ProductMngResponseProductDetInfo | undefined>(undefined); // prodId + prodDetColor 조합으로 조회된 결과는 고유하리라 기대되니 배열이 아닌 단일 객체로 관리
 
   const [targetedFileSetInfo, setTargetedFileSetInfo] = useState<targetedFileSetInfo | undefined>(undefined);
-  const [targetedImgInfoForEdit, setTargetedImgInfoForEdit] = useState<ImgProps | undefined>(undefined);
+  const [targetedImgInfoForEdit, setTargetedImgInfoForEdit] = useState<ImgPropsOnEditPop | undefined>(undefined);
 
   const [selectedRowsData, setSelectedRowsData] = useState<ProductMngResponseProductInfo | undefined>(undefined);
 
@@ -313,6 +313,7 @@ const ProductMng = () => {
             const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
             for (let index = 0; index < fileDetList.length; index++) {
               fileSetsElementInfos.push({
+                fileNm: fileDetList[index].fileNm,
                 fileSeq: fileDetList[index].fileSeq,
                 fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
               });
@@ -561,6 +562,7 @@ const ProductMng = () => {
                   },
                   onImgDoubleClick: (event) => {
                     setTargetedImgInfoForEdit({
+                      imgFileName: event.srcElement.fileNm,
                       seq: event.srcElement.fileSeq,
                       imgSrc: event.srcElement.fileSrc,
                     });

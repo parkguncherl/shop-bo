@@ -6,15 +6,15 @@ import CanvasByKonva, { CanvasByKonvaRef } from '../../drawing/CanvasByKonva';
 import useFilters from '../../../hooks/useFilters';
 import { CustomColorPicker } from '../../CustomColorPicker';
 
-export interface ImgProps {
+export interface ImgPropsOnEditPop {
+  imgFileName?: string;
   imgSrc?: string;
   seq?: number;
 }
 interface ImgEditPopProps {
   open: boolean;
   onClose: () => void;
-  //onEditingEnded?: () => void; // 에디팅 완료 후 사용자가 저장(수정)을 희망할 시 todo
-  imgProps?: ImgProps;
+  imgProps?: ImgPropsOnEditPop;
 }
 
 /** konva 기반 컴포넌트를 통한 이미지 편집 팝업 */
@@ -68,14 +68,8 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
                 <button
                   className="btn btnBlue"
                   onClick={() => {
-                    // const img = new Image();
-                    // // 1. CORS 설정 (toDataURL 에러 방지 핵심)
-                    // img.crossOrigin = 'Anonymous';
-                    //
-                    // img.onload = () => {
-                    //   img.src = canvasByKonvaRef.current.toDataURL({ pixelRatio: 3 }); // 고해상도를 위해 pixelRatio 설정 가능
-                    //   console.log('img.src : ', img.src);
-                    // }; todo
+                    const file = canvasByKonvaRef.current.customs.api.exportAsFile();
+                    console.log('file: ', file);
                   }}
                 >
                   저장

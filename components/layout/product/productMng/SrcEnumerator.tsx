@@ -2,6 +2,7 @@ import React from 'react';
 import { useCommonStore } from '../../../../stores';
 
 export interface SrcElement {
+  fileNm?: string;
   fileSeq?: number;
   fileSrc?: string;
 }

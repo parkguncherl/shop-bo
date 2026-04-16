@@ -20,13 +20,16 @@ interface CanvasByKonvaProps {
   preventDrawing?: boolean; // 드로잉 비활성화 여부
 }
 export interface ImgOnCanvasByKonva {
+  imgFileName?: string;
   imgSrc?: string;
+  seq?: number;
 }
 export type CanvasByKonvaRef = Konva.Stage & CanvasByKonvaCustomsRef;
 type CanvasByKonvaCustomsRef = {
   customs: {
     api: {
       addNewText: (value?: string) => void;
+      exportAsFile: (fileName?: string) => Promise<File | null>;
     };
   };
 };
@@ -498,6 +501,15 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
               },
             ]);
           },
+          async exportAsFile(fileName) {
+            if (!stageRef.current) return null;
+
+            const dataUrl = stageRef.current.toDataURL({ pixelRatio: 2 });
+            const res = await fetch(dataUrl);
+            const blob = await res.blob();
+
+            return new File([blob], fileName ? fileName : img?.imgFileName || 'canvas_image', { type: 'image/png' });
+          },
         },
       },
     });
@@ -507,6 +519,11 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
     // 이미지 정보 변경 시점에 필요한 초기화(혹은 동기화) 동작
     if (img && img.imgSrc) {
       const image = new window.Image();
+      //image.crossOrigin = 'anonymous'; // cors 문제 방지
+
+      // const cacheBuster = img.imgSrc.includes('?') ? `&t=${Date.now()}` : `?t=${Date.now()}`;
+      // image.src = img.imgSrc + cacheBuster;
+
       image.src = img.imgSrc;
       image.onload = () => {
         const stageWidth = wrapperRef.current?.offsetWidth || 0;
