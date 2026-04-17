@@ -67,6 +67,15 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
                 </button>
 
                 <button
+                  className="btn btnBlue"
+                  onClick={() => {
+                    canvasByKonvaRef.current?.customs.api.addNewDimensionLine();
+                  }}
+                >
+                  새로운 치수선 추가
+                </button>
+
+                <button
                   className={'btn ' + (!preview ? 'btnBlue' : '')}
                   onClick={() => {
                     setPreview(!preview);

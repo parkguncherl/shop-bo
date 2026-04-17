@@ -1,5 +1,5 @@
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { Layer, Stage, Image, Line, Text, Transformer } from 'react-konva';
+import { Layer, Stage, Image, Line, Text, Transformer, Arrow } from 'react-konva';
 import Konva from 'konva';
 import { Html, useImage } from 'react-konva-utils';
 import { Box } from 'konva/lib/shapes/Transformer';
@@ -34,6 +34,7 @@ type CanvasByKonvaCustomsRef = {
   customs: {
     api: {
       addNewText: (value?: string) => void;
+      addNewDimensionLine: () => void;
       exportAsFile: (fileName?: string) => Promise<File | null>;
     };
   };
@@ -45,6 +46,7 @@ interface ChangeEventOnText {
   height?: number; // 존재할 시 너비, 높이 조정
   content?: string; // 존재할 시 값 수정
 }
+interface TransformEventOnDimensionLine extends Omit<DimensionLine, 'color'> {}
 
 // 하위 컴포넌트 props interface
 interface MainImageProps {
@@ -72,6 +74,11 @@ interface TransformableImageProps {
   onTransformed?: (evt: TransformEventOnImg) => void;
   enablePreviewMode?: boolean; // 미리보기 활성 switching state
 }
+interface DimensionLineProps {
+  enablePreviewMode?: boolean; // 미리보기 활성 switching state
+  dimensionLine: DimensionLine;
+  onTransformed?: (evt: TransformEventOnDimensionLine) => void;
+}
 
 // state's types
 interface locProps {
@@ -96,12 +103,17 @@ interface Lines {
   color?: string;
   width?: number;
 }
+interface DimensionLine extends Omit<locProps, 'width' | 'height'> {
+  points: number[];
+  color?: string;
+}
 
 // 스냅샷용 인터페이스
 export interface CanvasSnapshot {
   lines: Lines[];
   texts: TextInfo[];
   imgs: ImageRepInfo[];
+  dimensionLines: DimensionLine[];
 }
 
 /** 주 이미지 영역 */
@@ -315,7 +327,7 @@ const EditableText = ({ textInfo, onMouseDown, onDragEnd, onEditEnd, onChangeByE
           }}
         />
       )}
-      {(status == 'transforming' || status == 'preview') && (
+      {status == 'transforming' && (
         <Transformer
           ref={trRef}
           enabledAnchors={['middle-left', 'middle-right']}
@@ -325,9 +337,9 @@ const EditableText = ({ textInfo, onMouseDown, onDragEnd, onEditEnd, onChangeByE
               width: Math.max(30, (newBox as any).width),
             };
           }}
-          borderEnabled={status == 'preview' ? false : undefined} // 테두리 선 제거
-          anchorSize={status == 'preview' ? 0 : undefined} // 조절 핸들 크기를 0으로 만들어 숨김
-          rotateEnabled={status == 'preview' ? false : undefined} // 회전 핸들 숨김
+          // borderEnabled={status == 'preview' ? false : undefined} // 테두리 선 제거
+          // anchorSize={status == 'preview' ? 0 : undefined} // 조절 핸들 크기를 0으로 만들어 숨김
+          // rotateEnabled={status == 'preview' ? false : undefined} // 회전 핸들 숨김
         />
       )}
     </>
@@ -403,20 +415,116 @@ const TransformableImage = ({
           }
         }}
       />
-      <Transformer
-        ref={trRef}
-        flipEnabled={false}
-        boundBoxFunc={(oldBox: Box, newBox: Box) => {
-          // 리사이징 제한
-          if (Math.abs((newBox as any).width) < 5 || Math.abs((newBox as any).height) < 5) {
-            return oldBox;
-          }
-          return newBox;
-        }}
-        borderEnabled={status == 'preview' ? false : undefined} // 테두리 선 제거
-        anchorSize={status == 'preview' ? 0 : undefined} // 조절 핸들 크기를 0으로 만들어 숨김
-        rotateEnabled={status == 'preview' ? false : undefined} // 회전 핸들 숨김
+      {status == 'transforming' && (
+        <Transformer
+          ref={trRef}
+          flipEnabled={false}
+          boundBoxFunc={(oldBox: Box, newBox: Box) => {
+            // 리사이징 제한
+            if (Math.abs((newBox as any).width) < 5 || Math.abs((newBox as any).height) < 5) {
+              return oldBox;
+            }
+            return newBox;
+          }}
+          // borderEnabled={status == 'preview' ? false : undefined} // 테두리 선 제거
+          // anchorSize={status == 'preview' ? 0 : undefined} // 조절 핸들 크기를 0으로 만들어 숨김
+          // rotateEnabled={status == 'preview' ? false : undefined} // 회전 핸들 숨김
+        />
+      )}
+    </>
+  );
+};
+
+const DimensionLine = ({ enablePreviewMode, dimensionLine, onTransformed }: DimensionLineProps) => {
+  const [status, setStatus] = useState<'transforming' | 'preview'>('transforming'); // 각각 변환(뒤집기, 늘리기 등의 동작), 미리보기 모드
+
+  const shapeRef = useRef(null);
+  const trRef = useRef(null);
+
+  useEffect(() => {
+    if (status == 'transforming') {
+      // transformer 활성화를 위하여 랜더링 시점에 image 참조와 연결
+      if (trRef.current && shapeRef.current) {
+        (trRef.current as any).nodes([shapeRef.current]);
+      }
+    }
+  }, [status]);
+
+  useEffect(() => {
+    if (enablePreviewMode) {
+      setStatus('preview');
+    } else {
+      setStatus('transforming');
+    }
+  }, [enablePreviewMode]);
+
+  const handleTransformEnd = () => {
+    const node = shapeRef.current as any;
+    const rotation = node.rotation();
+
+    // 현재 노드의 실제 좌표와 스케일 값을 가져옴
+    const scaleX = node.scaleX();
+    const scaleY = node.scaleY();
+
+    // 2. 새로운 points 좌표 계산
+    // 기존 points에 scale을 곱해서 실제 픽셀 길이를 구함
+    const oldPoints = node.points();
+    const newPoints = [oldPoints[0] * scaleX, oldPoints[1] * scaleY, oldPoints[2] * scaleX, oldPoints[3] * scaleY];
+
+    // 3. 노드의 scale을 다시 1로 리셋 (화살촉 왜곡 방지)
+    node.scaleX(1);
+    node.scaleY(1);
+
+    // 4. 상태 업데이트 (이 값이 DB 등에 저장될 최종 좌표)
+    if (onTransformed) {
+      onTransformed({
+        x: node.x(),
+        y: node.y(),
+        scaleX: 1, // 리셋 이후
+        scaleY: 1, // 리셋 이후
+        points: newPoints,
+        rotation: rotation as number,
+      });
+    }
+  };
+
+  useEffect(() => {
+    console.log('dimensionLine: ', dimensionLine);
+  }, [dimensionLine]);
+
+  return (
+    <>
+      <Arrow
+        ref={shapeRef}
+        points={dimensionLine.points}
+        rotation={dimensionLine.rotation}
+        scaleX={dimensionLine.scaleX}
+        scaleY={dimensionLine.scaleY}
+        x={dimensionLine.x}
+        y={dimensionLine.y}
+        stroke={dimensionLine.color}
+        strokeWidth={2}
+        fill={dimensionLine.color}
+        pointerAtBeginning={true}
+        draggable
+        onTransformEnd={handleTransformEnd}
       />
+
+      {status == 'transforming' && (
+        <Transformer
+          ref={trRef}
+          // 화살표의 경우 가로/세로 비율을 유지하지 않고
+          // 자유롭게 조절하고 싶다면 enabledAnchors 설정
+          enabledAnchors={['middle-left', 'middle-right', 'top-center', 'bottom-center']}
+          boundBoxFunc={(oldBox: Box, newBox: Box) => {
+            // 너무 작아지는 것 방지
+            if ((newBox as any).width < 20 || (newBox as any).height < 20) {
+              return oldBox;
+            }
+            return newBox;
+          }}
+        />
+      )}
     </>
   );
 };
@@ -433,11 +541,17 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
   const [textInfoList, setTextInfoList] = useState<TextInfo[]>([]);
   const [imgRepInfoList, setImgRepInfoList] = useState<ImageRepInfo[]>([]);
   const [lines, setLines] = useState<Lines[]>([]);
+  const [dimensionLineList, setDimensionLineList] = useState<DimensionLine[]>([]); // [100, 100, 300, 100]
 
   const isDrawing = useRef(false);
   const stageRef = useRef<Konva.Stage>(null);
 
-  const { pushHistory, undo, redo, getState } = useHistory<CanvasSnapshot>({ lines: lines, texts: textInfoList, imgs: imgRepInfoList });
+  const { pushHistory, undo, redo, getState } = useHistory<CanvasSnapshot>({
+    lines: lines,
+    texts: textInfoList,
+    imgs: imgRepInfoList,
+    dimensionLines: dimensionLineList,
+  });
 
   const [undoImg] = useImage(icoUndo.src);
   const [redoImg] = useImage(icoRedo.src);
@@ -447,6 +561,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
       texts: textInfos,
       lines: lines,
       imgs: imgRepInfoList,
+      dimensionLines: dimensionLineList,
     });
     setTextInfoList(textInfos);
   };
@@ -455,6 +570,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
       texts: textInfoList,
       lines: linesInfo,
       imgs: imgRepInfoList,
+      dimensionLines: dimensionLineList,
     });
     setLines(linesInfo);
   };
@@ -464,8 +580,18 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
       texts: textInfoList,
       lines: lines,
       imgs: ImageRepInfo,
+      dimensionLines: dimensionLineList,
     });
     setImgRepInfoList(ImageRepInfo);
+  };
+  const commitDimensionLines = (dimensionLines: DimensionLine[]) => {
+    pushHistory({
+      texts: textInfoList,
+      lines: lines,
+      imgs: imgRepInfoList,
+      dimensionLines: dimensionLines,
+    });
+    setDimensionLineList(dimensionLines);
   };
 
   const getCleanKonvaImage = async (presignedUrl: string): Promise<HTMLImageElement | undefined> => {
@@ -533,6 +659,21 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
                 // scaleY: 1,
                 scaleX: (textConfig?.scale || 20) / 20,
                 scaleY: (textConfig?.scale || 20) / 20,
+                rotation: 0,
+              },
+            ]);
+          },
+          addNewDimensionLine: () => {
+            commitDimensionLines([
+              ...dimensionLineList,
+              {
+                points: [100, 100, 300, 100],
+                color: lineConfig?.color, // 드로잉(line) 색을 추종
+
+                x: 70,
+                y: 70,
+                scaleX: 1,
+                scaleY: 1,
                 rotation: 0,
               },
             ]);
@@ -824,6 +965,27 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
               lineCap="round"
               lineJoin="round"
               globalCompositeOperation={line.tool === 'eraser' ? 'destination-out' : 'source-over'}
+            />
+          ))}
+          {dimensionLineList.map((dimensionLine, index) => (
+            <DimensionLine
+              key={index}
+              enablePreviewMode={preview}
+              onTransformed={(evt) => {
+                commitDimensionLines(
+                  dimensionLineList.map((prev, prevI) => {
+                    if (prevI == index) {
+                      return {
+                        ...prev,
+                        ...evt,
+                      };
+                    } else {
+                      return prev;
+                    }
+                  }),
+                );
+              }}
+              dimensionLine={dimensionLine}
             />
           ))}
           {textInfoList.map((textInfo, index) => (
