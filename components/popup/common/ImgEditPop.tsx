@@ -126,8 +126,24 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
                   }}
                   wrapperRef={topSearchWrapperRef}
                 />
-                <Search.DropDown title={'줄 너비'} name={'lineWidth'} codeUpper={'10040'} value={filters.lineWidth} onChange={onChangeFilters} />
-                <Search.DropDown title={'텍스트 크기'} name={'textScale'} codeUpper={'10050'} value={filters.textScale} onChange={onChangeFilters} />
+                <Search.DropDown
+                  title={'줄 너비'}
+                  name={'lineWidth'}
+                  codeUpper={'10040'}
+                  value={filters.lineWidth}
+                  onChange={(name, value) => {
+                    onChangeFilters(name, Number(value));
+                  }}
+                />
+                <Search.DropDown
+                  title={'텍스트 크기'}
+                  name={'textScale'}
+                  codeUpper={'10050'}
+                  value={filters.textScale}
+                  onChange={(name, value) => {
+                    onChangeFilters(name, Number(value));
+                  }}
+                />
               </div>
             </div>
           </div>
