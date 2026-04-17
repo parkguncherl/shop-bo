@@ -17,6 +17,7 @@ interface CanvasByKonvaProps {
   preview?: boolean; // 미리보기
   textConfig?: {
     color?: string;
+    scale?: number;
   };
   lineConfig?: Omit<Lines, 'tool' | 'points'>;
   preventDrawing?: boolean; // 드로잉 비활성화 여부
@@ -500,8 +501,10 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
                 content: value ? value : '신규 작성',
                 x: 50,
                 y: 50,
-                width: value ? value.length * 20 : 200,
-                height: 20,
+                // width: value ? value.length * 20 : 200,
+                // height: 20,
+                width: value ? value.length * (textConfig?.scale || 20) : 200,
+                height: textConfig?.scale || 20,
                 scaleX: 1,
                 scaleY: 1,
                 rotation: 0,

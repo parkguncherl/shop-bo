@@ -6,6 +6,9 @@ import CanvasByKonva, { CanvasByKonvaRef } from '../../drawing/CanvasByKonva';
 import useFilters from '../../../hooks/useFilters';
 import { CustomColorPicker } from '../../CustomColorPicker';
 import { toastError } from '../../ToastMessage';
+import { useCommonStore } from '../../../stores';
+import { ConfirmModal } from '../../ConfirmModal';
+import { Search } from '../../content';
 
 export interface ImgPropsOnEditPop {
   imgFileName?: string;
@@ -24,12 +27,17 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
   const canvasByKonvaRef = useRef<CanvasByKonvaRef>(null);
   const topSearchWrapperRef = useRef<HTMLDivElement>(null);
 
+  const [updateImageFile] = useCommonStore((s) => [s.updateImageFile]);
+
   const [preview, setPreview] = useState(false);
   const [colorPickerOpened, setColorPickerOpened] = useState(false);
 
+  const [updateConfOpened, setUpdateConfOpened] = useState(false);
+
   const [filters, onChangeFilters] = useFilters({
-    textColor: undefined,
-    lineColor: undefined,
+    textColor: '#000000',
+    textScale: undefined,
+    lineColor: '#FF4A00',
     lineWidth: undefined,
   });
 
@@ -68,14 +76,14 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
                 </button>
                 <button
                   className="btn btnBlue"
+                  disabled={!preview}
                   onClick={() => {
                     canvasByKonvaRef.current.customs.api.exportAsFile().then((file: File | null) => {
                       if (file == null) {
                         toastError('어떠한 수정사항도 없이 저장할 수 없습니다');
                         return;
                       }
-
-                      console.log('file: ', file);
+                      setUpdateConfOpened(true);
                     });
                   }}
                 >
@@ -118,6 +126,8 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
                   }}
                   wrapperRef={topSearchWrapperRef}
                 />
+                <Search.DropDown title={'줄 너비'} name={'lineWidth'} codeUpper={'10040'} value={filters.lineWidth} onChange={onChangeFilters} />
+                <Search.DropDown title={'텍스트 크기'} name={'textScale'} codeUpper={'10050'} value={filters.textScale} onChange={onChangeFilters} />
               </div>
             </div>
           </div>
@@ -129,6 +139,7 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
               preview={preview}
               textConfig={{
                 color: filters.textColor,
+                scale: filters.textScale,
               }}
               lineConfig={{
                 color: filters.lineColor,
@@ -139,6 +150,19 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
           </div>
         </PopupContent>
       </PopupLayout>
+      <ConfirmModal
+        open={updateConfOpened}
+        onClose={() => setUpdateConfOpened(false)}
+        onConfirm={() => {
+          canvasByKonvaRef.current.customs.api.exportAsFile().then((file: File | null) => {
+            if (file == null) {
+              console.error('파일을 저장할 수 없음');
+              return;
+            }
+          });
+        }}
+        title={'수정된 이미지로 기존 이미지를 대체하시겠습니까?'}
+      />
     </div>
   );
 };
