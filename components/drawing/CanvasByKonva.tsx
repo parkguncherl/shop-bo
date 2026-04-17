@@ -6,6 +6,8 @@ import { Box } from 'konva/lib/shapes/Transformer';
 import { useHistory } from '../../hooks/drawing/useHistory';
 import axios from 'axios';
 import path from 'path';
+import icoUndo from '../../public/images/ico_undo.svg';
+import icoRedo from '../../public/images/ico_redo.svg';
 
 // CanvasByKonva props interface 및 연관 interface
 interface CanvasByKonvaProps {
@@ -437,6 +439,9 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
 
   const { pushHistory, undo, redo, getState } = useHistory<CanvasSnapshot>({ lines: lines, texts: textInfoList, imgs: imgRepInfoList });
 
+  const [undoImg] = useImage(icoUndo.src);
+  const [redoImg] = useImage(icoRedo.src);
+
   const commitTextInfo = (textInfos: TextInfo[]) => {
     pushHistory({
       texts: textInfos,
@@ -601,54 +606,6 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
         }
       });
     }
-    // if (img && img.imgSrc) {
-    //   const image = new window.Image();
-    //
-    //   // const cacheBuster = img.imgSrc.includes('?') ? `&t=${Date.now()}` : `?t=${Date.now()}`;
-    //   // image.src = img.imgSrc + cacheBuster;
-    //
-    //   image.crossOrigin = 'anonymous'; // cors 문제 방지
-    //   image.src = img.imgSrc;
-    //   image.onload = () => {
-    //     const stageWidth = wrapperRef.current?.offsetWidth || 0;
-    //     const stageHeight = wrapperRef.current?.offsetHeight || 0;
-    //
-    //     if (wrapperRef.current) {
-    //       setDimensions({
-    //         width: stageWidth,
-    //         height: stageHeight,
-    //       });
-    //     }
-    //
-    //     // 1. 비율 계산 (비교)
-    //     const widthRatio = stageWidth / image.width;
-    //     const heightRatio = stageHeight / image.height;
-    //
-    //     // 2. contain 방식: 둘 중 더 작은 비율을 선택
-    //     const newScale = Math.min(widthRatio, heightRatio); // 비율(scale)
-    //
-    //     // 3. 실질적인 너비와 높이 구하기
-    //     const finalWidth = image.width * newScale;
-    //     const finalHeight = image.height * newScale;
-    //
-    //     // 4. 중앙 정렬을 위한 좌표(x, y) 구하기
-    //     const x = (stageWidth - finalWidth) / 2;
-    //     const y = (stageHeight - finalHeight) / 2;
-    //
-    //     // 최초 set State 이후에도 여전히 최초 요소 자리를 유지하여야(요소 순으로 z indexing)
-    //     setMainImgRepInfo({
-    //       src: image.src,
-    //       width: finalWidth,
-    //       height: finalHeight,
-    //       x: x,
-    //       y: y,
-    //
-    //       scaleX: newScale,
-    //       scaleY: newScale,
-    //       rotation: 0,
-    //     });
-    //   };
-    // }
   }, [img]);
 
   const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
@@ -919,8 +876,10 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
               }}
             />
           ))}
-          <Text text="undo" name="undo-btn" onClick={handleUndo} />
-          <Text text="redo" name="redo-btn" x={40} onClick={handleRedo} />
+          <Image name="undo-btn" x={0} y={0} onClick={handleUndo} image={undoImg} width={12} height={12} scaleX={1} scaleY={1} />
+          <Image name="redo-btn" x={20} y={0} onClick={handleRedo} image={redoImg} width={12} height={12} scaleX={1} scaleY={1} />
+          {/*<Text text="undo" name="undo-btn" onClick={handleUndo} />*/}
+          {/*<Text text="redo" name="redo-btn" x={40} onClick={handleRedo} />*/}
         </Layer>
       </Stage>
     </div>
