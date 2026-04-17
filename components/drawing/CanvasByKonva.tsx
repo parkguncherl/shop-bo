@@ -509,7 +509,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
                       ? textConfig?.scale < 20
                         ? textConfig?.scale < 16
                           ? textConfig?.scale < 10
-                            ? textConfig?.scale * 4
+                            ? textConfig?.scale * 3
                             : textConfig?.scale * 1.8
                           : textConfig?.scale * 1.2
                         : textConfig?.scale
@@ -519,7 +519,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
                   ? textConfig?.scale < 20
                     ? textConfig?.scale < 16
                       ? textConfig?.scale < 10
-                        ? textConfig?.scale * 4
+                        ? textConfig?.scale * 3
                         : textConfig?.scale * 1.8
                       : textConfig?.scale * 1.2
                     : textConfig?.scale
