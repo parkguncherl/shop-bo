@@ -503,10 +503,31 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
                 y: 50,
                 // width: value ? value.length * 20 : 200,
                 // height: 20,
-                width: value ? value.length * (textConfig?.scale || 20) : 200,
-                height: textConfig?.scale || 20,
-                scaleX: 1,
-                scaleY: 1,
+                width: value
+                  ? value.length *
+                    (textConfig?.scale
+                      ? textConfig?.scale < 20
+                        ? textConfig?.scale < 16
+                          ? textConfig?.scale < 10
+                            ? textConfig?.scale * 4
+                            : textConfig?.scale * 1.8
+                          : textConfig?.scale * 1.2
+                        : textConfig?.scale
+                      : 20)
+                  : 20 * 5,
+                height: textConfig?.scale
+                  ? textConfig?.scale < 20
+                    ? textConfig?.scale < 16
+                      ? textConfig?.scale < 10
+                        ? textConfig?.scale * 4
+                        : textConfig?.scale * 1.8
+                      : textConfig?.scale * 1.2
+                    : textConfig?.scale
+                  : 20,
+                // scaleX: 1,
+                // scaleY: 1,
+                scaleX: (textConfig?.scale || 20) / 20,
+                scaleY: (textConfig?.scale || 20) / 20,
                 rotation: 0,
               },
             ]);
