@@ -78,6 +78,7 @@ interface DimensionLineProps {
   enablePreviewMode?: boolean; // 미리보기 활성 switching state
   dimensionLine: DimensionLine;
   onTransformed?: (evt: TransformEventOnDimensionLine) => void;
+  onDragEnd?: (evt: Konva.KonvaEventObject<DragEvent>) => void;
 }
 
 // state's types
@@ -435,7 +436,7 @@ const TransformableImage = ({
   );
 };
 
-const DimensionLine = ({ enablePreviewMode, dimensionLine, onTransformed }: DimensionLineProps) => {
+const DimensionLine = ({ enablePreviewMode, dimensionLine, onTransformed, onDragEnd }: DimensionLineProps) => {
   const [status, setStatus] = useState<'transforming' | 'preview'>('transforming'); // 각각 변환(뒤집기, 늘리기 등의 동작), 미리보기 모드
 
   const shapeRef = useRef(null);
@@ -460,6 +461,9 @@ const DimensionLine = ({ enablePreviewMode, dimensionLine, onTransformed }: Dime
 
   const handleTransformEnd = () => {
     const node = shapeRef.current as any;
+    console.log('회전값:', node.rotation());
+    console.log('가로스케일:', node.scaleX());
+
     const rotation = node.rotation();
 
     // 현재 노드의 실제 좌표와 스케일 값을 가져옴
@@ -496,6 +500,7 @@ const DimensionLine = ({ enablePreviewMode, dimensionLine, onTransformed }: Dime
     <>
       <Arrow
         ref={shapeRef}
+        name={'arrow-with-tr'}
         points={dimensionLine.points}
         rotation={dimensionLine.rotation}
         scaleX={dimensionLine.scaleX}
@@ -503,9 +508,10 @@ const DimensionLine = ({ enablePreviewMode, dimensionLine, onTransformed }: Dime
         x={dimensionLine.x}
         y={dimensionLine.y}
         stroke={dimensionLine.color}
+        onDragEnd={onDragEnd}
         strokeWidth={2}
         fill={dimensionLine.color}
-        pointerAtBeginning={true}
+        //pointerAtBeginning={true}
         draggable
         onTransformEnd={handleTransformEnd}
       />
@@ -513,9 +519,10 @@ const DimensionLine = ({ enablePreviewMode, dimensionLine, onTransformed }: Dime
       {status == 'transforming' && (
         <Transformer
           ref={trRef}
-          // 화살표의 경우 가로/세로 비율을 유지하지 않고
-          // 자유롭게 조절하고 싶다면 enabledAnchors 설정
-          enabledAnchors={['middle-left', 'middle-right', 'top-center', 'bottom-center']}
+          flipEnabled={false}
+          enabledAnchors={['middle-left', 'middle-right', 'top-center', 'bottom-center']} // anchor 명시적 지정
+          rotateEnabled={true}
+          anchorSize={8}
           boundBoxFunc={(oldBox: Box, newBox: Box) => {
             // 너무 작아지는 것 방지
             if ((newBox as any).width < 20 || (newBox as any).height < 20) {
@@ -760,7 +767,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
       return; // 드로잉 이벤트 차단
     }
 
-    if (targetName === 'text-with-tr' || targetName === 'img-with-tr' || targetName.includes('anchor')) {
+    if (targetName === 'text-with-tr' || targetName === 'img-with-tr' || targetName === 'arrow-with-tr' || targetName.includes('anchor')) {
       return; // text, img 드래깅 시점에서 비활성, 혹은 변환을 위한 anchor 영역에서 그러함
     }
 
@@ -978,6 +985,21 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
                       return {
                         ...prev,
                         ...evt,
+                      };
+                    } else {
+                      return prev;
+                    }
+                  }),
+                );
+              }}
+              onDragEnd={(e: Konva.KonvaEventObject<DragEvent>) => {
+                commitDimensionLines(
+                  dimensionLineList.map((prev, prevI) => {
+                    if (prevI == index) {
+                      return {
+                        ...prev,
+                        x: e.target.x(),
+                        y: e.target.y(),
                       };
                     } else {
                       return prev;
