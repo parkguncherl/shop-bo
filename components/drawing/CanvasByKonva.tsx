@@ -668,7 +668,7 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
 
     isDrawing.current = true;
     const pos = e.target.getStage().getPointerPosition();
-    commitLines([...lines, { tool, points: [pos.x, pos.y], color: lineConfig?.color, width: lineConfig?.width }]); // 최초 마우스 down 시점에
+    commitLines([...lines, { tool, points: [pos.x, pos.y], color: lineConfig?.color, width: lineConfig?.width ? lineConfig?.width * 0.6 : 5 }]); // 최초 마우스 down 시점, width 값은 적절한 상수(0.6)로 별도 스케일링 처리
   };
 
   const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
