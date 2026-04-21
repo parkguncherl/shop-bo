@@ -105,15 +105,17 @@ const AccountMng = () => {
     isSuccess: isAccountListSuccess,
     isLoading: accountListIsInLoading,
     refetch: accountsRefetch,
-  } = useQuery(['/user/paging', paging.curPage], (): any =>
-    authApi.get('/user/paging', {
-      params: {
-        curPage: paging.curPage,
-        pageRowCount: paging.pageRowCount,
-        ...filters,
-      },
-    }),
-  );
+  } = useQuery({
+    queryKey: ['/user/paging', paging.curPage],
+    queryFn: (): any =>
+      authApi.get('/user/paging', {
+        params: {
+          curPage: paging.curPage,
+          pageRowCount: paging.pageRowCount,
+          ...filters,
+        },
+      }),
+  });
 
   useEffect(() => {
     if (isAccountListSuccess) {
@@ -134,20 +136,34 @@ const AccountMng = () => {
   const {
     data: gridUser,
     isLoading: gridUserIsLoading,
+    isSuccess: isGridUserSuccess,
     isFetching: gridUserIsFetching,
     refetch: gridUserRefetch,
-  } = useQuery(['/user/' + loginId], () => authApi.get(`/user/${loginId}`), {
+  } = useQuery({
+    queryKey: ['/user/' + loginId],
+    queryFn: () => authApi.get(`/user/${loginId}`),
     enabled: !!loginId,
-    cacheTime: 0,
-    onSuccess: (e) => {
-      const { resultCode, body, resultMessage } = e.data;
+    staleTime: 0,
+    // onSuccess: (e) => {
+    //   const { resultCode, body, resultMessage } = e.data;
+    //   if (resultCode === 200) {
+    //     setSelectedUser(body);
+    //   } else {
+    //     toastError(resultMessage);
+    //   }
+    // },
+  });
+
+  useEffect(() => {
+    if (isGridUserSuccess) {
+      const { resultCode, body, resultMessage } = gridUser.data;
       if (resultCode === 200) {
         setSelectedUser(body);
       } else {
         toastError(resultMessage);
       }
-    },
-  });
+    }
+  }, [gridUser, isGridUserSuccess]);
 
   /** 계정관리, 셀 클릭 이벤트 */
   const onCellDoubleClicked = async (cellDoubleClickedEvent: CellDoubleClickedEvent) => {
@@ -252,7 +268,10 @@ const AccountMng = () => {
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
           paginationPageSize={paging.pageRowCount}
-          rowSelection={'single'}
+          //rowSelection={'single'}
+          rowSelection={{
+            mode: 'singleRow',
+          }}
           onRowClicked={(e) => {
             setLoginId(e.data.loginId);
             gridUserRefetch();

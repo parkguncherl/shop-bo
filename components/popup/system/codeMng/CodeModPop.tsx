@@ -71,7 +71,8 @@ export const CodeModPop = ({ data }: Props) => {
   const queryClient = useQueryClient();
 
   /** 코드 수정 */
-  const { mutate: updateCodeMutate, isLoading } = useMutation(updateCode, {
+  const { mutate: updateCodeMutate, isPending: isCodePending } = useMutation({
+    mutationFn: updateCode,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
@@ -90,7 +91,8 @@ export const CodeModPop = ({ data }: Props) => {
   });
 
   /* 코드 미사용 */
-  const { mutate: updateCodeUseNotUseMutate, isLoading: isUseNotUseLoading } = useMutation(updateCodeUseNotUse, {
+  const { mutate: updateCodeUseNotUseMutate, isPending: isUseNotUseLoading } = useMutation({
+    mutationFn: updateCodeUseNotUse,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
@@ -109,7 +111,8 @@ export const CodeModPop = ({ data }: Props) => {
   });
 
   /** 코드 삭제 */
-  const { mutate: deleteCodeMutate, isLoading: deleteCodeIsLoading } = useMutation(deleteCode, {
+  const { mutate: deleteCodeMutate, isPending: deleteCodeIsLoading } = useMutation({
+    mutationFn: deleteCode,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
@@ -219,7 +222,7 @@ export const CodeModPop = ({ data }: Props) => {
               </PopupSearchType>
             </PopupSearchBox>
           </PopupContent>
-          {isLoading && <Loading />}
+          {isCodePending && <Loading />}
         </PopupLayout>
       </form>
     </dl>

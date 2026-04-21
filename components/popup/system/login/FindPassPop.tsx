@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react';
-import { Button } from '../../../Button';
 import { PopupLayout } from '../../index';
 import { PopupContent } from '../../PopupContent';
 import { PopupFooter } from '../../PopupFooter';
@@ -14,7 +13,9 @@ export const FindPassPop = () => {
   const [loginId, setLoginId] = useState('');
   const [phoneNo, setPhoneNo] = useState('');
   const [modalType, closeModal, onFindPassword] = useAuthStore((s) => [s.modalType, s.closeModal, s.onFindPassword]);
-  const { mutate: onFindPasswordMutate, isLoading: onFindPasswordIsLoading } = useMutation(['auth/passwordInit'], onFindPassword, {
+  const { mutate: onFindPasswordMutate, isPending: onFindPasswordIsLoading } = useMutation({
+    mutationKey: ['auth/passwordInit'],
+    mutationFn: onFindPassword,
     onSuccess: (e) => {
       const { resultCode, resultMessage } = e.data;
       if (resultCode === 200) {

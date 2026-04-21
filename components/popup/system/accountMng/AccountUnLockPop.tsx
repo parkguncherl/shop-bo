@@ -62,12 +62,13 @@ export const AccountUnLockPop = ({ data }: Props) => {
   const [isPassVisible, setIsPassVisible] = useState(true);
 
   /** 계정 잠금해제 */
-  const { mutate: updateUserUnLockMutate, isLoading } = useMutation(updateUserUnLock, {
+  const { mutate: updateUserUnLockMutate, isPending } = useMutation({
+    mutationFn: updateUserUnLock,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
           toastSuccess(t('잠금해제 되었습니다.') || '');
-          await queryClient.invalidateQueries(['/user/paging']);
+          await queryClient.invalidateQueries({ queryKey: ['/user/paging'] });
           closeModal('UNLOCK');
         } else {
           toastError(e.data.resultMessage);
@@ -137,7 +138,7 @@ export const AccountUnLockPop = ({ data }: Props) => {
               </div>
             </PopupSearchBox>
           </PopupContent>
-          {isLoading && <Loading />}
+          {isPending && <Loading />}
         </PopupLayout>
       </form>
     </dl>

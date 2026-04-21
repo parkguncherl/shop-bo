@@ -342,7 +342,8 @@ const ContentList = () => {
     }
   };
 
-  const { mutate: deleteProductContentsMutate } = useMutation(deleteProductContents, {
+  const { mutate: deleteProductContentsMutate } = useMutation({
+    mutationFn: deleteProductContents,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {

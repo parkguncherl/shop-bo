@@ -95,7 +95,8 @@ export const AccountModPop = ({ data }: Props) => {
   const queryClient = useQueryClient();
 
   /** 계정 수정 */
-  const { mutate: updateUserMutate, isLoading: updateIsLoading } = useMutation(updateUser, {
+  const { mutate: updateUserMutate, isPending: updateIsLoading } = useMutation({
+    mutationFn: updateUser,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
@@ -116,7 +117,8 @@ export const AccountModPop = ({ data }: Props) => {
   });
 
   /** 계정 삭제 */
-  const { mutate: deleteUserMutate, isLoading: deleteIsLoading } = useMutation(deleteUser, {
+  const { mutate: deleteUserMutate, isPending: deleteIsLoading } = useMutation({
+    mutationFn: deleteUser,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
@@ -155,7 +157,8 @@ export const AccountModPop = ({ data }: Props) => {
   // });
 
   /** 계정 비밀번호 초기화 */
-  const { mutate: updatePasswordInitMutate, isLoading: updatePasswordInitIsLoading } = useMutation(updatePasswordInit, {
+  const { mutate: updatePasswordInitMutate, isPending: updatePasswordInitIsLoading } = useMutation({
+    mutationFn: updatePasswordInit,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
@@ -173,7 +176,8 @@ export const AccountModPop = ({ data }: Props) => {
   });
 
   /** 계정 비밀번호 초기화 */
-  const { mutate: createAuthForPartnerMutate } = useMutation(createAuthForPartner, {
+  const { mutate: createAuthForPartnerMutate } = useMutation({
+    mutationFn: createAuthForPartner,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {

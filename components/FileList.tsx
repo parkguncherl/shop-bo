@@ -2,11 +2,10 @@ import { useAgGridApi } from '../hooks';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { authApi } from '../libs';
 import { toastError, toastSuccess } from './ToastMessage';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FileDet } from '../generated';
 import { ColDef } from 'ag-grid-community';
 import { defaultColDef, GridSetting } from '../libs/ag-grid';
-import { Button } from './Button';
 import { useCommonStore } from '../stores';
 import { AgGridReact } from 'ag-grid-react';
 import { ConfirmModal } from './ConfirmModal';
@@ -29,20 +28,34 @@ export const FileList = ({ fileId, headerBoolean = true, style = { height: '150p
   /** 파일 목록 조회 */
   const {
     data: files,
+    isSuccess: isFilesSuccess,
     isLoading: filesIsLoading,
     refetch: filesRefetch,
-  } = useQuery([`/common/file/${fileId}`], () => authApi.get(`/common/file/${fileId}`), {
+  } = useQuery({
+    queryKey: [`/common/file/${fileId}`],
+    queryFn: () => authApi.get(`/common/file/${fileId}`),
     enabled: !!fileId,
     refetchOnMount: 'always',
-    onSuccess: (e) => {
-      const { resultCode, body, resultMessage } = e.data;
+    // onSuccess: (e) => {
+    //   const { resultCode, body, resultMessage } = e.data;
+    //   if (resultCode === 200) {
+    //     setSelectFileList(body);
+    //   } else {
+    //     toastError(resultMessage);
+    //   }
+    // },
+  });
+
+  useEffect(() => {
+    if (isFilesSuccess) {
+      const { resultCode, body, resultMessage } = files.data;
       if (resultCode === 200) {
         setSelectFileList(body);
       } else {
         toastError(resultMessage);
       }
-    },
-  });
+    }
+  }, [isFilesSuccess, files]);
 
   const [selectFileList, setSelectFileList] = useState<FileDet[]>(files?.data?.body || []);
 
@@ -89,12 +102,13 @@ export const FileList = ({ fileId, headerBoolean = true, style = { height: '150p
   ]);
 
   /** 파일 삭제 */
-  const { mutate: deleteFileMutate, isLoading: deleteFileIsLoading } = useMutation(deleteFile, {
+  const { mutate: deleteFileMutate, isPending: deleteFileIsLoading } = useMutation({
+    mutationFn: deleteFile,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('삭제되었습니다.');
-          await queryClient.invalidateQueries([`/common/file/${fileId}`]);
+          await queryClient.invalidateQueries({ queryKey: [`/common/file/${fileId}`] });
         } else {
           toastError(e.data.resultMessage);
           throw new Error(e.data.resultMessage);

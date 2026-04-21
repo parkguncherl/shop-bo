@@ -50,27 +50,43 @@ export const CodeMngDetailPop = ({ data }: Props) => {
   ]);
 
   /** 하위코드 목록 조회 */
-  const { data: lowerCodes, isLoading } = useQuery(['/code/lower/', codeUpper], selectLowerCodeByCodeUpper, {
+  const {
+    data: lowerCodes,
+    isLoading,
+    isSuccess,
+  } = useQuery({
+    queryKey: ['/code/lower/', codeUpper],
+    queryFn: selectLowerCodeByCodeUpper,
     refetchOnMount: 'always',
-    onSuccess: (e) => {
-      const { resultCode, resultMessage } = e.data;
+    // onSuccess: (e) => {
+    //   const { resultCode, resultMessage } = e.data;
+    //   if (resultCode !== 200) {
+    //     toastError(resultMessage);
+    //   }
+    // },
+  });
+
+  useEffect(() => {
+    if (isSuccess) {
+      const { resultCode, resultMessage } = lowerCodes.data;
       if (resultCode !== 200) {
         toastError(resultMessage);
       }
-    },
-  });
+    }
+  }, [lowerCodes, isSuccess]);
 
   /** 하위코드 저장(수정/등록) */
-  const { mutate: insertCodesMutate, isLoading: insertCodesIsLoading } = useMutation(insertCodes, {
+  const { mutate: insertCodesMutate, isPending: insertCodesIsLoading } = useMutation({
+    mutationFn: insertCodes,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('저장되었습니다. ');
-          await queryClient.invalidateQueries(['/code/paging']);
-          await queryClient.invalidateQueries(['/code/dropdown/TOP']);
-          await queryClient.invalidateQueries(['/code/lower/', codeUpper]);
+          await queryClient.invalidateQueries({ queryKey: ['/code/paging'] });
+          await queryClient.invalidateQueries({ queryKey: ['/code/dropdown/TOP'] });
+          await queryClient.invalidateQueries({ queryKey: ['/code/lower/', codeUpper] });
           if (data.codeCd === '10280') {
-            await queryClient.invalidateQueries(['/code/dropdown/10280']);
+            await queryClient.invalidateQueries({ queryKey: ['/code/dropdown/10280'] });
           }
           closeModal('LOWER');
         } else {

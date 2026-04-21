@@ -25,7 +25,9 @@ export const FirstPassChangePop = ({ loginId, changeType }: Props) => {
   const [isModPasswordVisible, setIsModPasswordVisible] = useState(true);
   const [isReModPasswordVisible, setIsReModPasswordVisible] = useState(true);
 
-  const { mutate: changePasswordMutate, isLoading: changePasswordIsLoading } = useMutation(['auth/updatePassword'], setChangePassword, {
+  const { mutate: changePasswordMutate, isPending: changePasswordIsLoading } = useMutation({
+    mutationKey: ['auth/updatePassword'],
+    mutationFn: setChangePassword,
     onSuccess: (e) => {
       const { resultCode, resultMessage } = e.data;
       if (resultCode === 200) {
@@ -37,7 +39,9 @@ export const FirstPassChangePop = ({ loginId, changeType }: Props) => {
     },
   });
 
-  const { mutate: stayPasswordMutate, isLoading: stayPasswordIsLoading } = useMutation(['auth/stayPassword'], setStayPassword, {
+  const { mutate: stayPasswordMutate, isPending: stayPasswordIsLoading } = useMutation({
+    mutationKey: ['auth/stayPassword'],
+    mutationFn: setStayPassword,
     onSuccess: (e) => {
       const { resultCode, resultMessage } = e.data;
       if (resultCode === 200) {

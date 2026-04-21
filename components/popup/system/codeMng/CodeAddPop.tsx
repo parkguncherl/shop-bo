@@ -58,13 +58,14 @@ export const CodeAddPop = ({ data }: Props) => {
   const queryClient = useQueryClient();
 
   /** 코드 등록 */
-  const { mutate: insertCodeMutate, isLoading } = useMutation(insertCode, {
+  const { mutate: insertCodeMutate, isPending } = useMutation({
+    mutationFn: insertCode,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('저장되었습니다.');
-          await queryClient.invalidateQueries(['/code/paging']);
-          await queryClient.invalidateQueries(['/code/dropdown/TOP']);
+          await queryClient.invalidateQueries({ queryKey: ['/code/paging'] });
+          await queryClient.invalidateQueries({ queryKey: ['/code/dropdown/TOP'] });
           closeModal('ADD');
         } else {
           toastError(e.data.resultMessage);
@@ -146,7 +147,7 @@ export const CodeAddPop = ({ data }: Props) => {
               </PopupSearchType>
             </PopupSearchBox>
           </PopupContent>
-          {isLoading && <Loading />}
+          {isPending && <Loading />}
         </PopupLayout>
       </form>
     </dl>

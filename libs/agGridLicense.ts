@@ -1,7 +1,5 @@
 // libs/agGridLicense.ts
 
-import { LicenseManager } from 'ag-grid-enterprise';
-
 export function initAgGridLicense() {
   const licenseKey = process.env.NEXT_PUBLIC_AG_GRID_LICENSE_KEY;
 

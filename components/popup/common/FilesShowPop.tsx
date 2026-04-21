@@ -57,8 +57,8 @@ const FilesShowPop: React.FC<Props> = ({ file, initialIndex, setFile }) => {
     });
   };
   // 파일삭제
-  const deleteFileMutation = useMutation(
-    async ({ fileId, sysFileNm }: { fileId: string; sysFileNm: string }) => {
+  const deleteFileMutation = useMutation({
+    mutationFn: async ({ fileId, sysFileNm }: { fileId: string; sysFileNm: string }) => {
       // API 호출
       await authApi.delete(`/common/fileDeleteByKey`, {
         params: {
@@ -67,15 +67,13 @@ const FilesShowPop: React.FC<Props> = ({ file, initialIndex, setFile }) => {
         },
       });
     },
-    {
-      onSuccess: () => {
-        // 성공시 호출
-      },
-      onError: (error) => {
-        console.error(error);
-      },
+    onSuccess: () => {
+      // 성공시 호출
     },
-  );
+    onError: (error) => {
+      console.error(error);
+    },
+  });
 
   // 파일 삭제 처리 함수
   const handleFileDeleteCommon = (index: number, fileList: any[], setFileList: (updatedList: any[]) => void, deleteFileMutation: any, errorMessage: string) => {

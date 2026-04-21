@@ -52,8 +52,8 @@ export const CodeExcelUploadPop = () => {
         .then((response) => {
           if (response.data.resultCode === 200) {
             toastSuccess(t('업로드되었습니다.') || '');
-            queryClient.invalidateQueries(['/code/paging']);
-            queryClient.invalidateQueries(['/code/dropdown/TOP']);
+            queryClient.invalidateQueries({ queryKey: ['/code/paging'] });
+            queryClient.invalidateQueries({ queryKey: ['/code/dropdown/TOP'] });
             closeModal('EXCEL');
           } else {
             toastError(response.data.resultMessage);

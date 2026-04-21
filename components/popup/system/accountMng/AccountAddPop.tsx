@@ -70,7 +70,10 @@ export const AccountAddPop = () => {
   const [partnerList, setPartnerList] = useState([]);
 
   /** 화주리스트 조회하기 */
-  const { data: partner, isSuccess: isListSuccess } = useQuery([`/partner/upperPartner`], () => authApi.get(`/partner/upperPartner`, {}));
+  const { data: partner, isSuccess: isListSuccess } = useQuery({
+    queryKey: [`/partner/upperPartner`],
+    queryFn: () => authApi.get(`/partner/upperPartner`, {}),
+  });
   useEffect(() => {
     if (isListSuccess) {
       const { resultCode, body, resultMessage } = partner.data;
@@ -89,13 +92,16 @@ export const AccountAddPop = () => {
   }, [partner, isListSuccess]);
 
   /** 계정 등록 */
-  const { mutate: insertUserMutate, isLoading } = useMutation(insertUser, {
+  const { mutate: insertUserMutate, isPending } = useMutation({
+    mutationFn: insertUser,
     onSuccess: async (e) => {
       try {
         const { resultCode, body, resultMessage } = e.data;
         if (resultCode === 200) {
           toastSuccess('저장되었습니다.');
-          await queryClient.invalidateQueries(['/user/paging']);
+          await queryClient.invalidateQueries({
+            queryKey: ['/user/paging'],
+          });
           closeModal('ADD');
 
           // if (body) {
@@ -264,7 +270,7 @@ export const AccountAddPop = () => {
               )}
             </PopupSearchBox>
           </PopupContent>
-          {isLoading && <Loading />}
+          {isPending && <Loading />}
         </PopupLayout>
       </form>
     </dl>

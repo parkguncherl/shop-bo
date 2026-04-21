@@ -51,7 +51,9 @@ function ChangePasswordPop({ open = false, onClose }: Props) {
   };
 
   // 패스워드 변경
-  const { mutate: changePasswordMutate, isLoading: changePasswordIsLoading } = useMutation(['auth/updatePassword'], setChangePassword, {
+  const { mutate: changePasswordMutate, isPending: changePasswordIsLoading } = useMutation({
+    mutationKey: ['auth/updatePassword'],
+    mutationFn: setChangePassword,
     onSuccess: async (e) => {
       const { resultCode, resultMessage } = e.data;
       if (resultCode === 200) {
