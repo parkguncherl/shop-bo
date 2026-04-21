@@ -79,13 +79,14 @@ const UserModPop = () => {
 
   // 계정 수정 뮤테이션
   const queryClient = useQueryClient();
-  const modAccountMutation = useMutation(updateUser, {
+  const modAccountMutation = useMutation({
+    mutationFn: updateUser,
     onSuccess: async (data) => {
       if (data.data.resultCode === 200) {
         toastSuccess('계정이 수정되었습니다.');
         // 폼 초기화
         closeModal('USER_ADD');
-        await queryClient.invalidateQueries(['/user/paging']);
+        await queryClient.invalidateQueries({ queryKey: ['/user/paging'] });
       } else {
         toastError(data.data.resultMessage);
       }
