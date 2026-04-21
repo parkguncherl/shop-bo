@@ -96,9 +96,9 @@ const AccessLog = () => {
     isSuccess: isAccessLogSuccess,
     isLoading,
     refetch: accessLogRefetch,
-  } = useQuery(
-    ['/contact/paging', paging.curPage],
-    () =>
+  } = useQuery({
+    queryKey: ['/contact/paging', paging.curPage],
+    queryFn: () =>
       authApi.get('/contact/paging', {
         params: {
           curPage: paging.curPage,
@@ -106,10 +106,8 @@ const AccessLog = () => {
           ...filters,
         },
       }),
-    {
-      refetchOnMount: 'always',
-    },
-  );
+    refetchOnMount: 'always',
+  });
 
   useEffect(() => {
     if (isAccessLogSuccess) {

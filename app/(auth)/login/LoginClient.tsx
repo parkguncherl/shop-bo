@@ -95,7 +95,9 @@ const LoginClient = () => {
     mode: 'onSubmit',
   });
 
-  const { mutate: verificationMutate, isLoading: verificationIsLoading } = useMutation(['auth/verification'], onVerification, {
+  const { mutate: verificationMutate, isPending: verificationIsLoading } = useMutation({
+    mutationKey: ['auth/verification'],
+    mutationFn: onVerification,
     onSuccess: async (e) => {
       const { resultCode, body, resultMessage } = e.data;
       if (resultCode === 200) {
@@ -115,7 +117,9 @@ const LoginClient = () => {
     },
   });
 
-  const { mutate: sendOtpNoMutate, isLoading: sendOtpNoIsLoading } = useMutation(['auth/makeOtpNo'], onSendOtp, {
+  const { mutate: sendOtpNoMutate, isPending: sendOtpNoIsLoading } = useMutation({
+    mutationKey: ['auth/makeOtpNo'],
+    mutationFn: onSendOtp,
     onSuccess: (e) => {
       const { resultCode, resultMessage } = e.data;
       if (resultCode === 200) {

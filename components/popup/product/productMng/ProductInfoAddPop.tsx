@@ -110,7 +110,8 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
   });
 
   /** 품목컨텐츠 추가 요청 처리 동작 캐싱 */
-  const { mutate: insertProductInfoMutate } = useMutation(insertProductInfo, {
+  const { mutate: insertProductInfoMutate } = useMutation({
+    mutationFn: insertProductInfo,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {

@@ -9,8 +9,12 @@ import { toastError, toastSuccess } from '../../../ToastMessage';
 import { authApi } from '../../../../libs';
 import { ApiResponseAuthResponseMenuAuth } from '../../../../generated';
 
+export interface HistoryBoxRefProps {
+  closeAllTabs: () => void;
+  closeOtherTabs: () => void;
+}
 interface Props {
-  ref?: React.Ref<{ closeAllTabs: () => void }>;
+  ref?: React.RefObject<HistoryBoxRefProps>;
 }
 // 이하 local type, interface
 interface HistoryTypeForSorting extends HistoryType {
@@ -48,9 +52,62 @@ const HistoryBox = ({ ref }: Props) => {
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 }); // 우클릭시 출력되어지는 컨텍스트 메뉴의 상태
   const [hoverElementId, setHoverElementId] = useState<number | null>(null); // Hover 상태 관리
 
+  const closeContextMenu = () => {
+    setContextMenu({ ...contextMenu, visible: false });
+  };
+
+  // 모든탭 닫기
+  const closeAllTabs = () => {
+    // 컨텍스트 메뉴 닫기
+    closeContextMenu();
+    // 상태 초기화
+    setHistoryList([]);
+  };
+
+  // 현재 탭을 제외한 다른 모든 탭 닫기
+  const closeOtherTabs = () => {
+    const activeElementId = historyListAsMiddleState.filter((history) => history.histMenuUri == pathname)[0]?.id;
+    if (activeElementId !== undefined) {
+      const updatedList = historyList.filter(
+        (history) => history.histMenuUri == historyListAsMiddleState.filter((middleState) => middleState.id == activeElementId)[0].histMenuUri,
+      );
+      setHistoryList(updatedList);
+      closeContextMenu();
+    } else {
+      closeAllTabs();
+    }
+  };
+
+  // 현재 탭만 닫기
+  const closeCurrentTab = () => {
+    const activeElementId = historyListAsMiddleState.filter((history) => history.histMenuUri == pathname)[0]?.id;
+    if (activeElementId !== undefined) {
+      const updatedList = historyList.filter(
+        (history) => history.histMenuUri != historyListAsMiddleState.filter((middleState) => middleState.id == activeElementId)[0].histMenuUri,
+      );
+      if (updatedList.length != 0) {
+        // 다음 탭으로 이동 (마지막 탭이었다면 이전 탭으로)
+        historyListAsMiddleState.forEach((value, index) => {
+          if (value.id == activeElementId) {
+            if (historyListAsMiddleState[index + 1]) {
+              // 이후 탭이 존재하는 경우 다음 탭으로 이동
+              router.push(historyListAsMiddleState[index + 1].histMenuUri);
+            } else {
+              // 그 외 이전 탭으로
+              router.push(historyListAsMiddleState[index - 1].histMenuUri);
+            }
+          }
+        });
+      }
+      setHistoryList(updatedList);
+      closeContextMenu();
+    }
+  };
+
+  // closeAllTabs, closeOtherTabs 선언 이후 작성
   useImperativeHandle(ref, () => ({
-    closeAllTabs,
-    closeOtherTabs,
+    closeAllTabs: closeAllTabs,
+    closeOtherTabs: closeOtherTabs,
   }));
 
   const { data: menuAuthList, isSuccess: isMenuCheckSuccess } = useQuery({
@@ -202,7 +259,8 @@ const HistoryBox = ({ ref }: Props) => {
   const queryClient = useQueryClient();
 
   /** 즐겨찾기 영역 등록 영역 */
-  const { mutate: regFavoritesAllMutate } = useMutation(regFavoritesAll, {
+  const { mutate: regFavoritesAllMutate } = useMutation({
+    mutationFn: regFavoritesAll,
     onSuccess: async (e) => {
       const { resultCode } = e.data;
       try {
@@ -232,57 +290,57 @@ const HistoryBox = ({ ref }: Props) => {
     setContextMenu({ visible: true, x: event.clientX, y: event.clientY });
   };
 
-  const closeContextMenu = () => {
-    setContextMenu({ ...contextMenu, visible: false });
-  };
+  // const closeContextMenu = () => {
+  //   setContextMenu({ ...contextMenu, visible: false });
+  // };
 
-  // 모든탭 닫기
-  const closeAllTabs = () => {
-    // 컨텍스트 메뉴 닫기
-    closeContextMenu();
-    // 상태 초기화
-    setHistoryList([]);
-  };
-
-  // 현재 탭을 제외한 다른 모든 탭 닫기
-  const closeOtherTabs = () => {
-    const activeElementId = historyListAsMiddleState.filter((history) => history.histMenuUri == pathname)[0]?.id;
-    if (activeElementId !== undefined) {
-      const updatedList = historyList.filter(
-        (history) => history.histMenuUri == historyListAsMiddleState.filter((middleState) => middleState.id == activeElementId)[0].histMenuUri,
-      );
-      setHistoryList(updatedList);
-      closeContextMenu();
-    } else {
-      closeAllTabs();
-    }
-  };
-
-  // 현재 탭만 닫기
-  const closeCurrentTab = () => {
-    const activeElementId = historyListAsMiddleState.filter((history) => history.histMenuUri == pathname)[0]?.id;
-    if (activeElementId !== undefined) {
-      const updatedList = historyList.filter(
-        (history) => history.histMenuUri != historyListAsMiddleState.filter((middleState) => middleState.id == activeElementId)[0].histMenuUri,
-      );
-      if (updatedList.length != 0) {
-        // 다음 탭으로 이동 (마지막 탭이었다면 이전 탭으로)
-        historyListAsMiddleState.forEach((value, index) => {
-          if (value.id == activeElementId) {
-            if (historyListAsMiddleState[index + 1]) {
-              // 이후 탭이 존재하는 경우 다음 탭으로 이동
-              router.push(historyListAsMiddleState[index + 1].histMenuUri);
-            } else {
-              // 그 외 이전 탭으로
-              router.push(historyListAsMiddleState[index - 1].histMenuUri);
-            }
-          }
-        });
-      }
-      setHistoryList(updatedList);
-      closeContextMenu();
-    }
-  };
+  // // 모든탭 닫기
+  // const closeAllTabs = () => {
+  //   // 컨텍스트 메뉴 닫기
+  //   closeContextMenu();
+  //   // 상태 초기화
+  //   setHistoryList([]);
+  // };
+  //
+  // // 현재 탭을 제외한 다른 모든 탭 닫기
+  // const closeOtherTabs = () => {
+  //   const activeElementId = historyListAsMiddleState.filter((history) => history.histMenuUri == pathname)[0]?.id;
+  //   if (activeElementId !== undefined) {
+  //     const updatedList = historyList.filter(
+  //       (history) => history.histMenuUri == historyListAsMiddleState.filter((middleState) => middleState.id == activeElementId)[0].histMenuUri,
+  //     );
+  //     setHistoryList(updatedList);
+  //     closeContextMenu();
+  //   } else {
+  //     closeAllTabs();
+  //   }
+  // };
+  //
+  // // 현재 탭만 닫기
+  // const closeCurrentTab = () => {
+  //   const activeElementId = historyListAsMiddleState.filter((history) => history.histMenuUri == pathname)[0]?.id;
+  //   if (activeElementId !== undefined) {
+  //     const updatedList = historyList.filter(
+  //       (history) => history.histMenuUri != historyListAsMiddleState.filter((middleState) => middleState.id == activeElementId)[0].histMenuUri,
+  //     );
+  //     if (updatedList.length != 0) {
+  //       // 다음 탭으로 이동 (마지막 탭이었다면 이전 탭으로)
+  //       historyListAsMiddleState.forEach((value, index) => {
+  //         if (value.id == activeElementId) {
+  //           if (historyListAsMiddleState[index + 1]) {
+  //             // 이후 탭이 존재하는 경우 다음 탭으로 이동
+  //             router.push(historyListAsMiddleState[index + 1].histMenuUri);
+  //           } else {
+  //             // 그 외 이전 탭으로
+  //             router.push(historyListAsMiddleState[index - 1].histMenuUri);
+  //           }
+  //         }
+  //       });
+  //     }
+  //     setHistoryList(updatedList);
+  //     closeContextMenu();
+  //   }
+  // };
 
   // box 이외 영역 클릭 시 메뉴 비활성 동작
   useEffect(() => {

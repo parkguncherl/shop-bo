@@ -89,7 +89,8 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
     }
   }, [errors]);
 
-  const { mutate: updateProductDetMutate } = useMutation(updateProductDet, {
+  const { mutate: updateProductDetMutate } = useMutation({
+    mutationFn: updateProductDet,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
@@ -106,7 +107,8 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
     },
   });
 
-  const { mutate: deleteProductDetMutate } = useMutation(deleteProductDet, {
+  const { mutate: deleteProductDetMutate } = useMutation({
+    mutationFn: deleteProductDet,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
@@ -123,7 +125,8 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
     },
   });
 
-  const { mutate: insertProductDetMutate } = useMutation(insertProductDet, {
+  const { mutate: insertProductDetMutate } = useMutation({
+    mutationFn: insertProductDet,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {

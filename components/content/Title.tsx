@@ -66,7 +66,8 @@ export const Title = ({ title, search, reset, children, detail, className }: Pro
     });
   };
 
-  const { mutate: modFavoriteMutate } = useMutation(modFavorite, {
+  const { mutate: modFavoriteMutate } = useMutation({
+    mutationFn: modFavorite,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {

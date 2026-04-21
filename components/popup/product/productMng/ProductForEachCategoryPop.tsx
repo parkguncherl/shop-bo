@@ -175,7 +175,8 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
     [],
   );
 
-  const { mutate: insertCategoryProductMutate } = useMutation(insertCategoryProduct, {
+  const { mutate: insertCategoryProductMutate } = useMutation({
+    mutationFn: insertCategoryProduct,
     onSuccess: (e) => {
       try {
         if (e.data.resultCode === 200) {
@@ -198,7 +199,8 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
     },
   });
 
-  const { mutate: deleteCategoryProductMutate } = useMutation(deleteCategoryProduct, {
+  const { mutate: deleteCategoryProductMutate } = useMutation({
+    mutationFn: deleteCategoryProduct,
     onSuccess: (e) => {
       try {
         if (e.data.resultCode === 200) {
@@ -223,6 +225,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
 
   /** 하위코드 목록 조회 */
   const { data: categories, isSuccess: isCategoriesSuccess } = useQuery({
+    queryKey: [],
     queryFn: () => selectLowerPartnerCodeByCodeUpper(PARTNER_CODE.categories.code),
     enabled: open,
   });

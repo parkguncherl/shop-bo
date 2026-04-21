@@ -61,7 +61,8 @@ export const PartnerCodePop = ({ partnerCodeUpper, activated, title, codeName, o
   }, [isPartnerCodeSuccess, rowData]);
 
   /** 코드 수정 **/
-  const { mutate: savePartnerCodeMutate } = useMutation(savePartnerCode, {
+  const { mutate: savePartnerCodeMutate } = useMutation({
+    mutationFn: savePartnerCode,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
@@ -80,7 +81,8 @@ export const PartnerCodePop = ({ partnerCodeUpper, activated, title, codeName, o
   });
 
   /** 코드 수정 */
-  const { mutate: deletePartnerCodeMutate } = useMutation(deletePartnerCode, {
+  const { mutate: deletePartnerCodeMutate } = useMutation({
+    mutationFn: deletePartnerCode,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {

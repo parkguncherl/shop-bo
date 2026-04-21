@@ -134,7 +134,8 @@ const FormInput = function FormInput<T extends FieldValues>({
   }, [files, isFilesSuccess]);
 
   /** 파일 삭제 */
-  const { mutate: deleteFileMutate, isLoading: deleteFileIsLoading } = useMutation(deleteFile, {
+  const { mutate: deleteFileMutate, isPending: deleteFileIsLoading } = useMutation({
+    mutationFn: deleteFile,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {

@@ -71,7 +71,8 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
     mode: 'onChange',
   });
 
-  const { mutate: updateProductMutate } = useMutation(updateProduct, {
+  const { mutate: updateProductMutate } = useMutation({
+    mutationFn: updateProduct,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {

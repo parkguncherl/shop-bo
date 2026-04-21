@@ -74,7 +74,8 @@ const ProductMng = () => {
 
   const [selectedRowsData, setSelectedRowsData] = useState<ProductMngResponseProductInfo | undefined>(undefined);
 
-  const { mutate: deleteProductMutate } = useMutation(deleteProduct, {
+  const { mutate: deleteProductMutate } = useMutation({
+    mutationFn: deleteProduct,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
