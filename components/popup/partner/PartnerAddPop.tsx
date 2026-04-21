@@ -61,7 +61,8 @@ const PartnerAddPop = ({ data }: Props) => {
   const queryClient = useQueryClient();
 
   /** 화주 등록 */
-  const { mutate: insertPartnerMutate, isLoading } = useMutation(insertPartner, {
+  const { mutate: insertPartnerMutate, isPending } = useMutation({
+    mutationFn: insertPartner,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {

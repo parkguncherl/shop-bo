@@ -9,15 +9,15 @@ import { usePartnerStore } from '../../../stores/usePartnerStore';
 import { PopupSearchBox, PopupSearchType } from '../content';
 import FormInput from '../../form/FormInput';
 import { Placeholder } from '../../../libs/const';
-import { PartnerRequestDelete, PartnerRequestUpdate, PartnerResponsePaging } from '../../../generated';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { authApi, YupSchema } from '../../../libs';
+import { PartnerRequestDelete, PartnerRequestUpdate } from '../../../generated';
+import { authApi } from '../../../libs';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toastError, toastSuccess } from '../../ToastMessage';
 import { DeleteConfirmModal } from '../../DeleteConfirmModal';
 import { DropDownOption } from '../../../types/DropDownOptions';
 import useAppStore from '../../../stores/useAppStore';
 import { SubmitHandler, useForm } from 'react-hook-form';
+
 interface Props {
   datas: PartnerRequestUpdate;
 }
@@ -92,7 +92,8 @@ const PartnerModPop = ({ datas }: Props) => {
   }, [partner, reset]);
 
   /** 화주 수정하기 */
-  const { mutate: updatePartnerMutate } = useMutation(updatePartner, {
+  const { mutate: updatePartnerMutate } = useMutation({
+    mutationFn: updatePartner,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
@@ -110,7 +111,8 @@ const PartnerModPop = ({ datas }: Props) => {
   });
 
   /** 화주 삭제하기 */
-  const { mutate: deletePartnerMutate, isLoading: deleteCodeIsLoading } = useMutation(deletePartner, {
+  const { mutate: deletePartnerMutate, isPending: deleteCodeIsLoading } = useMutation({
+    mutationFn: deletePartner,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {

@@ -51,7 +51,8 @@ export const MenuModPop = ({ data, callback }: Props) => {
   const [confirmModal, setConfirmModal] = useState(false);
 
   /** 변경  */
-  const { mutate: updateMenuMutate, isLoading: updateIsLoading } = useMutation(updateMenu, {
+  const { mutate: updateMenuMutate, isPending: updateIsLoading } = useMutation({
+    mutationFn: updateMenu,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
@@ -74,16 +75,17 @@ export const MenuModPop = ({ data, callback }: Props) => {
   });
 
   /** 삭제 */
-  const { mutate: deleteMenuMutate, isLoading: deleteIsLoading } = useMutation(deleteMenu, {
+  const { mutate: deleteMenuMutate, isPending: deleteIsLoading } = useMutation({
+    mutationFn: deleteMenu,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('삭제되었습니다.');
           await Promise.all([
-            queryClient.invalidateQueries(['/menu/leftMenu']),
-            queryClient.invalidateQueries(['/auth/check/menu']),
-            queryClient.invalidateQueries(['/menu/paging']),
-            queryClient.invalidateQueries(['/menu/top']),
+            queryClient.invalidateQueries({ queryKey: ['/menu/leftMenu'] }),
+            queryClient.invalidateQueries({ queryKey: ['/auth/check/menu'] }),
+            queryClient.invalidateQueries({ queryKey: ['/menu/paging'] }),
+            queryClient.invalidateQueries({ queryKey: ['/menu/top'] }),
           ]);
           closeModal('MOD');
         } else {

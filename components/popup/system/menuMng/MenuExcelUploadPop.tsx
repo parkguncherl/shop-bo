@@ -53,7 +53,7 @@ export const MenuExcelUploadPop = ({ callback }: Props) => {
         .then(async (response) => {
           if (response.data.resultCode === 200) {
             toastSuccess(t('업로드되었습니다.') || '');
-            await Promise.all([queryClient.invalidateQueries(['/menu/leftMenu']), queryClient.invalidateQueries(['/menu/paging'])]);
+            await Promise.all([queryClient.invalidateQueries({ queryKey: ['/menu/leftMenu'] }), queryClient.invalidateQueries({ queryKey: ['/menu/paging'] })]);
             closeModal('EXCEL');
           } else {
             toastError(response.data.resultMessage);

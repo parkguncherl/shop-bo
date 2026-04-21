@@ -247,13 +247,17 @@ export const TabMenu = ({ ref }: Props) => {
     data: favoriteData,
     refetch: favRefetch,
     isSuccess: isFavSuccess,
-  } = useQuery([], () => authApi.get<ApiResponseListSelectFavorites>('/mypage/favorites', {}));
+  } = useQuery({
+    queryKey: [],
+    queryFn: () => authApi.get<ApiResponseListSelectFavorites>('/mypage/favorites', {}),
+  });
 
   useEffect(() => {
     setFavoriteList(favoriteData?.data?.body ? favoriteData?.data?.body : []);
   }, [favoriteData?.data?.body, isFavSuccess, setFavoriteList]);
 
-  const { mutate: regFavoritesAllMutate } = useMutation(regFavoritesAll, {
+  const { mutate: regFavoritesAllMutate } = useMutation({
+    mutationFn: regFavoritesAll,
     onSuccess: async (e) => {
       const { resultCode, body, resultMessage } = e.data;
       try {

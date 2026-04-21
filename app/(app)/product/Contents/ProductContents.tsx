@@ -46,7 +46,8 @@ const ProductContents = () => {
   });
 
   /** 상품컨텐츠 추가 요청 처리 동작 캐싱 */
-  const { mutate: insertProductContentsMutate } = useMutation(insertProductContents, {
+  const { mutate: insertProductContentsMutate } = useMutation({
+    mutationFn: insertProductContents,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {

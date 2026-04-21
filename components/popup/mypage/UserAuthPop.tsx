@@ -23,7 +23,9 @@ export const UserAuthPop = () => {
     data: auths,
     isLoading: isLeftMenuLoading,
     isSuccess: isLeftMenuLoaded,
-  } = useQuery(['/menu/withAuth', selectedUser.id], () => authApi.get<ApiResponseListAuthResponseEntity>(`/menu/withAuth/${selectedUser.id}`, {}), {
+  } = useQuery({
+    queryKey: ['/menu/withAuth', selectedUser.id],
+    queryFn: () => authApi.get<ApiResponseListAuthResponseEntity>(`/menu/withAuth/${selectedUser.id}`, {}),
     enabled: true,
     refetchOnMount: 'always',
   });
@@ -50,12 +52,13 @@ export const UserAuthPop = () => {
   }, [auths, isLeftMenuLoading]);
 
   /** 변경 */
-  const { mutate: updateUserAuth, isLoading: updateIsLoading } = useMutation(updateUserMenuAuth, {
+  const { mutate: updateUserAuth, isPending: updateIsLoading } = useMutation({
+    mutationFn: updateUserMenuAuth,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('반영되었습니다.');
-          await Promise.all([queryClient.invalidateQueries(['/menu/withAuth'])]);
+          await Promise.all([queryClient.invalidateQueries({ queryKey: ['/menu/withAuth'] })]);
           closeModal('USER_AUTH_MOD');
         } else {
           toastError(e.data.resultMessage);

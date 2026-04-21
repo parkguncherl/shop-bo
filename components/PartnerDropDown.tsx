@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { authApi } from '../libs';
-import { ApiResponseListPartnerCodeDropDown, PartnerCodeResponseLowerSelect } from '../generated';
+import { ApiResponseListPartnerCodeDropDown, PartnerCodeDropDown, PartnerCodeResponseLowerSelect } from '../generated';
 import { useQuery } from '@tanstack/react-query';
 import { toastError } from './ToastMessage';
 import { DropDownOption } from '../types/DropDownOptions';
@@ -51,40 +51,39 @@ export const PartnerDropDown = ({
   ref,
   filterData,
 }: Props) => {
-  const { data, isLoading } = useQuery(
-    ['/partnerCode/dropdown/' + codeUpper],
-    () =>
+  const {
+    data: partnerCodeData,
+    isLoading,
+    isSuccess: isPartnerCodeDataSuccess,
+  } = useQuery({
+    queryKey: ['/partnerCode/dropdown/' + codeUpper],
+    queryFn: () =>
       authApi.get<ApiResponseListPartnerCodeDropDown>('/partnerCode/dropdown', {
         params: {
           codeUpper,
           partnerId,
         },
       }),
-    {
-      enabled: !!codeUpper,
-      select: (e) => {
-        if (filterData) {
-          const keywords = filterData.split(',').map((s) => s.trim());
-          return e.data?.body
-            ?.map((v: PartnerCodeResponseLowerSelect) => ({ key: v.codeCd, value: v.codeCd, label: v.codeNm, defaultValue: v.defCodeVal }))
-            .filter((fData) => fData.label && keywords.some((keyword) => fData.label?.includes(keyword))) as DropDownOption[];
-        } else {
-          return e.data?.body?.map((v: PartnerCodeResponseLowerSelect) => ({
-            key: v.codeCd,
-            value: v.codeCd,
-            label: v.codeNm,
-            defaultValue: v.defCodeVal,
-          })) as DropDownOption[];
-        }
-      },
-      onError: (e) => {
-        toastError(e?.toString() || '오류');
-      },
+    enabled: !!codeUpper,
+    select: (e) => {
+      if (filterData) {
+        const keywords = filterData.split(',').map((s) => s.trim());
+        return e.data?.body
+          ?.map((v: PartnerCodeResponseLowerSelect) => ({ key: v.codeCd, value: v.codeCd, label: v.codeNm, defaultValue: v.defCodeVal }))
+          .filter((fData) => fData.label && keywords.some((keyword) => fData.label?.includes(keyword))) as DropDownOption[];
+      } else {
+        return e.data?.body?.map((v: PartnerCodeResponseLowerSelect) => ({
+          key: v.codeCd,
+          value: v.codeCd,
+          label: v.codeNm,
+          defaultValue: v.defCodeVal,
+        })) as DropDownOption[];
+      }
     },
-  );
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
+    // onError: (e) => {
+    //   toastError(e?.toString() || '오류');
+    // },
+  });
 
   // focus 관련
   const [focusStates, setFocusStates] = useState<{ [key: string]: boolean }>({});
@@ -110,7 +109,7 @@ export const PartnerDropDown = ({
                   name={name}
                   placeholder={placeholder || '선택'}
                   value={value}
-                  options={[{ key: '선택', value: '선택', label: '선택' }, ...(data || [])]}
+                  options={[{ key: '선택', value: '선택', label: '선택' }, ...(partnerCodeData || [])]}
                   onChangeOptions={onChange}
                   placement={placement}
                   style={dropDownStyle}
@@ -133,7 +132,7 @@ export const PartnerDropDown = ({
             name={name}
             placeholder={placeholder || '선택'}
             value={value}
-            options={[{ key: '선택', value: '선택', label: '선택' }, ...(data || [])]}
+            options={[{ key: '선택', value: '선택', label: '선택' }, ...(partnerCodeData || [])]}
             onChangeOptions={onChange}
             placement={placement}
             style={dropDownStyle}

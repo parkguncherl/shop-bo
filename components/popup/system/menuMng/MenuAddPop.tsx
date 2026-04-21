@@ -48,7 +48,8 @@ export const MenuAddPop = ({ data, callback }: Props) => {
   const [insertMenu] = useMenuStore((s) => [s.insertMenu]);
 
   /** 신규 */
-  const { mutate: insertMenuMutate, isLoading } = useMutation(insertMenu, {
+  const { mutate: insertMenuMutate, isPending } = useMutation({
+    mutationFn: insertMenu,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
@@ -137,7 +138,7 @@ export const MenuAddPop = ({ data, callback }: Props) => {
               </PopupSearchType>
             </PopupSearchBox>
           </PopupContent>
-          {isLoading && <Loading />}
+          {isPending && <Loading />}
         </PopupLayout>
       </form>
     </dl>

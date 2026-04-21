@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { authApi } from '../../../../libs';
 import { ApiResponseListAuthResponseEntity, Auth, Menu } from '../../../../generated';
 import { PopupContent, PopupFooter, PopupLayout } from '../../index';
@@ -19,31 +19,43 @@ export const MenuAuthPop = ({ data, callback }: Props) => {
   const [authCodes, setAuthCodes] = useState<Auth[]>([]);
   const [modalType, closeModal, updateAuth] = useMenuStore((s) => [s.modalType, s.closeModal, s.updateAuth]);
   /** 메뉴 권한 조회 수정 */
-  const { data: auths, isLoading } = useQuery(
-    ['/menu/auth', data.menuCd],
-    () => authApi.get<ApiResponseListAuthResponseEntity>(`/menu/auth/${data.menuCd}`, {}),
-    {
-      enabled: !!data.upMenuCd,
-      refetchOnMount: 'always',
-      onSuccess: (e) => {
-        const { body, resultCode } = e.data;
-        if (resultCode === 200) {
-          setAuthCodes(body || []);
-        }
-      },
-    },
-  );
+  const {
+    data: auths,
+    isLoading,
+    isSuccess: isAuthCodeSuccess,
+  } = useQuery({
+    queryKey: ['/menu/auth', data.menuCd],
+    queryFn: () => authApi.get<ApiResponseListAuthResponseEntity>(`/menu/auth/${data.menuCd}`, {}),
+    enabled: !!data.upMenuCd,
+    refetchOnMount: 'always',
+    // onSuccess: (e) => {
+    //   const { body, resultCode } = e.data;
+    //   if (resultCode === 200) {
+    //     setAuthCodes(body || []);
+    //   }
+    // },
+  });
+
+  useEffect(() => {
+    if (isAuthCodeSuccess) {
+      const { body, resultCode } = auths.data;
+      if (resultCode === 200) {
+        setAuthCodes(body || []);
+      }
+    }
+  }, [isAuthCodeSuccess, auths]);
 
   /** 변경 */
-  const { mutate: updateAuthMutate, isLoading: updateIsLoading } = useMutation(updateAuth, {
+  const { mutate: updateAuthMutate, isPending: updateIsLoading } = useMutation({
+    mutationFn: updateAuth,
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('저장되었습니다.');
           await Promise.all([
-            queryClient.invalidateQueries(['/menu/leftMenu']),
-            queryClient.invalidateQueries(['/menu/paging']),
-            queryClient.invalidateQueries(['/menu/top']),
+            queryClient.invalidateQueries({ queryKey: ['/menu/leftMenu'] }),
+            queryClient.invalidateQueries({ queryKey: ['/menu/paging'] }),
+            queryClient.invalidateQueries({ queryKey: ['/menu/top'] }),
           ]);
           closeModal('AUTH_MOD');
         } else {

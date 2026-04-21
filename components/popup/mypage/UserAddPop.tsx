@@ -56,7 +56,8 @@ const UserAddPop = () => {
 
   // 계정 추가 뮤테이션
   const queryClient = useQueryClient();
-  const addAccountMutation = useMutation(insertUser, {
+  const addAccountMutation = useMutation({
+    mutationFn: insertUser,
     onSuccess: async (data) => {
       if (data.data.resultCode === 200) {
         toastSuccess('계정이 추가되었습니다.');
