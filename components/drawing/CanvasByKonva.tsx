@@ -338,9 +338,6 @@ const EditableText = ({ textInfo, onMouseDown, onDragEnd, onEditEnd, onChangeByE
               width: Math.max(30, (newBox as any).width),
             };
           }}
-          // borderEnabled={status == 'preview' ? false : undefined} // 테두리 선 제거
-          // anchorSize={status == 'preview' ? 0 : undefined} // 조절 핸들 크기를 0으로 만들어 숨김
-          // rotateEnabled={status == 'preview' ? false : undefined} // 회전 핸들 숨김
         />
       )}
     </>
@@ -427,9 +424,6 @@ const TransformableImage = ({
             }
             return newBox;
           }}
-          // borderEnabled={status == 'preview' ? false : undefined} // 테두리 선 제거
-          // anchorSize={status == 'preview' ? 0 : undefined} // 조절 핸들 크기를 0으로 만들어 숨김
-          // rotateEnabled={status == 'preview' ? false : undefined} // 회전 핸들 숨김
         />
       )}
     </>
@@ -461,8 +455,6 @@ const DimensionLine = ({ enablePreviewMode, dimensionLine, onTransformed, onDrag
 
   const handleTransformEnd = () => {
     const node = shapeRef.current as any;
-    console.log('회전값:', node.rotation());
-    console.log('가로스케일:', node.scaleX());
 
     const rotation = node.rotation();
 
@@ -492,10 +484,6 @@ const DimensionLine = ({ enablePreviewMode, dimensionLine, onTransformed, onDrag
     }
   };
 
-  useEffect(() => {
-    console.log('dimensionLine: ', dimensionLine);
-  }, [dimensionLine]);
-
   return (
     <>
       <Arrow
@@ -510,8 +498,9 @@ const DimensionLine = ({ enablePreviewMode, dimensionLine, onTransformed, onDrag
         stroke={dimensionLine.color}
         onDragEnd={onDragEnd}
         strokeWidth={2}
+        hitStrokeWidth={20}
         fill={dimensionLine.color}
-        //pointerAtBeginning={true}
+        pointerAtBeginning={true}
         draggable
         onTransformEnd={handleTransformEnd}
       />
@@ -520,12 +509,11 @@ const DimensionLine = ({ enablePreviewMode, dimensionLine, onTransformed, onDrag
         <Transformer
           ref={trRef}
           flipEnabled={false}
-          enabledAnchors={['middle-left', 'middle-right', 'top-center', 'bottom-center']} // anchor 명시적 지정
-          rotateEnabled={true}
-          anchorSize={8}
+          enabledAnchors={['middle-left', 'middle-right']} // anchor 명시적 지정
+          anchorSize={12}
           boundBoxFunc={(oldBox: Box, newBox: Box) => {
-            // 너무 작아지는 것 방지
-            if ((newBox as any).width < 20 || (newBox as any).height < 20) {
+            // 리사이징 제한
+            if (Math.abs((newBox as any).width) < 5 || Math.abs((newBox as any).height) < 5) {
               return oldBox;
             }
             return newBox;
@@ -1062,8 +1050,6 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
           ))}
           <Image name="undo-btn" x={0} y={0} onClick={handleUndo} image={undoImg} width={12} height={12} scaleX={1} scaleY={1} />
           <Image name="redo-btn" x={20} y={0} onClick={handleRedo} image={redoImg} width={12} height={12} scaleX={1} scaleY={1} />
-          {/*<Text text="undo" name="undo-btn" onClick={handleUndo} />*/}
-          {/*<Text text="redo" name="redo-btn" x={40} onClick={handleRedo} />*/}
         </Layer>
       </Stage>
     </div>
