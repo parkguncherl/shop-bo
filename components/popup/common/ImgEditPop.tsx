@@ -5,10 +5,11 @@ import { PopupLayout } from '../PopupLayout';
 import CanvasByKonva, { CanvasByKonvaRef, ImgOnCanvasByKonva } from '../../drawing/CanvasByKonva';
 import useFilters from '../../../hooks/useFilters';
 import { CustomColorPicker } from '../../CustomColorPicker';
-import { toastError } from '../../ToastMessage';
+import { toastError, toastSuccess } from '../../ToastMessage';
 import { useCommonStore } from '../../../stores';
 import { ConfirmModal } from '../../ConfirmModal';
 import { Search } from '../../content';
+import { useMutation } from '@tanstack/react-query';
 
 export interface ImgPropsOnEditPop {
   imgFileId?: number;
@@ -19,11 +20,12 @@ export interface ImgPropsOnEditPop {
 interface ImgEditPopProps {
   open: boolean;
   onClose: () => void;
+  onImgFileUpdated?: () => Promise<void>;
   imgProps?: ImgPropsOnEditPop;
 }
 
 /** konva 기반 컴포넌트를 통한 이미지 편집 팝업 */
-const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
+const ImgEditPop = ({ open, onClose, onImgFileUpdated, imgProps }: ImgEditPopProps) => {
   const topWrapperRef = useRef<HTMLDivElement>(null);
   const canvasByKonvaRef = useRef<CanvasByKonvaRef>(null);
   const topSearchWrapperRef = useRef<HTMLDivElement>(null);
@@ -41,6 +43,23 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
     textScale: undefined,
     lineColor: '#FF4A00',
     lineWidth: undefined,
+  });
+
+  const { mutate: updateImageFileMutate } = useMutation({
+    mutationFn: updateImageFile,
+    onSuccess: async (e) => {
+      try {
+        if (e.data.resultCode === 200) {
+          toastSuccess('컨텐츠가 정상 삭제되었습니다.');
+          if (onImgFileUpdated) await onImgFileUpdated();
+          onCloseCommon();
+        } else {
+          toastError(`컨텐츠 삭제 도중 문제 발생 (${e.data.resultMessage})`);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
   });
 
   const onCloseCommon = () => {
@@ -194,7 +213,11 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
               console.error('이미지 파일 식별자(fileId)를 찾을 수 없음');
               return;
             }
-            console.log('file: ', file, imgProps?.imgFileId);
+            if (!imgProps.seq) {
+              console.error('이미지의 순서(seq) 정보를 찾을 수 없음');
+              return;
+            }
+            updateImageFileMutate({ fileId: imgProps.imgFileId, fileSeq: imgProps.seq, uploadFile: file });
           });
         }}
         title={'수정된 이미지로 기존 이미지를 대체하시겠습니까?'}

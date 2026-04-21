@@ -58,7 +58,7 @@ interface CommonApiState {
   // initGridColumnState: (gridRequest: GridRequest) => AxiosPromise<ApiResponse>;
   //getFilterData: (filterDataList: FilterData[], uri: string) => any;
   rearrangeFilesByStepsToMove: (commonRequestFileRearrangementRequest: CommonRequestFileRearrangementRequest) => AxiosPromise<ApiResponse>;
-  updateImageFile: (commonRequestFileUpdate: { fileDetId: number; uploadFile: File }) => AxiosPromise<ApiResponse>;
+  updateImageFile: (commonRequestFileUpdate: { fileId: number; fileSeq: number; uploadFile: File }) => AxiosPromise<ApiResponse>;
 }
 
 const initialStateCreator: StateCreator<CommonState & CommonApiState, any> = (set, get, api) => {
@@ -257,8 +257,9 @@ const initialStateCreator: StateCreator<CommonState & CommonApiState, any> = (se
     },
     updateImageFile: (commonRequestFileUpdate) => {
       const formData = new FormData();
-      formData.append('uploadFiles', commonRequestFileUpdate.uploadFile);
-      formData.append('fileDetId', commonRequestFileUpdate.fileDetId.toString());
+      formData.append('fileId', commonRequestFileUpdate.fileId.toString());
+      formData.append('fileSeq', commonRequestFileUpdate.fileSeq.toString());
+      formData.append('uploadFile', commonRequestFileUpdate.uploadFile);
 
       return authApi.patch('/common/imgfile/update', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },

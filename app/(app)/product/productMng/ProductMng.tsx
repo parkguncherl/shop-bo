@@ -690,6 +690,24 @@ const ProductMng = () => {
           setTargetedImgInfoForEdit(undefined);
         }}
         imgProps={targetedImgInfoForEdit}
+        onImgFileUpdated={async () => {
+          if (targetedFileSetInfo?.fileId) {
+            setTargetedFileSetInfo({
+              ...targetedFileSetInfo,
+              fileInfos: await selectFileList(targetedFileSetInfo?.fileId).then(async (fileDetList) => {
+                const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
+                for (let index = 0; index < fileDetList.length; index++) {
+                  fileSetsElementInfos.push({
+                    fileNm: fileDetList[index].fileNm,
+                    fileSeq: fileDetList[index].fileSeq,
+                    fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
+                  });
+                }
+                return fileSetsElementInfos;
+              }),
+            });
+          }
+        }}
       />
     </div>
   );
