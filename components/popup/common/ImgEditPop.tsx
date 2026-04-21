@@ -1,8 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { PopupFooter } from '../PopupFooter';
 import { PopupContent } from '../PopupContent';
 import { PopupLayout } from '../PopupLayout';
-import CanvasByKonva, { CanvasByKonvaRef } from '../../drawing/CanvasByKonva';
+import CanvasByKonva, { CanvasByKonvaRef, ImgOnCanvasByKonva } from '../../drawing/CanvasByKonva';
 import useFilters from '../../../hooks/useFilters';
 import { CustomColorPicker } from '../../CustomColorPicker';
 import { toastError } from '../../ToastMessage';
@@ -32,8 +32,9 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
 
   const [preview, setPreview] = useState(false);
   const [colorPickerOpened, setColorPickerOpened] = useState(false);
-
   const [updateConfOpened, setUpdateConfOpened] = useState(false);
+
+  const [imgOnKonva, setImgOnKonva] = useState<ImgOnCanvasByKonva | undefined>(undefined);
 
   const [filters, onChangeFilters] = useFilters({
     textColor: '#000000',
@@ -45,6 +46,10 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
   const onCloseCommon = () => {
     if (onClose) onClose();
   };
+
+  useEffect(() => {
+    setImgOnKonva(imgProps != undefined ? { imgFileName: imgProps.imgFileName, imgSrc: imgProps.imgSrc } : undefined);
+  }, [imgProps]);
 
   return (
     <div className="imgPopBox">
@@ -160,7 +165,7 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
           <div className={'imgEditPop'} ref={topWrapperRef}>
             <CanvasByKonva
               wrapperRef={topWrapperRef}
-              img={imgProps}
+              img={imgOnKonva}
               ref={canvasByKonvaRef}
               preview={preview}
               textConfig={{
@@ -185,7 +190,11 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
               console.error('파일을 저장할 수 없음');
               return;
             }
-            console.log('file: ', file);
+            if (!imgProps?.imgFileId) {
+              console.error('이미지 파일 식별자(fileId)를 찾을 수 없음');
+              return;
+            }
+            console.log('file: ', file, imgProps?.imgFileId);
           });
         }}
         title={'수정된 이미지로 기존 이미지를 대체하시겠습니까?'}
