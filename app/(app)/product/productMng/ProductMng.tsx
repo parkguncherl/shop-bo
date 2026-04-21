@@ -563,6 +563,7 @@ const ProductMng = () => {
                   },
                   onImgDoubleClick: (event) => {
                     setTargetedImgInfoForEdit({
+                      //imgFileId: targetedFileSetInfo?.fileId, todo
                       imgFileName: event.srcElement.fileNm,
                       seq: event.srcElement.fileSeq,
                       imgSrc: event.srcElement.fileSrc,

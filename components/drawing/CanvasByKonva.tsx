@@ -25,9 +25,8 @@ interface CanvasByKonvaProps {
   preventDrawing?: boolean; // 드로잉 비활성화 여부
 }
 export interface ImgOnCanvasByKonva {
-  imgFileName?: string;
+  imgFileName?: string; // 참조 콜백에서 반환할 파일명을 위하여 필요
   imgSrc?: string;
-  seq?: number;
 }
 export type CanvasByKonvaRef = Konva.Stage & CanvasByKonvaCustomsRef;
 type CanvasByKonvaCustomsRef = {
@@ -680,7 +679,14 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
             }
 
             const snapshotsStat = getState();
-            if (snapshotsStat.lines.length == 0 && snapshotsStat.texts.length == 0 && snapshotsStat.imgs.length == 0) return null; // 어떠한 편집 동작도 이루어지지 않은 상태에서는 동작하지 아니함
+            if (
+              snapshotsStat.lines.length == 0 && // line
+              snapshotsStat.texts.length == 0 && // 텍스트
+              snapshotsStat.imgs.length == 0 && // 이미지
+              snapshotsStat.dimensionLines.length == 0 // 치수선에 대한 어떠한 편집도 일어나지 아니한 경우
+            ) {
+              return null; // 어떠한 편집 동작도 이루어지지 않은 상태에서는 동작하지 아니함
+            }
 
             const dataUrl = stageRef.current.toDataURL({ pixelRatio: 2 });
             const res = await fetch(dataUrl);

@@ -11,6 +11,7 @@ import { ConfirmModal } from '../../ConfirmModal';
 import { Search } from '../../content';
 
 export interface ImgPropsOnEditPop {
+  imgFileId?: number;
   imgFileName?: string;
   imgSrc?: string;
   seq?: number;
@@ -184,6 +185,7 @@ const ImgEditPop = ({ open, onClose, imgProps }: ImgEditPopProps) => {
               console.error('파일을 저장할 수 없음');
               return;
             }
+            console.log('file: ', file);
           });
         }}
         title={'수정된 이미지로 기존 이미지를 대체하시겠습니까?'}
