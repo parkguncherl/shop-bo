@@ -50,11 +50,11 @@ const ImgEditPop = ({ open, onClose, onImgFileUpdated, imgProps }: ImgEditPopPro
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
-          toastSuccess('컨텐츠가 정상 삭제되었습니다.');
+          toastSuccess('컨텐츠가 정상 수정되었습니다.');
           if (onImgFileUpdated) await onImgFileUpdated();
           onCloseCommon();
         } else {
-          toastError(`컨텐츠 삭제 도중 문제 발생 (${e.data.resultMessage})`);
+          toastError(`컨텐츠 수정 도중 문제 발생 (${e.data.resultMessage})`);
         }
       } catch (e) {
         console.log(e);
