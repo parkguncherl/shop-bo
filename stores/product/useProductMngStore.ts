@@ -18,7 +18,7 @@ import {
 import { AxiosPromise } from 'axios';
 import { authApi } from '../../libs';
 
-type ModalType = 'IMG_UPLOAD' | 'PROD_INFO_ADD' | 'PROD_MOD' | 'PROD_DET_INFO' | 'PROD_DEL' | 'PROD_BY_CATEGORY';
+type ModalType = 'IMG_UPLOAD' | 'PROD_INFO_ADD' | 'PROD_MOD' | 'PROD_DET_INFO' | 'PROD_DEL' | 'PROD_BY_CATEGORY' | 'IMG_EDIT';
 
 interface ModalState {
   type: ModalType;

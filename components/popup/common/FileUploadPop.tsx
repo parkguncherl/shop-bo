@@ -25,11 +25,11 @@ interface FileUploadPopProps {
   onlyImg?: boolean;
   fileId?: number;
   limOnImg?: LimitationOnImg;
-  imageFileWidth?: number;
-  imageFileHeight?: number;
+  // imageFileWidth?: number;
+  // imageFileHeight?: number;
 }
 
-export const FileUploadPop = ({ open, onClose, onSuccess, onlyImg = false, fileId, limOnImg, imageFileWidth, imageFileHeight }: FileUploadPopProps) => {
+export const FileUploadPop = ({ open, onClose, onSuccess, onlyImg = false, fileId, limOnImg }: FileUploadPopProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const generatedId = useId();
@@ -138,10 +138,10 @@ export const FileUploadPop = ({ open, onClose, onSuccess, onlyImg = false, fileI
 
     formData.append('fileId', fileId.toString());
 
-    if (imageFileWidth && imageFileHeight) {
-      formData.append('imageFileWidth', imageFileWidth.toString());
-      formData.append('imageFileHeight', imageFileHeight.toString());
-    }
+    // if (imageFileWidth && imageFileHeight) {
+    //   formData.append('imageFileWidth', imageFileWidth.toString());
+    //   formData.append('imageFileHeight', imageFileHeight.toString());
+    // }
 
     authApi
       .post('/common/imgfile/uploads', formData, {

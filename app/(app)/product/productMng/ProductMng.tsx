@@ -49,12 +49,13 @@ const ProductMng = () => {
   const { onGridReady } = useAgGridApi();
 
   /** 공통 스토어 - State */
-  const [upMenuNm, menuNm, getFileUrl, selectFileList, updateImageFile] = useCommonStore((s) => [
+  const [upMenuNm, menuNm, getFileUrl, selectFileList, updateImageFile, uploadImageFiles] = useCommonStore((s) => [
     s.upMenuNm,
     s.menuNm,
     s.getFileUrl,
     s.selectFileList,
     s.updateImageFile,
+    s.uploadImageFiles,
   ]);
 
   /** 품목관리 스토어 - State */
@@ -75,7 +76,7 @@ const ProductMng = () => {
   const [productDetInfo, setProductDetInfo] = useState<ProductMngResponseProductDetInfo | undefined>(undefined); // prodId + prodDetColor 조합으로 조회된 결과는 고유하리라 기대되니 배열이 아닌 단일 객체로 관리
 
   const [targetedFileSetInfo, setTargetedFileSetInfo] = useState<targetedFileSetInfo | undefined>(undefined);
-  const [targetedImgInfoForEdit, setTargetedImgInfoForEdit] = useState<ImgPropsOnEditPop | undefined>(undefined);
+  //const [targetedImgInfoForEdit, setTargetedImgInfoForEdit] = useState<ImgPropsOnEditPop | undefined>(undefined);
 
   const [selectedRowsData, setSelectedRowsData] = useState<ProductMngResponseProductInfo | undefined>(undefined);
 
@@ -102,7 +103,8 @@ const ProductMng = () => {
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('컨텐츠가 정상 수정되었습니다.');
-          setTargetedImgInfoForEdit(undefined); // 팝업 닫음
+          //setTargetedImgInfoForEdit(undefined); // 팝업 닫음
+          closeModal('IMG_EDIT');
           if (targetedFileSetInfo?.fileId) {
             setTargetedFileSetInfo({
               ...targetedFileSetInfo,
@@ -121,6 +123,37 @@ const ProductMng = () => {
           }
         } else {
           toastError(`컨텐츠 수정 도중 문제 발생 (${e.data.resultMessage})`);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+  });
+
+  const { mutate: uploadImageFilesMutate } = useMutation({
+    mutationFn: uploadImageFiles,
+    onSuccess: async (e) => {
+      try {
+        if (e.data.resultCode === 200) {
+          toastSuccess('이미지가 정상적으로 업로드되었습니다.');
+          if (targetedFileSetInfo?.fileId) {
+            setTargetedFileSetInfo({
+              ...targetedFileSetInfo,
+              fileInfos: await selectFileList(targetedFileSetInfo?.fileId).then(async (fileDetList) => {
+                const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
+                for (let index = 0; index < fileDetList.length; index++) {
+                  fileSetsElementInfos.push({
+                    fileNm: fileDetList[index].fileNm,
+                    fileSeq: fileDetList[index].fileSeq,
+                    fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
+                  });
+                }
+                return fileSetsElementInfos;
+              }),
+            });
+          }
+        } else {
+          toastError(`이미지 업로드 도중 문제 발생 (${e.data.resultMessage})`);
         }
       } catch (e) {
         console.log(e);
@@ -599,12 +632,18 @@ const ProductMng = () => {
                     setTargetedFileSetInfo(refreshedTargetedFileSetInfo);
                   },
                   onImgDoubleClick: (event) => {
-                    setTargetedImgInfoForEdit({
+                    openModal('IMG_EDIT', {
                       imgFileId: targetedFileSetInfo?.fileId,
                       imgFileName: event.srcElement.fileNm,
                       seq: event.srcElement.fileSeq,
                       imgSrc: event.srcElement.fileSrc,
                     });
+                    // setTargetedImgInfoForEdit({
+                    //   imgFileId: targetedFileSetInfo?.fileId,
+                    //   imgFileName: event.srcElement.fileNm,
+                    //   seq: event.srcElement.fileSeq,
+                    //   imgSrc: event.srcElement.fileSrc,
+                    // });
                   },
                 }}
               >
@@ -722,15 +761,41 @@ const ProductMng = () => {
         }}
       />
       <ImgEditPop
-        open={targetedImgInfoForEdit != undefined}
-        onClose={() => {
-          setTargetedImgInfoForEdit(undefined);
-        }}
-        imgProps={targetedImgInfoForEdit}
+        //open={targetedImgInfoForEdit != undefined}
+        // onClose={() => {
+        //   //setTargetedImgInfoForEdit(undefined);
+        // }}
+        open={modals.type == 'IMG_EDIT' && modals.active}
+        onClose={() => closeModal('IMG_EDIT')}
+        // imgProps={targetedImgInfoForEdit}
+        // onFileIsExportedByConf={(file) => {
+        //   if (targetedImgInfoForEdit == undefined || targetedImgInfoForEdit.imgSrc == undefined) {
+        //     // 배경 이미지가 부재한 경우, 즉 free form 화이트보드인 경우
+        //     // todo 신규 업로드
+        //     if (targetedFileSetInfo?.fileId) {
+        //       uploadImageFilesMutate({ fileId: targetedFileSetInfo?.fileId, uploadFiles: [file] });
+        //     }
+        //   } else {
+        //     if (!targetedImgInfoForEdit?.imgFileId) {
+        //       console.error('이미지 파일 식별자(fileId)를 찾을 수 없음');
+        //       return;
+        //     }
+        //     if (!targetedImgInfoForEdit.seq) {
+        //       console.error('이미지의 순서(seq) 정보를 찾을 수 없음');
+        //       return;
+        //     }
+        //     updateImageFileMutate({ fileId: targetedImgInfoForEdit.imgFileId, fileSeq: targetedImgInfoForEdit.seq, uploadFile: file });
+        //   }
+        // }}
+        imgProps={modals.stored_temporary as ImgPropsOnEditPop | undefined}
         onFileIsExportedByConf={(file) => {
+          const targetedImgInfoForEdit = modals.stored_temporary as ImgPropsOnEditPop | undefined;
           if (targetedImgInfoForEdit == undefined || targetedImgInfoForEdit.imgSrc == undefined) {
             // 배경 이미지가 부재한 경우, 즉 free form 화이트보드인 경우
             // todo 신규 업로드
+            if (targetedFileSetInfo?.fileId) {
+              uploadImageFilesMutate({ fileId: targetedFileSetInfo?.fileId, uploadFiles: [file] });
+            }
           } else {
             if (!targetedImgInfoForEdit?.imgFileId) {
               console.error('이미지 파일 식별자(fileId)를 찾을 수 없음');

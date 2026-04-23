@@ -1,7 +1,7 @@
 import { create, StateCreator } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { ApiResponse, CommonRequestFileDownload, CommonRequestFileRearrangementRequest, FileDet } from '../generated';
+import { ApiResponse, CommonRequestFileDownload, CommonRequestFileRearrangementRequest, CommonRequestFileUploads, FileDet } from '../generated';
 import { AxiosPromise } from 'axios';
 import { authApi, authDownApi } from '../libs';
 import { GridRequest } from '../generated/src/model/grid-request';
@@ -58,6 +58,7 @@ interface CommonApiState {
   // initGridColumnState: (gridRequest: GridRequest) => AxiosPromise<ApiResponse>;
   //getFilterData: (filterDataList: FilterData[], uri: string) => any;
   rearrangeFilesByStepsToMove: (commonRequestFileRearrangementRequest: CommonRequestFileRearrangementRequest) => AxiosPromise<ApiResponse>;
+  uploadImageFiles: (commonRequestFileUploads: { fileId: number; uploadFiles: Array<File> }) => AxiosPromise<ApiResponse>;
   updateImageFile: (commonRequestFileUpdate: { fileId: number; fileSeq: number; uploadFile: File }) => AxiosPromise<ApiResponse>;
 }
 
@@ -254,6 +255,18 @@ const initialStateCreator: StateCreator<CommonState & CommonApiState, any> = (se
     // },
     rearrangeFilesByStepsToMove: (commonRequestFileRearrangementRequest) => {
       return authApi.patch('/common/rearrangeFilesByStepsToMove', commonRequestFileRearrangementRequest);
+    },
+    uploadImageFiles: (commonRequestFileUploads) => {
+      const formData = new FormData();
+      commonRequestFileUploads.uploadFiles.forEach((f) => {
+        formData.append('uploadFiles', f); // 멀티 파일 추가
+      });
+
+      formData.append('fileId', commonRequestFileUploads.fileId.toString());
+
+      return authApi.post('/common/imgfile/uploads', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
     },
     updateImageFile: (commonRequestFileUpdate) => {
       const formData = new FormData();
