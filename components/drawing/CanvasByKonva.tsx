@@ -1039,18 +1039,24 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
                 );
               }}
               onChangeByEditor={(evt) => {
-                commitTextInfo(
-                  textInfoList.map((prev, prevI) => {
-                    if (prevI == index) {
-                      return {
-                        ...prev,
-                        ...evt,
-                      };
-                    } else {
-                      return prev;
-                    }
-                  }),
-                );
+                if (evt.content != undefined && evt.content == '') {
+                  // 텍스트 공란인 경우 지움 동작
+                  commitTextInfo(textInfoList.filter((_, prevI) => prevI != index));
+                } else {
+                  // 그 외
+                  commitTextInfo(
+                    textInfoList.map((prev, prevI) => {
+                      if (prevI == index) {
+                        return {
+                          ...prev,
+                          ...evt,
+                        };
+                      } else {
+                        return prev;
+                      }
+                    }),
+                  );
+                }
               }}
             />
           ))}
