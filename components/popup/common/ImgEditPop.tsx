@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { PopupFooter } from '../PopupFooter';
 import { PopupContent } from '../PopupContent';
 import { PopupLayout } from '../PopupLayout';
-import CanvasByKonva, { CanvasByKonvaRef, ImgOnCanvasByKonva } from '../../drawing/CanvasByKonva';
+import CanvasByKonva, { CanvasByKonvaRef } from '../../drawing/CanvasByKonva';
 import useFilters from '../../../hooks/useFilters';
 import { CustomColorPicker } from '../../CustomColorPicker';
 import { toastError, toastSuccess } from '../../ToastMessage';
@@ -27,7 +27,7 @@ interface ImgEditPopProps {
   imgProps?: ImgPropsOnEditPop;
 }
 
-/** konva 기반 컴포넌트를 통한 이미지 편집 팝업 */
+/** konva 기반 컴포넌트를 통한 이미지 편집 팝업, 이미지 인자가 제공되지 아니하는 경우 free form */
 const ImgEditPop = ({ open, onClose, onImgFileUpdated, imgProps }: ImgEditPopProps) => {
   const topWrapperRef = useRef<HTMLDivElement>(null);
   const canvasByKonvaRef = useRef<CanvasByKonvaRef>(null);
@@ -39,7 +39,7 @@ const ImgEditPop = ({ open, onClose, onImgFileUpdated, imgProps }: ImgEditPopPro
   const [colorPickerOpened, setColorPickerOpened] = useState(false);
   const [updateConfOpened, setUpdateConfOpened] = useState(false);
 
-  const [imgOnKonva, setImgOnKonva] = useState<ImgOnCanvasByKonva | undefined>(undefined);
+  //const [imgOnKonva, setImgOnKonva] = useState<ImgOnCanvasByKonva | undefined>(undefined);
 
   const [filters, onChangeFilters] = useFilters({
     textColor: '#000000',
@@ -69,9 +69,9 @@ const ImgEditPop = ({ open, onClose, onImgFileUpdated, imgProps }: ImgEditPopPro
     if (onClose) onClose();
   };
 
-  useEffect(() => {
-    setImgOnKonva(imgProps != undefined ? { imgFileName: imgProps.imgFileName, imgSrc: imgProps.imgSrc } : undefined);
-  }, [imgProps]);
+  // useEffect(() => {
+  //   setImgOnKonva(imgProps != undefined ? { imgFileName: imgProps.imgFileName, imgSrc: imgProps.imgSrc } : undefined);
+  // }, [imgProps]);
 
   return (
     <div className="imgPopBox">
@@ -214,7 +214,8 @@ const ImgEditPop = ({ open, onClose, onImgFileUpdated, imgProps }: ImgEditPopPro
           <div className={'imgEditPop'} ref={topWrapperRef}>
             <CanvasByKonva
               wrapperRef={topWrapperRef}
-              img={imgOnKonva}
+              img={imgProps}
+              //img={imgOnKonva}
               ref={canvasByKonvaRef}
               preview={preview}
               textConfig={{
@@ -236,18 +237,35 @@ const ImgEditPop = ({ open, onClose, onImgFileUpdated, imgProps }: ImgEditPopPro
         onConfirm={() => {
           canvasByKonvaRef.current.customs.api.exportAsFile().then((file: File | null) => {
             if (file == null) {
+              // 기본 fallback
               console.error('파일을 저장할 수 없음');
               return;
             }
-            if (!imgProps?.imgFileId) {
-              console.error('이미지 파일 식별자(fileId)를 찾을 수 없음');
-              return;
+
+            if (imgProps == undefined || imgProps.imgSrc == undefined) {
+              // 배경 이미지가 부재한 경우, 즉 free form 화이트보드인 경우
+              // if (imgProps) {
+              //   if (!imgProps?.imgFileId) {
+              //     console.error('이미지 파일 식별자(fileId)를 찾을 수 없음');
+              //     return;
+              //   }
+              //   if (!imgProps.seq) {
+              //     console.error('이미지의 순서(seq) 정보를 찾을 수 없음');
+              //     return;
+              //   }
+              //   updateImageFileMutate({ fileId: imgProps.imgFileId, fileSeq: imgProps.seq, uploadFile: file });
+              // }
+            } else {
+              if (!imgProps?.imgFileId) {
+                console.error('이미지 파일 식별자(fileId)를 찾을 수 없음');
+                return;
+              }
+              if (!imgProps.seq) {
+                console.error('이미지의 순서(seq) 정보를 찾을 수 없음');
+                return;
+              }
+              updateImageFileMutate({ fileId: imgProps.imgFileId, fileSeq: imgProps.seq, uploadFile: file });
             }
-            if (!imgProps.seq) {
-              console.error('이미지의 순서(seq) 정보를 찾을 수 없음');
-              return;
-            }
-            updateImageFileMutate({ fileId: imgProps.imgFileId, fileSeq: imgProps.seq, uploadFile: file });
           });
         }}
         title={'수정된 이미지로 기존 이미지를 대체하시겠습니까?'}
