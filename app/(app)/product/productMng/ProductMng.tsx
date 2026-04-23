@@ -49,8 +49,13 @@ const ProductMng = () => {
   const { onGridReady } = useAgGridApi();
 
   /** 공통 스토어 - State */
-  const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
-  const [getFileUrl, selectFileList] = useCommonStore((s) => [s.getFileUrl, s.selectFileList]);
+  const [upMenuNm, menuNm, getFileUrl, selectFileList, updateImageFile] = useCommonStore((s) => [
+    s.upMenuNm,
+    s.menuNm,
+    s.getFileUrl,
+    s.selectFileList,
+    s.updateImageFile,
+  ]);
 
   /** 품목관리 스토어 - State */
   const [modals, openModal, closeModal, deleteProduct] = useProductMngStore((s) => [s.modals, s.openModal, s.closeModal, s.deleteProduct]);
@@ -84,6 +89,38 @@ const ProductMng = () => {
           await productInfosRefetch();
         } else {
           toastError(`컨텐츠 삭제 도중 문제 발생 (${e.data.resultMessage})`);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+  });
+
+  const { mutate: updateImageFileMutate } = useMutation({
+    mutationFn: updateImageFile,
+    onSuccess: async (e) => {
+      try {
+        if (e.data.resultCode === 200) {
+          toastSuccess('컨텐츠가 정상 수정되었습니다.');
+          setTargetedImgInfoForEdit(undefined); // 팝업 닫음
+          if (targetedFileSetInfo?.fileId) {
+            setTargetedFileSetInfo({
+              ...targetedFileSetInfo,
+              fileInfos: await selectFileList(targetedFileSetInfo?.fileId).then(async (fileDetList) => {
+                const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
+                for (let index = 0; index < fileDetList.length; index++) {
+                  fileSetsElementInfos.push({
+                    fileNm: fileDetList[index].fileNm,
+                    fileSeq: fileDetList[index].fileSeq,
+                    fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
+                  });
+                }
+                return fileSetsElementInfos;
+              }),
+            });
+          }
+        } else {
+          toastError(`컨텐츠 수정 도중 문제 발생 (${e.data.resultMessage})`);
         }
       } catch (e) {
         console.log(e);
@@ -690,24 +727,40 @@ const ProductMng = () => {
           setTargetedImgInfoForEdit(undefined);
         }}
         imgProps={targetedImgInfoForEdit}
-        onImgFileUpdated={async () => {
-          if (targetedFileSetInfo?.fileId) {
-            setTargetedFileSetInfo({
-              ...targetedFileSetInfo,
-              fileInfos: await selectFileList(targetedFileSetInfo?.fileId).then(async (fileDetList) => {
-                const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
-                for (let index = 0; index < fileDetList.length; index++) {
-                  fileSetsElementInfos.push({
-                    fileNm: fileDetList[index].fileNm,
-                    fileSeq: fileDetList[index].fileSeq,
-                    fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
-                  });
-                }
-                return fileSetsElementInfos;
-              }),
-            });
+        onFileIsExportedByConf={(file) => {
+          if (targetedImgInfoForEdit == undefined || targetedImgInfoForEdit.imgSrc == undefined) {
+            // 배경 이미지가 부재한 경우, 즉 free form 화이트보드인 경우
+            // todo 신규 업로드
+          } else {
+            if (!targetedImgInfoForEdit?.imgFileId) {
+              console.error('이미지 파일 식별자(fileId)를 찾을 수 없음');
+              return;
+            }
+            if (!targetedImgInfoForEdit.seq) {
+              console.error('이미지의 순서(seq) 정보를 찾을 수 없음');
+              return;
+            }
+            updateImageFileMutate({ fileId: targetedImgInfoForEdit.imgFileId, fileSeq: targetedImgInfoForEdit.seq, uploadFile: file });
           }
         }}
+        // onImgFileUpdated={async () => {
+        //   if (targetedFileSetInfo?.fileId) {
+        //     setTargetedFileSetInfo({
+        //       ...targetedFileSetInfo,
+        //       fileInfos: await selectFileList(targetedFileSetInfo?.fileId).then(async (fileDetList) => {
+        //         const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
+        //         for (let index = 0; index < fileDetList.length; index++) {
+        //           fileSetsElementInfos.push({
+        //             fileNm: fileDetList[index].fileNm,
+        //             fileSeq: fileDetList[index].fileSeq,
+        //             fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
+        //           });
+        //         }
+        //         return fileSetsElementInfos;
+        //       }),
+        //     });
+        //   }
+        // }}
       />
     </div>
   );

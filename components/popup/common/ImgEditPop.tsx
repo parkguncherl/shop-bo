@@ -23,12 +23,13 @@ export interface ImgPropsOnEditPop {
 interface ImgEditPopProps {
   open: boolean;
   onClose: () => void;
-  onImgFileUpdated?: () => Promise<void>;
+  //onImgFileUpdated?: () => Promise<void>;
   imgProps?: ImgPropsOnEditPop;
+  onFileIsExportedByConf: (file: File) => void;
 }
 
 /** konva 기반 컴포넌트를 통한 이미지 편집 팝업, 이미지 인자가 제공되지 아니하는 경우 free form */
-const ImgEditPop = ({ open, onClose, onImgFileUpdated, imgProps }: ImgEditPopProps) => {
+const ImgEditPop = ({ open, onClose, imgProps, onFileIsExportedByConf }: ImgEditPopProps) => {
   const topWrapperRef = useRef<HTMLDivElement>(null);
   const canvasByKonvaRef = useRef<CanvasByKonvaRef>(null);
   const topSearchWrapperRef = useRef<HTMLDivElement>(null);
@@ -54,7 +55,7 @@ const ImgEditPop = ({ open, onClose, onImgFileUpdated, imgProps }: ImgEditPopPro
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('컨텐츠가 정상 수정되었습니다.');
-          if (onImgFileUpdated) await onImgFileUpdated();
+          //if (onImgFileUpdated) await onImgFileUpdated();
           onCloseCommon();
         } else {
           toastError(`컨텐츠 수정 도중 문제 발생 (${e.data.resultMessage})`);
@@ -241,34 +242,28 @@ const ImgEditPop = ({ open, onClose, onImgFileUpdated, imgProps }: ImgEditPopPro
               console.error('파일을 저장할 수 없음');
               return;
             }
-
-            if (imgProps == undefined || imgProps.imgSrc == undefined) {
-              // 배경 이미지가 부재한 경우, 즉 free form 화이트보드인 경우
-              // if (imgProps) {
-              //   if (!imgProps?.imgFileId) {
-              //     console.error('이미지 파일 식별자(fileId)를 찾을 수 없음');
-              //     return;
-              //   }
-              //   if (!imgProps.seq) {
-              //     console.error('이미지의 순서(seq) 정보를 찾을 수 없음');
-              //     return;
-              //   }
-              //   updateImageFileMutate({ fileId: imgProps.imgFileId, fileSeq: imgProps.seq, uploadFile: file });
-              // }
-            } else {
-              if (!imgProps?.imgFileId) {
-                console.error('이미지 파일 식별자(fileId)를 찾을 수 없음');
-                return;
-              }
-              if (!imgProps.seq) {
-                console.error('이미지의 순서(seq) 정보를 찾을 수 없음');
-                return;
-              }
-              updateImageFileMutate({ fileId: imgProps.imgFileId, fileSeq: imgProps.seq, uploadFile: file });
-            }
+            onFileIsExportedByConf(file);
+            // if (imgProps == undefined || imgProps.imgSrc == undefined) {
+            //   // 배경 이미지가 부재한 경우, 즉 free form 화이트보드인 경우
+            //   onFileIsExportedByConf(file);
+            // } else {
+            //   if (!imgProps?.imgFileId) {
+            //     console.error('이미지 파일 식별자(fileId)를 찾을 수 없음');
+            //     return;
+            //   }
+            //   if (!imgProps.seq) {
+            //     console.error('이미지의 순서(seq) 정보를 찾을 수 없음');
+            //     return;
+            //   }
+            //   updateImageFileMutate({ fileId: imgProps.imgFileId, fileSeq: imgProps.seq, uploadFile: file });
+            // }
           });
         }}
-        title={'수정된 이미지로 기존 이미지를 대체하시겠습니까?'}
+        title={
+          imgProps == undefined || imgProps.imgSrc == undefined
+            ? '화이트보드에 작성된 현 상태를 이미지로서 저장하시겠습니까?'
+            : '수정된 이미지로 기존 이미지를 대체하시겠습니까?'
+        }
       />
     </div>
   );
