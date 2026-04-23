@@ -23,6 +23,7 @@ interface CanvasByKonvaProps {
   };
   lineConfig?: Omit<Lines, 'tool' | 'points'>;
   preventDrawing?: boolean; // 드로잉 비활성화 여부
+  enableEmbeddedUndoRedoBtn?: boolean;
 }
 export interface ImgOnCanvasByKonva {
   imgFileName?: string; // 참조 콜백에서 반환할 파일명을 위하여 필요
@@ -35,6 +36,8 @@ type CanvasByKonvaCustomsRef = {
       addNewText: (value?: string) => void;
       addNewDimensionLine: () => void;
       exportAsFile: (fileName?: string) => Promise<File | null>;
+      undo: () => void;
+      redo: () => void;
     };
   };
 };
@@ -527,7 +530,17 @@ const DimensionLine = ({ enablePreviewMode, dimensionLine, onTransformed, onDrag
  * konva를 통한 주어진 이미지 에디팅을 가능하게 하는 StateFul 컴포넌트
  *
  * */
-const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig, lineConfig, preventDrawing }: CanvasByKonvaProps) => {
+const CanvasByKonva = ({
+  img,
+  wrapperRef,
+  ref,
+  tool = 'pen',
+  preview,
+  textConfig,
+  lineConfig,
+  preventDrawing,
+  enableEmbeddedUndoRedoBtn,
+}: CanvasByKonvaProps) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   const [mainImgRepInfo, setMainImgRepInfo] = useState<ImageRepInfo | undefined>(undefined);
@@ -610,6 +623,24 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
       });
     } catch (error) {
       console.error('이미지 로드 실패:', error);
+    }
+  };
+
+  const handleUndo = () => {
+    const prev = undo();
+    if (prev) {
+      setTextInfoList(prev.texts);
+      setLines(prev.lines);
+      setImgRepInfoList(prev.imgs);
+    }
+  };
+
+  const handleRedo = () => {
+    const next = redo();
+    if (next) {
+      setTextInfoList(next.texts);
+      setLines(next.lines);
+      setImgRepInfoList(next.imgs);
     }
   };
 
@@ -698,6 +729,8 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
               { type: 'image/png' },
             );
           },
+          undo: handleUndo,
+          redo: handleRedo,
         },
       },
     });
@@ -795,24 +828,6 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
   // 마우스 이탈
   const handleMouseLeave = () => {
     isDrawing.current = false;
-  };
-
-  const handleUndo = () => {
-    const prev = undo();
-    if (prev) {
-      setTextInfoList(prev.texts);
-      setLines(prev.lines);
-      setImgRepInfoList(prev.imgs);
-    }
-  };
-
-  const handleRedo = () => {
-    const next = redo();
-    if (next) {
-      setTextInfoList(next.texts);
-      setLines(next.lines);
-      setImgRepInfoList(next.imgs);
-    }
   };
 
   // 파일 검증 및 추가 공통 로직
@@ -1060,8 +1075,12 @@ const CanvasByKonva = ({ img, wrapperRef, ref, tool = 'pen', preview, textConfig
               }}
             />
           ))}
-          <Image name="undo-btn" x={0} y={0} onClick={handleUndo} image={undoImg} width={12} height={12} scaleX={1} scaleY={1} />
-          <Image name="redo-btn" x={20} y={0} onClick={handleRedo} image={redoImg} width={12} height={12} scaleX={1} scaleY={1} />
+          {!preview && enableEmbeddedUndoRedoBtn && (
+            <>
+              <Image name="undo-btn" x={0} y={0} onClick={handleUndo} image={undoImg} width={12} height={12} scaleX={1} scaleY={1} />
+              <Image name="redo-btn" x={20} y={0} onClick={handleRedo} image={redoImg} width={12} height={12} scaleX={1} scaleY={1} />
+            </>
+          )}
         </Layer>
       </Stage>
     </div>

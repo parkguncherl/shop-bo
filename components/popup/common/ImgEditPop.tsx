@@ -11,6 +11,9 @@ import { ConfirmModal } from '../../ConfirmModal';
 import { Search } from '../../content';
 import { useMutation } from '@tanstack/react-query';
 
+import icoUndo from '../../../public/images/ico_undo.svg';
+import icoRedo from '../../../public/images/ico_redo.svg';
+
 export interface ImgPropsOnEditPop {
   imgFileId?: number;
   imgFileName?: string;
@@ -73,7 +76,7 @@ const ImgEditPop = ({ open, onClose, onImgFileUpdated, imgProps }: ImgEditPopPro
   return (
     <div className="imgPopBox">
       <PopupLayout
-        width={900}
+        width={930}
         open={open}
         isEscClose={true}
         title={'이미지 수정'}
@@ -178,6 +181,33 @@ const ImgEditPop = ({ open, onClose, onImgFileUpdated, imgProps }: ImgEditPopPro
                     onChangeFilters(name, Number(value));
                   }}
                 />
+                <dl>
+                  <dt>
+                    <label>{'뒤로(혹은 앞으로)가기'}</label>
+                  </dt>
+                  <dd>
+                    <div className={`formBox`}>
+                      <div style={{ padding: '3px' }}>
+                        <img
+                          src={icoUndo.src}
+                          style={{ width: '15px', height: '15px' }}
+                          onClick={() => {
+                            canvasByKonvaRef.current.customs.api.undo();
+                          }}
+                        />
+                      </div>
+                      <div style={{ padding: '3px' }}>
+                        <img
+                          src={icoRedo.src}
+                          style={{ width: '15px', height: '15px' }}
+                          onClick={() => {
+                            canvasByKonvaRef.current.customs.api.redo();
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </dd>
+                </dl>
               </div>
             </div>
           </div>
