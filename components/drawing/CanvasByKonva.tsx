@@ -644,6 +644,15 @@ const CanvasByKonva = ({
     }
   };
 
+  const syncDimensionsState = (dimensions: { width?: number; height?: number }) => {
+    setDimensions((prevState) => {
+      return {
+        ...prevState,
+        ...dimensions,
+      };
+    });
+  };
+
   /** 참조를 통해 외부로 노출되는 영역을 정의함 */
   useImperativeHandle<Konva.Stage, CanvasByKonvaRef>(ref, () => {
     return Object.assign<Konva.Stage, CanvasByKonvaCustomsRef>(stageRef.current ?? {}, {
@@ -738,19 +747,12 @@ const CanvasByKonva = ({
 
   useEffect(() => {
     // 이미지 정보 변경 시점에 필요한 초기화(혹은 동기화) 동작
+    const stageWidth = wrapperRef.current?.offsetWidth || 0;
+    const stageHeight = wrapperRef.current?.offsetHeight || 0;
+
     if (img && img.imgSrc) {
       getCleanKonvaImage(img.imgSrc).then((image) => {
         if (image) {
-          const stageWidth = wrapperRef.current?.offsetWidth || 0;
-          const stageHeight = wrapperRef.current?.offsetHeight || 0;
-
-          if (wrapperRef.current) {
-            setDimensions({
-              width: stageWidth,
-              height: stageHeight,
-            });
-          }
-
           // 1. 비율 계산 (비교)
           const widthRatio = stageWidth / image.width;
           const heightRatio = stageHeight / image.height;
@@ -759,20 +761,28 @@ const CanvasByKonva = ({
           const newScale = Math.min(widthRatio, heightRatio); // 비율(scale)
 
           // 3. 실질적인 너비와 높이 구하기
-          const finalWidth = image.width * newScale;
-          const finalHeight = image.height * newScale;
+          const scaledWidth = image.width * newScale;
+          const scaledHeight = image.height * newScale;
+
+          const finalWidth = scaledWidth == stageWidth ? stageWidth : scaledWidth;
+          const finalHeight = scaledHeight == stageHeight ? stageHeight : scaledHeight;
+
+          syncDimensionsState({
+            width: finalWidth,
+            height: finalHeight,
+          });
 
           // 4. 중앙 정렬을 위한 좌표(x, y) 구하기
-          const x = (stageWidth - finalWidth) / 2;
-          const y = (stageHeight - finalHeight) / 2;
+          // const x = (stageWidth - finalWidth) / 2;
+          // const y = (stageHeight - finalHeight) / 2;
 
           // 최초 set State 이후에도 여전히 최초 요소 자리를 유지하여야(요소 순으로 z indexing)
           setMainImgRepInfo({
             src: image.src,
             width: finalWidth,
             height: finalHeight,
-            x: x,
-            y: y,
+            x: 0,
+            y: 0,
 
             scaleX: newScale,
             scaleY: newScale,
@@ -780,6 +790,16 @@ const CanvasByKonva = ({
           });
         }
       });
+    }
+
+    if (!img || img.imgSrc == undefined) {
+      // 이미지 정보 부재한 경우 화이트보드 랜더링
+      syncDimensionsState({
+        width: stageWidth,
+        height: stageHeight,
+      });
+
+      setMainImgRepInfo(undefined);
     }
   }, [img]);
 
