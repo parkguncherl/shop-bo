@@ -35,7 +35,7 @@ const ImgEditPop = ({ open, onClose, imgProps, onFileIsExportedByConf }: ImgEdit
   const [colorPickerOpened, setColorPickerOpened] = useState(false);
   const [updateConfOpened, setUpdateConfOpened] = useState(false);
 
-  const [filters, onChangeFilters] = useFilters({
+  const [filters, onChangeFilters, onFiltersReset] = useFilters({
     textColor: '#000000',
     textScale: undefined,
     lineColor: '#FF4A00',
@@ -44,6 +44,10 @@ const ImgEditPop = ({ open, onClose, imgProps, onFileIsExportedByConf }: ImgEdit
 
   const onCloseCommon = () => {
     if (onClose) onClose();
+    onFiltersReset();
+    setPreview(false);
+    setColorPickerOpened(false);
+    setUpdateConfOpened(false);
   };
 
   return (

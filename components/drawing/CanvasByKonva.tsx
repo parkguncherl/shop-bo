@@ -254,27 +254,28 @@ const TextEditor = (props: TextEditorProps) => {
 
 /** text 에디팅 동작을 위한 필요 영역이 정의된 고수준 영역 */
 const EditableText = ({ textInfo, onMouseDown, onDragEnd, onEditEnd, onChangeByEditor, enablePreviewMode, onTransformed }: EditableTextProps) => {
-  const [status, setStatus] = useState<'editing' | 'transforming' | 'preview'>('transforming'); // 각각 편집, 변환(뒤집기, 늘리기 등의 동작), 미리보기 모드
+  //const [status, setStatus] = useState<'editing' | 'transforming' | 'preview'>('transforming'); // 각각 편집, 변환(뒤집기, 늘리기 등의 동작), 미리보기 모드
+  const [onEditing, setOnEditing] = useState(false);
 
   const textRef = useRef(null);
   const trRef = useRef(null);
 
   useEffect(() => {
     // transformer 활성화를 위하여 랜더링 시점에 text 참조와 연결
-    if (status == 'transforming') {
+    if (!enablePreviewMode && !onEditing) {
       if (trRef.current && textRef.current) {
         (trRef.current as any).nodes([textRef.current]);
       }
     }
-  }, [status]);
+  }, [enablePreviewMode, onEditing]);
 
-  useEffect(() => {
-    if (enablePreviewMode) {
-      setStatus('preview');
-    } else {
-      setStatus('transforming');
-    }
-  }, [enablePreviewMode]);
+  // useEffect(() => {
+  //   if (enablePreviewMode) {
+  //     setStatus('preview');
+  //   } else {
+  //     setStatus('transforming');
+  //   }
+  // }, [enablePreviewMode]);
 
   return (
     <>
@@ -288,12 +289,14 @@ const EditableText = ({ textInfo, onMouseDown, onDragEnd, onEditEnd, onChangeByE
         scaleX={textInfo?.scaleX}
         scaleY={textInfo?.scaleY}
         rotation={textInfo?.rotation}
-        draggable
+        draggable={!enablePreviewMode}
         onMouseDown={onMouseDown}
         onDragEnd={onDragEnd}
-        visible={status != 'editing'}
+        visible={!onEditing}
         onDblClick={() => {
-          setStatus('editing');
+          if (!enablePreviewMode) {
+            setOnEditing(true);
+          }
         }}
         ref={textRef}
         onTransformEnd={() => {
@@ -317,7 +320,7 @@ const EditableText = ({ textInfo, onMouseDown, onDragEnd, onEditEnd, onChangeByE
         fontSize={20}
         fill={textInfo.color}
       />
-      {status == 'editing' && (
+      {onEditing && (
         <TextEditor
           content={textInfo.content}
           textRef={textRef}
@@ -325,16 +328,16 @@ const EditableText = ({ textInfo, onMouseDown, onDragEnd, onEditEnd, onChangeByE
             if (onChangeByEditor) onChangeByEditor(evt);
           }}
           onClose={() => {
-            setStatus('transforming');
+            setOnEditing(false);
             if (onEditEnd) onEditEnd();
           }}
         />
       )}
-      {status == 'transforming' && (
+      {!enablePreviewMode && !onEditing && (
         <Transformer
           ref={trRef}
           enabledAnchors={['middle-left', 'middle-right']}
-          boundBoxFunc={(oldBox: Box, newBox: Box) => {
+          boundBoxFunc={(_: Box, newBox: Box) => {
             return {
               ...newBox,
               width: Math.max(30, (newBox as any).width),
@@ -355,27 +358,27 @@ const TransformableImage = ({
 }: TransformableImageProps) => {
   const [image] = useImage(imgRepInfo.src); // 항상 유효한 HTMLImageElement 보장
 
-  const [status, setStatus] = useState<'transforming' | 'preview'>('transforming'); // 각각 변환(뒤집기, 늘리기 등의 동작), 미리보기 모드
+  //const [status, setStatus] = useState<'transforming' | 'preview'>('transforming'); // 각각 변환(뒤집기, 늘리기 등의 동작), 미리보기 모드
 
   const imageRef = useRef(null);
   const trRef = useRef(null);
 
   useEffect(() => {
-    if (status == 'transforming') {
+    if (!enablePreviewMode) {
       // transformer 활성화를 위하여 랜더링 시점에 image 참조와 연결
       if (trRef.current && imageRef.current) {
         (trRef.current as any).nodes([imageRef.current]);
       }
     }
-  }, [status]);
-
-  useEffect(() => {
-    if (enablePreviewMode) {
-      setStatus('preview');
-    } else {
-      setStatus('transforming');
-    }
   }, [enablePreviewMode]);
+
+  // useEffect(() => {
+  //   if (enablePreviewMode) {
+  //     setStatus('preview');
+  //   } else {
+  //     setStatus('transforming');
+  //   }
+  // }, [enablePreviewMode]);
 
   return (
     <>
@@ -392,10 +395,10 @@ const TransformableImage = ({
         onMouseDown={onMouseDown}
         onDragEnd={onDragEnd}
         ref={imageRef}
-        draggable
-        onDblClick={() => {
-          setStatus('transforming');
-        }}
+        draggable={!enablePreviewMode}
+        // onDblClick={() => {
+        //   setStatus('transforming');
+        // }}
         onTransformEnd={() => {
           const node = imageRef.current as any;
           const scaleX = node.scaleX();
@@ -415,7 +418,7 @@ const TransformableImage = ({
           }
         }}
       />
-      {status == 'transforming' && (
+      {!enablePreviewMode && (
         <Transformer
           ref={trRef}
           flipEnabled={false}
@@ -433,27 +436,27 @@ const TransformableImage = ({
 };
 
 const DimensionLine = ({ enablePreviewMode, dimensionLine, onTransformed, onDragEnd }: DimensionLineProps) => {
-  const [status, setStatus] = useState<'transforming' | 'preview'>('transforming'); // 각각 변환(뒤집기, 늘리기 등의 동작), 미리보기 모드
+  //const [status, setStatus] = useState<'transforming' | 'preview'>('transforming'); // 각각 변환(뒤집기, 늘리기 등의 동작), 미리보기 모드
 
   const shapeRef = useRef(null);
   const trRef = useRef(null);
 
   useEffect(() => {
-    if (status == 'transforming') {
+    if (!enablePreviewMode) {
       // transformer 활성화를 위하여 랜더링 시점에 image 참조와 연결
       if (trRef.current && shapeRef.current) {
         (trRef.current as any).nodes([shapeRef.current]);
       }
     }
-  }, [status]);
-
-  useEffect(() => {
-    if (enablePreviewMode) {
-      setStatus('preview');
-    } else {
-      setStatus('transforming');
-    }
   }, [enablePreviewMode]);
+
+  // useEffect(() => {
+  //   if (enablePreviewMode) {
+  //     setStatus('preview');
+  //   } else {
+  //     setStatus('transforming');
+  //   }
+  // }, [enablePreviewMode]);
 
   const handleTransformEnd = () => {
     const node = shapeRef.current as any;
@@ -503,11 +506,11 @@ const DimensionLine = ({ enablePreviewMode, dimensionLine, onTransformed, onDrag
         hitStrokeWidth={20}
         fill={dimensionLine.color}
         pointerAtBeginning={true}
-        draggable
+        draggable={!enablePreviewMode}
         onTransformEnd={handleTransformEnd}
       />
 
-      {status == 'transforming' && (
+      {!enablePreviewMode && (
         <Transformer
           ref={trRef}
           flipEnabled={false}
@@ -804,11 +807,15 @@ const CanvasByKonva = ({
   }, [img]);
 
   const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
+    const targetName: string = e.target.name();
+
     if (preventDrawing) {
       return; // 클라이언트 의사에 따라 드로잉 이벤트 차단
     }
 
-    const targetName: string = e.target.name();
+    if (preview) {
+      return; // 미리보기 활성화 시점에 드로잉 이벤트 차단
+    }
 
     if (targetName === 'undo-btn' || targetName === 'redo-btn') {
       return; // 드로잉 이벤트 차단
