@@ -1,15 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { PopupFooter } from '../PopupFooter';
 import { PopupContent } from '../PopupContent';
 import { PopupLayout } from '../PopupLayout';
 import CanvasByKonva, { CanvasByKonvaRef } from '../../drawing/CanvasByKonva';
 import useFilters from '../../../hooks/useFilters';
 import { CustomColorPicker } from '../../CustomColorPicker';
-import { toastError, toastSuccess } from '../../ToastMessage';
-import { useCommonStore } from '../../../stores';
+import { toastError } from '../../ToastMessage';
 import { ConfirmModal } from '../../ConfirmModal';
 import { Search } from '../../content';
-import { useMutation } from '@tanstack/react-query';
 
 import icoUndo from '../../../public/images/ico_undo.svg';
 import icoRedo from '../../../public/images/ico_redo.svg';
@@ -23,7 +21,6 @@ export interface ImgPropsOnEditPop {
 interface ImgEditPopProps {
   open: boolean;
   onClose: () => void;
-  //onImgFileUpdated?: () => Promise<void>;
   imgProps?: ImgPropsOnEditPop;
   onFileIsExportedByConf: (file: File) => void;
 }
@@ -34,13 +31,9 @@ const ImgEditPop = ({ open, onClose, imgProps, onFileIsExportedByConf }: ImgEdit
   const canvasByKonvaRef = useRef<CanvasByKonvaRef>(null);
   const topSearchWrapperRef = useRef<HTMLDivElement>(null);
 
-  const [updateImageFile] = useCommonStore((s) => [s.updateImageFile]);
-
   const [preview, setPreview] = useState(false);
   const [colorPickerOpened, setColorPickerOpened] = useState(false);
   const [updateConfOpened, setUpdateConfOpened] = useState(false);
-
-  //const [imgOnKonva, setImgOnKonva] = useState<ImgOnCanvasByKonva | undefined>(undefined);
 
   const [filters, onChangeFilters] = useFilters({
     textColor: '#000000',
@@ -49,30 +42,9 @@ const ImgEditPop = ({ open, onClose, imgProps, onFileIsExportedByConf }: ImgEdit
     lineWidth: undefined,
   });
 
-  const { mutate: updateImageFileMutate } = useMutation({
-    mutationFn: updateImageFile,
-    onSuccess: async (e) => {
-      try {
-        if (e.data.resultCode === 200) {
-          toastSuccess('컨텐츠가 정상 수정되었습니다.');
-          //if (onImgFileUpdated) await onImgFileUpdated();
-          onCloseCommon();
-        } else {
-          toastError(`컨텐츠 수정 도중 문제 발생 (${e.data.resultMessage})`);
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    },
-  });
-
   const onCloseCommon = () => {
     if (onClose) onClose();
   };
-
-  // useEffect(() => {
-  //   setImgOnKonva(imgProps != undefined ? { imgFileName: imgProps.imgFileName, imgSrc: imgProps.imgSrc } : undefined);
-  // }, [imgProps]);
 
   return (
     <div className="imgPopBox">
@@ -216,7 +188,6 @@ const ImgEditPop = ({ open, onClose, imgProps, onFileIsExportedByConf }: ImgEdit
             <CanvasByKonva
               wrapperRef={topWrapperRef}
               img={imgProps}
-              //img={imgOnKonva}
               ref={canvasByKonvaRef}
               preview={preview}
               textConfig={{
@@ -243,20 +214,6 @@ const ImgEditPop = ({ open, onClose, imgProps, onFileIsExportedByConf }: ImgEdit
               return;
             }
             onFileIsExportedByConf(file);
-            // if (imgProps == undefined || imgProps.imgSrc == undefined) {
-            //   // 배경 이미지가 부재한 경우, 즉 free form 화이트보드인 경우
-            //   onFileIsExportedByConf(file);
-            // } else {
-            //   if (!imgProps?.imgFileId) {
-            //     console.error('이미지 파일 식별자(fileId)를 찾을 수 없음');
-            //     return;
-            //   }
-            //   if (!imgProps.seq) {
-            //     console.error('이미지의 순서(seq) 정보를 찾을 수 없음');
-            //     return;
-            //   }
-            //   updateImageFileMutate({ fileId: imgProps.imgFileId, fileSeq: imgProps.seq, uploadFile: file });
-            // }
           });
         }}
         title={
