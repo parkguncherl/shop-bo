@@ -254,7 +254,6 @@ const TextEditor = (props: TextEditorProps) => {
 
 /** text 에디팅 동작을 위한 필요 영역이 정의된 고수준 영역 */
 const EditableText = ({ textInfo, onMouseDown, onDragEnd, onEditEnd, onChangeByEditor, enablePreviewMode, onTransformed }: EditableTextProps) => {
-  //const [status, setStatus] = useState<'editing' | 'transforming' | 'preview'>('transforming'); // 각각 편집, 변환(뒤집기, 늘리기 등의 동작), 미리보기 모드
   const [onEditing, setOnEditing] = useState(false);
 
   const textRef = useRef(null);
@@ -268,14 +267,6 @@ const EditableText = ({ textInfo, onMouseDown, onDragEnd, onEditEnd, onChangeByE
       }
     }
   }, [enablePreviewMode, onEditing]);
-
-  // useEffect(() => {
-  //   if (enablePreviewMode) {
-  //     setStatus('preview');
-  //   } else {
-  //     setStatus('transforming');
-  //   }
-  // }, [enablePreviewMode]);
 
   return (
     <>
@@ -358,8 +349,6 @@ const TransformableImage = ({
 }: TransformableImageProps) => {
   const [image] = useImage(imgRepInfo.src); // 항상 유효한 HTMLImageElement 보장
 
-  //const [status, setStatus] = useState<'transforming' | 'preview'>('transforming'); // 각각 변환(뒤집기, 늘리기 등의 동작), 미리보기 모드
-
   const imageRef = useRef(null);
   const trRef = useRef(null);
 
@@ -371,14 +360,6 @@ const TransformableImage = ({
       }
     }
   }, [enablePreviewMode]);
-
-  // useEffect(() => {
-  //   if (enablePreviewMode) {
-  //     setStatus('preview');
-  //   } else {
-  //     setStatus('transforming');
-  //   }
-  // }, [enablePreviewMode]);
 
   return (
     <>
@@ -396,9 +377,6 @@ const TransformableImage = ({
         onDragEnd={onDragEnd}
         ref={imageRef}
         draggable={!enablePreviewMode}
-        // onDblClick={() => {
-        //   setStatus('transforming');
-        // }}
         onTransformEnd={() => {
           const node = imageRef.current as any;
           const scaleX = node.scaleX();
@@ -436,8 +414,6 @@ const TransformableImage = ({
 };
 
 const DimensionLine = ({ enablePreviewMode, dimensionLine, onTransformed, onDragEnd }: DimensionLineProps) => {
-  //const [status, setStatus] = useState<'transforming' | 'preview'>('transforming'); // 각각 변환(뒤집기, 늘리기 등의 동작), 미리보기 모드
-
   const shapeRef = useRef(null);
   const trRef = useRef(null);
 
@@ -449,14 +425,6 @@ const DimensionLine = ({ enablePreviewMode, dimensionLine, onTransformed, onDrag
       }
     }
   }, [enablePreviewMode]);
-
-  // useEffect(() => {
-  //   if (enablePreviewMode) {
-  //     setStatus('preview');
-  //   } else {
-  //     setStatus('transforming');
-  //   }
-  // }, [enablePreviewMode]);
 
   const handleTransformEnd = () => {
     const node = shapeRef.current as any;

@@ -94,7 +94,7 @@ export const CustomColorPicker = ({
               <div
                 ref={colorDisplayedPlateRef}
                 className={'color-displayed-plate'}
-                style={{ width: 60, height: 30, padding: '3px', borderWidth: '5px', borderColor: 'black' }}
+                style={{ width: 30, height: 25, padding: '3px', borderWidth: '5px', borderColor: 'black' }}
               >
                 <div style={{ width: '100%', height: '100%', backgroundColor: typeof selectedColor == 'string' ? selectedColor : undefined }}></div>
               </div>
@@ -105,7 +105,7 @@ export const CustomColorPicker = ({
         <div
           ref={colorDisplayedPlateRef}
           className={'color-displayed-plate'}
-          style={{ width: 60, height: 30, padding: '3px', borderWidth: '5px', borderColor: 'black' }}
+          style={{ width: 30, height: 25, padding: '3px', borderWidth: '5px', borderColor: 'black' }}
         >
           <div style={{ width: '100%', height: '100%', backgroundColor: typeof selectedColor == 'string' ? selectedColor : undefined }}></div>
         </div>

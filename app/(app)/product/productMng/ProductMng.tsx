@@ -132,6 +132,7 @@ const ProductMng = () => {
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('이미지가 정상적으로 업로드되었습니다.');
+          closeModal('INIT_BOARD'); // 팝업 닫음
           if (targetedFileSetInfo?.fileId) {
             setTargetedFileSetInfo({
               ...targetedFileSetInfo,
