@@ -68,7 +68,7 @@ export async function createReceiptData(data: ReceiptData): Promise<string> {
  * @returns {Promise<string>} QR 코드 이미지 URL
  */
 async function fetchReceiptQRCodeImageUrl(data: string): Promise<string> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3030';
   const url = new URL('/api/receipt/qrCode', baseUrl);
   url.searchParams.append('data', data);
 
