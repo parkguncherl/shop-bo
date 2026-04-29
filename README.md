@@ -1,5 +1,5 @@
-# shop-frontend
-빈블러 주문관리 시스템(프론트)
+# shop-fo
+gguanggu 시스템(프론트)
 서버 3.35.254.165 gguanggu/Jun0812!
 
 - version
