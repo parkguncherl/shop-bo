@@ -3,9 +3,9 @@
   "version": "2.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3030",
+    "dev": "next dev -p 3000",
     "build:dev": "NODE_OPTIONS=--max-old-space-size=2048 env-cmd -f .env.development next build",
-    "start:dev": "env-cmd -f .env.development next start -H 0.0.0.0 -p 3030",
+    "start:dev": "env-cmd -f .env.development next start -H 0.0.0.0 -p 3000",
     "build:prod": "NODE_OPTIONS=--max-old-space-size=2048 env-cmd -f .env.production next build",
     "start:prod": "env-cmd -f .env.production next start -H 0.0.0.0 -p 3030",
     "lint": "next lint",
