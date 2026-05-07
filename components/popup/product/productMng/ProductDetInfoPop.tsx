@@ -464,6 +464,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
               noRowsOverlayComponent={CustomNoRowsOverlay}
               ref={RefForGrid}
               loading={isProductDetInfosLoading}
+              singleClickEdit={true}
               rowSelection={{
                 mode: 'singleRow',
                 isRowSelectable: (rowNode) => !flagAboutIsOnWritingOrNot.current, // 신규 작성 시점에는 행 선택 제한
