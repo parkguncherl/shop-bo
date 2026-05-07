@@ -26,6 +26,9 @@ interface ProductContentShowPopProps {
   productContentData?: ProductContentListResponseProductContent;
 }
 
+type FileInfoWithFileObj = FileInfo & Required<Pick<FileInfo, 'file'>>;
+type FileInfoWithFileDetId = Omit<FileInfo & Required<Pick<FileInfo, 'detId'>>, 'file'>;
+
 interface DisplayMode {
   holdByPreview: boolean;
   innerDisplayMode: EnhancedTextAreasMode;
@@ -68,12 +71,12 @@ function DisplayModeManagementReducerFn(state: DisplayMode, action: DisplayModeA
 }
 
 /**
- * components/popup/product/contentList/ProductContentAddPop.tsx
- * desc: 품목컨텐츠 추가 팝업
- * Date: 2026/02/19
+ * components/popup/product/contentList/ProductContentPop.tsx
+ * desc: 품목컨텐츠 관련 동작 수행 팝업
+ * Date: 2026/05/07
  * Author: park junsung
  * */
-const ProductContentAddPop = ({ open, onClose, mode = 'ADD', productContentData }: ProductContentShowPopProps) => {
+const ProductContentPop = ({ open, onClose, mode = 'ADD', productContentData }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
   const [getFileUrl, selectFileList] = useCommonStore((s) => [s.getFileUrl, s.selectFileList]);
   const [insertProductContents, updateProductContents] = useProductContentListStore((s) => [s.insertProductContents, s.updateProductContents]);
@@ -228,11 +231,12 @@ const ProductContentAddPop = ({ open, onClose, mode = 'ADD', productContentData 
   // 줄바꿈(\n) 기준으로 문단 분기, 파일(이미지)명(<<IMG|image_title>>) 뒤에는 반드시 이를(캐리지 리턴) 첨부
   const onValid: SubmitHandler<ProductContentsFields> = (data, event) => {
     const fileInfoList: FileInfo[] = [...data.content.filter((content) => content.fileInfo != undefined).map((content) => content.fileInfo as FileInfo)]; // fileInfo 목록
+    const fileInfoWithFileObjList: FileInfoWithFileObj[] = [...(fileInfoList.filter((content) => content.file != undefined) as FileInfoWithFileObj[])]; // file 객체가 존재하는 file 정보만을 추출
+    const fileInfoWithFileDetIdList: FileInfoWithFileDetId[] = [...(fileInfoList.filter((content) => content.detId) as FileInfoWithFileDetId[])]; // detId가 존재하는(기존 파일) 객체만을 추출
 
-    // fileInfoList 에서 File 객체를 포함하는 경우로 필터링하여 이에 대한 고유 요소들의 목록 저장
     const uniqueFileList: File[] = Array.from(
-      new Map(fileInfoList.filter((fileInfo) => fileInfo.file != undefined).map((fileInfo) => [(fileInfo.file as File).name, fileInfo.file as File])).values(),
-    );
+      new Map(fileInfoWithFileObjList.map((fileInfo) => [(fileInfo.file as File).name, fileInfo.file as File])).values(),
+    ); // fileInfoWithFileObjList 에서 이름 기준 고유한 요소들로 이루어진 배열
     const fileInfoIncludedContentList = data.content
       .map((content) => {
         if (content.fileInfo && content.fileInfo.file && content.fileInfo.file.name) {
@@ -276,19 +280,18 @@ const ProductContentAddPop = ({ open, onClose, mode = 'ADD', productContentData 
         //           uploadFiles: uniqueFileList,
         //         },
         // });
-        console.log('fileInfoList: ', fileInfoList);
+        console.log('fileInfoWithFileObjList: ', fileInfoWithFileObjList);
+        console.log('fileInfoWithFileDetIdList: ', fileInfoWithFileDetIdList);
         console.log({
           id: productContentData.id,
           newsTitle: data.title,
           newsSubTitle: data.title, // 현재는 newsTitle 과 동일한 값을 사용하나 추후 요청이 들어올 경우 수정
           newsContents: joinedFileInfoIncludedContent,
-          commonRequestFileUploads:
-            productContentData.fileId && uniqueFileList.length == 0
-              ? undefined
-              : {
-                  fileId: productContentData.fileId,
-                  uploadFiles: uniqueFileList,
-                },
+          updateProductContentsFileInfos: {
+            fileId: productContentData.fileId,
+            uploadFiles: uniqueFileList,
+            preservedFileDetIdList: fileInfoWithFileDetIdList.map((fileInfoWithFileDetId) => fileInfoWithFileDetId.detId),
+          },
         });
       } else {
         console.error('유효한 상품컨텐츠 정보 혹은 식별자를 발견하지 못함');
