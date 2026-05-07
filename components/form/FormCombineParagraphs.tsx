@@ -15,6 +15,7 @@ type FormEnhancedTextAreaProps<TForm extends FieldValues> = {
   textAreaBoxHeight?: string;
 };
 export interface FileInfo {
+  detId?: number; // 내부에서 file det Id 관리가 용이하도록 지정한 key
   file?: File; // 단순 파일 출력을 위한 경우는 생략 가능(브라우저 paste 이벤트 등에 의하지 않고는 할당되지 않으리라 가정)
   fileSrcUrl?: string; // 이미지 파일 출력을 위한 url
 }
