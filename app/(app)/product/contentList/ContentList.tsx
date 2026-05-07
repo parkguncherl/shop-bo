@@ -563,7 +563,7 @@ const ContentList = () => {
       {/*/>*/}
       {/*<ProductContentShowPop open={modals.type == 'SHOW' && modals.active} productContentData={modals.stored_temporary} onClose={() => closeModal('SHOW')} />*/}
       <ProductContentPop
-        open={(modals.type == 'ADD' || modals.type == 'SHOW') && modals.active}
+        open={(modals.type == 'ADD' || modals.type == 'MOD' || modals.type == 'SHOW') && modals.active}
         mode={modals.type as 'SHOW' | 'ADD' | 'MOD' | undefined}
         productContentData={modals.stored_temporary}
         onClose={() => closeModal(modals.type)}

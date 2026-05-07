@@ -162,6 +162,7 @@ const ProductContentAddPop = ({ open, onClose, mode = 'ADD', productContentData 
                 id: index + 1,
                 partialContent: undefined,
                 fileInfo: {
+                  detId: correspondedFileDet[0].id,
                   fileSrcUrl: await getFileUrl(correspondedFileDet[0].sysFileNm),
                 },
               });
@@ -226,10 +227,12 @@ const ProductContentAddPop = ({ open, onClose, mode = 'ADD', productContentData 
   // 컨텐츠로서 저장하는 내용은 내용 영역에서 파일 제목, 문단 단위 절삭을 위한 정보를 포함하도록 한다.
   // 줄바꿈(\n) 기준으로 문단 분기, 파일(이미지)명(<<IMG|image_title>>) 뒤에는 반드시 이를(캐리지 리턴) 첨부
   const onValid: SubmitHandler<ProductContentsFields> = (data, event) => {
-    const fileInfoList: FileInfo[] = [
-      ...data.content.filter((content) => content.fileInfo && content.fileInfo.file).map((content) => content.fileInfo as FileInfo),
-    ];
-    const uniqueFileList: File[] = Array.from(new Map(fileInfoList.map((fileInfo) => [(fileInfo.file as File).name, fileInfo.file as File])).values());
+    const fileInfoList: FileInfo[] = [...data.content.filter((content) => content.fileInfo != undefined).map((content) => content.fileInfo as FileInfo)]; // fileInfo 목록
+
+    // fileInfoList 에서 File 객체를 포함하는 경우로 필터링하여 이에 대한 고유 요소들의 목록 저장
+    const uniqueFileList: File[] = Array.from(
+      new Map(fileInfoList.filter((fileInfo) => fileInfo.file != undefined).map((fileInfo) => [(fileInfo.file as File).name, fileInfo.file as File])).values(),
+    );
     const fileInfoIncludedContentList = data.content
       .map((content) => {
         if (content.fileInfo && content.fileInfo.file && content.fileInfo.file.name) {
@@ -261,15 +264,29 @@ const ProductContentAddPop = ({ open, onClose, mode = 'ADD', productContentData 
       });
     } else if (mode == 'MOD') {
       if (productContentData != undefined && productContentData.id) {
-        updateProductContentsMutate({
+        // updateProductContentsMutate({
+        //   id: productContentData.id,
+        //   newsTitle: data.title,
+        //   newsSubTitle: data.title, // 현재는 newsTitle 과 동일한 값을 사용하나 추후 요청이 들어올 경우 수정
+        //   newsContents: joinedFileInfoIncludedContent,
+        //   commonRequestFileUploads:
+        //     uniqueFileList.length == 0
+        //       ? undefined
+        //       : {
+        //           uploadFiles: uniqueFileList,
+        //         },
+        // });
+        console.log('fileInfoList: ', fileInfoList);
+        console.log({
           id: productContentData.id,
           newsTitle: data.title,
           newsSubTitle: data.title, // 현재는 newsTitle 과 동일한 값을 사용하나 추후 요청이 들어올 경우 수정
           newsContents: joinedFileInfoIncludedContent,
           commonRequestFileUploads:
-            uniqueFileList.length == 0
+            productContentData.fileId && uniqueFileList.length == 0
               ? undefined
               : {
+                  fileId: productContentData.fileId,
                   uploadFiles: uniqueFileList,
                 },
         });
