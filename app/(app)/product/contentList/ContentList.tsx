@@ -16,17 +16,16 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
 import { useAgGridApi } from '../../../../hooks';
 import { authApi } from '../../../../libs';
-import TunedGrid, { AddPagingOptions, TunedGridRef } from '../../../../components/grid/TunedGrid';
+import TunedGrid, { TunedGridRef } from '../../../../components/grid/TunedGrid';
 import { useProductContentListStore } from '../../../../stores/product/useProductContentListStore';
 import useFilters from '../../../../hooks/useFilters';
 import useDebounce from '../../../../hooks/useDebounce';
-import { AlertMessage, Placeholder } from '../../../../libs/const';
-import ProductContentShowPop from '../../../../components/popup/product/contentList/ProductContentShowPop';
-import ProductContentAddPop from '../../../../components/popup/product/contentList/ProductContentAddPop';
+import { Placeholder } from '../../../../libs/const';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import ProductAddPop from '../../../../components/popup/product/contentList/ProductAddPop';
 import { CustomSwitch } from '../../../../components/CustomSwitch';
 import ImgPreviewBox, { ImgPreviewFileDet } from '../../../../components/content/ImgPreviewBox';
+import ProductContentPop from '../../../../components/popup/product/contentList/ProductContentPop';
 
 /** 상품관리 - 상품컨텐츠 목록 페이지 */
 const ContentList = () => {
@@ -465,6 +464,15 @@ const ContentList = () => {
                   {'신규'}
                 </button>
                 <button
+                  className={selectedRowsData == undefined ? 'btn' : 'btn btn_blue'}
+                  disabled={selectedRowsData == undefined}
+                  onClick={() => {
+                    openModal('MOD', selectedRowsData);
+                  }}
+                >
+                  {'수정'}
+                </button>
+                <button
                   className={'btn btn_blue'}
                   onClick={() => {
                     const selectedRows = gridRef.current?.api.getSelectedRows();
@@ -543,17 +551,18 @@ const ContentList = () => {
           </Table>
         </div>
       </div>
-      <ProductContentAddPop
-        open={modals.type == 'ADD' && modals.active}
-        onClose={(closeRes) => {
-          if (closeRes == 'success') {
-            productContentListResponseRefetch();
-          }
+      {/*<ProductContentAddPop*/}
+      {/*  open={modals.type == 'ADD' && modals.active}*/}
+      {/*  onClose={(closeRes) => {*/}
+      {/*    if (closeRes == 'success') {*/}
+      {/*      productContentListResponseRefetch();*/}
+      {/*    }*/}
 
-          closeModal('ADD');
-        }}
-      />
-      <ProductContentShowPop open={modals.type == 'SHOW' && modals.active} productContentData={modals.stored_temporary} onClose={() => closeModal('SHOW')} />
+      {/*    closeModal('ADD');*/}
+      {/*  }}*/}
+      {/*/>*/}
+      {/*<ProductContentShowPop open={modals.type == 'SHOW' && modals.active} productContentData={modals.stored_temporary} onClose={() => closeModal('SHOW')} />*/}
+      <ProductContentPop open={(modals.type == 'ADD' || modals.type == 'SHOW') && modals.active} mode={modals.type as 'SHOW' | 'ADD' | 'MOD' | undefined} productContentData={modals.stored_temporary} onClose={() => closeModal(modals.type)} />
       <ProductAddPop
         open={modals.type == 'ADD_PROD' && modals.active}
         onClose={() => closeModal('ADD_PROD')}
