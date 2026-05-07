@@ -8,13 +8,14 @@ import {
   ProductContentListRequestDeleteProductContents,
   ProductContentListRequestInsertContentsProduct,
   ProductContentListRequestUpdateContentsProductSeq,
+  ProductContentListRequestUpdateProductContents,
   ProductContentListResponseProductContent,
   ProductContentsRequestInsertProductContents,
 } from '../../generated';
 import { AxiosPromise } from 'axios';
 import { authApi } from '../../libs';
 
-type ModalType = 'SHOW' | 'ADD' | 'DEL_CONF' | 'ADD_PROD' |'MOD';
+type ModalType = 'SHOW' | 'ADD' | 'DEL_CONF' | 'ADD_PROD' | 'MOD';
 
 interface ModalState {
   type: ModalType;
@@ -32,6 +33,7 @@ interface ProductContentListState {
 
 interface ProductContentListApiState {
   insertProductContents: (productContentsRequestInsertProductContents: ProductContentsRequestInsertProductContents) => AxiosPromise<ApiResponse>;
+  updateProductContents: (productContentListRequestUpdateProductContents: ProductContentListRequestUpdateProductContents) => AxiosPromise<ApiResponse>;
   deleteProductContents: (productContentListRequestDeleteProductContents: ProductContentListRequestDeleteProductContents) => AxiosPromise<ApiResponse>;
   insertContentsProductList: (productContentListRequestInsertContentsProduct: ProductContentListRequestInsertContentsProduct[]) => AxiosPromise<ApiResponse>;
   updateContentsProductSeq: (productContentListRequestUpdateContentsProductSeq: ProductContentListRequestUpdateContentsProductSeq) => AxiosPromise<ApiResponse>;
@@ -84,6 +86,20 @@ const initialStateCreator: StateCreator<ProductContentListStateOfAll> = (set, ge
         productContentsRequestInsertProductContents.commonRequestFileUploads.uploadFiles = undefined; // 본 요청 객체의 파일 목록은 무효화
       }
       formData.append('main', new Blob([JSON.stringify(productContentsRequestInsertProductContents)], { type: 'application/json' })); // 파일을
+      return authApi.put('/productContentList/insertProductContents', formData); // Blob 형태로 전송하여 백앤드 차원에서 이를 다시 프론트와 동기화된 dto로 변환, 이하 처리
+    },
+    updateProductContents: async (productContentsRequestUpdateProductContents) => {
+      const formData = new FormData();
+      if (
+        productContentsRequestUpdateProductContents.commonRequestFileUploads?.uploadFiles &&
+        productContentsRequestUpdateProductContents.commonRequestFileUploads.uploadFiles.length > 0
+      ) {
+        for (let i = 0; i < productContentsRequestUpdateProductContents.commonRequestFileUploads.uploadFiles.length; i++) {
+          formData.append('files', productContentsRequestUpdateProductContents.commonRequestFileUploads.uploadFiles[i]);
+        }
+        productContentsRequestUpdateProductContents.commonRequestFileUploads.uploadFiles = undefined; // 본 요청 객체의 파일 목록은 무효화
+      }
+      formData.append('main', new Blob([JSON.stringify(productContentsRequestUpdateProductContents)], { type: 'application/json' })); // 파일을
       return authApi.put('/productContentList/insertProductContents', formData); // Blob 형태로 전송하여 백앤드 차원에서 이를 다시 프론트와 동기화된 dto로 변환, 이하 처리
     },
     deleteProductContents: (productContentListRequestDeleteProductContents) => {

@@ -14,11 +14,7 @@ import { YupSchema } from '../../../../libs';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import { Formatter, RegExpression } from '../../../../libs/const';
 import { ConfirmModal } from '../../../ConfirmModal';
-import FormCombineParagraphs, {
-  ContentElement,
-  EnhancedTextAreasMode,
-  FileInfo,
-} from '../../../form/FormCombineParagraphs';
+import FormCombineParagraphs, { ContentElement, EnhancedTextAreasMode, FileInfo } from '../../../form/FormCombineParagraphs';
 import { useProductContentListStore } from '../../../../stores/product/useProductContentListStore';
 import { ProductContentListResponseProductContent } from '../../../../generated';
 import { useCommonStore } from '../../../../stores';
@@ -26,31 +22,30 @@ import { useCommonStore } from '../../../../stores';
 interface ProductContentShowPopProps {
   open: boolean;
   onClose: (closeRes?: 'success') => void;
-  mode?: 'ADD' | 'MOD' | 'SHOW'
+  mode?: 'ADD' | 'MOD' | 'SHOW';
   productContentData?: ProductContentListResponseProductContent;
 }
 
 interface DisplayMode {
-  holdByPreview: boolean
-  innerDisplayMode: EnhancedTextAreasMode
+  holdByPreview: boolean;
+  innerDisplayMode: EnhancedTextAreasMode;
 }
 type DisplayModeAction =
   | {
-  type: 'sync_holdenByPreviewMod';
-  payload: {
-    holdByPreview: boolean
-  }
-  }
+      type: 'sync_holdenByPreviewMod';
+      payload: {
+        holdByPreview: boolean;
+      };
+    }
   | {
-  type: 'sync_onInnerDisplayMode';
-  payload: {
-    innerDisplayMode: EnhancedTextAreasMode;
-  };
-};
+      type: 'sync_onInnerDisplayMode';
+      payload: {
+        innerDisplayMode: EnhancedTextAreasMode;
+      };
+    };
 
 function DisplayModeManagementReducerFn(state: DisplayMode, action: DisplayModeAction): DisplayMode {
   if (action.type == 'sync_holdenByPreviewMod') {
-
     return {
       ...state,
       holdByPreview: action.payload.holdByPreview,
@@ -59,7 +54,6 @@ function DisplayModeManagementReducerFn(state: DisplayMode, action: DisplayModeA
   }
 
   if (action.type == 'sync_onInnerDisplayMode') {
-
     if (!state.holdByPreview) {
       // sync_holdByPreviewMod 에 의하여 잠기지 아니한 경우에만 디스패칭 유효
       return {
@@ -67,10 +61,10 @@ function DisplayModeManagementReducerFn(state: DisplayMode, action: DisplayModeA
         innerDisplayMode: action.payload.innerDisplayMode,
       };
     }
-    return state
+    return state;
   }
 
-  return state
+  return state;
 }
 
 /**
@@ -82,15 +76,14 @@ function DisplayModeManagementReducerFn(state: DisplayMode, action: DisplayModeA
 const ProductContentAddPop = ({ open, onClose, mode = 'ADD', productContentData }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
   const [getFileUrl, selectFileList] = useCommonStore((s) => [s.getFileUrl, s.selectFileList]);
-  const [insertProductContents] = useProductContentListStore((s) => [s.insertProductContents]);
+  const [insertProductContents, updateProductContents] = useProductContentListStore((s) => [s.insertProductContents, s.updateProductContents]);
 
   const [displayModeStatus, dispatchDisplayModeStatus] = useReducer(DisplayModeManagementReducerFn, {
     holdByPreview: false,
-    innerDisplayMode: 'edit'
+    innerDisplayMode: 'edit',
   });
 
   /** 팝업 내부 local state */
-  //const [displayMode, setDisplayMode] = useState<EnhancedTextAreasMode>('edit');
   const [openConf, setOpenConf] = useState(false);
 
   /** 품목 내용 입력 서식 */
@@ -116,6 +109,23 @@ const ProductContentAddPop = ({ open, onClose, mode = 'ADD', productContentData 
           onClose('success');
         } else {
           toastError(`컨텐츠 저장 도중 문제 발생 (${e.data.resultMessage})`);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+  });
+
+  /** 품목컨텐츠 수정 요청 처리 동작 캐싱 */
+  const { mutate: updateProductContentsMutate } = useMutation({
+    mutationFn: updateProductContents,
+    onSuccess: async (e) => {
+      try {
+        if (e.data.resultCode === 200) {
+          toastSuccess('수정되었습니다.');
+          onClose('success');
+        } else {
+          toastError(`컨텐츠 수정 도중 문제 발생 (${e.data.resultMessage})`);
         }
       } catch (e) {
         console.log(e);
@@ -183,7 +193,7 @@ const ProductContentAddPop = ({ open, onClose, mode = 'ADD', productContentData 
         type: 'sync_holdenByPreviewMod',
         payload: {
           holdByPreview: true,
-        }
+        },
       });
     } else {
       if (displayModeStatus.holdByPreview) {
@@ -191,14 +201,14 @@ const ProductContentAddPop = ({ open, onClose, mode = 'ADD', productContentData 
           type: 'sync_holdenByPreviewMod',
           payload: {
             holdByPreview: false, // unFreeze
-          }
+          },
         });
       }
       dispatchDisplayModeStatus({
         type: 'sync_onInnerDisplayMode',
         payload: {
           innerDisplayMode: 'edit', // show 이외에는 편집 모드
-        }
+        },
       });
     }
   }, [mode]);
@@ -236,17 +246,37 @@ const ProductContentAddPop = ({ open, onClose, mode = 'ADD', productContentData 
       .filter((value) => value != undefined && value != ''); // 빈 문단의 경우 저장 이전에 제거
 
     const joinedFileInfoIncludedContent = fileInfoIncludedContentList.join('');
-    insertProductContentsMutate({
-      newsTitle: data.title,
-      newsSubTitle: data.title, // 현재는 newsTitle 과 동일한 값을 사용하나 추후 요청이 들어올 경우 수정
-      newsContents: joinedFileInfoIncludedContent,
-      commonRequestFileUploads:
-        uniqueFileList.length == 0
-          ? undefined
-          : {
-            uploadFiles: uniqueFileList,
-          },
-    });
+
+    if (mode == 'ADD') {
+      insertProductContentsMutate({
+        newsTitle: data.title,
+        newsSubTitle: data.title, // 현재는 newsTitle 과 동일한 값을 사용하나 추후 요청이 들어올 경우 수정
+        newsContents: joinedFileInfoIncludedContent,
+        commonRequestFileUploads:
+          uniqueFileList.length == 0
+            ? undefined
+            : {
+                uploadFiles: uniqueFileList,
+              },
+      });
+    } else if (mode == 'MOD') {
+      if (productContentData != undefined && productContentData.id) {
+        updateProductContentsMutate({
+          id: productContentData.id,
+          newsTitle: data.title,
+          newsSubTitle: data.title, // 현재는 newsTitle 과 동일한 값을 사용하나 추후 요청이 들어올 경우 수정
+          newsContents: joinedFileInfoIncludedContent,
+          commonRequestFileUploads:
+            uniqueFileList.length == 0
+              ? undefined
+              : {
+                  uploadFiles: uniqueFileList,
+                },
+        });
+      } else {
+        console.error('유효한 상품컨텐츠 정보 혹은 식별자를 발견하지 못함');
+      }
+    }
   };
 
   // 유효하지 않은 경우
@@ -272,7 +302,7 @@ const ProductContentAddPop = ({ open, onClose, mode = 'ADD', productContentData 
             <div className="btnArea between">
               <div className="left">
                 <button
-                  className={mode == 'SHOW' ? 'btn' : "btn btn_blue"}
+                  className={mode == 'SHOW' ? 'btn' : 'btn btn_blue'}
                   onClick={() => {
                     const title = getValues('title');
                     const content = getValues('content');
@@ -299,9 +329,9 @@ const ProductContentAddPop = ({ open, onClose, mode = 'ADD', productContentData 
                     dispatchDisplayModeStatus({
                       type: 'sync_onInnerDisplayMode',
                       payload: {
-                        innerDisplayMode: displayModeStatus.innerDisplayMode != 'preview' ? 'preview' : 'edit'
-                      }
-                    })
+                        innerDisplayMode: displayModeStatus.innerDisplayMode != 'preview' ? 'preview' : 'edit',
+                      },
+                    });
                   }}
                 >
                   {displayModeStatus.innerDisplayMode == 'edit' ? '미리보기' : '편집'}
@@ -325,7 +355,14 @@ const ProductContentAddPop = ({ open, onClose, mode = 'ADD', productContentData 
           <PopupFormBox className={''}>
             <PopupFormGroup>
               <PopupFormType className={'type1'}>
-                <FormInput<ProductContentsFields> control={control} name={'title'} label={'제목'} inputType={'label'} placeholder={'제목'} disable={mode == 'SHOW'}/>
+                <FormInput<ProductContentsFields>
+                  control={control}
+                  name={'title'}
+                  label={'제목'}
+                  inputType={'label'}
+                  placeholder={'제목'}
+                  disable={mode == 'SHOW'}
+                />
               </PopupFormType>
               <PopupFormType className={'type1'}>
                 <FormCombineParagraphs<ProductContentsFields>
@@ -345,8 +382,8 @@ const ProductContentAddPop = ({ open, onClose, mode = 'ADD', productContentData 
       </PopupLayout>
       <ConfirmModal
         open={openConf}
-        title={'저장 하시겠습니까?'}
-        confirmText={'저장'}
+        title={mode == 'ADD' ? '저장 하시겠습니까?' : '수정 하시겠습니까?'}
+        confirmText={mode == 'ADD' ? '저장' : '수정'}
         onConfirm={() => {
           handleSubmit(onValid, onInvalid)(); // 함수를 반환하므로 다음과 같이, 호출하여야
         }}
