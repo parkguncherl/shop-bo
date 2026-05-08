@@ -76,7 +76,7 @@ const FormInput = function FormInput<T extends FieldValues>({
   } = useController({ name, rules, control });
 
   /** 공통 스토어 - API */
-  const [fileDownload, deleteFile] = useCommonStore((s) => [s.fileDownload, s.deleteFile]);
+  const { deleteFile } = useCommonStore();
 
   /** 파일 목록 조회 */
   const {

@@ -5,10 +5,7 @@ import DropDownAtom from '../atom/DropDownAtom';
 import { authApi } from '../../libs';
 import { ApiResponseListCodeDropDown } from '../../generated';
 import { TControl } from '../../types/Control';
-import { BaseSelectRef } from 'rc-select';
 import { Input } from 'antd';
-import { toastError, toastSuccess } from '../ToastMessage';
-import { Utils } from '../../libs/utils';
 
 type TProps<T extends FieldValues> = TControl<T> & {
   title?: string;
@@ -31,10 +28,10 @@ type TProps<T extends FieldValues> = TControl<T> & {
   className?: string;
   onKeyDown?: (e: React.KeyboardEvent) => void;
   defaultValue?: string;
-  ref?: React.Ref<BaseSelectRef>;
+  startWith?: string;
 };
 
-const FormDropDown = <T extends FieldValues>({ ref, ...props }: TProps<T>) => {
+const FormDropDown = <T extends FieldValues>({ ...props }: TProps<T>) => {
   const {
     field: { name, onChange: controlChange, value },
     fieldState: { error },
@@ -56,19 +53,14 @@ const FormDropDown = <T extends FieldValues>({ ref, ...props }: TProps<T>) => {
           ...params,
         },
       });
-      const newDropDownData = [
-        ...dropDownData,
-        ...(res.data.body || [])
-          .map(
-            (v) =>
-              ({
-                key: v.codeCd,
-                value: v.codeCd,
-                label: v.codeNm,
-              } as DropDownOption),
-          )
-          .filter((f) => f),
-      ];
+      const newDropDownData = (res.data.body || []).map(
+        (v) =>
+          ({
+            key: v.codeCd,
+            value: v.codeCd,
+            label: v.codeNm,
+          } as DropDownOption),
+      );
       setDropDownData(newDropDownData);
     } catch (err) {
       console.log('실패');
@@ -91,43 +83,6 @@ const FormDropDown = <T extends FieldValues>({ ref, ...props }: TProps<T>) => {
     setFocusStates((prev) => ({ ...prev, [name]: false }));
   };
 
-  const onKeyDown = async (e: React.KeyboardEvent) => {
-    if (e.code === 'Enter') {
-      if (props.gbCode && gbVal) {
-        try {
-          const result = await authApi.post('/partnerCode/updatePartnerCode', {
-            partnerId: 0,
-            codeUpper: 'P0010',
-            codeCd: props.gbCode,
-            codeNm: gbVal,
-          });
-          const { resultCode, body, resultMessage } = result.data;
-          if (resultCode == 200) {
-            Utils.updateGubun(props.gbCode, gbVal); // 로컬스토리지 정보 변경
-            /*
-            await updateSession({
-              ...session,
-              user: {
-                ...session?.user,
-                [(props.gbCode as string).toLowerCase()]: gbVal,
-              },
-            });
-*/
-            toastSuccess('구분 변경 성공');
-          } else {
-            toastError('구분수정 오류');
-          }
-        } catch (error) {
-          toastError('구분수정 오류');
-        }
-      }
-    }
-  };
-
-  const onChange = (value: string) => {
-    setGbVal(value);
-  };
-
   return (
     <>
       {props.multiple ? (
@@ -141,13 +96,14 @@ const FormDropDown = <T extends FieldValues>({ ref, ...props }: TProps<T>) => {
               <DropDownAtom
                 name={name}
                 values={values}
-                options={props.codeUpper ? dropDownData : props.options || []}
+                options={(props.codeUpper ? dropDownData : props.options || []).filter(
+                  (f) => !props.startWith || String(f.value).startsWith(String(props.startWith)),
+                )}
                 onChangeOptions={props.onChange}
                 onChangeControl={controlChange}
                 defaultValues={props.defaultOptions || []}
                 readonly={props.readonly}
                 multiple={props.multiple}
-                ref={ref}
                 virtual={props.virtual}
                 onFocus={() => {
                   handleFocus(name);
@@ -171,7 +127,7 @@ const FormDropDown = <T extends FieldValues>({ ref, ...props }: TProps<T>) => {
           {props.title && (
             <dl ref={el} style={{ ...props.style }} className={props.className}>
               <dt>
-                {props.gbCode ? <Input onKeyDown={onKeyDown} onChange={(e) => setGbVal(e.target.value)} value={gbVal} /> : <label>{props.title}</label>}
+                {props.gbCode ? <Input onChange={(e) => setGbVal(e.target.value)} value={gbVal} /> : <label>{props.title}</label>}
                 {props.required && <span className={'req'}>*</span>}
               </dt>
               <dd>
@@ -179,12 +135,13 @@ const FormDropDown = <T extends FieldValues>({ ref, ...props }: TProps<T>) => {
                   <DropDownAtom
                     name={name}
                     value={value || ''}
-                    options={props.codeUpper ? dropDownData : props.options || []}
+                    options={(props.codeUpper ? dropDownData : props.options || []).filter(
+                      (f) => !props.startWith || String(f.value).startsWith(String(props.startWith)),
+                    )}
                     onChangeOptions={props.onChange}
                     onChangeControl={controlChange}
                     readonly={props.readonly}
                     virtual={props.virtual}
-                    ref={ref}
                     onFocus={() => {
                       handleFocus(name);
                     }}
@@ -209,14 +166,15 @@ const FormDropDown = <T extends FieldValues>({ ref, ...props }: TProps<T>) => {
               <DropDownAtom
                 name={name}
                 value={value}
-                options={props.codeUpper ? dropDownData : props.options || []}
+                options={(props.codeUpper ? dropDownData : props.options || []).filter(
+                  (f) => !props.startWith || String(f.value).startsWith(String(props.startWith)),
+                )}
                 onChangeOptions={props.onChange}
                 onChangeControl={controlChange}
                 readonly={props.readonly}
                 disabledOptionValues={props.disabledOptionValues}
                 virtual={props.virtual}
                 style={props.style}
-                ref={ref}
                 onFocus={() => {
                   handleFocus(name);
                 }}
@@ -239,7 +197,6 @@ const FormDropDown = <T extends FieldValues>({ ref, ...props }: TProps<T>) => {
                 onChangeControl={controlChange}
                 readonly={props.readonly}
                 virtual={props.virtual}
-                ref={ref}
                 onFocus={() => {
                   handleFocus(name);
                 }}

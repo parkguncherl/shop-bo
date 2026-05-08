@@ -5,7 +5,6 @@ export * from './CustomChart';
 export * from './CustomDatePicker';
 export * from './CustomTooltip';
 export * from './ErrorMessage';
-export * from './FileList';
 export * from './Input';
 export * from './Label';
 // export { SimpleSouthKoreaMapChart } from './SimpleSouthKoreaMapChart';

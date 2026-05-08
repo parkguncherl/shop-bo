@@ -10,7 +10,6 @@ interface Props {
 }
 
 export const PopupHeader = ({ title, subTitle, onClick, type = 'normal', style }: Props) => {
-  //const { t } = useTranslation();
   return (
     <div className="popupHeader">
       {type == 'success' && <div className={`${styles.img} ${styles.success}`}></div>}

@@ -89,6 +89,11 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
 
   /** 팝업 내부 local state */
   const [openAddConf, setOpenAddConf] = useState<{ open: boolean; stored?: ProductMngRequestInsertProduct }>({ open: false });
+  const [prodCd, setProdCd] = useState<string>('');
+
+  useEffect(() => {
+    console.log('prodCd ==>', prodCd);
+  }, [prodCd]);
 
   /** 품목 내용 입력 서식 */
   const {
@@ -215,7 +220,6 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
     <div className="imgPopBox">
       <PopupLayout
         width={900}
-        height={900}
         open={open}
         isEscClose={true}
         title={productInfo?.id ? productInfo?.prodNm + ' 이하 상세정보 추가' : '품목정보 추가'}
@@ -255,8 +259,22 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
                   <FormInput<ProductInfoCreateFields> control={control} name={'product.prodNm'} label={'품목명'} placeholder={'제목'} />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
-                  <FormDropDown<ProductInfoCreateFields> control={control} name={'product.prodTp'} title={'품목유형'} codeUpper={'90010'} />
-                  <FormDropDown<ProductInfoCreateFields> control={control} name={'product.prodDetTp'} title={'품목상세유형'} codeUpper={'90011'} />
+                  <FormDropDown<ProductInfoCreateFields>
+                    control={control}
+                    name={'product.prodTp'}
+                    title={'품목유형'}
+                    codeUpper={'90010'}
+                    onChange={(name, value) => {
+                      setProdCd(String(value));
+                    }}
+                  />
+                  <FormDropDown<ProductInfoCreateFields>
+                    control={control}
+                    name={'product.prodDetTp'}
+                    title={'품목상세유형'}
+                    codeUpper={'90011'}
+                    startWith={prodCd}
+                  />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
                   <FormDatePicker<ProductInfoCreateFields> control={control} name={'product.makeYmd'} title={'제조일자'} />
