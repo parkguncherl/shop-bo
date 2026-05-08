@@ -18,7 +18,6 @@ import {
 } from 'ag-grid-community';
 import { AG_GRID_LOCALE_KO, GridSetting, withCommonKeyboardSuppress } from '../../libs/ag-grid';
 import { useCommonStore } from '../../stores';
-import { GridResponse } from '../../generated';
 
 type clickSelectionConfig = {
   colField: string; // 적용 대상 컬럼
@@ -247,6 +246,7 @@ const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ 
     }
 
     /** 개인화된 컬럼 설정 불러오는 영역 */
+    /*
     if (!props.preventPersonalizedColumnSetting && props.gridId) {
       selectGridColumnState(props.gridId).then((result) => {
         const { resultCode, body } = result.data;
@@ -264,6 +264,8 @@ const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ 
         }
       });
     }
+    */
+
     /** 저장된 컬럼 정보 fetch 이후 콜백 호출 */
     if (props.onGridReady) {
       props.onGridReady(event);
@@ -495,7 +497,7 @@ const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ 
   };
 
   /** 외부 컬럼 정의와의 동기화 */
-  useEffect(() => {
+  /*useEffect(() => {
     if (props.columnDefs) {
       if (!props.preventPersonalizedColumnSetting && props.gridId) {
         selectGridColumnState(props.gridId).then((result) => {
@@ -525,7 +527,7 @@ const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ 
         setColumnDefs(props.columnDefs);
       }
     }
-  }, [props.columnDefs]);
+  }, [props.columnDefs]);*/
 
   /** 인자로 받은 rowData 변경에 따른 동작 */
   useEffect(() => {

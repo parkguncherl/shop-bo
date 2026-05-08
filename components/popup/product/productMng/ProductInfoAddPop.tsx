@@ -215,6 +215,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
     <div className="imgPopBox">
       <PopupLayout
         width={900}
+        height={900}
         open={open}
         isEscClose={true}
         title={productInfo?.id ? productInfo?.prodNm + ' 이하 상세정보 추가' : '품목정보 추가'}
@@ -250,23 +251,22 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
           <PopupFormBox className={''}>
             {!productInfo?.id && (
               <PopupFormGroup title={'품목정보'}>
-                <PopupFormType className={'type2'}>
+                <PopupFormType className={'type1'}>
                   <FormInput<ProductInfoCreateFields> control={control} name={'product.prodNm'} label={'품목명'} placeholder={'제목'} />
-                  <FormDropDown<ProductInfoCreateFields> control={control} name={'product.prodTp'} title={'품목유형'} codeUpper={'90010'} />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
+                  <FormDropDown<ProductInfoCreateFields> control={control} name={'product.prodTp'} title={'품목유형'} codeUpper={'90010'} />
                   <FormDropDown<ProductInfoCreateFields> control={control} name={'product.prodDetTp'} title={'품목상세유형'} codeUpper={'90011'} />
-                  <FormInput<ProductInfoCreateFields> control={control} name={'product.composition'} label={'혼용율'} />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
                   <FormDatePicker<ProductInfoCreateFields> control={control} name={'product.makeYmd'} title={'제조일자'} />
-                  <FormInput<ProductInfoCreateFields> control={control} name={'product.discountRate'} label={'할인율'} />
+                  <FormInput<ProductInfoCreateFields> control={control} name={'product.composition'} label={'혼용율'} />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
                   <FormInput<ProductInfoCreateFields> control={control} name={'product.orgAmt'} label={'원가'} />
                   <FormInput<ProductInfoCreateFields> control={control} name={'product.sellAmt'} label={'판매가'} />
                 </PopupFormType>
-                <PopupFormType className={'type1'}>
+                <PopupFormType className={'type2'}>
                   <FormDropDown<ProductInfoCreateFields>
                     control={control}
                     name={'product.weather'}
@@ -279,6 +279,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
                       { key: 3, value: 'winter', label: '겨울' },
                     ]}
                   />
+                  <FormInput<ProductInfoCreateFields> control={control} name={'product.discountRate'} label={'할인율'} />
                 </PopupFormType>
               </PopupFormGroup>
             )}
