@@ -418,7 +418,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                         ...selectedProductInfo,
                         categoryId: filtersForProdInfoByCategory.categoryId,
                       },
-                    });
+                    } as ConfForAddToCategory);
                   }}
                 >
                   {/*{`${*/}
