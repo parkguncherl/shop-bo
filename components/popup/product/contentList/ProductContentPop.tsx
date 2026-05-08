@@ -415,4 +415,4 @@ const ProductContentPop = ({ open, onClose, mode = 'ADD', productContentData }: 
   );
 };
 
-export default ProductContentAddPop;
+export default ProductContentPop;
