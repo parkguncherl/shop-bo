@@ -700,6 +700,7 @@ const ProductMng = () => {
 
           const refreshedTargetedFileSetInfo = await targetedFileSetInfoRefreshFn(targetedFileSetInfo);
           setTargetedFileSetInfo(refreshedTargetedFileSetInfo);
+          productInfosRefetch();
         }}
       />
       <ProductInfoAddPop
