@@ -162,16 +162,25 @@ const ProductContentPop = ({ open, onClose, mode = 'ADD', productContentData }: 
                 return Promise.reject('failed to the corresponded fileDet');
               }
               contentElements.push({
-                id: index + 1,
-                partialContent: undefined,
+                id: contentElements.length + 1,
+                partialContent: newsContent, // 이미지 토큰(미포함 시 추후 업데이트 시점에 컨텐츠에 이미지 토큰이 부재하여 수정 결과에서 이미지가 랜더링되지 않음)
                 fileInfo: {
                   detId: correspondedFileDet[0].id,
                   fileSrcUrl: await getFileUrl(correspondedFileDet[0].sysFileNm),
                 },
               });
+
+              if (index == splittedNewsContents.length - 1) {
+                // editing 시점에 최하단 요소에 이미지가 등장하는 걸 방지
+                contentElements.push({
+                  id: contentElements.length + 1,
+                  partialContent: '',
+                  fileInfo: undefined,
+                });
+              }
             } else {
               contentElements.push({
-                id: index + 1,
+                id: contentElements.length + 1,
                 partialContent: newsContent,
                 fileInfo: undefined,
               });
@@ -268,21 +277,7 @@ const ProductContentPop = ({ open, onClose, mode = 'ADD', productContentData }: 
       });
     } else if (mode == 'MOD') {
       if (productContentData != undefined && productContentData.id) {
-        // updateProductContentsMutate({
-        //   id: productContentData.id,
-        //   newsTitle: data.title,
-        //   newsSubTitle: data.title, // 현재는 newsTitle 과 동일한 값을 사용하나 추후 요청이 들어올 경우 수정
-        //   newsContents: joinedFileInfoIncludedContent,
-        //   commonRequestFileUploads:
-        //     uniqueFileList.length == 0
-        //       ? undefined
-        //       : {
-        //           uploadFiles: uniqueFileList,
-        //         },
-        // });
-        console.log('fileInfoWithFileObjList: ', fileInfoWithFileObjList);
-        console.log('fileInfoWithFileDetIdList: ', fileInfoWithFileDetIdList);
-        console.log({
+        updateProductContentsMutate({
           id: productContentData.id,
           newsTitle: data.title,
           newsSubTitle: data.title, // 현재는 newsTitle 과 동일한 값을 사용하나 추후 요청이 들어올 경우 수정
@@ -293,6 +288,21 @@ const ProductContentPop = ({ open, onClose, mode = 'ADD', productContentData }: 
             preservedFileDetIdList: fileInfoWithFileDetIdList.map((fileInfoWithFileDetId) => fileInfoWithFileDetId.detId),
           },
         });
+
+        // console.log('fileInfoWithFileObjList: ', fileInfoWithFileObjList);
+        // console.log('fileInfoWithFileDetIdList: ', fileInfoWithFileDetIdList);
+
+        // console.log({
+        //   id: productContentData.id,
+        //   newsTitle: data.title,
+        //   newsSubTitle: data.title, // 현재는 newsTitle 과 동일한 값을 사용하나 추후 요청이 들어올 경우 수정
+        //   newsContents: joinedFileInfoIncludedContent,
+        //   updateProductContentsFileInfos: {
+        //     fileId: productContentData.fileId,
+        //     uploadFiles: uniqueFileList,
+        //     preservedFileDetIdList: fileInfoWithFileDetIdList.map((fileInfoWithFileDetId) => fileInfoWithFileDetId.detId),
+        //   },
+        // });
       } else {
         console.error('유효한 상품컨텐츠 정보 혹은 식별자를 발견하지 못함');
       }
