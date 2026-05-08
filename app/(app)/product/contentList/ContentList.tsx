@@ -567,6 +567,11 @@ const ContentList = () => {
         mode={modals.type as 'SHOW' | 'ADD' | 'MOD' | undefined}
         productContentData={modals.stored_temporary}
         onClose={() => closeModal(modals.type)}
+        onSuccess={() => {
+          closeModal(modals.type);
+          productContentListResponseRefetch();
+          contentsProductInfoListRefetch();
+        }}
       />
       <ProductAddPop
         open={modals.type == 'ADD_PROD' && modals.active}

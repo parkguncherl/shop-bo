@@ -21,7 +21,8 @@ import { useCommonStore } from '../../../../stores';
 
 interface ProductContentShowPopProps {
   open: boolean;
-  onClose: (closeRes?: 'success') => void;
+  onClose: () => void;
+  onSuccess?: () => void;
   mode?: 'ADD' | 'MOD' | 'SHOW';
   productContentData?: ProductContentListResponseProductContent;
 }
@@ -76,7 +77,7 @@ function DisplayModeManagementReducerFn(state: DisplayMode, action: DisplayModeA
  * Date: 2026/05/07
  * Author: park junsung
  * */
-const ProductContentPop = ({ open, onClose, mode = 'ADD', productContentData }: ProductContentShowPopProps) => {
+const ProductContentPop = ({ open, onClose, onSuccess, mode = 'ADD', productContentData }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
   const [getFileUrl, selectFileList] = useCommonStore((s) => [s.getFileUrl, s.selectFileList]);
   const [insertProductContents, updateProductContents] = useProductContentListStore((s) => [s.insertProductContents, s.updateProductContents]);
@@ -109,7 +110,7 @@ const ProductContentPop = ({ open, onClose, mode = 'ADD', productContentData }: 
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('저장되었습니다.');
-          onClose('success');
+          onSuccess();
         } else {
           toastError(`컨텐츠 저장 도중 문제 발생 (${e.data.resultMessage})`);
         }
@@ -126,7 +127,7 @@ const ProductContentPop = ({ open, onClose, mode = 'ADD', productContentData }: 
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('수정되었습니다.');
-          onClose('success');
+          onSuccess();
         } else {
           toastError(`컨텐츠 수정 도중 문제 발생 (${e.data.resultMessage})`);
         }
