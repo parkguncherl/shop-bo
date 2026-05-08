@@ -49,13 +49,14 @@ const ProductMng = () => {
   const { onGridReady } = useAgGridApi();
 
   /** 공통 스토어 - State */
-  const [upMenuNm, menuNm, getFileUrl, selectFileList, updateImageFile, uploadImageFiles] = useCommonStore((s) => [
+  const [upMenuNm, menuNm, getFileUrl, selectFileList, updateImageFile, uploadImageFiles, deleteFile] = useCommonStore((s) => [
     s.upMenuNm,
     s.menuNm,
     s.getFileUrl,
     s.selectFileList,
     s.updateImageFile,
     s.uploadImageFiles,
+    s.deleteFile,
   ]);
 
   /** 품목관리 스토어 - State */
@@ -151,6 +152,42 @@ const ProductMng = () => {
           }
         } else {
           toastError(`이미지 업로드 도중 문제 발생 (${e.data.resultMessage})`);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+  });
+
+  const { mutate: deleteImgFileMutate } = useMutation({
+    mutationFn: deleteFile,
+    onSuccess: async (e) => {
+      try {
+        if (e.data.resultCode === 200) {
+          toastSuccess('이미지가 정상적으로 삭제되었습니다.');
+          closeModal('IMG_DEL_CONF'); // 팝업 닫음
+
+          // targetedFileSetInfo 리프레쉬
+          if (targetedFileSetInfo?.fileId) {
+            setTargetedFileSetInfo({
+              ...targetedFileSetInfo,
+              fileInfos: await selectFileList(targetedFileSetInfo?.fileId).then(async (fileDetList) => {
+                const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
+                for (let index = 0; index < fileDetList.length; index++) {
+                  fileSetsElementInfos.push({
+                    fileNm: fileDetList[index].fileNm,
+                    fileSeq: fileDetList[index].fileSeq,
+                    fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
+                  });
+                }
+                return fileSetsElementInfos;
+              }),
+            });
+          }
+          productInfosRefetch();
+        } else {
+          console.log('e.data.resultMessage: ', e.data.resultMessage);
+          toastError(`이미지 삭제 도중 문제 발생 (${e.data.resultMessage})`);
         }
       } catch (e) {
         console.log(e);
@@ -642,6 +679,9 @@ const ProductMng = () => {
                     //   imgSrc: event.srcElement.fileSrc,
                     // });
                   },
+                  delReqHandler: (event) => {
+                    openModal('IMG_DEL_CONF', { imgFileId: targetedFileSetInfo?.fileId, fileSeq: event.srcElement.fileSeq });
+                  },
                 }}
               >
                 <div className="btnArea between">
@@ -799,6 +839,23 @@ const ProductMng = () => {
           }
           uploadImageFilesMutate({ fileId: targetedFileSetInfo?.fileId, uploadFiles: [file] }); // 화이트보드 캔버스의 작성물 업로드
         }}
+      />
+      <ConfirmModal
+        open={modals.active && modals.type == 'IMG_DEL_CONF'}
+        title={'선택하신 이미지를 삭제 하시겠습니까?'}
+        confirmText={'삭제'}
+        onConfirm={() => {
+          if (modals.stored_temporary) {
+            deleteImgFileMutate({
+              fileId: (modals.stored_temporary as any).imgFileId,
+              fileSeq: (modals.stored_temporary as any).fileSeq,
+            });
+          } else {
+            toastError('저장하고자 하는 입력 결과를 찾을 수 없습니다.');
+            console.error('저장하고자 하는 입력 결과를 찾을 수 없습니다.');
+          }
+        }}
+        onClose={() => closeModal('IMG_DEL_CONF')}
       />
     </div>
   );

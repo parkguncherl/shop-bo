@@ -20,6 +20,7 @@ export interface SrcEnumeratorProps {
     onToUpperReqSuccess?: (srcElement: SrcElement) => void;
     onToUpperReqFailure?: (srcElement: SrcElement, resultMessage?: string) => void;
     onImgDoubleClick?: (event: onImgDoubleClickEvent) => void;
+    delReqHandler?: (event: DelReqHandlerEvent) => void;
   };
 
   children?: React.ReactNode;
@@ -29,6 +30,7 @@ interface EnumElementProps {
   toUpperReqHandler?: (event: ToUpperReqEvent) => void;
   oneStepMovementReqHandler?: (event: OneStepMovementReqEvent) => void;
   onImgDoubleClick?: (event: onImgDoubleClickEvent) => void;
+  delReqHandler?: (event: DelReqHandlerEvent) => void;
 }
 
 interface ToUpperReqEvent extends React.MouseEvent<HTMLButtonElement, MouseEvent> {
@@ -41,8 +43,11 @@ interface OneStepMovementReqEvent extends React.MouseEvent<HTMLButtonElement, Mo
 interface onImgDoubleClickEvent extends React.MouseEvent<HTMLDivElement, MouseEvent> {
   srcElement: SrcElement;
 }
+interface DelReqHandlerEvent extends React.MouseEvent<HTMLButtonElement, MouseEvent> {
+  srcElement: SrcElement;
+}
 
-const EnumElement = ({ srcElement, toUpperReqHandler, oneStepMovementReqHandler, onImgDoubleClick }: EnumElementProps) => {
+const EnumElement = ({ srcElement, toUpperReqHandler, oneStepMovementReqHandler, onImgDoubleClick, delReqHandler }: EnumElementProps) => {
   return (
     <div className={'enumElement'}>
       <div className={'element_container'}>
@@ -63,12 +68,17 @@ const EnumElement = ({ srcElement, toUpperReqHandler, oneStepMovementReqHandler,
           )}
         </div>
         <div className={'btn_wrapper'}>
-          {(toUpperReqHandler || oneStepMovementReqHandler) && srcElement?.fileSrc && (
+          {(toUpperReqHandler || oneStepMovementReqHandler || delReqHandler) && srcElement?.fileSrc && (
             <div className={'btnArea between'}>
               <div className={'left'}>
                 {toUpperReqHandler && (
                   <button className={'btn btnBlue'} onClick={(e) => toUpperReqHandler({ ...e, srcElement: srcElement })}>
                     맨 위로
+                  </button>
+                )}
+                {delReqHandler && (
+                  <button className={'btn'} onClick={(e) => delReqHandler({ ...e, srcElement: srcElement })}>
+                    삭제
                   </button>
                 )}
               </div>
@@ -185,6 +195,7 @@ const SrcEnumerator = ({ srcInfo, title, callBack, children }: SrcEnumeratorProp
                 }
                 oneStepMovementReqHandler={oneStepMovementReqEmerged}
                 onImgDoubleClick={callBack?.onImgDoubleClick}
+                delReqHandler={callBack?.delReqHandler}
               />
             ))}
         </div>
