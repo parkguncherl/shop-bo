@@ -226,7 +226,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
   /** 하위코드 목록 조회 */
   const { data: categories, isSuccess: isCategoriesSuccess } = useQuery({
     queryKey: [],
-    queryFn: () => selectLowerPartnerCodeByCodeUpper(PARTNER_CODE.categories.code),
+    queryFn: () => selectLowerPartnerCodeByCodeUpper({ codeUpper: PARTNER_CODE.categories.code, codeEtc: 'PROD' }),
     enabled: open,
   });
 

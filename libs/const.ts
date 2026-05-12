@@ -6,31 +6,6 @@ export const Placeholder = {
   PhoneNo: '-를 제외한 숫자만 입력하세요.',
 };
 
-// 작업구분코드
-export const JobType = {
-  jumun: 'A',
-  misong: 'B',
-  majang: 'C',
-  sample: 'D',
-  order: 'E',
-};
-
-// 발주구분
-export const AsnType = {
-  정상발주: '1',
-  매장반납: '2',
-  기타입하: '3',
-  수선분발주: '9',
-};
-
-// 발주상태코드
-export const AsnStatCd = {
-  발주예정: '1',
-  발주확정: '2',
-  입하예정: '3',
-  입하완료: '9',
-};
-
 // 정규표현식 모음
 export const RegExpression = {
   ProductContent: {
@@ -60,7 +35,7 @@ export const LOCAL_STORAGE_HISTORY = 'shopMenuHistoryList';
 export const LOCAL_STORAGE_GUBUN = 'shopGubun';
 export const LOCAL_STORAGE_WMS_HISTORY = 'shopWmsMenuHistoryList';
 
-export const PARTNER_CODE = { categories: {code: 'P0001', name:'상품카테고리'}};
+export const PARTNER_CODE = { categories: { code: 'P0001', name: '상품카테고리' } };
 
 export const DefaultOptions = {
   // 전체

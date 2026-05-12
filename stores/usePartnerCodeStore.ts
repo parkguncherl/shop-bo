@@ -46,7 +46,9 @@ interface PartnerCodeApiState {
   savePartnerCode: (codeRequest: PartnerCodeRequestCreate) => AxiosPromise<ApiResponse>;
   deletePartnerCode: (codeRequest: PartnerCodeRequestDelete) => AxiosPromise<ApiResponse>;
   updatePartnerCodeToDeletedStatus: (codeRequests: PartnerCodeRequestSoftDelete) => AxiosPromise<ApiResponse>;
-  selectLowerPartnerCodeByCodeUpper: (codeUpper: string, searchKeyword?: string) => AxiosPromise<ApiResponseListPartnerCodeResponseLowerSelect>;
+  selectLowerPartnerCodeByCodeUpper: (
+    partnerCodeDropDown: PartnerCodeControllerApiSelectDropdownByPartnerCodeUpperRequest,
+  ) => AxiosPromise<ApiResponseListPartnerCodeResponseLowerSelect>;
   selectPartnerCodeDropdown: (codeUpper: string) => AxiosPromise<ApiResponseListPartnerCodeDropDown>; // 코드 콤보용
 }
 
@@ -121,9 +123,9 @@ const initialStateCreator: StateCreator<PartnerCodeState & PartnerCodeApiState, 
     updatePartnerCodeToDeletedStatus: (codeRequests: PartnerCodeRequestSoftDelete) => {
       return authApi.put('/partnerCode/update-status', codeRequests);
     },
-    selectLowerPartnerCodeByCodeUpper: (codeUpper: string, searchKeyword?: string) => {
+    selectLowerPartnerCodeByCodeUpper: (codeRequests: PartnerCodeControllerApiSelectDropdownByPartnerCodeUpperRequest) => {
       return authApi.get('/partnerCode/lowerCodeList', {
-        params: { codeUpper: codeUpper, searchKeyword: searchKeyword },
+        params: codeRequests,
       });
     },
     selectPartnerCodeDropdown: (codeUpper: string) => {
