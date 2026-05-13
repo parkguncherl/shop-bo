@@ -6,7 +6,6 @@ import PopupFormBox from '../../content/PopupFormBox';
 import PopupFormGroup from '../../content/PopupFormGroup';
 import PopupFormType from '../../content/PopupFormType';
 import FormInput from '../../../form/FormInput';
-import { ProductContentsFields } from '../../../../app/(app)/product/Contents/ProductContents';
 import { SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -25,6 +24,12 @@ interface ProductContentShowPopProps {
   onSuccess?: () => void;
   mode?: 'ADD' | 'MOD' | 'SHOW';
   productContentData?: ProductContentListResponseProductContent;
+}
+
+export interface ProductContentFields {
+  title: string;
+  subTitle: string;
+  content: ContentElement[];
 }
 
 type FileInfoWithFileObj = FileInfo & Required<Pick<FileInfo, 'file'>>;
@@ -98,7 +103,7 @@ const ProductContentPop = ({ open, onClose, onSuccess, mode = 'ADD', productCont
     setValue,
     reset,
     //formState: { errors, isValid },
-  } = useForm<ProductContentsFields>({
+  } = useForm<ProductContentFields>({
     resolver: yupResolver(YupSchema.ProductContentsRequest()),
     mode: 'onChange',
   });
@@ -110,7 +115,7 @@ const ProductContentPop = ({ open, onClose, onSuccess, mode = 'ADD', productCont
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('저장되었습니다.');
-          onSuccess();
+          if (onSuccess) onSuccess();
         } else {
           toastError(`컨텐츠 저장 도중 문제 발생 (${e.data.resultMessage})`);
         }
@@ -127,7 +132,7 @@ const ProductContentPop = ({ open, onClose, onSuccess, mode = 'ADD', productCont
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('수정되었습니다.');
-          onSuccess();
+          if (onSuccess) onSuccess();
         } else {
           toastError(`컨텐츠 수정 도중 문제 발생 (${e.data.resultMessage})`);
         }
@@ -239,7 +244,7 @@ const ProductContentPop = ({ open, onClose, onSuccess, mode = 'ADD', productCont
   // 입력이 유효한 경우
   // 컨텐츠로서 저장하는 내용은 내용 영역에서 파일 제목, 문단 단위 절삭을 위한 정보를 포함하도록 한다.
   // 줄바꿈(\n) 기준으로 문단 분기, 파일(이미지)명(<<IMG|image_title>>) 뒤에는 반드시 이를(캐리지 리턴) 첨부
-  const onValid: SubmitHandler<ProductContentsFields> = (data, event) => {
+  const onValid: SubmitHandler<ProductContentFields> = (data, event) => {
     const fileInfoList: FileInfo[] = [...data.content.filter((content) => content.fileInfo != undefined).map((content) => content.fileInfo as FileInfo)]; // fileInfo 목록
     const fileInfoWithFileObjList: FileInfoWithFileObj[] = [...(fileInfoList.filter((content) => content.file != undefined) as FileInfoWithFileObj[])]; // file 객체가 존재하는 file 정보만을 추출
     const fileInfoWithFileDetIdList: FileInfoWithFileDetId[] = [...(fileInfoList.filter((content) => content.detId) as FileInfoWithFileDetId[])]; // detId가 존재하는(기존 파일) 객체만을 추출
@@ -267,7 +272,7 @@ const ProductContentPop = ({ open, onClose, onSuccess, mode = 'ADD', productCont
     if (mode == 'ADD') {
       insertProductContentsMutate({
         newsTitle: data.title,
-        newsSubTitle: data.title, // 현재는 newsTitle 과 동일한 값을 사용하나 추후 요청이 들어올 경우 수정
+        newsSubTitle: data.subTitle,
         newsContents: joinedFileInfoIncludedContent,
         commonRequestFileUploads:
           uniqueFileList.length == 0
@@ -281,7 +286,7 @@ const ProductContentPop = ({ open, onClose, onSuccess, mode = 'ADD', productCont
         updateProductContentsMutate({
           id: productContentData.id,
           newsTitle: data.title,
-          newsSubTitle: data.title, // 현재는 newsTitle 과 동일한 값을 사용하나 추후 요청이 들어올 경우 수정
+          newsSubTitle: data.subTitle,
           newsContents: joinedFileInfoIncludedContent,
           updateProductContentsFileInfos: {
             fileId: productContentData.fileId,
@@ -311,7 +316,7 @@ const ProductContentPop = ({ open, onClose, onSuccess, mode = 'ADD', productCont
   };
 
   // 유효하지 않은 경우
-  const onInvalid: SubmitErrorHandler<ProductContentsFields> = (errors, event) => {
+  const onInvalid: SubmitErrorHandler<ProductContentFields> = (errors, event) => {
     if (errors.title) {
       toastError(errors.title.message);
     } else {
@@ -386,7 +391,7 @@ const ProductContentPop = ({ open, onClose, onSuccess, mode = 'ADD', productCont
           <PopupFormBox className={''}>
             <PopupFormGroup>
               <PopupFormType className={'type1'}>
-                <FormInput<ProductContentsFields>
+                <FormInput<ProductContentFields>
                   control={control}
                   name={'title'}
                   label={'제목'}
@@ -394,9 +399,17 @@ const ProductContentPop = ({ open, onClose, onSuccess, mode = 'ADD', productCont
                   placeholder={'제목'}
                   disable={mode == 'SHOW'}
                 />
+                <FormInput<ProductContentFields>
+                  control={control}
+                  name={'subTitle'}
+                  label={'하위 제목'}
+                  inputType={'label'}
+                  placeholder={'하위 제목'}
+                  disable={mode == 'SHOW'}
+                />
               </PopupFormType>
               <PopupFormType className={'type1'}>
-                <FormCombineParagraphs<ProductContentsFields>
+                <FormCombineParagraphs<ProductContentFields>
                   control={control}
                   name={'content'}
                   autoSize={{ minRows: 7, maxRows: 40 }}

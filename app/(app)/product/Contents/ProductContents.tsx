@@ -14,11 +14,13 @@ import { useProductContentsStore } from '../../../../stores/product/useProductCo
 import { useMutation } from '@tanstack/react-query';
 import { Formatter } from '../../../../libs/const';
 
-export interface ProductContentsFields {
+// todo export
+interface ProductContentsFields {
   title: string;
   content: ContentElement[];
 }
 
+// todo 사용여부 확인
 /** 상품관리 - 상품컨텐츠 페이지 */
 const ProductContents = () => {
   /** 공통 스토어 - State */

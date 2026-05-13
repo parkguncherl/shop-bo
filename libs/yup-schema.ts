@@ -5,11 +5,11 @@ import { AccountRequestCreateFields, AccountRequestUnLockFields, AccountRequestU
 import { CodeRequestCreateFields, CodeRequestUpdateFields } from '../components/popup/system/codeMng';
 import { MenuFormData, MenuRequestCreateFields } from '../components/popup/system/menuMng';
 import { LoginVerificationFields } from '../app/(auth)/login/LoginClient';
-import { ProductContentsFields } from '../app/(app)/product/Contents/ProductContents';
 import { ProductInfoCreateFields } from '../components/popup/product/productMng/ProductInfoAddPop';
 import { ProductModFields } from '../components/popup/product/productMng/ProductModPop';
 import { ProductDetInsertFields } from '../components/popup/product/productMng/ProductDetInfoPop';
 import { UserRequestCreateUseYn } from '../generated';
+import { ProductContentFields } from '../components/popup/product/contentList/ProductContentPop';
 
 export interface MenuRequestParams {
   menuCd?: string;
@@ -166,7 +166,7 @@ export const YupSchema = {
       //.matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,24}$/, '올바르지 않은 비밀번호입니다.'),
     }),
 
-  ProductContentsRequest: (): yup.ObjectSchema<ProductContentsFields> =>
+  ProductContentsRequest: (): yup.ObjectSchema<ProductContentFields> =>
     yup.object({
       title: yup.string().required('제목은 반드시 입력하셔야 합니다.'),
       content: yup
@@ -205,7 +205,7 @@ export const YupSchema = {
             .filter((item) => item != null);
           return fileTitles.length === new Set(fileTitles).size;
         }),
-    }) as yup.ObjectSchema<ProductContentsFields>,
+    }) as yup.ObjectSchema<ProductContentFields>,
 
   //InsertProductInfoRequest: (productId?: number): yup.ObjectSchema<ProductInfoCreateFields> =>
   InsertProductInfoRequest: (): yup.ObjectSchema<ProductInfoCreateFields> =>
