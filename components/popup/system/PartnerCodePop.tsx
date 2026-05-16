@@ -9,13 +9,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toastError, toastSuccess } from '../../ToastMessage';
 import { formatDateWithDay, GridSetting } from '../../../libs/ag-grid';
 import { ColDef, GridApi } from 'ag-grid-community';
-import { PartnerCodeResponseLowerSelect } from '../../../generated';
 import { ConfirmModal } from '../../ConfirmModal';
 import useFilters from '../../../hooks/useFilters';
 import TunedGrid, { TunedGridRef } from '../../grid/TunedGrid';
 import { usePausedEventQueue } from '../../../customFn/pausedEventsQueue';
 import { usePartnerCodeStore } from '../../../stores/usePartnerCodeStore';
 import { useSession } from 'next-auth/react';
+import { PartnerCodeResponseLowerSelect } from '../../../generated';
 
 interface Props {
   partnerCodeUpper: string;

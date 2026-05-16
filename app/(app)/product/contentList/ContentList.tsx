@@ -2,13 +2,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Search, Table, Title, toastSuccess } from '../../../../components';
-import {
-  FileDet,
-  ProductContentListRequestContentsProductInfoListFilter,
-  ProductContentListRequestProductContentListFilter,
-  ProductContentListResponseContentProductInfo,
-  ProductContentListResponseProductContent,
-} from '../../../../generated';
 import { ColDef, RowDragEndEvent, SelectionChangedEvent } from 'ag-grid-community';
 import { TableHeader, toastError } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
@@ -26,6 +19,13 @@ import ProductAddPop from '../../../../components/popup/product/contentList/Prod
 import { CustomSwitch } from '../../../../components/CustomSwitch';
 import ImgPreviewBox, { ImgPreviewFileDet } from '../../../../components/content/ImgPreviewBox';
 import ProductContentPop from '../../../../components/popup/product/contentList/ProductContentPop';
+import {
+  FileDet,
+  ProductContentListRequestContentsProductInfoListFilter,
+  ProductContentListRequestProductContentListFilter,
+  ProductContentListResponseContentProductInfo,
+  ProductContentListResponseProductContent,
+} from '../../../../generated';
 
 /** 상품관리 - 상품컨텐츠 목록 페이지 */
 const ContentList = () => {

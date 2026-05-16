@@ -1,24 +1,22 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import {
-  ApiResponse,
-  ApiResponseListCodeDropDown,
-  PartnerCodeControllerApiSelectPartnerCodePagingRequest,
-  PartnerCodeControllerApiSelectDropdownByPartnerCodeUpperRequest,
-  PageObject,
-  PartnerCodeRequestDelete,
-  ApiResponseListPartnerCodeResponseLowerSelect,
-  PartnerCodeResponseLowerSelect,
-  PartnerCodeRequestCreate,
-  ApiResponseListPartnerCodeDropDown,
-  PartnerCodeRequestSoftDelete,
-  ProductContentListResponseProductContent,
-  PartnerCodeResponsePaging,
-} from '../generated';
 import { AxiosPromise } from 'axios';
 import { authApi } from '../libs';
 import { StateCreator } from 'zustand';
+import {
+  ApiResponse,
+  ApiResponseListCodeDropDown,
+  ApiResponseListPartnerCodeDropDown,
+  ApiResponseListPartnerCodeResponseLowerSelect,
+  PageObject,
+  PartnerCodeDropDown,
+  PartnerCodeRequestCreate,
+  PartnerCodeRequestDelete,
+  PartnerCodeRequestSoftDelete,
+  PartnerCodeResponseLowerSelect,
+  PartnerCodeResponsePaging,
+} from '../generated';
 
 type ModalType = 'PARTNER_CODE_OPEN';
 
@@ -37,8 +35,7 @@ interface PartnerCodeState {
   selectedPartnerCode: PartnerCodeResponseLowerSelect[] | undefined;
   setSelectedPartnerCode: (code: PartnerCodeResponseLowerSelect[]) => void;
   updatePartnerCodeItem: (id: number, updateData: PartnerCodeResponseLowerSelect) => void;
-  partnerCodeDropDown: PartnerCodeControllerApiSelectDropdownByPartnerCodeUpperRequest | undefined;
-  setPartnerCodeDropDown: (codeDropDown: PartnerCodeControllerApiSelectDropdownByPartnerCodeUpperRequest) => void;
+  partnerCodeDropDown: PartnerCodeDropDown | undefined;
 }
 
 interface PartnerCodeApiState {
@@ -46,9 +43,7 @@ interface PartnerCodeApiState {
   savePartnerCode: (codeRequest: PartnerCodeRequestCreate) => AxiosPromise<ApiResponse>;
   deletePartnerCode: (codeRequest: PartnerCodeRequestDelete) => AxiosPromise<ApiResponse>;
   updatePartnerCodeToDeletedStatus: (codeRequests: PartnerCodeRequestSoftDelete) => AxiosPromise<ApiResponse>;
-  selectLowerPartnerCodeByCodeUpper: (
-    partnerCodeDropDown: PartnerCodeControllerApiSelectDropdownByPartnerCodeUpperRequest,
-  ) => AxiosPromise<ApiResponseListPartnerCodeResponseLowerSelect>;
+  selectLowerPartnerCodeByCodeUpper: (codeUpper: string, searchKeyWord: string) => AxiosPromise<ApiResponseListPartnerCodeResponseLowerSelect>;
   selectPartnerCodeDropdown: (codeUpper: string) => AxiosPromise<ApiResponseListPartnerCodeDropDown>; // 코드 콤보용
 }
 
@@ -92,14 +87,6 @@ const initialStateCreator: StateCreator<PartnerCodeState & PartnerCodeApiState, 
       }));
     },
     partnerCodeDropDown: undefined,
-    setPartnerCodeDropDown: (partnerCodeDropDown) => {
-      set((state) => ({
-        partnerCodeDropDown: {
-          ...state.partnerCodeDropDown,
-          ...partnerCodeDropDown,
-        },
-      }));
-    },
     updatePartnerCodeItem: (id, updateData) => {
       set((state) => ({
         selectedPartnerCode: state.selectedPartnerCode?.map((item) => (item.id === id ? { ...item, ...updateData } : item)),
@@ -123,14 +110,17 @@ const initialStateCreator: StateCreator<PartnerCodeState & PartnerCodeApiState, 
     updatePartnerCodeToDeletedStatus: (codeRequests: PartnerCodeRequestSoftDelete) => {
       return authApi.put('/partnerCode/update-status', codeRequests);
     },
-    selectLowerPartnerCodeByCodeUpper: (codeRequests: PartnerCodeControllerApiSelectDropdownByPartnerCodeUpperRequest) => {
+    selectLowerPartnerCodeByCodeUpper: (codeUpper: string, searchKeyWord: string) => {
       return authApi.get('/partnerCode/lowerCodeList', {
-        params: codeRequests,
+        params: {
+          codeUpper: codeUpper,
+          searchKeyword: searchKeyWord,
+        },
       });
     },
-    selectPartnerCodeDropdown: (codeUpper: string) => {
+    selectPartnerCodeDropdown: (codeUpper: string, searchKeyWord?: string) => {
       return authApi.get('/partnerCode/dropdown', {
-        params: { codeUpper: codeUpper },
+        params: { codeUpper: codeUpper, searchKeyWord: searchKeyWord },
       });
     },
   };
