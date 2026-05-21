@@ -115,17 +115,6 @@ const MenuMng = () => {
     { field: 'createDateTime', headerName: '등록일시', minWidth: 150, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
   ]);
 
-  /** 컬럼 설정 - 권한 컬럼 제외 */
-  const [excludedAuthsColumnDefs, setExcludedAuthsColumnDefs] = useState<ColDef[]>([
-    { field: 'no', headerName: 'NO', minWidth: 70, maxWidth: 80, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
-    { field: 'menuCd', headerName: '코드', minWidth: 150, suppressHeaderMenuButton: true },
-    { field: 'menuNm', headerName: '이름', minWidth: 150, suppressHeaderMenuButton: true },
-    { field: 'menuEngNm', headerName: '영문명', minWidth: 150, suppressHeaderMenuButton: true },
-    { field: 'menuUri', headerName: filter?.upMenuCd === 'TOP' ? 'ICO' : 'URI' || '', minWidth: 150, suppressHeaderMenuButton: true },
-    { field: 'menuOrder', headerName: '순서', minWidth: 60, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
-    { field: 'createDateTime', headerName: '등록일시', minWidth: 150, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
-  ]);
-
   const excelUploadFn = () => {
     openModal('EXCEL');
   };
@@ -189,7 +178,7 @@ const MenuMng = () => {
           loading={isLoading}
           rowData={(menu?.data?.body?.rows as MenuResponsePaging[]) || []}
           gridOptions={{ rowHeight: 28 }}
-          columnDefs={['TOP', undefined, '', null].includes(filter.upMenuCd) || !menuUpdYn ? excludedAuthsColumnDefs : columnDefs}
+          columnDefs={columnDefs}
           defaultColDef={defaultColDef}
           paginationPageSize={paging.pageRowCount}
           rowSelection={{
