@@ -351,7 +351,7 @@ const ProductContentPop = ({ open, onClose, onSuccess, mode = 'ADD', productCont
                   }}
                   disabled={mode == 'SHOW'}
                 >
-                  {mode == 'ADD' ? '저장' : mode == 'MOD' ? '수정' : '미리보기'}
+                  {mode == 'ADD' || mode == 'MOD' ? '확인' : '미리보기'}
                 </button>
                 <button
                   type={'button'}
