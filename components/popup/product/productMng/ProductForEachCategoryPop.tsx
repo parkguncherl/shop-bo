@@ -226,7 +226,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
   /** 하위코드 목록 조회 */
   const { data: categories, isSuccess: isCategoriesSuccess } = useQuery({
     queryKey: [],
-    queryFn: () => selectLowerPartnerCodeByCodeUpper({ codeUpper: PARTNER_CODE.categories.code, codeEtc: 'PROD' }),
+    queryFn: () => selectLowerPartnerCodeByCodeUpper(PARTNER_CODE.categories.code, 'PROD'),
     enabled: open,
   });
 
@@ -366,7 +366,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
         width={1000}
         open={open}
         isEscClose={!modalsStatus.active}
-        title={'키테고리별 상품'}
+        title={'카테고리별 상품'}
         onClose={commonOnCloseCallback}
         footer={
           <PopupFooter>
