@@ -12,21 +12,14 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../../libs/lang/i18n';
 import '../../libs/agGridLicense';
-//import '../../styles/global.scss';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
-
-//import 'ag-grid-community/styles/ag-grid.css'; // Mandatory CSS required by the Data Grid
-//import 'ag-grid-community/styles/ag-theme-alpine.css';
-
 import 'react-datepicker/dist/react-datepicker.css';
-//import 'ag-grid-enterprise';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AxiosResponse } from 'axios';
 import { ApiResponse } from '../../generated';
-//import { AllEnterpriseModule } from 'ag-grid-enterprise'; // Enterprise 사용 시
 
 // dayjs 플러그인 설정
 dayjs.extend(utc);
@@ -40,6 +33,7 @@ ModuleRegistry.registerModules([
 ]);
 
 export default function RootProvider({ children }: { children: ReactNode }) {
+  console.log('ToastContainer ==>', ToastContainer);
   const queryClient = new QueryClient({
     /**
      * 백앤드의 aop 구조에 대응하여 전역 핸들러 정의, 리다이렉트
