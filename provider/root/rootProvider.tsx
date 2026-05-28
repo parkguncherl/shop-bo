@@ -6,9 +6,7 @@ import ko from 'antd/locale/ko_KR';
 import { ConfigProvider } from 'antd';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { SessionProvider, signOut } from 'next-auth/react';
-import { AppProvider } from '../../stores';
 import { ToastContainer } from 'react-toastify';
-
 import 'react-toastify/dist/ReactToastify.css';
 import '../../libs/lang/i18n';
 import '../../libs/agGridLicense';
