@@ -5,7 +5,7 @@ import { Button } from '../../Button';
 import { Menu } from '../../../generated';
 import { useCommonStore, useMenuStore } from '../../../stores';
 import { toast } from 'react-toastify';
-import { toastError } from '../../ToastMessage';
+import { toastError, toastInfo } from '../../ToastMessage';
 
 type ICellRendererType = ICellRendererParams;
 
@@ -36,11 +36,11 @@ export const AuthsCellRenderer = ({ title, styles, onClick, data }: Props) => {
       }}
       onClick={(e) => {
         if (!menuUpdYn) {
-          toastError(t('접근 권한이 없습니다.') || '');
+          toastError('접근 권한이 없습니다.');
           return;
         }
         if (data.menuCd === data.upMenuCd) {
-          toast.warning(t('권한은 하위메뉴에만 줄수 있습니다.') || '');
+          toastError('권한은 하위메뉴에만 줄수 있습니다.');
         } else {
           openModal('AUTH_MOD');
         }
