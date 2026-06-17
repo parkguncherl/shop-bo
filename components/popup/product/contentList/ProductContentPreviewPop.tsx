@@ -132,31 +132,32 @@ const ProductContentPreviewPop = ({ open, onClose, productContentData }: Props) 
 const phoneFrameStyle: React.CSSProperties = {
   width: 360,
   height: 720,
-  borderRadius: 40,
-  border: '10px solid #222',
+  borderRadius: 20,
+  border: '3px solid #ccc',
   backgroundColor: '#fff',
   display: 'flex',
   flexDirection: 'column',
   overflow: 'hidden',
-  boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
+  boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
   position: 'relative',
 };
 
 const notchStyle: React.CSSProperties = {
   width: '100%',
-  height: 28,
-  backgroundColor: '#111',
+  height: 20,
+  backgroundColor: '#f5f5f5',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
   flexShrink: 0,
+  borderBottom: '1px solid #eee',
 };
 
 const notchDotStyle: React.CSSProperties = {
-  width: 10,
-  height: 10,
+  width: 6,
+  height: 6,
   borderRadius: '50%',
-  backgroundColor: '#333',
+  backgroundColor: '#bbb',
 };
 
 const scrollAreaStyle: React.CSSProperties = {
@@ -210,8 +211,8 @@ const textStyle: React.CSSProperties = {
 };
 
 const homeBarStyle: React.CSSProperties = {
-  height: 28,
-  backgroundColor: '#fff',
+  height: 22,
+  backgroundColor: '#f5f5f5',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -220,10 +221,10 @@ const homeBarStyle: React.CSSProperties = {
 };
 
 const homeBarInnerStyle: React.CSSProperties = {
-  width: 100,
-  height: 4,
+  width: 80,
+  height: 3,
   borderRadius: 2,
-  backgroundColor: '#222',
+  backgroundColor: '#bbb',
 };
 
 export default ProductContentPreviewPop;
