@@ -291,6 +291,7 @@ const ProductMng = () => {
         cellStyle: GridSetting.CellStyle.CENTER,
         suppressHeaderMenuButton: true,
       },
+      { field: 'partnerNm', headerName: '매장', minWidth: 70, maxWidth: 80, suppressHeaderMenuButton: true },
       { field: 'prodNm', headerName: '품목명', minWidth: 120, maxWidth: 120, suppressHeaderMenuButton: true },
       { field: 'prodDetTpNm', headerName: '소분류', minWidth: 100, maxWidth: 120, suppressHeaderMenuButton: true },
       { field: 'season', headerName: '계절', minWidth: 100, maxWidth: 120, suppressHeaderMenuButton: true },

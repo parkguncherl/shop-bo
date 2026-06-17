@@ -3,13 +3,13 @@
 import Loading from '../../../components/Loading';
 import { signOut, useSession } from 'next-auth/react';
 import { LOCAL_STORAGE_WMS_HISTORY } from '../../../libs/const';
-import { ApiResponseListSelectFavorites, SelectFavorites } from '../../../generated';
 import { useQuery } from '@tanstack/react-query';
 import { authApi } from '../../../libs';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '../../../stores';
 import { toastError } from '../../../components';
+import { ApiResponseListSelectFavorites, SelectFavorites } from '../../../generated';
 
 /**
  * 로그인 성공 직후 리다이렉트 되는 영역
