@@ -19,6 +19,7 @@ import ProductAddPop from '../../../../components/popup/product/contentList/Prod
 import { CustomSwitch } from '../../../../components/CustomSwitch';
 import ImgPreviewBox, { ImgPreviewFileDet } from '../../../../components/content/ImgPreviewBox';
 import ProductContentPop from '../../../../components/popup/product/contentList/ProductContentPop';
+import ProductContentPreviewPop from '../../../../components/popup/product/contentList/ProductContentPreviewPop';
 import {
   FileDet,
   ProductContentListRequestContentsProductInfoListFilter,
@@ -485,6 +486,13 @@ const ContentList = () => {
                 >
                   {'삭제'}
                 </button>
+                <button
+                  className={selectedRowsData == undefined ? 'btn' : 'btn btn_blue'}
+                  disabled={selectedRowsData == undefined}
+                  onClick={() => openModal('PREVIEW', selectedRowsData)}
+                >
+                  {'미리보기'}
+                </button>
               </div>
               <div className="right">
                 <button
@@ -581,6 +589,11 @@ const ContentList = () => {
           closeModal('ADD_PROD');
           contentsProductInfoListRefetch();
         }}
+      />
+      <ProductContentPreviewPop
+        open={modals.type == 'PREVIEW' && modals.active}
+        productContentData={modals.stored_temporary}
+        onClose={() => closeModal('PREVIEW')}
       />
       <ConfirmModal
         open={modals.type == 'DEL_CONF' && modals.active}
