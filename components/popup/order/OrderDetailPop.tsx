@@ -112,7 +112,7 @@ export const OrderDetailPop = ({ orderId, open, onClose }: Props) => {
   const { data: detail, isLoading } = useQuery<OrderDetail | null>({
     queryKey: ['/frontWeb/order', orderId],
     queryFn: async () => {
-      const { data } = await authApi.get(`/order/${orderId}`);
+      const { data } = await authApi.get(`/orderMng/${orderId}`);
       if (data?.resultCode === 200) return data.body as OrderDetail;
       toastError(data?.resultMessage ?? '조회 실패');
       return null;
@@ -122,7 +122,7 @@ export const OrderDetailPop = ({ orderId, open, onClose }: Props) => {
 
   const { mutate: cancelMutate, isPending: isCancelling } = useMutation({
     mutationFn: async () => {
-      const { data } = await authApi.post(`/order/payment/${detail?.paymentSeq}/cancel`, { reason: 'BO 관리자 취소' });
+      const { data } = await authApi.post(`/orderMng/payment/${detail?.paymentSeq}/cancel`, { reason: 'BO 관리자 취소' });
       return data;
     },
     onSuccess: (data) => {
@@ -204,7 +204,7 @@ export const OrderDetailPop = ({ orderId, open, onClose }: Props) => {
             </tbody>
           </table>
 
-          <div style={{ height: 280 }}>
+          <div style={{ height: 180 }}>
             <TunedGrid
               headerHeight={35}
               rowData={detail.items ?? []}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ColDef } from 'ag-grid-community';
 import { Search, Table, Title } from '../../../../components';
 import { useQuery } from '@tanstack/react-query';
@@ -13,9 +13,9 @@ import useFilters from '../../../../hooks/useFilters';
 import CustomNoRowsOverlay from '../../../../components/CustomNoRowsOverlay';
 import CustomGridLoading from '../../../../components/CustomGridLoading';
 import TunedGrid from '../../../../components/grid/TunedGrid';
-import { CustomDatePicker } from '../../../../components/CustomDatePicker';
 import { OrderDetailPop } from '../../../../components/popup/order/OrderDetailPop';
 import dayjs from 'dayjs';
+import CustomNewDatePicker from '../../../../components/CustomNewDatePicker';
 
 interface OrderBoListItem {
   orderId: number;
@@ -45,7 +45,7 @@ const orderStatusLabel = (status: string) => {
 
 const paymentStatusLabel = (status: string) => {
   const map: Record<string, string> = { P: '결제완료', C: '취소' };
-  return map[status] ?? (status ?? '-');
+  return map[status] ?? status ?? '-';
 };
 
 const formatWon = (params: any) => {
@@ -62,6 +62,8 @@ const OrderList = () => {
     fromDate: today,
     toDate: today,
   });
+
+  const isFirstRender = useRef(true);
 
   const [rowData, setRowData] = useState<OrderBoListItem[]>([]);
   const [pinnedBottomRow, setPinnedBottomRow] = useState<any[]>([]);
@@ -140,9 +142,9 @@ const OrderList = () => {
   ];
 
   const { isLoading } = useQuery({
-    queryKey: ['/order/list', filters],
+    queryKey: ['/orderMng/list', filters],
     queryFn: async () => {
-      const { data } = await authApi.get('/order/list', { params: filters });
+      const { data } = await authApi.get('/orderMng/list', { params: filters });
       return data;
     },
     enabled: false,
@@ -150,21 +152,23 @@ const OrderList = () => {
   });
 
   const runSearch = async () => {
-    const { data } = await authApi.get('/order/list', { params: filters });
+    const { data } = await authApi.get('/orderMng/list', { params: filters });
     if (data?.resultCode === 200) {
       const rows: OrderBoListItem[] = data.body ?? [];
       setRowData(rows);
 
       if (rows.length > 0) {
         const sumProductAmount = rows.reduce((acc, r) => acc + (r.productAmount ?? 0), 0);
-        const sumUsedPoint     = rows.reduce((acc, r) => acc + (r.usedPoint ?? 0), 0);
+        const sumUsedPoint = rows.reduce((acc, r) => acc + (r.usedPoint ?? 0), 0);
         const sumPaymentAmount = rows.reduce((acc, r) => acc + (r.paymentAmount ?? 0), 0);
-        setPinnedBottomRow([{
-          orderNo: `합계 (${rows.length}건)`,
-          productAmount: sumProductAmount,
-          usedPoint: sumUsedPoint,
-          paymentAmount: sumPaymentAmount,
-        }]);
+        setPinnedBottomRow([
+          {
+            orderNo: `합계 (${rows.length}건)`,
+            productAmount: sumProductAmount,
+            usedPoint: sumUsedPoint,
+            paymentAmount: sumPaymentAmount,
+          },
+        ]);
       } else {
         setPinnedBottomRow([]);
       }
@@ -172,6 +176,16 @@ const OrderList = () => {
       toastError(data?.resultMessage ?? '조회 중 오류가 발생했습니다.');
     }
   };
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (filters.fromDate && filters.toDate) {
+      runSearch();
+    }
+  }, [filters.fromDate, filters.toDate]);
 
   const reset = () => {
     onFiltersReset();
@@ -182,22 +196,15 @@ const OrderList = () => {
   return (
     <div>
       <Title title={menuNm ?? '주문 목록'} reset={reset} search={runSearch} />
-      <Search className={'type_2'}>
-        <CustomDatePicker
-          title="조회시작일"
-          name="fromDate"
-          value={filters.fromDate}
+      <Search className={'type_1'}>
+        <CustomNewDatePicker
+          title={''}
+          type={'range'}
+          defaultType={'today'}
+          startName={'fromDate'}
+          endName={'toDate'}
           onChange={onChangeFilters}
-          onEnter={runSearch}
-          filters={filters}
-        />
-        <CustomDatePicker
-          title="조회종료일"
-          name="toDate"
-          value={filters.toDate}
-          onChange={onChangeFilters}
-          onEnter={runSearch}
-          filters={filters}
+          value={[filters.fromDate, filters.toDate]}
         />
       </Search>
       <Table>
