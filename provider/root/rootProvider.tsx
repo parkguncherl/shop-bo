@@ -8,7 +8,6 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { SessionProvider, signOut } from 'next-auth/react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../../libs/lang/i18n';
 import '../../libs/agGridLicense';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
@@ -25,10 +24,7 @@ dayjs.extend(timezone);
 dayjs.locale('ko');
 dayjs.tz.setDefault('Asia/Seoul');
 
-ModuleRegistry.registerModules([
-  AllCommunityModule,
-  //AllEnterpriseModule, // Enterprise 라이선스가 있는 경우만
-]);
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 export default function RootProvider({ children }: { children: ReactNode }) {
   console.log('ToastContainer ==>', ToastContainer);

@@ -1,11 +1,7 @@
 import React from 'react';
 import { ICellRendererParams } from 'ag-grid-community';
-import { useTranslation } from 'react-i18next';
-import { Button } from '../../Button';
 import { Menu } from '../../../generated';
-import { useCommonStore, useMenuStore, useMypageStore } from '../../../stores';
-import { toast } from 'react-toastify';
-import { toastError } from '../../ToastMessage';
+import { useMypageStore } from '../../../stores';
 
 type ICellRendererType = ICellRendererParams;
 
@@ -18,8 +14,6 @@ interface Props extends ICellRendererType {
 
 /** mypage - 사용자 권한관리 : 권한 Cell Renderer*/
 export const UserAuthsCellRenderer = ({ title, styles, onClick, data }: Props) => {
-  const { t } = useTranslation();
-
   const [openModal] = useMypageStore((s) => [s.openModal]);
 
   return (
@@ -36,7 +30,7 @@ export const UserAuthsCellRenderer = ({ title, styles, onClick, data }: Props) =
       }}
     >
       <button className={'tblBtn'} onClick={onClick} style={{ width: '100%' }}>
-        {t(title || '미리보기') || ''}
+        {title || '미리보기'}
       </button>
     </div>
   );

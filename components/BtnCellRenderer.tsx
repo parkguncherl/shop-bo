@@ -1,7 +1,5 @@
 import React from 'react';
 import { ICellRendererParams } from 'ag-grid-community';
-import { Button } from './Button';
-import { useTranslation } from 'react-i18next';
 
 type ICellRendererType = ICellRendererParams;
 

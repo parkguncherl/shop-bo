@@ -1,5 +1,4 @@
 import { useAccountStore } from '../../../../stores';
-import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useEffect, useRef, useState } from 'react';
 import { PopupContent } from '../../PopupContent';

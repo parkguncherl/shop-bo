@@ -1,8 +1,6 @@
-import { useTranslation } from 'react-i18next';
 import React, { useRef } from 'react';
 import ModalLayout from '../../ModalLayout';
 import { PopupContent } from '../PopupContent';
-import { Button } from '../../Button';
 import { PopupFooter } from '../PopupFooter';
 import styles from './../../../styles/dashboard/main.module.scss';
 import { CheckBox } from '../../CheckBox';
@@ -16,7 +14,6 @@ interface Props {
 
 /** 대시보드 메인 - 위젯편집 팝업 */
 const EditWidget = ({ open, onClose }: Props) => {
-  const { t } = useTranslation();
   const el = useRef<HTMLDListElement | null>(null);
 
   const [
@@ -89,13 +86,13 @@ const EditWidget = ({ open, onClose }: Props) => {
         <ModalLayout
           width={600}
           open={open}
-          title={t('위젯편집') || ''}
+          title={'위젯편집'}
           onClose={onClose}
           footer={
             <PopupFooter>
               <div className={'btnArea'}>
                 <button className={'btn'} onClick={onClose}>
-                  {t('닫기') || ''}
+                  {'닫기'}
                 </button>
               </div>
             </PopupFooter>

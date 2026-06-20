@@ -1,6 +1,5 @@
 import React from 'react';
 import { DropDownOption } from '../../types/DropDownOptions';
-import { useTranslation } from 'react-i18next';
 import DropDownAtom from '../atom/DropDownAtom';
 
 interface Props {
@@ -13,8 +12,6 @@ interface Props {
 }
 
 export const TitleCategory = ({ title = '전체', name, options, value = 'TOP', onChangeOptions, onReset }: Props) => {
-  const { t } = useTranslation();
-
   return (
     <div className="titleCategoryBox">
       <div className="labelWrap">

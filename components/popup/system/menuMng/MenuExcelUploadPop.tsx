@@ -1,9 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { useMenuStore } from '../../../../stores';
-import { useTranslation } from 'react-i18next';
 import { PopupContent } from '../../PopupContent';
 import { PopupSearchBox, PopupSearchType } from '../../content';
-import { Button } from '../../../Button';
 import { PopupFooter } from '../../PopupFooter';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import { authApi } from '../../../../libs';

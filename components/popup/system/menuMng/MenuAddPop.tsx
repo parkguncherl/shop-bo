@@ -6,7 +6,6 @@ import { Input, toastError, toastSuccess } from '../../../index';
 import { useMenuStore } from '../../../../stores';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
 import FormInput from '../../../form/FormInput';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '../../../../libs';

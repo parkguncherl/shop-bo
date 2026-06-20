@@ -1,14 +1,11 @@
 import React, { useRef, useState } from 'react';
 import { useCodeStore } from '../../../../stores';
-import { useTranslation } from 'react-i18next';
 import { PopupContent } from '../../PopupContent';
 import { PopupSearchBox, PopupSearchType } from '../../content';
-import { Button } from '../../../Button';
 import { PopupFooter } from '../../PopupFooter';
 import { authApi } from '../../../../libs';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import { useQueryClient } from '@tanstack/react-query';
-import ModalLayout from '../../../ModalLayout';
 import { Utils } from '../../../../libs/utils';
 import { PopupLayout } from '../../PopupLayout';
 

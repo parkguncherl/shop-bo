@@ -1,15 +1,11 @@
 import React from 'react';
-import { Button } from '../../../Button';
 import { PopupContent, PopupFooter, PopupLayout } from '../../index';
 import { PopupSearchBox, PopupSearchType } from '../../content';
 import { Label } from '../../../index';
 import { useContactState } from '../../../../stores';
 import { isEmpty } from 'lodash';
-import { useTranslation } from 'react-i18next';
-import ModalLayout from '../../../ModalLayout';
 
 export const AccessLogDeatilPop = () => {
-  const { t } = useTranslation();
   const [modalType, closeModal, selectContact] = useContactState((s) => [s.modalType, s.closeModal, s.selectContact]);
 
   return (

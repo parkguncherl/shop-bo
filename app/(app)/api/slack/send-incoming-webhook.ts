@@ -1,14 +1,11 @@
 import axios from 'axios';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { useTranslation } from 'react-i18next';
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const { t } = useTranslation();
-
   if (req.method === 'POST') {
     if (!req.body) {
       res.statusCode = 400;
-      return res.send(t('메시지가 없습니다.') || '');
+      return res.send('메시지가 없습니다.');
     }
 
     try {
