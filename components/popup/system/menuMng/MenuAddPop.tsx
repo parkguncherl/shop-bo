@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+﻿import React, { useEffect, useRef, useState } from 'react';
 import { Menu, MenuRequestCreate } from '../../../../generated';
 import { PopupContent, PopupFooter, PopupLayout } from '../../index';
 import { PopupSearchBox, PopupSearchType } from '../../content';
@@ -28,7 +28,6 @@ export type MenuRequestCreateFields = {
 export const MenuAddPop = ({ data, callback }: Props) => {
   const menuUriTitle = data.upMenuCd === 'TOP' ? 'ICO' : 'URI';
   const el = useRef<HTMLDListElement | null>(null);
-  const { t } = useTranslation();
   const {
     watch,
     handleSubmit,
@@ -52,7 +51,7 @@ export const MenuAddPop = ({ data, callback }: Props) => {
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
-          toastSuccess(t('저장되었습니다.') || '');
+          toastSuccess('저장되었습니다.');
           await Promise.all([
             queryClient.invalidateQueries({ queryKey: ['/menu/leftMenu'] }),
             queryClient.invalidateQueries({ queryKey: ['/auth/check/menu'] }),
@@ -97,7 +96,7 @@ export const MenuAddPop = ({ data, callback }: Props) => {
           width={500}
           isEscClose={false}
           open={modalType.type === 'ADD' && modalType.active}
-          title={t('신규 메뉴 생성') || ''}
+          title={'신규 메뉴 생성'}
           onClose={() => closeModal('ADD')}
           footer={
             <PopupFooter>
@@ -115,25 +114,25 @@ export const MenuAddPop = ({ data, callback }: Props) => {
           <PopupContent>
             <PopupSearchBox>
               <PopupSearchType className={'type_1'}>
-                <Input title={t('상위코드') || ''} disable={true} value={data.upMenuCd} />
+                <Input title={'상위코드'} disable={true} value={data.upMenuCd} />
               </PopupSearchType>
               <PopupSearchType className={'type_1'}>
-                <Input title={t('상위코드명') || ''} disable={true} value={data.upMenuCd === 'TOP' ? 'TOP' : data.upMenuNm} />
+                <Input title={'상위코드명'} disable={true} value={data.upMenuCd === 'TOP' ? 'TOP' : data.upMenuNm} />
               </PopupSearchType>
               <PopupSearchType className={'type_1'}>
-                <FormInput<MenuRequestCreateFields> control={control} name={'menuCd'} label={t('코드') || ''} required={true} />
+                <FormInput<MenuRequestCreateFields> control={control} name={'menuCd'} label={'코드'} required={true} />
               </PopupSearchType>
               <PopupSearchType className={'type_1'}>
-                <FormInput<MenuRequestCreateFields> control={control} name={'menuNm'} label={t('이름') || ''} required={true} />
+                <FormInput<MenuRequestCreateFields> control={control} name={'menuNm'} label={'이름'} required={true} />
               </PopupSearchType>
               <PopupSearchType className={'type_1'}>
-                <FormInput<MenuRequestCreateFields> control={control} name={'menuEngNm'} label={t('영문명') || ''} />
+                <FormInput<MenuRequestCreateFields> control={control} name={'menuEngNm'} label={'영문명'} />
               </PopupSearchType>
               <PopupSearchType className={'type_1'}>
-                <FormInput<MenuRequestCreateFields> control={control} name={'menuUri'} label={t(menuUriTitle) || ''} required={true} />
+                <FormInput<MenuRequestCreateFields> control={control} name={'menuUri'} label={menuUriTitle} required={true} />
               </PopupSearchType>
               <PopupSearchType className={'type_1'}>
-                <FormInput<MenuRequestCreateFields> control={control} name={'menuOrder'} label={t('순서') || ''} required={true} />
+                <FormInput<MenuRequestCreateFields> control={control} name={'menuOrder'} label={'순서'} required={true} />
               </PopupSearchType>
             </PopupSearchBox>
           </PopupContent>

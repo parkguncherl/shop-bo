@@ -1,4 +1,4 @@
-import { useAccountStore } from '../../../../stores';
+﻿import { useAccountStore } from '../../../../stores';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React, { useRef, useState } from 'react';
 import { PopupContent } from '../../PopupContent';
@@ -30,8 +30,6 @@ interface Props {
 
 /** 시스템 - 계정관리 - 잠금해제 팝업 */
 export const AccountUnLockPop = ({ data }: Props) => {
-  const { t } = useTranslation();
-
   const el = useRef<HTMLDListElement | null>(null);
   const {
     watch,
@@ -66,7 +64,7 @@ export const AccountUnLockPop = ({ data }: Props) => {
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
-          toastSuccess(t('잠금해제 되었습니다.') || '');
+          toastSuccess('잠금해제 되었습니다.');
           await queryClient.invalidateQueries({ queryKey: ['/user/paging'] });
           closeModal('UNLOCK');
         } else {
@@ -93,13 +91,13 @@ export const AccountUnLockPop = ({ data }: Props) => {
           width={620}
           isEscClose={false}
           open={modalType.type === 'UNLOCK' && modalType.active}
-          title={t('계정잠금 해제') || ''}
+          title={'계정잠금 해제'}
           onClose={() => closeModal('UNLOCK')}
           footer={
             <PopupFooter>
               <div className={'btnArea'}>
                 <button className={'btn btnBlue'} onClick={handleSubmit(onValid)}>
-                  {t('저장') || ''}
+                  {'저장'}
                 </button>
               </div>
             </PopupFooter>
@@ -111,7 +109,7 @@ export const AccountUnLockPop = ({ data }: Props) => {
                 <Label title={'ID(e-mail)'} value={watch('loginId')} />
               </PopupSearchType>
               <PopupSearchType className={'type_1'}>
-                <Label title={t('이름') || ''} value={watch('userNm')} />
+                <Label title={'이름'} value={watch('userNm')} />
               </PopupSearchType>
             </PopupSearchBox>
             <p className="mt10 mb10 etcTxt" style={{ textAlign: 'center', width: '72%', margin: '0 auto' }}>
@@ -123,8 +121,8 @@ export const AccountUnLockPop = ({ data }: Props) => {
                   control={control}
                   type={isPassVisible ? 'password' : 'text'}
                   name={'loginPass'}
-                  label={t('비밀번호 입력') || ''}
-                  placeholder={t(Placeholder.Input) || ''}
+                  label={'비밀번호 입력'}
+                  placeholder={Placeholder.Input}
                   required={true}
                 />
                 <button

@@ -15,7 +15,6 @@ import FormDropDown from '../../../form/FormDropDown';
 import Loading from '../../../Loading';
 import { PopupLayout } from '../../PopupLayout';
 import { useSession } from 'next-auth/react';
-import { DropDownOption } from '../../../../types/DropDownOptions';
 
 export type AccountRequestCreateFields = {
   loginId: string;
@@ -36,7 +35,6 @@ export type AccountRequestCreateFields = {
 export const AccountAddPop = () => {
   const session = useSession();
   const el = useRef<HTMLDListElement | null>(null);
-  const { t } = useTranslation();
 
   const {
     watch,
@@ -196,16 +194,10 @@ export const AccountAddPop = () => {
                   control={control}
                   name={'loginId'}
                   label={'ID(e-mail)'}
-                  placeholder={t(Placeholder.Input) || ''}
+                  placeholder={Placeholder.Input}
                   required={true}
                 />
-                <FormInput<AccountRequestCreateFields>
-                  control={control}
-                  name={'userNm'}
-                  label={'이름'}
-                  placeholder={t(Placeholder.Input) || ''}
-                  required={true}
-                />
+                <FormInput<AccountRequestCreateFields> control={control} name={'userNm'} label={'이름'} placeholder={Placeholder.Input} required={true} />
               </PopupSearchType>
               <PopupSearchType className={'type_2'}>
                 <FormInput<AccountRequestCreateFields>
@@ -216,7 +208,7 @@ export const AccountAddPop = () => {
                   }}
                   name={'phoneNo'}
                   label={'전화번호'}
-                  placeholder={t(Placeholder.PhoneNo) || ''}
+                  placeholder={Placeholder.PhoneNo}
                   required={true}
                 />
                 <FormDropDown<AccountRequestCreateFields>
@@ -230,17 +222,11 @@ export const AccountAddPop = () => {
               </PopupSearchType>
               <PopupSearchType className={'type_2'}>
                 <FormDropDown<AccountRequestCreateFields> control={control} title={'상태'} name={'useYn'} codeUpper={'10280'} required={true} />
-                <FormInput<AccountRequestCreateFields>
-                  control={control}
-                  name={'belongNm'}
-                  label={'소속'}
-                  placeholder={t(Placeholder.Input) || ''}
-                  required={true}
-                />
+                <FormInput<AccountRequestCreateFields> control={control} name={'belongNm'} label={'소속'} placeholder={Placeholder.Input} required={true} />
               </PopupSearchType>
               <PopupSearchType className={'type_2'}>
-                <FormInput<AccountRequestCreateFields> control={control} name={'deptNm'} label={'부서'} placeholder={t(Placeholder.Input) || ''} />
-                <FormInput<AccountRequestCreateFields> control={control} name={'positionNm'} label={'직책'} placeholder={t(Placeholder.Input) || ''} />
+                <FormInput<AccountRequestCreateFields> control={control} name={'deptNm'} label={'부서'} placeholder={Placeholder.Input} />
+                <FormInput<AccountRequestCreateFields> control={control} name={'positionNm'} label={'직책'} placeholder={Placeholder.Input} />
               </PopupSearchType>
               {authCd > 399 ? ( // 화주 이상만(관리자만) 보이게 처리
                 <PopupSearchType className={'type_2'}>

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+﻿import React, { useRef, useState } from 'react';
 import { useCodeStore } from '../../../../stores';
 import { PopupContent } from '../../PopupContent';
 import { PopupSearchBox, PopupSearchType } from '../../content';
@@ -15,15 +15,9 @@ export const CodeExcelUploadPop = () => {
 
   /** 코드관리 스토어 - API */
   const [excelTemplate] = useCodeStore((s) => [s.excelTemplate]);
-
-  const { t } = useTranslation();
-
   const queryClient = useQueryClient();
-
   const inputRef = useRef<HTMLInputElement | null>(null);
-
   const [file, setFile] = useState<File | undefined>();
-
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     setFile(selectedFile);
@@ -34,7 +28,7 @@ export const CodeExcelUploadPop = () => {
     const formData = new FormData();
     if (file) {
       if (Utils.isNotAllowedFileMaxSize(file)) {
-        toastError(t('파일 사이즈가 50MB를 초과하였습니다.') || '');
+        toastError('파일 사이즈가 50MB를 초과하였습니다.');
         return;
       }
 
@@ -48,7 +42,7 @@ export const CodeExcelUploadPop = () => {
         })
         .then((response) => {
           if (response.data.resultCode === 200) {
-            toastSuccess(t('업로드되었습니다.') || '');
+            toastSuccess('업로드되었습니다.');
             queryClient.invalidateQueries({ queryKey: ['/code/paging'] });
             queryClient.invalidateQueries({ queryKey: ['/code/dropdown/TOP'] });
             closeModal('EXCEL');
@@ -62,7 +56,7 @@ export const CodeExcelUploadPop = () => {
           console.error(error);
         });
     } else {
-      toastError(t('선택된 파일이 없습니다.') || '');
+      toastError('선택된 파일이 없습니다.');
       return;
     }
   };
@@ -77,16 +71,16 @@ export const CodeExcelUploadPop = () => {
       width={600}
       isEscClose={true}
       open={modalType.type === 'EXCEL' && modalType.active}
-      title={t('엑셀 파일 업로드') || ''}
+      title={'엑셀 파일 업로드'}
       onClose={() => closeModal('EXCEL')}
       footer={
         <PopupFooter>
           <div className={'btnArea'}>
             <button className={'btn'} onClick={excelTemplateFn}>
-              {t('엑셀 템플릿 다운로드') || ''}
+              {'엑셀 템플릿 다운로드'}
             </button>
             <button className={'btn'} onClick={handleUpload}>
-              {t('엑셀 업로드') || ''}
+              {'엑셀 업로드'}
             </button>
             <button className={'btn'} onClick={() => closeModal('EXCEL')}>
               닫기
@@ -100,7 +94,7 @@ export const CodeExcelUploadPop = () => {
           <PopupSearchType className={'type_1'}>
             <dl>
               <dt>
-                <label>{t('업로드 파일') || ''}</label>
+                <label>{'업로드 파일'}</label>
               </dt>
               <dd>
                 <div className={'form_box'}>

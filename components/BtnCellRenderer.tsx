@@ -10,8 +10,6 @@ interface Props extends ICellRendererType {
 }
 
 export const BtnCellRenderer = ({ title, styles, onClick }: Props) => {
-  const { t } = useTranslation();
-
   return (
     <div
       style={{
@@ -27,7 +25,7 @@ export const BtnCellRenderer = ({ title, styles, onClick }: Props) => {
       }}
     >
       <button className={'tblBtn'} onClick={onClick}>
-        {t(title || '미리보기')}
+        {'미리보기'}
       </button>
     </div>
   );

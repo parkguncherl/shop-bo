@@ -15,7 +15,7 @@ export const TitleCategory = ({ title = '전체', name, options, value = 'TOP', 
   return (
     <div className="titleCategoryBox">
       <div className="labelWrap">
-        <span className="txt" dangerouslySetInnerHTML={{ __html: t(title) || '' }} onClick={onReset}></span>
+        <span className="txt" dangerouslySetInnerHTML={{ __html: title }} onClick={onReset}></span>
         <span className="arrow"></span>
       </div>
       <DropDownAtom value={value} options={options} name={name} onChangeOptions={onChangeOptions} dropDownStyle={{ width: '150px' }} />

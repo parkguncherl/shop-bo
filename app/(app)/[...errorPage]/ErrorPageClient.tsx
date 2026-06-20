@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useRouter } from 'next/navigation';
 
@@ -34,7 +34,7 @@ const ErrorPageClient = ({ styles }: ErrorPageClientProps) => {
                 router.push('/');
               }}
             >
-              {t('홈 바로가기') || ''}
+              {'홈 바로가기'}
             </button>
           </div>
         </div>

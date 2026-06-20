@@ -1,10 +1,7 @@
-import React from 'react';
+﻿import React from 'react';
 import { ICellRendererParams } from 'ag-grid-community';
-import { useTranslation } from 'react-i18next';
-import { Button } from '../../Button';
 import { CodeResponsePaging } from '../../../generated';
 import { useCodeStore, useCommonStore } from '../../../stores';
-import { toastError } from '../../ToastMessage';
 
 type ICellRendererType = ICellRendererParams;
 
@@ -17,8 +14,6 @@ interface Props extends ICellRendererType {
 
 /** 시스템 - 코드관리 : 하위코드 수 Cell Renderer*/
 export const LowerCellRender = ({ title, styles, onClick, data }: Props) => {
-  const { t } = useTranslation();
-
   /** 공통 스토어 - State */
   const [menuUpdYn, menuExcelYn] = useCommonStore((s) => [s.menuUpdYn, s.menuExcelYn]);
 
@@ -36,7 +31,7 @@ export const LowerCellRender = ({ title, styles, onClick, data }: Props) => {
       }}
       onClick={() => {
         /*if (!menuUpdYn) {
-          toastError(t('접근 권한이 없습니다.') || '');
+          toastError('접근 권한이 없습니다.');
           return;
         }*/
         setSelectedCode(data);

@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import styles from '../../styles/delete/popup.module.scss';
 
 interface Props {
@@ -24,7 +24,7 @@ export const PopupHeader = ({ title, subTitle, onClick, type = 'normal', style }
       )}
       {/*<div className={styles.close}>*/}
       {/*  <div>*/}
-      {/*    <Button onClick={onClick}>{t('닫기') || ''}</Button>*/}
+      {/*    <Button onClick={onClick}>{'닫기'}</Button>*/}
       {/*  </div>*/}
       {/*</div>*/}
     </div>
