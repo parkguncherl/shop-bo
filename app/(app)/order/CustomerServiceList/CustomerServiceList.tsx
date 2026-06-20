@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { ColDef } from 'ag-grid-community';
 import { Search, Table, Title } from '../../../../components';
 import { toastError } from '../../../../components';
@@ -14,43 +15,10 @@ import CustomGridLoading from '../../../../components/CustomGridLoading';
 import TunedGrid from '../../../../components/grid/TunedGrid';
 import CustomNewDatePicker from '../../../../components/CustomNewDatePicker';
 import dayjs from 'dayjs';
+import { Utils } from '../../../../libs/utils';
+import { ComuResponseBoListItem, ComuResponseMessage, ComuResponseThread } from '../../../../generated';
 
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
-
-interface BoListItem {
-  comuId: number;
-  comuType: string;
-  comuTypeName: string;
-  orderId: number;
-  orderNo: string;
-  orderDate: string;
-  paymentStatus: string;
-  topProductName: string;
-  lastMessage: string;
-  lastMessageTm: string;
-  unreadCount: number;
-  creTm: string;
-}
-
-interface ComuMessage {
-  id: number;
-  comuId: number;
-  reqYn: string;
-  comuCntn: string;
-  fileId?: number | null;
-  creUser: string;
-  creTm: string;
-  readYn: string;
-}
-
-interface ComuThread {
-  id: number;
-  comuType: string;
-  comuTypeName: string;
-  orderId: number;
-  creTm: string;
-  messages: ComuMessage[];
-}
 
 type FilterType = {
   comuType: string;
@@ -60,28 +28,8 @@ type FilterType = {
   toDate: string;
 };
 
-// ─── 유틸 ─────────────────────────────────────────────────────────────────────
-
-const formatTime = (value?: string | null) => {
-  if (!value) return '';
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return '';
-  return new Intl.DateTimeFormat('ko-KR', {
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(d);
-};
-
-const paymentStatusLabel = (status?: string) => {
-  const map: Record<string, string> = { P: '결제완료', C: '취소', R: '미결제' };
-  return status ? map[status] ?? status : '-';
-};
-
 // ─── 메시지 버블 ──────────────────────────────────────────────────────────────
-
-function MessageBubble({ msg, getFileUrl }: { msg: ComuMessage; getFileUrl: (name: string) => Promise<string> }) {
+function MessageBubble({ msg, getFileUrl }: { msg: ComuResponseMessage; getFileUrl: (name: string) => Promise<string> }) {
   const isAdmin = msg.reqYn === 'N'; // 관리자가 보낸 메시지 → 오른쪽
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const { selectFileList } = useCommonStore();
@@ -121,7 +69,7 @@ function MessageBubble({ msg, getFileUrl }: { msg: ComuMessage; getFileUrl: (nam
             </div>
           )}
         </div>
-        <span style={{ fontSize: 10, color: '#aaa', alignSelf: 'flex-end' }}>{formatTime(msg.creTm)}</span>
+        <span style={{ fontSize: 10, color: '#aaa', alignSelf: 'flex-end' }}>{Utils.formatMonthDayTime(msg.creTm)}</span>
       </div>
 
       {lightbox && (
@@ -154,19 +102,32 @@ const CustomerServiceList = () => {
     toDate: today,
   });
 
-  const [comuTypes, setComuTypes] = useState<{ codeCd: string; codeNm: string }[]>([]);
-  const [rowData, setRowData] = useState<BoListItem[]>([]);
-  const [selectedThread, setSelectedThread] = useState<ComuThread | null>(null);
-  const [selectedItem, setSelectedItem] = useState<BoListItem | null>(null);
+  const { data: comuTypesData } = useQuery({
+    queryKey: ['/code/lower/10130'],
+    queryFn: () => authApi.get('/code/lower/10130'),
+    staleTime: 1000 * 60 * 10,
+  });
+  const comuTypes: { codeCd: string; codeNm: string }[] = (comuTypesData?.data?.body ?? []).filter((c: { codeCd: string; codeNm: string }) =>
+    String(c.codeCd ?? '').startsWith('A'),
+  );
+
+  const { data: paymentStatusData } = useQuery({
+    queryKey: ['/code/lower/10070'],
+    queryFn: () => authApi.get('/code/lower/10070'),
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const [rowData, setRowData] = useState<ComuResponseBoListItem[]>([]);
+  const [selectedThread, setSelectedThread] = useState<ComuResponseThread | null>(null);
+  const [selectedItem, setSelectedItem] = useState<ComuResponseBoListItem | null>(null);
   const [replyText, setReplyText] = useState('');
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isSending, setIsSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const isFirstRender = useRef(true);
 
-  const columnDefs: ColDef<BoListItem>[] = [
+  const columnDefs: ColDef<ComuResponseBoListItem>[] = [
     {
       headerName: 'NO',
       minWidth: 55,
@@ -206,25 +167,20 @@ const CustomerServiceList = () => {
       suppressHeaderMenuButton: true,
     },
     {
-      field: 'paymentStatus',
+      field: 'paymentStatusName',
       headerName: '결제상태',
       minWidth: 85,
       maxWidth: 95,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
-      valueFormatter: (p) => paymentStatusLabel(p.value),
     },
     {
       field: 'unreadCount',
-      headerName: '미읽',
+      headerName: '미대응',
       minWidth: 60,
       maxWidth: 70,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
-      cellRenderer: (params: any) => {
-        if (!params.value || params.value === 0) return '';
-        return `<span style="background:#e53e3e;color:#fff;border-radius:100px;padding:1px 7px;font-size:11px;font-weight:700">${params.value}</span>`;
-      },
     },
     {
       field: 'lastMessage',
@@ -243,41 +199,27 @@ const CustomerServiceList = () => {
     },
   ];
 
-  const runSearch = async () => {
-    const params: Record<string, string> = {};
-    if (filters.comuType) params.comuType = filters.comuType;
-    if (filters.paymentStatus) params.paymentStatus = filters.paymentStatus;
-    if (filters.productName) params.productName = filters.productName;
-    if (filters.fromDate) params.fromDate = filters.fromDate;
-    if (filters.toDate) params.toDate = filters.toDate;
+  const {
+    data: listData,
+    isSuccess,
+    refetch,
+  } = useQuery({
+    queryKey: ['/comuMng/list', filters],
+    queryFn: () => authApi.get('/comuMng/list', { params: filters }),
+    enabled: !!(filters.fromDate && filters.toDate),
+  });
 
-    const { data } = await authApi.get('/comuMng/list', { params });
-    if (data?.resultCode === 200) {
-      setRowData(data.body ?? []);
+  useEffect(() => {
+    if (!isSuccess) return;
+    const { resultCode, body, resultMessage } = listData.data;
+    if (resultCode === 200) {
+      setRowData(body ?? []);
     } else {
-      toastError(data?.resultMessage ?? '조회 중 오류가 발생했습니다.');
+      toastError(resultMessage ?? '조회 중 오류가 발생했습니다.');
     }
-  };
+  }, [listData, isSuccess]);
 
-  useEffect(() => {
-    authApi.get('/code/lower/10130').then(({ data }) => {
-      const list: { codeCd: string; codeNm: string }[] = data?.body ?? [];
-      setComuTypes(list.filter((c) => String(c.codeCd ?? '').startsWith('A')));
-    });
-  }, []);
-
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      runSearch();
-      return;
-    }
-    if (filters.fromDate && filters.toDate) {
-      runSearch();
-    }
-  }, [filters.fromDate, filters.toDate]);
-
-  const loadThread = async (item: BoListItem) => {
+  const loadThread = async (item: ComuResponseBoListItem) => {
     setSelectedItem(item);
     setSelectedThread(null);
     const { data } = await authApi.get(`/comuMng/${item.comuId}/thread`);
@@ -298,11 +240,11 @@ const CustomerServiceList = () => {
         const form = new FormData();
         form.append('fileId', '0');
         imageFiles.forEach((f) => form.append('uploadFiles', f));
-        const up = await authApi.post('/frontWeb/webCommon/imgfile/uploads', form, {
+        const up = await authApi.post('/common/imgfile/uploads', form, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
         if (up.data?.resultCode !== 200) throw new Error(up.data?.resultMessage ?? '파일 업로드 오류');
-        fileId = up.data?.body;
+        fileId = up.data?.body?.[0]?.fileId;
       }
 
       const { data } = await authApi.post(`/comuMng/${selectedThread.id}/reply`, {
@@ -354,7 +296,7 @@ const CustomerServiceList = () => {
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Title title={menuNm ?? '고객 문의 관리'} reset={reset} search={runSearch} />
+      <Title title={menuNm ?? '고객 문의 관리'} reset={reset} search={refetch} />
 
       {/* 검색 영역 */}
       <Search className={'type_1'}>
@@ -373,7 +315,7 @@ const CustomerServiceList = () => {
           value={filters.productName}
           onChange={onChangeFilters}
           placeholder={'상품명 검색'}
-          onEnter={runSearch}
+          onEnter={() => refetch()}
         />
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <label style={{ fontSize: 13, whiteSpace: 'nowrap', fontWeight: 600, color: '#555' }}>문의종류</label>
@@ -390,8 +332,11 @@ const CustomerServiceList = () => {
           <label style={{ fontSize: 13, whiteSpace: 'nowrap', fontWeight: 600, color: '#555' }}>결제상태</label>
           <select value={filters.paymentStatus} onChange={(e) => onChangeFilters('paymentStatus', e.target.value)} style={selectStyle}>
             <option value="">전체</option>
-            <option value="P">결제완료</option>
-            <option value="C">취소</option>
+            {(paymentStatusData?.data?.body ?? []).map((c: { codeCd: string; codeNm: string }) => (
+              <option key={c.codeCd} value={c.codeCd}>
+                {c.codeNm}
+              </option>
+            ))}
           </select>
         </div>
       </Search>
@@ -414,11 +359,6 @@ const CustomerServiceList = () => {
               onRowClicked={(e) => {
                 if (e.data) loadThread(e.data);
               }}
-              getRowStyle={(params) => {
-                if (selectedItem?.comuId === params.data?.comuId) {
-                  return { background: '#eef4ff' };
-                }
-              }}
             />
           </Table>
         </div>
@@ -439,7 +379,7 @@ const CustomerServiceList = () => {
                   [{selectedItem.comuTypeName}] {selectedItem.topProductName ?? '-'}
                 </div>
                 <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>
-                  {selectedItem.orderNo} · {paymentStatusLabel(selectedItem.paymentStatus)} · 구매일{' '}
+                  {selectedItem.orderNo} · {selectedItem.paymentStatusName} · 구매일{' '}
                   {selectedItem.orderDate ? dayjs(selectedItem.orderDate).format('YYYY-MM-DD') : '-'}
                 </div>
               </div>
@@ -448,10 +388,10 @@ const CustomerServiceList = () => {
               <div style={{ flex: 1, overflowY: 'auto', padding: '16px 16px 8px' }}>
                 {!selectedThread ? (
                   <div style={{ textAlign: 'center', color: '#bbb', paddingTop: 40 }}>로딩 중...</div>
-                ) : selectedThread.messages.length === 0 ? (
+                ) : (selectedThread.messages ?? []).length === 0 ? (
                   <div style={{ textAlign: 'center', color: '#bbb', paddingTop: 40 }}>메시지가 없습니다.</div>
                 ) : (
-                  selectedThread.messages.map((msg) => <MessageBubble key={msg.id} msg={msg} getFileUrl={getFileUrl} />)
+                  (selectedThread.messages ?? []).map((msg) => <MessageBubble key={msg.id} msg={msg} getFileUrl={getFileUrl} />)
                 )}
                 <div ref={bottomRef} />
               </div>

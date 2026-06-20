@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ColDef } from 'ag-grid-community';
 import { Search, Table, Title } from '../../../../components';
 import { useQuery } from '@tanstack/react-query';
@@ -16,20 +16,7 @@ import TunedGrid from '../../../../components/grid/TunedGrid';
 import { OrderDetailPop } from '../../../../components/popup/order/OrderDetailPop';
 import dayjs from 'dayjs';
 import CustomNewDatePicker from '../../../../components/CustomNewDatePicker';
-
-interface OrderBoListItem {
-  orderId: number;
-  orderNo: string;
-  orderStatus: string;
-  productAmount: number;
-  usedPoint: number;
-  paymentAmount: number;
-  creTm: string;
-  paymentSeq: number;
-  paymentStatus: string;
-  itemCount: number;
-  topProductName: string;
-}
+import { OrderResponseBoListItem } from '../../../../generated';
 
 type OrderFilter = {
   fromDate: string;
@@ -63,14 +50,12 @@ const OrderList = () => {
     toDate: today,
   });
 
-  const isFirstRender = useRef(true);
-
-  const [rowData, setRowData] = useState<OrderBoListItem[]>([]);
+  const [rowData, setRowData] = useState<OrderResponseBoListItem[]>([]);
   const [pinnedBottomRow, setPinnedBottomRow] = useState<any[]>([]);
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
 
-  const columnDefs: ColDef<OrderBoListItem>[] = [
+  const columnDefs: ColDef<OrderResponseBoListItem>[] = [
     {
       field: 'creTm',
       headerName: '주문일시',
@@ -141,51 +126,39 @@ const OrderList = () => {
     },
   ];
 
-  const { isLoading } = useQuery({
+  const {
+    data: orderListData,
+    isLoading,
+    isSuccess,
+    refetch,
+  } = useQuery({
     queryKey: ['/orderMng/list', filters],
-    queryFn: async () => {
-      const { data } = await authApi.get('/orderMng/list', { params: filters });
-      return data;
-    },
-    enabled: false,
-    placeholderData: (prev: any) => prev,
+    queryFn: () => authApi.get('/orderMng/list', { params: filters }),
+    enabled: !!(filters.fromDate && filters.toDate),
   });
 
-  const runSearch = async () => {
-    const { data } = await authApi.get('/orderMng/list', { params: filters });
-    if (data?.resultCode === 200) {
-      const rows: OrderBoListItem[] = data.body ?? [];
+  useEffect(() => {
+    if (!isSuccess) return;
+    const { resultCode, body, resultMessage } = orderListData.data;
+    if (resultCode === 200) {
+      const rows: OrderResponseBoListItem[] = body ?? [];
       setRowData(rows);
-
       if (rows.length > 0) {
-        const sumProductAmount = rows.reduce((acc, r) => acc + (r.productAmount ?? 0), 0);
-        const sumUsedPoint = rows.reduce((acc, r) => acc + (r.usedPoint ?? 0), 0);
-        const sumPaymentAmount = rows.reduce((acc, r) => acc + (r.paymentAmount ?? 0), 0);
         setPinnedBottomRow([
           {
             orderNo: `합계 (${rows.length}건)`,
-            productAmount: sumProductAmount,
-            usedPoint: sumUsedPoint,
-            paymentAmount: sumPaymentAmount,
+            productAmount: rows.reduce((acc, r) => acc + (r.productAmount ?? 0), 0),
+            usedPoint: rows.reduce((acc, r) => acc + (r.usedPoint ?? 0), 0),
+            paymentAmount: rows.reduce((acc, r) => acc + (r.paymentAmount ?? 0), 0),
           },
         ]);
       } else {
         setPinnedBottomRow([]);
       }
     } else {
-      toastError(data?.resultMessage ?? '조회 중 오류가 발생했습니다.');
+      toastError(resultMessage ?? '조회 중 오류가 발생했습니다.');
     }
-  };
-
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    if (filters.fromDate && filters.toDate) {
-      runSearch();
-    }
-  }, [filters.fromDate, filters.toDate]);
+  }, [orderListData, isSuccess]);
 
   const reset = () => {
     onFiltersReset();
@@ -195,7 +168,7 @@ const OrderList = () => {
 
   return (
     <div>
-      <Title title={menuNm ?? '주문 목록'} reset={reset} search={runSearch} />
+      <Title title={menuNm ?? '주문 목록'} reset={reset} search={refetch} />
       <Search className={'type_1'}>
         <CustomNewDatePicker
           title={''}
@@ -238,7 +211,7 @@ const OrderList = () => {
           open={detailOpen}
           onClose={() => {
             setDetailOpen(false);
-            runSearch();
+            refetch();
           }}
         />
       )}
