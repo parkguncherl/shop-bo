@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useRef, useState, useImperativeHandle, useReducer } from 'react';
+import React, { useEffect, useRef, useState, useImperativeHandle, useReducer } from 'react';
 import { DatePicker, Select } from 'antd';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/ko'; // 한국어 로케일 추가
@@ -285,8 +285,8 @@ const CustomNewDatePicker = ({
     // 오리지널은 useEffect hook 이나 최초 랜더링 시점에 불필요히 동작하여 콜백의 취지를 훼손하는걸 방지하고자 이리 처리함
     if (!dateStatus.rangeDate.includes(null) && onChange) {
       if (dateStatus.rangeDate && dateStatus.rangeDate[0] && dateStatus.rangeDate[1]) {
-        onChange(startName, dateStatus.rangeDate[0]?.forma'YYYY-MM-DD');
-        onChange(endName, dateStatus.rangeDate[1]?.forma'YYYY-MM-DD');
+        onChange(startName, dateStatus.rangeDate[0]?.format('YYYY-MM-DD'));
+        onChange(endName, dateStatus.rangeDate[1]?.format('YYYY-MM-DD'));
       }
     }
   }, [dateStatus.rangeDate]);
