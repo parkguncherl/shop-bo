@@ -16,7 +16,7 @@ import TunedGrid from '../../../../components/grid/TunedGrid';
 import { OrderDetailPop } from '../../../../components/popup/order/OrderDetailPop';
 import dayjs from 'dayjs';
 import CustomNewDatePicker from '../../../../components/CustomNewDatePicker';
-import { OrderResponseBoListItem } from '../../../../generated';
+import { OrderMngResponseBoListItem } from '../../../../generated';
 
 type OrderFilter = {
   fromDate: string;
@@ -24,16 +24,6 @@ type OrderFilter = {
 };
 
 const today = dayjs().format('YYYY-MM-DD');
-
-const orderStatusLabel = (status: string) => {
-  const map: Record<string, string> = { O: '주문접수', P: '결제완료', R: '배송준비', S: '배송중', D: '배송완료', C: '취소' };
-  return map[status] ?? status;
-};
-
-const paymentStatusLabel = (status: string) => {
-  const map: Record<string, string> = { R: '결제대기', P: '결제완료', C: '결제취소', F: '결제실패' };
-  return map[status] ?? status ?? '-';
-};
 
 const formatWon = (params: any) => {
   if (params.value == null) return '-';
@@ -50,12 +40,12 @@ const OrderList = () => {
     toDate: today,
   });
 
-  const [rowData, setRowData] = useState<OrderResponseBoListItem[]>([]);
+  const [rowData, setRowData] = useState<OrderMngResponseBoListItem[]>([]);
   const [pinnedBottomRow, setPinnedBottomRow] = useState<any[]>([]);
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
 
-  const columnDefs: ColDef<OrderResponseBoListItem>[] = [
+  const columnDefs: ColDef<OrderMngResponseBoListItem>[] = [
     {
       field: 'creTm',
       headerName: '주문일시',
@@ -83,22 +73,20 @@ const OrderList = () => {
       },
     },
     {
-      field: 'orderStatus',
+      field: 'orderStatusNm',
       headerName: '주문상태',
       minWidth: 100,
       maxWidth: 110,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
-      valueFormatter: (params) => orderStatusLabel(params.value),
     },
     {
-      field: 'paymentStatus',
+      field: 'paymentStatusNm',
       headerName: '결제상태',
       minWidth: 100,
       maxWidth: 110,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
-      valueFormatter: (params) => paymentStatusLabel(params.value),
     },
     {
       field: 'productAmount',
@@ -141,7 +129,7 @@ const OrderList = () => {
     if (!isSuccess) return;
     const { resultCode, body, resultMessage } = orderListData.data;
     if (resultCode === 200) {
-      const rows: OrderResponseBoListItem[] = body ?? [];
+      const rows: OrderMngResponseBoListItem[] = body ?? [];
       setRowData(rows);
       if (rows.length > 0) {
         setPinnedBottomRow([

@@ -27,16 +27,6 @@ const formatWon = (params: any) => {
   return Number(params.value).toLocaleString() + '원';
 };
 
-const orderStatusLabel = (status: string) => {
-  const map: Record<string, string> = { O: '주문접수', P: '결제완료', R: '배송준비', S: '배송중', D: '배송완료', C: '취소' };
-  return map[status] ?? status;
-};
-
-const paymentStatusLabel = (status: string) => {
-  const map: Record<string, string> = { R: '결제대기', P: '결제완료', C: '결제취소', F: '결제실패' };
-  return map[status] ?? status ?? '-';
-};
-
 /** BO 주문 상세 팝업 */
 export const OrderDetailPop = ({ orderId, open, onClose }: Props) => {
   const columnDefs: ColDef<OrderResponseItem>[] = [
@@ -157,7 +147,7 @@ export const OrderDetailPop = ({ orderId, open, onClose }: Props) => {
                 <th style={thStyle}>주문번호</th>
                 <td style={tdStyle}>{detail.orderNo}</td>
                 <th style={thStyle}>주문상태</th>
-                <td style={tdStyle}>{orderStatusLabel(detail.orderStatus)}</td>
+                <td style={tdStyle}>{detail.orderStatusNm ?? detail.orderStatus}</td>
               </tr>
               <tr>
                 <th style={thStyle}>상품금액</th>
@@ -169,14 +159,18 @@ export const OrderDetailPop = ({ orderId, open, onClose }: Props) => {
                 <th style={thStyle}>실결제금액</th>
                 <td style={tdStyle}>{detail.paymentAmount?.toLocaleString()}원</td>
                 <th style={thStyle}>결제상태</th>
-                <td style={tdStyle}>{detail.paymentStatusNm ?? paymentStatusLabel(detail.paymentStatus ?? '')}</td>
+                <td style={tdStyle}>{detail.paymentStatusNm ?? detail.paymentStatus ?? '-'}</td>
               </tr>
               {detail.delivery && (
                 <tr>
                   <th style={thStyle}>수령인</th>
-                  <td style={tdStyle}>{detail.delivery.receiverName} ({detail.delivery.receiverPhone})</td>
+                  <td style={tdStyle}>
+                    {detail.delivery.receiverName} ({detail.delivery.receiverPhone})
+                  </td>
                   <th style={thStyle}>배송지</th>
-                  <td style={tdStyle}>{detail.delivery.address} {detail.delivery.addressDetail}</td>
+                  <td style={tdStyle}>
+                    {detail.delivery.address} {detail.delivery.addressDetail}
+                  </td>
                 </tr>
               )}
             </tbody>
