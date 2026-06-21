@@ -4500,12 +4500,11 @@ aside[class*="orderBox"] {
             overflow: visible !important;
             min-width: 0;
             padding: 0 !important;
+            padding-inline-end: 18px !important;
           }
           & .ant-select-suffix,
           & .ant-select-arrow {
-            margin-inline-start: 4px !important;
-            position: relative !important;
-            inset-inline-end: unset !important;
+            inset-inline-end: 0 !important;
           }
         }
       }

@@ -813,6 +813,12 @@ const CustomNewDatePicker = ({
       ) : (
         // type === 'range'
         <dl className={className}>
+          {title && (
+            <dt className="rangeTitle">
+              <label>{title}</label>
+              {required && <span className="req">*</span>}
+            </dt>
+          )}
           {options.length == 1 ? (
             <dt>
               <label>{options[0].label}</label>

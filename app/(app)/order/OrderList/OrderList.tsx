@@ -26,12 +26,12 @@ type OrderFilter = {
 const today = dayjs().format('YYYY-MM-DD');
 
 const orderStatusLabel = (status: string) => {
-  const map: Record<string, string> = { R: '주문접수', P: '결제완료', C: '취소', D: '배송중', F: '배송완료' };
+  const map: Record<string, string> = { O: '주문접수', P: '결제완료', R: '배송준비', S: '배송중', D: '배송완료', C: '취소' };
   return map[status] ?? status;
 };
 
 const paymentStatusLabel = (status: string) => {
-  const map: Record<string, string> = { P: '결제완료', C: '취소' };
+  const map: Record<string, string> = { R: '결제대기', P: '결제완료', C: '결제취소', F: '결제실패' };
   return map[status] ?? status ?? '-';
 };
 
@@ -171,7 +171,7 @@ const OrderList = () => {
       <Title title={menuNm ?? '주문 목록'} reset={reset} search={refetch} />
       <Search className={'type_1'}>
         <CustomNewDatePicker
-          title={''}
+          title={'조회기간'}
           type={'range'}
           defaultType={'today'}
           startName={'fromDate'}

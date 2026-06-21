@@ -11,6 +11,8 @@ import { defaultColDef, GridSetting } from '../../../libs/ag-grid';
 import TunedGrid from '../../grid/TunedGrid';
 import CustomNoRowsOverlay from '../../CustomNoRowsOverlay';
 import CustomGridLoading from '../../CustomGridLoading';
+import type { OrderResponseInfo } from '../../../generated/src/model/order-response-info';
+import type { OrderResponseItem } from '../../../generated/src/model/order-response-item';
 
 interface Props {
   orderId: number;
@@ -18,36 +20,7 @@ interface Props {
   onClose: () => void;
 }
 
-interface OrderItem {
-  orderItemId: number;
-  productName: string;
-  optionName: string;
-  quantity: number;
-  unitPrice: number;
-  discountAmount: number;
-  paymentAmount: number;
-}
-
-interface OrderDetail {
-  orderId: number;
-  orderNo: string;
-  orderStatus: string;
-  productAmount: number;
-  usedPoint: number;
-  paymentAmount: number;
-  creTm: string;
-  paymentSeq: number;
-  paymentStatus: string;
-  delivery: {
-    receiverName: string;
-    receiverPhone: string;
-    address: string;
-    addressDetail: string;
-    zipCode: string;
-    memo: string;
-  };
-  items: OrderItem[];
-}
+type OrderDetail = OrderResponseInfo;
 
 const formatWon = (params: any) => {
   if (params.value == null) return '-';
@@ -55,13 +28,18 @@ const formatWon = (params: any) => {
 };
 
 const orderStatusLabel = (status: string) => {
-  const map: Record<string, string> = { R: '주문접수', P: '결제완료', C: '취소', D: '배송중', F: '배송완료' };
+  const map: Record<string, string> = { O: '주문접수', P: '결제완료', R: '배송준비', S: '배송중', D: '배송완료', C: '취소' };
   return map[status] ?? status;
+};
+
+const paymentStatusLabel = (status: string) => {
+  const map: Record<string, string> = { R: '결제대기', P: '결제완료', C: '결제취소', F: '결제실패' };
+  return map[status] ?? status ?? '-';
 };
 
 /** BO 주문 상세 팝업 */
 export const OrderDetailPop = ({ orderId, open, onClose }: Props) => {
-  const columnDefs: ColDef<OrderItem>[] = [
+  const columnDefs: ColDef<OrderResponseItem>[] = [
     {
       field: 'productName',
       headerName: '상품명',
@@ -142,7 +120,7 @@ export const OrderDetailPop = ({ orderId, open, onClose }: Props) => {
     },
   });
 
-  const canCancel = detail?.paymentStatus === 'P' || (detail?.paymentSeq != null && detail?.orderStatus !== 'C');
+  const canCancel = detail?.paymentStatus === 'P' && detail?.orderStatus !== 'C';
 
   const handleCancel = () => {
     if (!confirm('결제를 취소하시겠습니까?')) return;
@@ -191,7 +169,7 @@ export const OrderDetailPop = ({ orderId, open, onClose }: Props) => {
                 <th style={thStyle}>실결제금액</th>
                 <td style={tdStyle}>{detail.paymentAmount?.toLocaleString()}원</td>
                 <th style={thStyle}>결제상태</th>
-                <td style={tdStyle}>{detail.paymentStatus === 'P' ? '결제완료' : detail.paymentStatus === 'C' ? '취소' : '-'}</td>
+                <td style={tdStyle}>{detail.paymentStatusNm ?? paymentStatusLabel(detail.paymentStatus ?? '')}</td>
               </tr>
               {detail.delivery && (
                 <tr>
