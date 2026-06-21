@@ -18,7 +18,7 @@ import { authApi } from '../../../../libs';
 import TunedGrid from '../../../../components/grid/TunedGrid';
 import useFilters from '../../../../hooks/useFilters';
 import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
-import { PARTNER_CODE, Placeholder } from '../../../../libs/const';
+import { PARTNER_CODE_CATEGORI, Placeholder } from '../../../../libs/const';
 import SrcEnumerator, { SrcElement, SrcEnumeratorProps } from '../../../../components/layout/product/productMng/SrcEnumerator';
 import { FileUploadPop } from '../../../../components/popup/common';
 import ProductInfoAddPop from '../../../../components/popup/product/productMng/ProductInfoAddPop';
@@ -547,7 +547,15 @@ const ProductMng = () => {
                       partnerCodeOpenModal('PARTNER_CODE_OPEN');
                     }}
                   >
-                    품목카테고리 추가
+                    카테고리
+                  </button>
+                  <button
+                    className={'btn btnGray'}
+                    onClick={() => {
+                      partnerCodeOpenModal('PARTNER_CODE_OPEN');
+                    }}
+                  >
+                    질의응답
                   </button>
                   <button
                     className={'btn btnGray'}
@@ -782,10 +790,10 @@ const ProductMng = () => {
         productInfo={selectedRowsData}
       />
       <PartnerCodePop
-        partnerCodeUpper={PARTNER_CODE.categories.code}
+        partnerCodeUpper={PARTNER_CODE_CATEGORI.categories.code}
         title={'품목카테고리관리'}
         activated={partnerCodeModals?.type === 'PARTNER_CODE_OPEN' && partnerCodeModals.active}
-        codeName={PARTNER_CODE.categories.name}
+        codeName={PARTNER_CODE_CATEGORI.categories.name}
         onCloseRequestEmerged={() => partnerCodeCloseModal('PARTNER_CODE_OPEN')}
       />
       <ProductForEachCategoryPop open={modals.type == 'PROD_BY_CATEGORY' && modals.active} onClose={() => closeModal('PROD_BY_CATEGORY')} />

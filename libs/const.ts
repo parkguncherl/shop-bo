@@ -35,7 +35,7 @@ export const LOCAL_STORAGE_HISTORY = 'shopMenuHistoryList';
 export const LOCAL_STORAGE_GUBUN = 'shopGubun';
 export const LOCAL_STORAGE_WMS_HISTORY = 'shopWmsMenuHistoryList';
 
-export const PARTNER_CODE = { categories: { code: 'P0001', name: '상품카테고리' } };
+export const PARTNER_CODE_CATEGORI = { categories: { code: 'P0001', name: '카테고리' } };
 
 export const DefaultOptions = {
   // 전체
