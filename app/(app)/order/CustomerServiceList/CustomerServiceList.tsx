@@ -69,7 +69,14 @@ function MessageBubble({ msg, getFileUrl }: { msg: ComuResponseMessage; getFileU
             </div>
           )}
         </div>
-        <span style={{ fontSize: 10, color: '#aaa', alignSelf: 'flex-end' }}>{Utils.formatMonthDayTime(msg.creTm)}</span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: isAdmin ? 'flex-end' : 'flex-start', gap: 2, alignSelf: 'flex-end' }}>
+          {isAdmin && (
+            <span style={{ fontSize: 10, color: msg.readYn === 'Y' ? '#333' : '#bbb' }}>
+              {msg.readYn === 'Y' ? '읽음' : '안읽음'}
+            </span>
+          )}
+          <span style={{ fontSize: 10, color: '#aaa' }}>{Utils.formatMonthDayTime(msg.creTm)}</span>
+        </div>
       </div>
 
       {lightbox && (
