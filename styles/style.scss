@@ -4482,17 +4482,35 @@ aside[class*="orderBox"] {
       align-items: center;
       width: 275px;
       & dt {
-        width: 50px;
+        width: 55px;
         padding-right: 0;
+        flex-shrink: 0;
         & .ant-select {
-          width: 100% !important;
-          & .ant-select-selection-item {
+          width: 55px !important;
+          & .ant-select-selection-item,
+          & .ant-select-content-value {
             font-weight: 500;
+            font-size: 12px !important;
+            overflow: visible !important;
+            white-space: nowrap !important;
+          }
+          & .ant-select-content {
+            display: flex;
+            align-items: center;
+            overflow: visible !important;
+            min-width: 0;
+            padding: 0 !important;
+          }
+          & .ant-select-suffix,
+          & .ant-select-arrow {
+            margin-inline-start: 4px !important;
+            position: relative !important;
+            inset-inline-end: unset !important;
           }
         }
       }
       & dd {
-        width: calc(100% - 50px);
+        width: calc(100% - 55px);
         & .formBox {
           gap: 0;
           & .ant-picker {
@@ -6994,11 +7012,9 @@ option {
         width: 295px;
         & dt {
           width: 70px;
-          & .ant-select-selector {
+          & .ant-select-selector,
+          & .ant-select-content {
             background-color: transparent;
-            & .ant-select-selection-search {
-
-            }
           }
         }
       }

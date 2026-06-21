@@ -215,7 +215,7 @@ const CustomNewDatePicker = ({
 
   const options = [
     { value: 'type', label: '입력' },
-    { value: 'today', label: '오늘' },
+    { value: 'today', label: '일자' },
     { value: 'week', label: '주간' },
     { value: 'month', label: '월간' },
     { value: 'year', label: '1년' },
@@ -315,7 +315,7 @@ const CustomNewDatePicker = ({
       const endDate = settingDay.endOf('year');
       return [startDate, endDate];
     } else if (rangeType === 'today') {
-      // "오늘"일 때는 오늘 ~ 오늘로 처리
+      // "일자"일 때는 일자 ~ 일자로 처리
       const startDate = settingDay;
       const endDate = settingDay;
       return [startDate, endDate];
@@ -617,7 +617,7 @@ const CustomNewDatePicker = ({
 
       case 'today': {
         if (!dateStatus.rangeDate[0] || !dateStatus.rangeDate[1]) return;
-        // 오늘
+        // 일자
         startDate = direction === 'prev' ? dateStatus.rangeDate[0].subtract(1, 'day') : dateStatus.rangeDate[0].add(1, 'day');
         endDate = direction === 'prev' ? dateStatus.rangeDate[1].subtract(1, 'day') : dateStatus.rangeDate[1].add(1, 'day');
         break;
@@ -823,7 +823,7 @@ const CustomNewDatePicker = ({
               <Select
                 value={dropDownValue}
                 onChange={handleOnChangeSelectedType}
-                //popupClassName={'dateDropDown'}
+                variant="borderless"
                 classNames={{
                   popup: {
                     root: 'dateDropDown', // popupClassName={'dateDropDown'} 대용
