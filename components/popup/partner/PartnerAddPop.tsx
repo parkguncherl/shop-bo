@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { PopupFooter } from '../PopupFooter';
 import { PopupContent } from '../PopupContent';
 import { PopupLayout } from '../PopupLayout';
@@ -12,9 +12,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { CommonResponseFileDown, PartnerRequestCreate, PartnerResponsePaging } from '../../../generated';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toastError, toastSuccess } from '../../ToastMessage';
-import { yupResolver } from '@hookform/resolvers/yup';
 import { authApi, YupSchema } from '../../../libs';
-import { FileUploadPop } from '../common';
 import { useCommonStore } from '../../../stores';
 import FormDropDown from '../../form/FormDropDown';
 
@@ -155,6 +153,7 @@ const PartnerAddPop = ({ data }: Props) => {
               placeholder={Placeholder.Input || ''}
               required={true}
             />
+            <FormDropDown<PartnerRequestCreate> control={control} name={'partnerType'} title={'파트너유형'} codeUpper={'10060'} required={false} />
           </PopupSearchType>
         </PopupSearchBox>
       </PopupContent>

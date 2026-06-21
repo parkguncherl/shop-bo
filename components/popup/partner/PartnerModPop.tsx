@@ -8,6 +8,7 @@ import { useCommonStore } from '../../../stores';
 import { usePartnerStore } from '../../../stores/usePartnerStore';
 import { PopupSearchBox, PopupSearchType } from '../content';
 import FormInput from '../../form/FormInput';
+import FormDropDown from '../../form/FormDropDown';
 import { Placeholder } from '../../../libs/const';
 import { PartnerRequestDelete, PartnerRequestUpdate } from '../../../generated';
 import { authApi } from '../../../libs';
@@ -85,6 +86,7 @@ const PartnerModPop = ({ datas }: Props) => {
         partnerTicker: body.partnerTicker,
         phoneNo: body.phoneNo.replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, '$1-$2-$3'),
         domain: body.domain,
+        partnerType: body.partnerType,
         creUser: body.creUser,
         updUser: body.updUser,
       });
@@ -199,6 +201,7 @@ const PartnerModPop = ({ datas }: Props) => {
               placeholder={Placeholder.Input || ''}
               required={true}
             />
+            <FormDropDown<PartnerRequestUpdate> control={control} name={'partnerType'} title={'파트너유형'} codeUpper={'10060'} required={false} />
           </PopupSearchType>
         </PopupSearchBox>
       </PopupContent>
