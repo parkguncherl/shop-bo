@@ -6,7 +6,7 @@ import { ColDef } from 'ag-grid-community';
 import { Search, Table, Title } from '../../../../components';
 import { toastError } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
-import { defaultColDef, GridSetting, formatDateWithDay } from '../../../../libs/ag-grid';
+import { defaultColDef, GridSetting, formatDateWithDay, formatDateWithMinute } from '../../../../libs/ag-grid';
 import { useAgGridApi } from '../../../../hooks';
 import { authApi } from '../../../../libs';
 import useFilters from '../../../../hooks/useFilters';
@@ -175,8 +175,8 @@ const CustomerServiceList = () => {
       suppressHeaderMenuButton: true,
     },
     {
-      field: 'unreadCount',
-      headerName: '미대응',
+      field: 'cntCntn',
+      headerName: '메시지',
       minWidth: 60,
       maxWidth: 70,
       cellStyle: GridSetting.CellStyle.CENTER,
@@ -188,6 +188,7 @@ const CustomerServiceList = () => {
       minWidth: 180,
       suppressHeaderMenuButton: true,
       valueFormatter: (p) => p.value ?? '-',
+      hide: true,
     },
     {
       field: 'lastMessageTm',
@@ -195,7 +196,7 @@ const CustomerServiceList = () => {
       minWidth: 120,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
-      valueFormatter: formatDateWithDay,
+      valueFormatter: formatDateWithMinute,
     },
   ];
 

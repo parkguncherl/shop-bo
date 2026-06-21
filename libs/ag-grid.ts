@@ -13,17 +13,33 @@ export const defaultColDef: ColDef = {
 };
 
 export const formatDateWithDay = (params: any): string => {
-    if (!params.value) return '';
-    const formatDated = params.value.indexOf('.') > -1 ? params.value.split('.')[0] : params.value;
-    const date = new Date(formatDated);
-    const year = String(date.getFullYear()).slice(2); // 25
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // 10
-    const day = String(date.getDate()).padStart(2, '0'); // 02
+  if (!params.value) return '';
+  const formatDated = params.value.indexOf('.') > -1 ? params.value.split('.')[0] : params.value;
+  const date = new Date(formatDated);
+  const year = String(date.getFullYear()).slice(2); // 25
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // 10
+  const day = String(date.getDate()).padStart(2, '0'); // 02
 
-    const days = ['일', '월', '화', '수', '목', '금', '토'];
-    const dayOfWeek = days[date.getDay()]; // 목
+  const days = ['일', '월', '화', '수', '목', '금', '토'];
+  const dayOfWeek = days[date.getDay()]; // 목
 
-    return `${year}/${month}/${day}(${dayOfWeek})`;
+  return `${year}/${month}/${day}(${dayOfWeek})`;
+};
+
+export const formatDateWithMinute = (params: any): string => {
+  if (!params.value) return '';
+  const formatDated = params.value.indexOf('.') > -1 ? params.value.split('.')[0] : params.value;
+  const date = new Date(formatDated);
+  const year = String(date.getFullYear()).slice(2); // 25
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // 10
+  const day = String(date.getDate()).padStart(2, '0'); // 02
+  const hour = String(date.getHours()).padStart(2, '0'); // 14
+  const minute = String(date.getMinutes()).padStart(2, '0'); // 05
+
+  const days = ['일', '월', '화', '수', '목', '금', '토'];
+  const dayOfWeek = days[date.getDay()]; // 목
+
+  return `${year}/${month}/${day}(${dayOfWeek}) ${hour}:${minute}`;
 };
 
 export const GridSetting = {
