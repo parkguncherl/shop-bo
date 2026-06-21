@@ -4,11 +4,10 @@
  /wms/system/partnerMng
  */
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAgGridApi, useDidMountEffect } from '../../../../hooks';
 import { useCommonStore } from '../../../../stores';
 import useFilters from '../../../../hooks/useFilters';
-import { AgGridReact } from 'ag-grid-react';
 import { useQuery } from '@tanstack/react-query';
 import { authApi } from '../../../../libs';
 import { PartnerResponsePaging } from '../../../../generated';
@@ -18,10 +17,12 @@ import { PartnerPagingFilter, usePartnerStore } from '../../../../stores/usePart
 import { CellClickedEvent, ColDef } from 'ag-grid-community';
 import PartnerAddPop from '../../../../components/popup/partner/PartnerAddPop';
 import PartnerModPop from '../../../../components/popup/partner/PartnerModPop';
+import TunedGrid from '../../../../components/grid/TunedGrid';
+import CustomNewDatePicker from '../../../../components/CustomNewDatePicker';
 
 const PartnerMng = () => {
   /** Grid Api */
-  const { gridApi, gridColumnApi, onGridReady } = useAgGridApi();
+  const { onGridReady } = useAgGridApi();
   /** 공통 스토어 - State */
   const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
   /** 스토어 */
@@ -34,109 +35,35 @@ const PartnerMng = () => {
     s.openModal,
   ]);
   /** 필터 */
-  const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<PartnerPagingFilter>({});
-
-  // 파트너 추가하기 버튼 렌더링
-  const lowAddBtnCellRenderer = (params: any) => {
-    const isTopPartner = params.data.id === params.data.upperPartnerId;
-    const onClick = () => {
-      openModal('ADD');
-    };
-    // 화주만 추가할수있음 도매 X
-    if (isTopPartner) {
-      return (
-        <div className="btnArea center">
-          <button className="btn tblBtn" onClick={onClick}>
-            +
-          </button>
-        </div>
-      );
-    } else {
-      return null;
-    }
-  };
-
-  const [columnDefs] = useState<ColDef[]>([
-    {
-      headerName: '추가',
-      field: 'action',
-      minWidth: 40,
-      maxWidth: 40,
-      cellRenderer: lowAddBtnCellRenderer,
-      suppressHeaderMenuButton: true,
-    },
-    { field: 'no', headerName: 'No', minWidth: 36, maxWidth: 36, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
-    { field: 'logisNm', headerName: '센터명', filter: true, minWidth: 100, maxWidth: 100, suppressHeaderMenuButton: true },
-    {
-      field: 'upperPartnerNm',
-      headerName: '대표매장',
-      maxWidth: 100,
-      minWidth: 100,
-      suppressHeaderMenuButton: true,
-      valueFormatter: (params) => {
-        return params.data.upperPartnerId === params.data.id ? '대표' : params.value;
+  const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<PartnerPagingFilter>({
+    startDate: '2026-01-01',
+    endDate: new Date().toISOString().slice(0, 10),
+  });
+  const columnDefs = useMemo<ColDef<PartnerResponsePaging>[]>(
+    () => [
+      { field: 'no', headerName: 'No', minWidth: 36, maxWidth: 36, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
+      { field: 'partnerTypeNm', headerName: '파트너타입', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
+      { field: 'partnerNm', headerName: '파트너명', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
+      {
+        field: 'phoneNo',
+        headerName: '전화번호',
+        minWidth: 100,
+        maxWidth: 100,
+        cellStyle: GridSetting.CellStyle.CENTER,
+        valueFormatter: (params) => {
+          const value = params.value;
+          if (value && typeof value === 'string') {
+            return value.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+          }
+          return value;
+        },
+        suppressHeaderMenuButton: true,
       },
-      cellStyle: (params) => {
-        return {
-          ...GridSetting.CellStyle.LEFT,
-          color: params.value === params.data.id ? 'blue' : 'gray',
-        };
-      },
-    },
-    { field: 'partnerNm', headerName: '매장명', minWidth: 150, maxWidth: 150, suppressHeaderMenuButton: true },
-    { field: 'shortNm', headerName: '약어', minWidth: 80, maxWidth: 100, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
-    {
-      field: 'partnerTelNo',
-      headerName: '회사 전화번호',
-      minWidth: 100,
-      maxWidth: 100,
-      cellStyle: GridSetting.CellStyle.CENTER,
-      valueFormatter: (params) => {
-        const value = params.value;
-        if (value && typeof value === 'string') {
-          return value.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
-        }
-        return value;
-      },
-      suppressHeaderMenuButton: true,
-    },
-    { field: 'logisId', headerName: '창고key', minWidth: 100, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true, hide: true },
-    { field: 'repNm', headerName: '대표자명', minWidth: 120, maxWidth: 120, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
-    {
-      field: 'repTelNo',
-      headerName: '대표자 전화번호',
-      minWidth: 120,
-      maxWidth: 120,
-      cellStyle: GridSetting.CellStyle.CENTER,
-      valueFormatter: (params) => {
-        const value = params.value;
-        if (value && typeof value === 'string') {
-          return value.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
-        }
-        return value;
-      },
-      suppressHeaderMenuButton: true,
-    },
-    {
-      field: 'compNo',
-      headerName: '사업자번호',
-      minWidth: 120,
-      maxWidth: 120,
-      cellStyle: GridSetting.CellStyle.CENTER,
-      valueFormatter: (params) => {
-        const value = params.value;
-        if (value && typeof value === 'string') {
-          return value.replace(/(\d{3})(\d{2})(\d{5})/, '$1-$2-$3');
-        }
-        return value;
-      },
-      suppressHeaderMenuButton: true,
-    },
-    { field: 'partnerEmail', headerName: '회사이메일', minWidth: 150, maxWidth: 150, cellStyle: GridSetting.CellStyle.LEFT, suppressHeaderMenuButton: true },
-    { field: 'detailInfo', headerName: '정산정보', minWidth: 150, maxWidth: 150, cellStyle: GridSetting.CellStyle.LEFT, suppressHeaderMenuButton: true },
-    { field: 'addTime', headerName: '시스템시간', minWidth: 100, maxWidth: 100, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
-    { field: 'orderSeq', headerName: '순서', minWidth: 50, maxWidth: 50, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
-  ]); // 컬럼헤더
+      { field: 'repNm', headerName: '대표자명', minWidth: 120, maxWidth: 120, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
+      { field: 'email', headerName: '회사이메일', minWidth: 150, maxWidth: 150, cellStyle: GridSetting.CellStyle.LEFT, suppressHeaderMenuButton: true },
+    ],
+    [],
+  );
 
   /** 검색 */
   const onSearch = async () => {
@@ -223,13 +150,14 @@ const PartnerMng = () => {
           onChange={onChangeFilters}
           filters={filters}
         />
-        <Search.TwoDatePicker
+        <CustomNewDatePicker
           title={'기간'}
+          type={'range'}
+          defaultType={'today'}
           startName={'startDate'}
           endName={'endDate'}
           value={[filters.startDate, filters.endDate]}
           onEnter={search}
-          filters={filters}
           onChange={onChangeFilters}
         />
         <Search.DropDown
@@ -245,7 +173,7 @@ const PartnerMng = () => {
       <Table>
         <TableHeader count={paging.totalRowCount || 0} paging={paging} setPaging={setPaging} search={search}></TableHeader>
         <div className={'ag-theme-alpine wmsDefault'}>
-          <AgGridReact
+          <TunedGrid
             headerHeight={35}
             onGridReady={onGridReady}
             loading={isLoading}
@@ -254,7 +182,10 @@ const PartnerMng = () => {
             columnDefs={columnDefs}
             defaultColDef={defaultColDef}
             paginationPageSize={paging.pageRowCount}
-            rowSelection={'multiple'}
+            rowSelection={{
+              mode: 'singleRow',
+              enableClickSelection: true,
+            }}
             onCellClicked={onCellClicked}
             onRowClicked={(e) => {
               setSelectedPartner(e.data as PartnerResponsePaging);
