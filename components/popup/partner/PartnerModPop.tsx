@@ -84,9 +84,11 @@ const PartnerModPop = ({ datas }: Props) => {
         partnerNm: body.partnerNm,
         partnerSubNm: body.partnerSubNm,
         partnerTicker: body.partnerTicker,
-        phoneNo: body.phoneNo.replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, '$1-$2-$3'),
+        phoneNo: (body.phoneNo || '').replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, '$1-$2-$3'),
         domain: body.domain,
         partnerType: body.partnerType,
+        repNm: body.repNm,
+        email: body.email,
         creUser: body.creUser,
         updUser: body.updUser,
       });
@@ -202,6 +204,10 @@ const PartnerModPop = ({ datas }: Props) => {
               required={true}
             />
             <FormDropDown<PartnerRequestUpdate> control={control} name={'partnerType'} title={'파트너유형'} codeUpper={'10060'} required={false} />
+          </PopupSearchType>
+          <PopupSearchType className={'type_2'}>
+            <FormInput<PartnerRequestUpdate> control={control} name={'repNm'} label={'대표자명'} placeholder={Placeholder.Input || ''} required={false} />
+            <FormInput<PartnerRequestUpdate> control={control} name={'email'} label={'이메일'} placeholder={Placeholder.Input || ''} required={false} />
           </PopupSearchType>
         </PopupSearchBox>
       </PopupContent>

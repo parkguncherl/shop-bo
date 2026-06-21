@@ -155,6 +155,10 @@ const PartnerAddPop = ({ data }: Props) => {
             />
             <FormDropDown<PartnerRequestCreate> control={control} name={'partnerType'} title={'파트너유형'} codeUpper={'10060'} required={false} />
           </PopupSearchType>
+          <PopupSearchType className={'type_2'}>
+            <FormInput<PartnerRequestCreate> control={control} name={'repNm'} label={'대표자명'} placeholder={Placeholder.Input || ''} required={false} />
+            <FormInput<PartnerRequestCreate> control={control} name={'email'} label={'이메일'} placeholder={Placeholder.Input || ''} required={false} />
+          </PopupSearchType>
         </PopupSearchBox>
       </PopupContent>
     </PopupLayout>
