@@ -9270,3 +9270,9 @@ option {
     font-size: 9px;
   }
 }
+dl.imgToggle {
+  dt { min-width: unset; width: auto; }
+  dd .formBox .ant-segmented {
+    .ant-segmented-item-label { padding: 0 6px; font-size: 11px; }
+  }
+}

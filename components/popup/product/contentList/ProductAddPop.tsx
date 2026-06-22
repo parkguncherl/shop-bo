@@ -375,6 +375,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
                 value={filters.partnerId}
                 onChange={(name, value) => onChangeFilters(name, value ? Number(value) : undefined)}
                 options={[{ value: '', label: '전체' }, ...partnerOptions.map((o) => ({ value: String(o.partnerId ?? ''), label: o.label ?? '' }))]}
+                style={{ minWidth: 180 }}
               />
               <Search.Input
                 title={'품목명'}
@@ -388,10 +389,11 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
               <CustomSwitch
                 title={'이미지보기'}
                 name={'imgShow'}
-                checkedLabel={'켜기'}
-                uncheckedLabel={'끄기'}
+                checkedLabel={'ON'}
+                uncheckedLabel={'OFF'}
                 value={imgPreviewBoxOn}
                 onChange={(_name, value) => setImgPreviewBoxOn(value)}
+                wrapperClassNames={'imgToggle'}
               />
             </PopupSearchType>
           </PopupSearchBox>
