@@ -7,7 +7,6 @@ import { PopupFooter } from '../../PopupFooter';
 import { ProductContentListResponseProductContent } from '../../../../generated';
 import { useCommonStore } from '../../../../stores';
 import { RegExpression } from '../../../../libs/const';
-import { toastError, toastSuccess } from '../../../ToastMessage';
 
 interface Props {
   open: boolean;
@@ -25,7 +24,6 @@ const ProductContentPreviewPop = ({ open, onClose, productContentData }: Props) 
   const [getFileUrl, selectFileList] = useCommonStore((s) => [s.getFileUrl, s.selectFileList]);
   const [elements, setElements] = useState<PreviewElement[]>([]);
   const [loading, setLoading] = useState(false);
-  const [posting, setPosting] = useState(false);
 
   useEffect(() => {
     if (!open || !productContentData?.newsContents) {
@@ -61,35 +59,6 @@ const ProductContentPreviewPop = ({ open, onClose, productContentData }: Props) 
     parse();
   }, [open, productContentData]);
 
-  const handleInstagramPost = async () => {
-    const imageUrls = elements.filter((el) => el.type === 'image' && el.url).map((el) => el.url as string);
-    if (imageUrls.length === 0) {
-      toastError('게시할 이미지가 없습니다.');
-      return;
-    }
-
-    const textParts = elements.filter((el) => el.type === 'text' && el.content).map((el) => el.content as string);
-    const caption = [productContentData?.newsTitle, productContentData?.newsSubTitle, ...textParts].filter(Boolean).join('\n\n');
-
-    setPosting(true);
-    try {
-      const res = await fetch('/api/instagram/post', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrls, caption }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        toastSuccess('인스타그램에 게시되었습니다.');
-      } else {
-        toastError(data.error || '게시 실패');
-      }
-    } catch {
-      toastError('게시 중 오류가 발생했습니다.');
-    } finally {
-      setPosting(false);
-    }
-  };
 
   return (
     <PopupLayout
@@ -100,21 +69,10 @@ const ProductContentPreviewPop = ({ open, onClose, productContentData }: Props) 
       onClose={onClose}
       footer={
         <PopupFooter>
-          <div className="btnArea between">
-            <div className="left">
-              <button
-                className={posting ? 'btn' : 'btn btn_blue'}
-                disabled={posting || loading}
-                onClick={handleInstagramPost}
-              >
-                {posting ? '게시 중...' : '인스타그램 게시'}
-              </button>
-            </div>
-            <div className="right">
-              <button className="btn" onClick={onClose}>
-                닫기
-              </button>
-            </div>
+          <div className="btnArea">
+            <button className="btn" onClick={onClose}>
+              닫기
+            </button>
           </div>
         </PopupFooter>
       }
