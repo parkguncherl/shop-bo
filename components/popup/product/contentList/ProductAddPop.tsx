@@ -368,8 +368,6 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
                 onChange={onChangeFilters}
                 filters={filters}
               />
-            </PopupSearchType>
-            <PopupSearchType className={'type_2'}>
               <CustomSwitch
                 title={'이미지보기'}
                 name={'imgShow'}
