@@ -550,6 +550,7 @@ const ProductMng = () => {
                 }}
                 popupParent={typeof document !== 'undefined' ? document.body : undefined} // ag grid 내장 드롭다운 사용 시 그리드가 사라지는 현상을 방지하기 위하여 document.body 영역을 popup의 부모 요소로 명시 박근철 수정
                 onCellClicked={onCellClickedCallBack}
+                onRowDoubleClicked={() => openModal('PROD_MOD')}
                 className={'default check'}
               />
               <div className="btnArea between">
@@ -601,23 +602,14 @@ const ProductMng = () => {
                     className={`btn ${selectedRowsData != undefined && 'btnBlue'}`}
                     disabled={selectedRowsData == undefined}
                     onClick={() => {
-                      openModal('PROD_MOD');
-                    }}
-                  >
-                    {`${selectedRowsData == undefined ? '수정할 행 선택' : '품목정보 수정'}`}
-                  </button>
-                  <button
-                    className={`btn ${selectedRowsData != undefined && 'btnBlue'}`}
-                    disabled={selectedRowsData == undefined}
-                    onClick={() => {
                       openModal('PROD_DET_INFO');
                     }}
                   >
                     {`${selectedRowsData == undefined ? '품목 데이터 선택' : '품목상세 목록 출력'}`}
                   </button>
                   <button
-                    className={`btn ${selectedRowsData != undefined && selectedRowsData.prodDetCnt == 0 && 'btn_blue'}`}
-                    disabled={selectedRowsData == undefined || selectedRowsData.prodDetCnt != 0}
+                    className={`btn ${selectedRowsData != undefined && 'btnBlue'}`}
+                    disabled={selectedRowsData == undefined}
                     onClick={() => {
                       if (selectedRowsData && selectedRowsData.id) {
                         openModal('PROD_DEL', selectedRowsData);
@@ -626,13 +618,7 @@ const ProductMng = () => {
                       }
                     }}
                   >
-                    {`${
-                      selectedRowsData == undefined
-                        ? '삭제할 품목 선택'
-                        : selectedRowsData.prodDetCnt != 0
-                        ? selectedRowsData.prodDetCnt + '개의 상세정보가 잔존'
-                        : '선택한 품목 삭제'
-                    }`}
+                    {selectedRowsData == undefined ? '삭제할 품목 선택' : '선택한 품목 삭제'}
                   </button>
                 </div>
               </div>
