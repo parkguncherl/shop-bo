@@ -55,8 +55,8 @@ const ContentList = () => {
     {
       field: 'no',
       headerName: 'NO',
-      minWidth: 50,
-      maxWidth: 50,
+      minWidth: 37,
+      maxWidth: 37,
       valueGetter: (params) => (params.node ? (params.node.rowIndex ?? 0) + 1 : ''),
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
@@ -151,7 +151,7 @@ const ContentList = () => {
 
   const [selectedRowsData, setSelectedRowsData] = useState<ProductContentListResponseProductContent | undefined>(undefined);
 
-  const [imgPreviewBoxOn, setImgPreviewBoxOn] = useState(true);
+  const [imgPreviewBoxOn, setImgPreviewBoxOn] = useState(false);
   const [resized, setResized] = useState(false);
   const [imgPreviewFileDetList, setImgPreviewFileDetList] = useState<ImgPreviewFileDet[]>([]);
 
@@ -337,10 +337,6 @@ const ContentList = () => {
               rowData={productContentList}
               columnDefs={columnDefs}
               defaultColDef={defaultColDef}
-              rowSelection={{
-                mode: 'singleRow',
-                enableClickSelection: true,
-              }}
               onRowDoubleClicked={(e) => openModal('SHOW', e.data)}
               onSelectionChanged={(event) => {
                 const selectedRows = event.api.getSelectedRows();

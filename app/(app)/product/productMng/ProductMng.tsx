@@ -25,6 +25,7 @@ import ProductInfoAddPop from '../../../../components/popup/product/productMng/P
 import ProductModPop from '../../../../components/popup/product/productMng/ProductModPop';
 import ProductDetInfoPop from '../../../../components/popup/product/productMng/ProductDetInfoPop';
 import { usePartnerCodeStore } from '../../../../stores/usePartnerCodeStore';
+import { usePartnerList } from '../../../../customHook/usePartnerList';
 import { PartnerCodePop } from '../../../../components/popup/system/PartnerCodePop';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import ProductForEachCategoryPop from '../../../../components/popup/product/productMng/ProductForEachCategoryPop';
@@ -64,9 +65,12 @@ const ProductMng = () => {
   const [partnerCodeModals, partnerCodeOpenModal, partnerCodeCloseModal] = usePartnerCodeStore((s) => [s.modals, s.openModal, s.closeModal]);
 
   /** 검색 필터 */
-  const [filters, onChangeFilters] = useFilters<ProductMngRequestProductInfoFilter>({
+  const [filters, onChangeFilters] = useFilters<ProductMngRequestProductInfoFilter & { partnerId?: number }>({
     prodNm: undefined,
+    partnerId: undefined,
   });
+
+  const { data: partnerOptions = [] } = usePartnerList({ enabled: true });
   const [detFilters, onChangeDetFilters, onDetFiltersReset] = useFilters<ProductMngRequestProductDetInfoFilter>({
     prodId: undefined,
     prodDetColor: undefined,
@@ -202,7 +206,7 @@ const ProductMng = () => {
     isLoading: isProductInfosLoading,
     refetch: productInfosRefetch,
   } = useQuery({
-    queryKey: ['/productMng/productInfoList'],
+    queryKey: ['/productMng/productInfoList', { partnerId: filters.partnerId }],
     queryFn: () =>
       authApi.get('/productMng/productInfoList', {
         params: {
@@ -513,6 +517,15 @@ const ProductMng = () => {
     <div>
       <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} />
       <Search className="type_2">
+        <Search.DropDown
+          title={'매장명'}
+          name={'partnerId'}
+          value={filters.partnerId}
+          onChange={(_name, value) => onChangeFilters('partnerId', value ? Number(value) : undefined)}
+          defaultOptions={partnerOptions}
+          showAll={true}
+          dropDownStyle={{ width: '120px' }}
+        />
         <Search.Input title={'품목명'} name={'prodNm'} placeholder={Placeholder.Input} value={filters.prodNm} onChange={onChangeFilters} onEnter={onSearch} />
       </Search>
       <Table>

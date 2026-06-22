@@ -2,32 +2,17 @@
 import { useQuery } from '@tanstack/react-query';
 import { authApi } from '../libs';
 import { toastError } from '../components';
-import { PartnerCodeResponseLowerSelect } from '../generated';
-interface UsePartnerCodeListParams {
-  codeUpper: string;
-  searchKeyword?: string;
-  orderType?: string;
+import { PartnerResponseForSearching } from '../generated';
+interface UsePartnerListParams {
   enabled?: boolean;
-  queryKey?: string | number; // ✅ 단순 식별자로 변경
   staleTime?: number;
   refetchOnMount?: boolean | 'always';
 }
 
-export const usePartnerCodeList = ({
-  codeUpper,
-  searchKeyword = '',
-  orderType = 'NAME',
-  enabled = true,
-  queryKey,
-  staleTime,
-  refetchOnMount,
-}: UsePartnerCodeListParams) => {
+export const usePartnerList = ({ enabled = true, staleTime, refetchOnMount }: UsePartnerListParams) => {
   return useQuery({
-    queryKey: ['/partnerCode/lowerCodeList/', codeUpper, queryKey],
-    queryFn: () =>
-      authApi.get('/partnerCode/lowerCodeList', {
-        params: { codeUpper, searchKeyword, orderType },
-      }),
+    queryKey: ['/partner/list'],
+    queryFn: () => authApi.get('/partner/list'),
     select: (response) => {
       const { resultCode, body, resultMessage } = response.data;
 
@@ -39,11 +24,10 @@ export const usePartnerCodeList = ({
       return body.map(
         (item: any) =>
           ({
-            key: item.codeCd,
-            value: item.codeCd,
-            label: item.codeNm,
-            defCodeVal: item.defCodeVal,
-          }) as PartnerCodeResponseLowerSelect,
+            key: item.id,
+            value: item.id as string,
+            label: item.partnerNm,
+          } as PartnerResponseForSearching),
       );
     },
     enabled: enabled,

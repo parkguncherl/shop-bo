@@ -224,7 +224,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
     isLoading: isProductDetInfosLoading,
     refetch: productDetInfosRefetch,
   } = useQuery({
-    queryKey: ['/productContentList/productInfoListPaging', selectedContent?.id],
+    queryKey: ['/productContentList/productInfoListPaging', { partnerId: filters.partnerId, contentsId: filters.contentsId }],
     queryFn: () =>
       authApi.get('/productContentList/productInfoListPaging', {
         params: {
@@ -352,7 +352,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
       >
         <PopupContent>
           <PopupSearchBox>
-            <PopupSearchType className={'type1'}>
+            <PopupSearchType className={'type3'}>
               <Search.DropDown
                 title={'매장명'}
                 name={'partnerId'}
@@ -360,7 +360,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
                 onChange={(_name, value) => onChangeFilters('partnerId', value ? Number(value) : undefined)}
                 defaultOptions={partnerOptions}
                 showAll={true}
-                dtWidth={'200px'}
+                dropDownStyle={{ width: '120px' }}
               />
               <Search.Input
                 title={'품목명'}
