@@ -11,6 +11,9 @@ import FormInput from '../../form/FormInput';
 import FormDropDown from '../../form/FormDropDown';
 import { Placeholder } from '../../../libs/const';
 import { PartnerRequestDelete, PartnerRequestUpdate } from '../../../generated';
+
+type PartnerRequestUpdateExtended = PartnerRequestUpdate & { reviewPointRate?: number };
+
 import { authApi } from '../../../libs';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toastError, toastSuccess } from '../../ToastMessage';
@@ -32,7 +35,7 @@ const PartnerModPop = ({ datas }: Props) => {
   const [commonModalType, commonOpenModal, getFileUrl] = useCommonStore((s) => [s.modalType, s.openModal, s.getFileUrl]);
   /** 화주관리 스토어 - API */
   const [updatePartner, deletePartner, openModal] = usePartnerStore((s) => [s.updatePartner, s.deletePartner, s.openModal]);
-  const [confirmModal, setConfirmModal] = useState<boolean>(false); // 삭제 모달
+  const [confirmModal, setConfirmModal] = useState<boolean>(false);
   const queryClient = useQueryClient();
   const [fileUrl, setFileUrl] = useState('');
   const [logisOptions, setLogisOptions] = useState<DropDownOption[]>([]);
@@ -41,7 +44,7 @@ const PartnerModPop = ({ datas }: Props) => {
   const { data: partner, isSuccess: isListSuccess } = useQuery({
     queryKey: ['/partner/detail', datas.id],
     queryFn: () => authApi.get(`/partner/detail/${datas.id}`),
-    refetchOnMount: true, // 'always' 대신 true
+    refetchOnMount: true,
     enabled: !!datas.id,
   });
 
@@ -55,11 +58,9 @@ const PartnerModPop = ({ datas }: Props) => {
     }
   }, [partner, isListSuccess]);
 
-  // 공통적으로 사용할 onChange 함수
   const handleInputChange = (regexPattern: RegExp, formatPattern: string) => (e: any) => {
-    const rawValue = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 남기기
-    const formattedValue = rawValue.replace(regexPattern, formatPattern); // 포맷에 맞게 변환
-    // 입력 필드에 표시할 값은 하이픈 포함된 포맷된 값으로 설정
+    const rawValue = e.target.value.replace(/[^0-9]/g, '');
+    const formattedValue = rawValue.replace(regexPattern, formatPattern);
     e.target.value = formattedValue;
   };
 
@@ -70,8 +71,7 @@ const PartnerModPop = ({ datas }: Props) => {
     getValues,
     formState: { errors, isValid },
     clearErrors,
-  } = useForm<PartnerRequestUpdate>({
-    //resolver: yupResolver(YupSchema.PartnerRequestForUpdate()), // 완료
+  } = useForm<PartnerRequestUpdateExtended>({
     defaultValues: {},
     mode: 'onSubmit',
   });
@@ -89,6 +89,7 @@ const PartnerModPop = ({ datas }: Props) => {
         partnerType: body.partnerType,
         repNm: body.repNm,
         email: body.email,
+        reviewPointRate: body.reviewPointRate,
         creUser: body.creUser,
         updUser: body.updUser,
       });
@@ -133,12 +134,11 @@ const PartnerModPop = ({ datas }: Props) => {
     },
   });
 
-  const onValid: SubmitHandler<PartnerRequestUpdate> = (data) => {
-    // 번호 리플레이스
+  const onValid: SubmitHandler<PartnerRequestUpdateExtended> = (data) => {
     data.phoneNo = (data.phoneNo || '').replace(/[^0-9]/g, '');
-
-    updatePartnerMutate(data);
+    updatePartnerMutate(data as PartnerRequestUpdate);
   };
+
   const deleteCodeFn = async () => {
     deletePartnerMutate({ id: partner?.data.body.id, upperPartnerId: partner?.data.body.upperPartnerId } as PartnerRequestDelete);
   };
@@ -181,19 +181,12 @@ const PartnerModPop = ({ datas }: Props) => {
         <PopupSearchBox>
           <PopupSearchType className={'type_2'}>
             <FormInput<PartnerRequestUpdate> control={control} name={'partnerNm'} label={'회사명'} placeholder={Placeholder.Input || ''} required={true} />
-            <FormInput<PartnerRequestUpdate>
-              control={control}
-              name={'partnerTicker'}
-              label={'회사티커'}
-              placeholder={Placeholder.Input || ''}
-              required={false}
-            />
+            <FormInput<PartnerRequestUpdate> control={control} name={'partnerTicker'} label={'회사티커'} placeholder={Placeholder.Input || ''} required={false} />
           </PopupSearchType>
           <PopupSearchType className={'type_2'}>
             <FormInput<PartnerRequestUpdate> control={control} name={'domain'} label={'도메인'} placeholder={Placeholder.Input || ''} required={true} />
             <FormInput<PartnerRequestUpdate> control={control} name={'partnerSubNm'} label={'도메인명'} placeholder={Placeholder.Input || ''} required={true} />
           </PopupSearchType>
-
           <PopupSearchType className={'type_2'}>
             <FormInput<PartnerRequestUpdate>
               control={control}
@@ -203,11 +196,14 @@ const PartnerModPop = ({ datas }: Props) => {
               placeholder={Placeholder.Input || ''}
               required={true}
             />
-            <FormDropDown<PartnerRequestUpdate> control={control} name={'partnerType'} title={'파트너유형'} codeUpper={'10060'} required={false} />
+            <FormDropDown<PartnerRequestUpdate> control={control} name={'partnerType'} title={'파트너유형'} codeUpper={'10060'} required={true} />
           </PopupSearchType>
           <PopupSearchType className={'type_2'}>
             <FormInput<PartnerRequestUpdate> control={control} name={'repNm'} label={'대표자명'} placeholder={Placeholder.Input || ''} required={false} />
             <FormInput<PartnerRequestUpdate> control={control} name={'email'} label={'이메일'} placeholder={Placeholder.Input || ''} required={false} />
+          </PopupSearchType>
+          <PopupSearchType className={'type_2'}>
+            <FormInput<PartnerRequestUpdateExtended> control={control} name={'reviewPointRate'} label={'리뷰포인트 적립률'} placeholder={Placeholder.Input || ''} required={false} />
           </PopupSearchType>
         </PopupSearchBox>
       </PopupContent>

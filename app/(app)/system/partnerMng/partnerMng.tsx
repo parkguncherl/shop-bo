@@ -61,6 +61,7 @@ const PartnerMng = () => {
       },
       { field: 'repNm', headerName: '대표자명', minWidth: 120, maxWidth: 120, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
       { field: 'email', headerName: '회사이메일', minWidth: 150, maxWidth: 150, cellStyle: GridSetting.CellStyle.LEFT, suppressHeaderMenuButton: true },
+      { field: 'reviewPointRate', headerName: '리뷰포인트율', minWidth: 100, maxWidth: 100, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true, valueFormatter: (p) => p.value != null ? `${p.value}%` : '' },
     ],
     [],
   );

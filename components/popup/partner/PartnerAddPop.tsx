@@ -10,9 +10,12 @@ import FormInput from '../../form/FormInput';
 import { Placeholder } from '../../../libs/const';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { CommonResponseFileDown, PartnerRequestCreate, PartnerResponsePaging } from '../../../generated';
+
+type PartnerRequestCreateExtended = PartnerRequestCreate & { reviewPointRate?: number };
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toastError, toastSuccess } from '../../ToastMessage';
-import { authApi, YupSchema } from '../../../libs';
+import { authApi } from '../../../libs';
 import { useCommonStore } from '../../../stores';
 import FormDropDown from '../../form/FormDropDown';
 
@@ -48,8 +51,7 @@ const PartnerAddPop = ({ data }: Props) => {
     setValue,
     formState: { errors, isValid },
     clearErrors,
-  } = useForm<PartnerRequestCreate>({
-    //resolver: yupResolver(YupSchema.PartnerRequest()), // 완료
+  } = useForm<PartnerRequestCreateExtended>({
     defaultValues: {},
     mode: 'onSubmit',
   });
@@ -76,21 +78,18 @@ const PartnerAddPop = ({ data }: Props) => {
       }
     },
   });
-  const onValid: SubmitHandler<PartnerRequestCreate> = (data) => {
-    // 번호 리플레이스
+
+  const onValid: SubmitHandler<PartnerRequestCreateExtended> = (data) => {
     data.phoneNo = (data.phoneNo || '').replace(/[^0-9]/g, '');
-    insertPartnerMutate(data);
+    insertPartnerMutate(data as PartnerRequestCreate);
   };
 
-  // 공통적으로 사용할 onChange 함수
   const handleInputChange = (regexPattern: RegExp, formatPattern: string) => (e: any) => {
-    const rawValue = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 남기기
-    const formattedValue = rawValue.replace(regexPattern, formatPattern); // 포맷에 맞게 변환
-    // 입력 필드에 표시할 값은 하이픈 포함된 포맷된 값으로 설정
+    const rawValue = e.target.value.replace(/[^0-9]/g, '');
+    const formattedValue = rawValue.replace(regexPattern, formatPattern);
     e.target.value = formattedValue;
   };
 
-  // 파일업로드
   const handleChildValueChange = (fileInfo: CommonResponseFileDown) => {
     reset((prev) => ({
       ...prev,
@@ -114,13 +113,7 @@ const PartnerAddPop = ({ data }: Props) => {
             <button className="btn btnBlue" title="저장" onClick={handleSubmit(onValid)}>
               저장
             </button>
-            <button
-              className="btn"
-              title="닫기"
-              onClick={() => {
-                closeModal('ADD');
-              }}
-            >
+            <button className="btn" title="닫기" onClick={() => closeModal('ADD')}>
               닫기
             </button>
           </div>
@@ -131,19 +124,12 @@ const PartnerAddPop = ({ data }: Props) => {
         <PopupSearchBox>
           <PopupSearchType className={'type_2'}>
             <FormInput<PartnerRequestCreate> control={control} name={'partnerNm'} label={'회사명'} placeholder={Placeholder.Input || ''} required={true} />
-            <FormInput<PartnerRequestCreate>
-              control={control}
-              name={'partnerTicker'}
-              label={'회사티커'}
-              placeholder={Placeholder.Input || ''}
-              required={false}
-            />
+            <FormInput<PartnerRequestCreate> control={control} name={'partnerTicker'} label={'회사티커'} placeholder={Placeholder.Input || ''} required={false} />
           </PopupSearchType>
           <PopupSearchType className={'type_2'}>
             <FormInput<PartnerRequestCreate> control={control} name={'domain'} label={'도메인'} placeholder={Placeholder.Input || ''} required={true} />
             <FormInput<PartnerRequestCreate> control={control} name={'partnerSubNm'} label={'도메인명'} placeholder={Placeholder.Input || ''} required={true} />
           </PopupSearchType>
-
           <PopupSearchType className={'type_2'}>
             <FormInput<PartnerRequestCreate>
               control={control}
@@ -158,6 +144,9 @@ const PartnerAddPop = ({ data }: Props) => {
           <PopupSearchType className={'type_2'}>
             <FormInput<PartnerRequestCreate> control={control} name={'repNm'} label={'대표자명'} placeholder={Placeholder.Input || ''} required={false} />
             <FormInput<PartnerRequestCreate> control={control} name={'email'} label={'이메일'} placeholder={Placeholder.Input || ''} required={false} />
+          </PopupSearchType>
+          <PopupSearchType className={'type_2'}>
+            <FormInput<PartnerRequestCreateExtended> control={control} name={'reviewPointRate'} label={'리뷰포인트 적립률'} placeholder={Placeholder.Input || ''} required={false} />
           </PopupSearchType>
         </PopupSearchBox>
       </PopupContent>
