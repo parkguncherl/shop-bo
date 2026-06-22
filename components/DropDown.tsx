@@ -114,7 +114,7 @@ export const DropDown = ({
   return (
     <>
       {title ? (
-        <dl className={wrapperClassNames} style={style}>
+        <dl className={wrapperClassNames}>
           <dt>
             <label>{title}</label>
             {required && <span className={'req'}>*</span>} {/* 필수 항목일 때 별표 표시 */}

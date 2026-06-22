@@ -352,7 +352,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
       >
         <PopupContent>
           <PopupSearchBox>
-            <PopupSearchType className={'type_3'}>
+            <PopupSearchType className={'type1'}>
               <Search.DropDown
                 title={'매장명'}
                 name={'partnerId'}
@@ -360,7 +360,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
                 onChange={(_name, value) => onChangeFilters('partnerId', value ? Number(value) : undefined)}
                 defaultOptions={partnerOptions}
                 showAll={true}
-                style={{ minWidth: 200 }}
+                dtWidth={'200px'}
               />
               <Search.Input
                 title={'품목명'}
