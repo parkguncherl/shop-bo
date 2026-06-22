@@ -61,8 +61,8 @@ const ContentList = () => {
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
     },
-    { field: 'newsTitle', headerName: '제목', minWidth: 60, maxWidth: 150, suppressHeaderMenuButton: true },
-    { field: 'newsSubTitle', headerName: '하위 제목', minWidth: 60, maxWidth: 150, suppressHeaderMenuButton: true },
+    { field: 'newsTitle', headerName: '제목', minWidth: 200, maxWidth: 250, suppressHeaderMenuButton: true },
+    { field: 'newsSubTitle', headerName: '하위 제목', minWidth: 100, maxWidth: 200, suppressHeaderMenuButton: true },
     {
       field: 'imageCnt',
       headerName: '이미지 건수',
@@ -91,7 +91,6 @@ const ContentList = () => {
       valueGetter: (params) => (params.node ? (params.node.rowIndex ?? 0) + 1 : ''),
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
-      rowDrag: true,
     },
     { field: 'prodNm', headerName: '상품명', minWidth: 130, maxWidth: 200, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.LEFT },
     {
@@ -152,7 +151,7 @@ const ContentList = () => {
 
   const [selectedRowsData, setSelectedRowsData] = useState<ProductContentListResponseProductContent | undefined>(undefined);
 
-  const [imgPreviewBoxOn, setImgPreviewBoxOn] = useState(false);
+  const [imgPreviewBoxOn, setImgPreviewBoxOn] = useState(true);
   const [resized, setResized] = useState(false);
   const [imgPreviewFileDetList, setImgPreviewFileDetList] = useState<ImgPreviewFileDet[]>([]);
 
@@ -426,7 +425,7 @@ const ContentList = () => {
   return (
     <div>
       <div className="layoutBox">
-        <div className={'layout30'}>
+        <div className={'layout40'}>
           <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} />
           <Search className="type_2">
             <Search.Input title={'컨텐츠 제목'} name={'newsTitle'} placeholder={Placeholder.Input} value={filters.newsTitle} onChange={onChangeFilters} />
@@ -511,7 +510,7 @@ const ContentList = () => {
             </div>
           </Table>
         </div>
-        <div className={'layout70'}>
+        <div className={'layout60'}>
           <Title title={'연결품목목록'} detail={true} />
           <Search className="type_2">
             <CustomSwitch
@@ -537,10 +536,8 @@ const ContentList = () => {
                 mode: 'singleRow',
                 enableClickSelection: true,
               }}
-              onRowDoubleClicked={(e) => openModal('SHOW', e.data)}
               onSelectionChanged={onSelectionChangedByRigSideGrid}
               className={'default check'}
-              onRowDragEnd={onRowDragEndHandler}
             />
             <div className="btnArea between">
               <div className="left"></div>
@@ -551,7 +548,7 @@ const ContentList = () => {
                     // todo
                   }}
                 >
-                  {'미사용'}
+                  {'연결끊기'}
                 </button>
               </div>
             </div>

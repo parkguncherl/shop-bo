@@ -54,7 +54,7 @@ export const CodeModPop = ({ data }: Props) => {
       codeEtc1: data.codeEtc1,
       codeEtc2: data.codeEtc2,
       codeOrder: data.codeOrder,
-      delYn: data.deleteYn ? 'Y' : 'N',
+      delYn: data.deleteYn === 'Y' ? 'Y' : 'N',
     },
     mode: 'onSubmit',
   });
@@ -214,6 +214,7 @@ export const CodeModPop = ({ data }: Props) => {
                   control={control}
                   name={'delYn'}
                   title={'사용여부'}
+                  style={{ width: '100%' }}
                   options={[
                     { value: 'N', label: '사용' },
                     { value: 'Y', label: '미사용' },

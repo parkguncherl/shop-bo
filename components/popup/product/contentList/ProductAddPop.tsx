@@ -6,6 +6,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { authApi } from '../../../../libs';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import {
+  FileDet,
   ProductContentListRequestProductInfoListFilter,
   ProductContentListResponseProductContent,
   ProductContentListResponseProductInfo,
@@ -15,11 +16,14 @@ import { PopupSearchBox, PopupSearchType } from '../../content';
 import CustomGridLoading from '../../../CustomGridLoading';
 import CustomNoRowsOverlay from '../../../CustomNoRowsOverlay';
 import { GridSetting } from '../../../../libs/ag-grid';
-import { ColDef } from 'ag-grid-community';
+import { ColDef, SelectionChangedEvent } from 'ag-grid-community';
 import useFilters from '../../../../hooks/useFilters';
 import { Search } from '../../../content';
 import { useProductContentListStore } from '../../../../stores/product/useProductContentListStore';
 import { ConfirmModal } from '../../../ConfirmModal';
+import { useCommonStore } from '../../../../stores';
+import ImgPreviewBox, { ImgPreviewFileDet } from '../../../content/ImgPreviewBox';
+import { CustomSwitch } from '../../../CustomSwitch';
 
 interface ProductContentShowPopProps {
   open: boolean;
@@ -37,6 +41,7 @@ interface ProductContentShowPopProps {
 const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
   const [insertContentsProductList] = useProductContentListStore((s) => [s.insertContentsProductList]);
+  const [getFileUrl, getFileList] = useCommonStore((s) => [s.getFileUrl, s.getFileList]);
 
   /** 팝업 내부 local state */
   const [productInfoList, setProductInfoList] = useState<ProductContentListResponseProductInfo[]>([]);
@@ -63,6 +68,9 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
   });
 
   const [selectedRowsDataList, setSelectedRowsDataList] = useState<ProductContentListResponseProductInfo[]>([]);
+  const [imgPreviewBoxOn, setImgPreviewBoxOn] = useState(true);
+  const [resized, setResized] = useState(false);
+  const [imgPreviewFileDetList, setImgPreviewFileDetList] = useState<ImgPreviewFileDet[]>([]);
 
   /** filters, lastInfo's filters*/
   const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<ProductContentListRequestProductInfoListFilter>({
@@ -87,6 +95,14 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
         valueGetter: (params) => (params.node ? (params.node.rowIndex ?? 0) + 1 : ''),
         cellStyle: GridSetting.CellStyle.CENTER,
         suppressHeaderMenuButton: true,
+      },
+      {
+        field: 'partnerNm',
+        headerName: '매장명',
+        minWidth: 100,
+        maxWidth: 100,
+        suppressHeaderMenuButton: true,
+        cellStyle: GridSetting.CellStyle.LEFT,
       },
       {
         field: 'prodNm',
@@ -260,6 +276,34 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
     }
   }, [open]);
 
+  /** row 선택 시 이미지 미리보기 */
+  const onSelectionChanged = (e: SelectionChangedEvent) => {
+    const selectedRows: ProductContentListResponseProductInfo[] = e.api.getSelectedRows();
+    setSelectedRowsDataList(selectedRows);
+    if (selectedRows.length > 0) {
+      const selectedRow = selectedRows[0];
+      if (selectedRow.repFileId) {
+        getFileList(selectedRow.repFileId).then(async (result) => {
+          const { resultCode, body, resultMessage } = result.data;
+          if (resultCode == 200 && body != undefined) {
+            const fileDetList: ImgPreviewFileDet[] = [];
+            await Promise.all(
+              (body as FileDet[]).map(async (file: FileDet) => {
+                if (!file.sysFileNm) return;
+                fileDetList.push({ ...file, url: await getFileUrl(file.sysFileNm) });
+              }),
+            );
+            setImgPreviewFileDetList(fileDetList);
+          } else {
+            toastError(`이미지 정보 조회 도중 문제가 발생하였습니다: ${resultMessage}`);
+          }
+        });
+      } else {
+        setImgPreviewFileDetList([]);
+      }
+    }
+  };
+
   /** 검색 버튼 클릭 시 */
   const search = async () => {
     await onSearch();
@@ -272,7 +316,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
   return (
     <div className="imgPopBox">
       <PopupLayout
-        width={950}
+        width={1000}
         open={open}
         isEscClose={!modalsStatus.active}
         title={'신규 품목추가'}
@@ -280,11 +324,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
         footer={
           <PopupFooter>
             <div className="btnArea between">
-              <div>
-                <button className="btn" onClick={onCloseCommonCallBack}>
-                  닫기
-                </button>
-              </div>
+              <div></div>
               <div className="right">
                 <button
                   className="btn btn_blue"
@@ -308,6 +348,9 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
                 >
                   추가
                 </button>
+                <button className="btn" onClick={onCloseCommonCallBack}>
+                  닫기
+                </button>
               </div>
             </div>
           </PopupFooter>
@@ -326,6 +369,16 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
                 filters={filters}
               />
             </PopupSearchType>
+            <PopupSearchType className={'type_2'}>
+              <CustomSwitch
+                title={'이미지보기'}
+                name={'imgShow'}
+                checkedLabel={'켜기'}
+                uncheckedLabel={'끄기'}
+                value={imgPreviewBoxOn}
+                onChange={(_name, value) => setImgPreviewBoxOn(value)}
+              />
+            </PopupSearchType>
           </PopupSearchBox>
           <div className="mt10">
             <TunedGrid<ProductContentListResponseProductInfo>
@@ -339,10 +392,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
                 mode: 'multiRow',
                 enableClickSelection: true,
               }}
-              onSelectionChanged={(event) => {
-                const selectedRows = event.api.getSelectedRows();
-                setSelectedRowsDataList(selectedRows);
-              }}
+              onSelectionChanged={onSelectionChanged}
               // todo 페이징 영역 한시적 비활성화
               // pagingOptions={pagingOption}
               // pagingDeps={[filters]}
@@ -374,6 +424,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
               // }}
               className={'default check'}
             />
+            <ImgPreviewBox open={imgPreviewBoxOn} resized={resized} onReSizeReq={() => setResized(!resized)} fileDetList={imgPreviewFileDetList} />
           </div>
           <ConfirmModal
             open={modalsStatus.active && modalsStatus.type == 'ADD_CONTENTS_PRODUCTS'}
