@@ -125,13 +125,13 @@ const FormDropDown = <T extends FieldValues>({ ...props }: TProps<T>) => {
       ) : (
         <>
           {props.title && (
-            <dl ref={el} style={{ ...props.style }} className={props.className}>
+            <dl ref={el} className={props.className}>
               <dt>
                 {props.gbCode ? <Input onChange={(e) => setGbVal(e.target.value)} value={gbVal} /> : <label>{props.title}</label>}
                 {props.required && <span className={'req'}>*</span>}
               </dt>
               <dd>
-                <div className={`formBox ${props.disabled ? 'disabled' : ''} ${focusStates[name] ? 'focus' : ''} border`}>
+                <div className={`formBox ${props.disabled ? 'disabled' : ''} ${focusStates[name] ? 'focus' : ''} border`} style={{ ...props.style }}>
                   <DropDownAtom
                     name={name}
                     value={value || ''}

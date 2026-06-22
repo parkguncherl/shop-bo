@@ -181,7 +181,13 @@ const PartnerModPop = ({ datas }: Props) => {
         <PopupSearchBox>
           <PopupSearchType className={'type_2'}>
             <FormInput<PartnerRequestUpdate> control={control} name={'partnerNm'} label={'회사명'} placeholder={Placeholder.Input || ''} required={true} />
-            <FormInput<PartnerRequestUpdate> control={control} name={'partnerTicker'} label={'회사티커'} placeholder={Placeholder.Input || ''} required={false} />
+            <FormInput<PartnerRequestUpdate>
+              control={control}
+              name={'partnerTicker'}
+              label={'회사티커'}
+              placeholder={Placeholder.Input || ''}
+              required={false}
+            />
           </PopupSearchType>
           <PopupSearchType className={'type_2'}>
             <FormInput<PartnerRequestUpdate> control={control} name={'domain'} label={'도메인'} placeholder={Placeholder.Input || ''} required={true} />
@@ -196,14 +202,27 @@ const PartnerModPop = ({ datas }: Props) => {
               placeholder={Placeholder.Input || ''}
               required={true}
             />
-            <FormDropDown<PartnerRequestUpdate> control={control} name={'partnerType'} title={'파트너유형'} codeUpper={'10060'} required={true} />
+            <FormDropDown<PartnerRequestUpdate>
+              control={control}
+              name={'partnerType'}
+              title={'파트너유형'}
+              codeUpper={'10060'}
+              required={true}
+              style={{ width: 173 }}
+            />
           </PopupSearchType>
           <PopupSearchType className={'type_2'}>
             <FormInput<PartnerRequestUpdate> control={control} name={'repNm'} label={'대표자명'} placeholder={Placeholder.Input || ''} required={false} />
             <FormInput<PartnerRequestUpdate> control={control} name={'email'} label={'이메일'} placeholder={Placeholder.Input || ''} required={false} />
           </PopupSearchType>
           <PopupSearchType className={'type_2'}>
-            <FormInput<PartnerRequestUpdateExtended> control={control} name={'reviewPointRate'} label={'리뷰포인트 적립률'} placeholder={Placeholder.Input || ''} required={false} />
+            <FormInput<PartnerRequestUpdateExtended>
+              control={control}
+              name={'reviewPointRate'}
+              label={'리뷰포인트 적립률'}
+              placeholder={Placeholder.Input || ''}
+              required={false}
+            />
           </PopupSearchType>
         </PopupSearchBox>
       </PopupContent>
