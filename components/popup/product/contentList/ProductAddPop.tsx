@@ -7,7 +7,6 @@ import { authApi } from '../../../../libs';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import {
   FileDet,
-  ProductContentListRequestProductInfoListFilter,
   ProductContentListResponseProductContent,
   ProductContentListResponseProductInfo,
 } from '../../../../generated';
@@ -24,6 +23,14 @@ import { ConfirmModal } from '../../../ConfirmModal';
 import { useCommonStore } from '../../../../stores';
 import ImgPreviewBox, { ImgPreviewFileDet } from '../../../content/ImgPreviewBox';
 import { CustomSwitch } from '../../../CustomSwitch';
+import { usePartnerCodeList } from '../../../../customHook/usePartnerCodeList';
+
+type ProductInfoListFilter = {
+  prodNm?: string;
+  partnerId?: number;
+  contentsId?: number;
+  lastId?: number;
+};
 
 interface ProductContentShowPopProps {
   open: boolean;
@@ -73,9 +80,12 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
   const [imgPreviewFileDetList, setImgPreviewFileDetList] = useState<ImgPreviewFileDet[]>([]);
 
   /** filters, lastInfo's filters*/
-  const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<ProductContentListRequestProductInfoListFilter>({
+  const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<ProductInfoListFilter>({
     prodNm: undefined,
+    partnerId: undefined,
   });
+
+  const { data: partnerOptions = [] } = usePartnerCodeList({ codeUpper: 'P0001' });
 
   // todo 페이징 영역 한시적 비활성화
   // const [lastInfos, onChangelastInfos, onlastInfosReset] = useFilters<ProductContentListRequestProductInfoListFilter>({
@@ -359,6 +369,13 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
         <PopupContent>
           <PopupSearchBox>
             <PopupSearchType className={'type_2'}>
+              <Search.DropDown
+                title={'매장명'}
+                name={'partnerId'}
+                value={filters.partnerId}
+                onChange={(name, value) => onChangeFilters(name, value ? Number(value) : undefined)}
+                options={[{ value: '', label: '전체' }, ...partnerOptions.map((o) => ({ value: String(o.partnerId ?? ''), label: o.label ?? '' }))]}
+              />
               <Search.Input
                 title={'품목명'}
                 name={'prodNm'}
