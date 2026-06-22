@@ -5,11 +5,7 @@ import { PopupLayout } from '../../PopupLayout';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { authApi } from '../../../../libs';
 import { toastError, toastSuccess } from '../../../ToastMessage';
-import {
-  FileDet,
-  ProductContentListResponseProductContent,
-  ProductContentListResponseProductInfo,
-} from '../../../../generated';
+import { FileDet, ProductContentListResponseProductContent, ProductContentListResponseProductInfo } from '../../../../generated';
 import TunedGrid, { TunedGridRef } from '../../../grid/TunedGrid';
 import { PopupSearchBox, PopupSearchType } from '../../content';
 import CustomGridLoading from '../../../CustomGridLoading';
@@ -23,7 +19,7 @@ import { ConfirmModal } from '../../../ConfirmModal';
 import { useCommonStore } from '../../../../stores';
 import ImgPreviewBox, { ImgPreviewFileDet } from '../../../content/ImgPreviewBox';
 import { CustomSwitch } from '../../../CustomSwitch';
-import { usePartnerCodeList } from '../../../../customHook/usePartnerCodeList';
+import { usePartnerList } from '../../../../customHook/usePartnerList';
 
 type ProductInfoListFilter = {
   prodNm?: string;
@@ -52,18 +48,6 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
 
   /** 팝업 내부 local state */
   const [productInfoList, setProductInfoList] = useState<ProductContentListResponseProductInfo[]>([]);
-
-  // todo 페이징 영역 한시적 비활성화
-  // const [lastProductInfo, setLastProductInfo] = useState<ProductContentListResponseProductInfo | undefined>(undefined);
-  //
-  // const [pagingOption] = useState<AddPagingOptions | undefined>({
-  //   pagingStrategy: 'add',
-  // });
-  // const [paging, setPaging] = useState<PageObject>({
-  //   curPage: 1,
-  //   pageRowCount: 50,
-  // });
-
   const [modalsStatus, setModalsStatus] = useState<{
     type: 'ADD_CONTENTS_PRODUCTS';
     active: boolean;
@@ -85,7 +69,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
     partnerId: undefined,
   });
 
-  const { data: partnerOptions = [] } = usePartnerCodeList({ codeUpper: 'P0001' });
+  const { data: partnerOptions = [] } = usePartnerList({ enabled: true });
 
   // todo 페이징 영역 한시적 비활성화
   // const [lastInfos, onChangelastInfos, onlastInfosReset] = useFilters<ProductContentListRequestProductInfoListFilter>({
@@ -368,14 +352,15 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
       >
         <PopupContent>
           <PopupSearchBox>
-            <PopupSearchType className={'type_2'}>
+            <PopupSearchType className={'type_1'}>
               <Search.DropDown
                 title={'매장명'}
                 name={'partnerId'}
                 value={filters.partnerId}
-                onChange={(name, value) => onChangeFilters(name, value ? Number(value) : undefined)}
-                options={[{ value: '', label: '전체' }, ...partnerOptions.map((o) => ({ value: String(o.partnerId ?? ''), label: o.label ?? '' }))]}
-                style={{ minWidth: 180 }}
+                onChange={(_name, value) => onChangeFilters('partnerId', value ? Number(value) : undefined)}
+                defaultOptions={(partnerOptions as { key?: string | number; value?: string | number; label?: string }[]) ?? []}
+                showAll={true}
+                dtWidth={'150px'}
               />
               <Search.Input
                 title={'품목명'}
