@@ -36,6 +36,7 @@ type ProductViewItem = {
 };
 
 const today = dayjs().format('YYYY-MM-DD');
+const yearStart = dayjs().startOf('year').format('YYYY-MM-DD');
 
 const ProductView = () => {
   const { onGridReady } = useAgGridApi();
@@ -43,7 +44,7 @@ const ProductView = () => {
   const [getFileUrl, getFileList] = useCommonStore((s) => [s.getFileUrl, s.getFileList]);
 
   const [filters, onChangeFilters, onFiltersReset] = useFilters<ProductViewFilter>({
-    fromDate: today,
+    fromDate: yearStart,
     toDate: today,
   });
 
@@ -56,6 +57,11 @@ const ProductView = () => {
 
   const chartOption = useMemo(() => {
     const names = top10.map((d) => (d.prodNm.length > 8 ? d.prodNm.slice(0, 8) + '…' : d.prodNm));
+    const maxPageView = Math.max(0, ...top10.map((d) => d.pageViewCnt));
+    const useRightAxis = maxPageView > 1000;
+    const rightAxisMax = useRightAxis ? Math.ceil(maxPageView / 10000) * 10000 : undefined;
+    const rightAxisInterval = useRightAxis ? 1000 : undefined;
+
     return {
       tooltip: {
         trigger: 'axis',
@@ -65,20 +71,31 @@ const ProductView = () => {
         bottom: 0,
         data: ['구매건수', '장바구니건수', '페이지뷰', '총점'],
       },
-      grid: { left: 16, right: 24, top: 50, bottom: 50, containLabel: true },
+      grid: { left: 16, right: 60, top: 50, bottom: 50, containLabel: true },
       xAxis: {
         type: 'category',
         data: names,
         axisLabel: { rotate: 30, fontSize: 11 },
       },
-      yAxis: {
-        type: 'value',
-        nameTextStyle: { fontSize: 11 },
-      },
+      yAxis: [
+        {
+          type: 'value',
+          name: '건수',
+          nameTextStyle: { fontSize: 11 },
+        },
+        {
+          type: 'value',
+          name: '페이지뷰',
+          nameTextStyle: { fontSize: 11 },
+          ...(useRightAxis ? { max: rightAxisMax, interval: rightAxisInterval } : {}),
+          splitLine: { show: false },
+        },
+      ],
       series: [
         {
           name: '구매건수',
           type: 'bar',
+          yAxisIndex: 0,
           data: top10.map((d) => d.purchaseCnt),
           itemStyle: { color: '#5b8ff9' },
           label: { show: true, position: 'top', fontSize: 10, formatter: '{c}' },
@@ -86,6 +103,7 @@ const ProductView = () => {
         {
           name: '장바구니건수',
           type: 'bar',
+          yAxisIndex: 0,
           data: top10.map((d) => d.cartCnt),
           itemStyle: { color: '#61ddaa' },
           label: { show: true, position: 'top', fontSize: 10, formatter: '{c}' },
@@ -93,6 +111,7 @@ const ProductView = () => {
         {
           name: '페이지뷰',
           type: 'bar',
+          yAxisIndex: 1,
           data: top10.map((d) => d.pageViewCnt),
           itemStyle: { color: '#f6bd16' },
           label: { show: true, position: 'top', fontSize: 10, formatter: '{c}' },
@@ -100,6 +119,7 @@ const ProductView = () => {
         {
           name: '총점',
           type: 'bar',
+          yAxisIndex: 0,
           data: top10.map((d) => d.totalScore),
           itemStyle: { color: '#e86452' },
           label: { show: true, position: 'top', fontSize: 10, formatter: '{c}' },
@@ -215,7 +235,6 @@ const ProductView = () => {
         <CustomNewDatePicker
           title={'조회기간'}
           type={'range'}
-          defaultType={'today'}
           startName={'fromDate'}
           endName={'toDate'}
           onChange={onChangeFilters}
