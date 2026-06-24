@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useImperativeHandle, useReducer } from 'react';
+import React, { useEffect, useRef, useState, useImperativeHandle, useReducer, useMemo } from 'react';
 import { DatePicker, Select } from 'antd';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/ko'; // 한국어 로케일 추가
@@ -145,6 +145,15 @@ function DateStatusManagementReducerFn(state: DateStatus, action: DateStatusActi
   }
 }
 
+// 이하 해당 영역에서 사용할 상수
+const BASE_OPTIONS = [
+  { value: 'type', label: '입력' },
+  { value: 'today', label: '일자' },
+  { value: 'week', label: '주간' },
+  { value: 'month', label: '월간' },
+  { value: 'year', label: '1년' },
+];
+
 const CustomNewDatePicker = ({
   title,
   startName,
@@ -213,13 +222,20 @@ const CustomNewDatePicker = ({
     [8, 10],
   ];
 
-  const options = [
-    { value: 'type', label: '입력' },
-    { value: 'today', label: '일자' },
-    { value: 'week', label: '주간' },
-    { value: 'month', label: '월간' },
-    { value: 'year', label: '1년' },
-  ].filter((option) => (selectType == defaultType ? defaultType == option.value : true)); // 한가지만 선택해야 되는경우
+  // const options2 = [
+  //   { value: 'type', label: '입력' },
+  //   { value: 'today', label: '일자' },
+  //   { value: 'week', label: '주간' },
+  //   { value: 'month', label: '월간' },
+  //   { value: 'year', label: '1년' },
+  // ].filter((option) => (selectType == defaultType ? defaultType == option.value : true)); // 한가지만 선택해야 되는경우
+
+  /** selectType 인자가 주어진 경우 options 는 단일하게 고정됨 */
+  const options = useMemo(
+    //() => BASE_OPTIONS.filter((option) => (selectType == defaultType ? defaultType == option.value : true)), // 한가지만 선택해야 되는경우
+    () => BASE_OPTIONS.filter((option) => (selectType != undefined ? selectType == option.value : true)), // 한가지만 선택해야 되는경우
+    [selectType],
+  );
 
   const moveSelection = (inPositons: number, input: HTMLInputElement) => {
     if (input) {
