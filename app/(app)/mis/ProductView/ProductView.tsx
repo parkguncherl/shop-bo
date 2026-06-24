@@ -18,6 +18,7 @@ import dayjs from 'dayjs';
 import ReactECharts from 'echarts-for-react';
 import ImgPreviewBox, { ImgPreviewFileDet } from '../../../../components/content/ImgPreviewBox';
 import { CustomSwitch } from '../../../../components/CustomSwitch';
+import SeasonButtonGroup from '../../../../components/SeasonButtonGroup';
 import { FileDet } from '../../../../generated';
 
 type ProductViewFilter = {
@@ -25,10 +26,12 @@ type ProductViewFilter = {
   toDate: string;
 };
 
+
 type ProductViewItem = {
   prodId: number;
   prodNm: string;
   repFileId?: number;
+  totalPaymentAmt: number;
   purchaseCnt: number;
   cartCnt: number;
   pageViewCnt: number;
@@ -47,6 +50,8 @@ const ProductView = () => {
     fromDate: yearStart,
     toDate: today,
   });
+
+  const [weather, setWeather] = useState<string[]>(['spring', 'summer', 'autumn', 'winter']);
 
   const [rowData, setRowData] = useState<ProductViewItem[]>([]);
   const [imgPreviewBoxOn, setImgPreviewBoxOn] = useState(true);
@@ -144,6 +149,15 @@ const ProductView = () => {
       suppressHeaderMenuButton: true,
     },
     {
+      field: 'totalPaymentAmt',
+      headerName: '총구매금액',
+      minWidth: 110,
+      maxWidth: 130,
+      cellStyle: GridSetting.CellStyle.RIGHT,
+      suppressHeaderMenuButton: true,
+      valueFormatter: (p) => p.value != null ? p.value.toLocaleString() + '원' : '0원',
+    },
+    {
       field: 'purchaseCnt',
       headerName: '구매건수',
       minWidth: 90,
@@ -206,8 +220,8 @@ const ProductView = () => {
     isSuccess,
     refetch,
   } = useQuery({
-    queryKey: ['/mis/productViewList', filters],
-    queryFn: () => authApi.get('/mis/productViewList', { params: filters }),
+    queryKey: ['/mis/productViewList', filters, weather],
+    queryFn: () => authApi.get('/mis/productViewList', { params: { ...filters, weather } }),
     enabled: !!(filters.fromDate && filters.toDate),
   });
 
@@ -224,6 +238,7 @@ const ProductView = () => {
 
   const reset = () => {
     onFiltersReset();
+    setWeather(['spring', 'summer', 'autumn', 'winter']);
     setRowData([]);
     setImgPreviewFileDetList([]);
   };
@@ -240,6 +255,51 @@ const ProductView = () => {
           onChange={onChangeFilters}
           value={[filters.fromDate, filters.toDate]}
         />
+        <dl>
+          <dd>
+            <div className="formBox">
+              {([
+                { label: '1주일', days: 7 },
+                { label: '2주일', days: 14 },
+                { label: '1개월', days: 30 },
+              ] as const).map((item, i, arr) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  style={{
+                    padding: '0 12px',
+                    height: 32,
+                    fontSize: 13,
+                    fontWeight: 500,
+                    border: '1px solid #d9d9d9',
+                    background: '#f3f4f6',
+                    color: '#6b7280',
+                    cursor: 'pointer',
+                    marginLeft: -1,
+                    position: 'relative',
+                    borderRadius: i === 0 ? '6px 0 0 6px' : i === arr.length - 1 ? '0 6px 6px 0' : 0,
+                  }}
+                  onClick={() => {
+                    const from = dayjs().subtract(item.days, 'day').format('YYYY-MM-DD');
+                    const to = today;
+                    onChangeFilters('fromDate', from);
+                    onChangeFilters('toDate', to);
+                    refetch();
+                  }}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </dd>
+        </dl>
+        <dl>
+          <dd>
+            <div className="formBox">
+              <SeasonButtonGroup value={weather} onChange={setWeather} />
+            </div>
+          </dd>
+        </dl>
         <CustomSwitch
           title={'이미지보기'}
           name={'imgShow'}
