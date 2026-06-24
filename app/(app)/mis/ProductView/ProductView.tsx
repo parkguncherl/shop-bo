@@ -268,12 +268,7 @@ const ProductView = () => {
             className={'default'}
             domLayout={'autoHeight'}
           />
-          <ImgPreviewBox
-            open={imgPreviewBoxOn}
-            resized={resized}
-            onReSizeReq={() => setResized(!resized)}
-            fileDetList={imgPreviewFileDetList}
-          />
+          <ImgPreviewBox open={imgPreviewBoxOn} resized={resized} onReSizeReq={() => setResized(!resized)} fileDetList={imgPreviewFileDetList} />
         </div>
 
         {/* 오른쪽: ECharts 상위 10개 */}
@@ -282,9 +277,7 @@ const ProductView = () => {
           {top10.length > 0 ? (
             <ReactECharts option={chartOption} style={{ height: 400 }} />
           ) : (
-            <div style={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaa', fontSize: 13 }}>
-              데이터가 없습니다.
-            </div>
+            <div style={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaa', fontSize: 13 }}>데이터가 없습니다.</div>
           )}
         </div>
       </div>
