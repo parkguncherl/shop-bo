@@ -18,7 +18,7 @@ dayjs.locale('ko'); // 기본 한국어 로케일 사용
 import weekday from 'dayjs/plugin/weekday';
 import useUpdateEffect from '../customHook/useUpdateEffect'; // week 시작일 설정
 
-export type DatePickerSelectType = 'today' | 'week' | 'month' | 'year' | 'type';
+export type DatePickerSelectType = 'today' | 'week' | 'month' | 'year' | 'decade' | 'type';
 
 export interface CustomNewDatePickerRefInterface {
   initDatePicker: (type: DatePickerSelectType, startDate: Dayjs, endDate: Dayjs) => void;
@@ -44,7 +44,7 @@ interface Props {
   className?: string;
   selectType?: DatePickerSelectType;
   maxDays?: number;
-  defaultType?: string;
+  defaultType?: DatePickerSelectType;
   //initDatePicker?: (selectedType: DatePickerSelectType, startDate: Dayjs, endDate: Dayjs) => void;
   disabled?: boolean; // 디스에이블 여부 date타입만 적용 20250326
   ref?: React.Ref<CustomNewDatePickerRefInterface>;
@@ -52,6 +52,7 @@ interface Props {
   onOpenChange?: ((open: boolean) => void) | undefined;
 }
 
+// 이하 리듀서 타입
 interface DateStatus {
   selectedDate: Dayjs | null;
   rangeDate: [Dayjs | null, Dayjs | null];
@@ -146,7 +147,7 @@ function DateStatusManagementReducerFn(state: DateStatus, action: DateStatusActi
 }
 
 // 이하 해당 영역에서 사용할 상수
-const BASE_OPTIONS = [
+const BASE_OPTIONS: { value: DatePickerSelectType; label: string }[] = [
   { value: 'type', label: '입력' },
   { value: 'today', label: '일자' },
   { value: 'week', label: '주간' },
@@ -197,7 +198,7 @@ const CustomNewDatePicker = ({
   const [tempRange, setTempRange] = useState<[Dayjs | null, Dayjs | null]>([null, null]); // RangePicker 사용 시 날짜 영역 선택 후 동기화 이전 상태를 임시로 저장하는 local state
 
   const [open, setOpen] = useState(false);
-  const [dropDownValue, setDropDownValue] = useState(defaultType || 'type');
+  const [dropDownValue, setDropDownValue] = useState<DatePickerSelectType>(defaultType || 'type');
   const [panelMode, setPanelMode] = useState(dropDownValue);
 
   const handleInitDatePicker = (type: DatePickerSelectType, startDate: Dayjs, endDate: Dayjs) => {
@@ -316,7 +317,7 @@ const CustomNewDatePicker = ({
   };
 
   /** 주어진 날짜에 해당하는 주, 월, 연에 해당하는 range 반환 */
-  const settingDefaultValue = (rangeType: string, day: Dayjs | null): [Dayjs, Dayjs] => {
+  const settingDefaultValue = (rangeType: DatePickerSelectType, day: Dayjs | null): [Dayjs, Dayjs] => {
     const settingDay = day ? day : today;
     if (rangeType === 'week') {
       const startDate = settingDay.startOf('week').add(1, 'day'); // 월요일
@@ -336,6 +337,7 @@ const CustomNewDatePicker = ({
       const endDate = settingDay;
       return [startDate, endDate];
     } else {
+      // type
       const startDate = settingDay;
       const endDate = settingDay;
       return [startDate, endDate];
@@ -343,7 +345,7 @@ const CustomNewDatePicker = ({
   };
 
   // 날짜 범위 계산 (주, 월, 연)
-  const handleRangeChange = (date: Dayjs | null, rangeType: string) => {
+  const handleRangeChange = (date: Dayjs | null, rangeType: DatePickerSelectType) => {
     if (!date) {
       dispatchDateStatus({ type: 'sync_by_value', payload: { value: [null, null] } });
       return;
@@ -692,7 +694,8 @@ const CustomNewDatePicker = ({
 
   // 결과날짜 클릭시 달력띄우기
   const handleResultClick = () => {
-    if (dropDownValue === 'range' && dateStatus.rangeDate[0] && dateStatus.rangeDate[1]) {
+    //if (dropDownValue === 'range' && dateStatus.rangeDate[0] && dateStatus.rangeDate[1]) {
+    if (dropDownValue === 'type' && dateStatus.rangeDate[0] && dateStatus.rangeDate[1]) {
       setOpen(true);
     } else {
       if (dropDownValue === 'year') {
@@ -714,12 +717,13 @@ const CustomNewDatePicker = ({
   };
 
   // 드롭다운 변경시
-  const handleOnChangeSelectedType = (sel: string) => {
+  const handleOnChangeSelectedType = (sel: DatePickerSelectType) => {
     setDropDownValue(sel); // 드롭다운 값 변경
     // 기본값 설정
     const startDate: Dayjs = settingDefaultValue(sel, null)[0];
     const endDate: Dayjs = settingDefaultValue(sel, null)[1];
-    if (startDate && endDate && sel != 'date') {
+    //if (startDate && endDate && sel != 'date') { todo
+    if (startDate && endDate) {
       dispatchDateStatus({
         type: 'sync_by_value',
         payload: { value: [dayjs(startDate), dayjs(endDate)] },
@@ -968,6 +972,7 @@ const CustomNewDatePicker = ({
                   </button>
                 </>
               ) : (
+                // 직접입력(type) 이외
                 <>
                   <DatePicker
                     value={dateStatus.selectedDate}
