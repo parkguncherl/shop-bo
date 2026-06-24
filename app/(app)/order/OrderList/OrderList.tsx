@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ColDef } from 'ag-grid-community';
 import { Search, Table, Title } from '../../../../components';
 import { useQuery } from '@tanstack/react-query';
-import { toastError } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
 import { defaultColDef, GridSetting, formatDateWithDay } from '../../../../libs/ag-grid';
 import { useAgGridApi } from '../../../../hooks';
@@ -16,7 +15,8 @@ import TunedGrid from '../../../../components/grid/TunedGrid';
 import { OrderDetailPop } from '../../../../components/popup/order/OrderDetailPop';
 import dayjs from 'dayjs';
 import CustomNewDatePicker from '../../../../components/CustomNewDatePicker';
-import { OrderMngResponseBoListItem } from '../../../../generated';
+import { ApiResponse, OrderMngResponseBoListItem } from '../../../../generated';
+import { AxiosResponse } from 'axios';
 
 type OrderFilter = {
   fromDate: string;
@@ -40,9 +40,9 @@ const OrderList = () => {
     toDate: today,
   });
 
-  const [rowData, setRowData] = useState<OrderMngResponseBoListItem[]>([]);
-  const [pinnedBottomRow, setPinnedBottomRow] = useState<any[]>([]);
-  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+  // const [boListAsOrderList, setBoListAsOrderList] = useState<OrderMngResponseBoListItem[]>([]); // todo, 추후 그리드 내에서 수정 동작이 요구되어 별도 상태 관리가 필요하지 않은 이상 불필요
+  // const [pinnedBottomRow, setPinnedBottomRow] = useState<any[]>([]); // todo 추후 그리드 bottom 내에서 수정 동작이 요구되어 별도 상태 관리가 필요하지 않은 이상 불필요
+  const [selectedOrderId, setSelectedOrderId] = useState<number | undefined>(undefined);
   const [detailOpen, setDetailOpen] = useState(false);
 
   const columnDefs: ColDef<OrderMngResponseBoListItem>[] = [
@@ -116,47 +116,68 @@ const OrderList = () => {
 
   const {
     data: orderListData,
-    isLoading,
-    isSuccess,
-    refetch,
-  } = useQuery({
+    isLoading: isOrderListDataLoading,
+    //isSuccess: isOrderListDataSuccess,
+    refetch: orderListDataRefetch,
+  } = useQuery<AxiosResponse<ApiResponse>>({
     queryKey: ['/orderMng/list', filters],
     queryFn: () => authApi.get('/orderMng/list', { params: filters }),
     enabled: !!(filters.fromDate && filters.toDate),
   });
 
-  useEffect(() => {
-    if (!isSuccess) return;
-    const { resultCode, body, resultMessage } = orderListData.data;
-    if (resultCode === 200) {
-      const rows: OrderMngResponseBoListItem[] = body ?? [];
-      setRowData(rows);
-      if (rows.length > 0) {
-        setPinnedBottomRow([
-          {
-            orderNo: `합계 (${rows.length}건)`,
-            productAmount: rows.reduce((acc, r) => acc + (r.productAmount ?? 0), 0),
-            usedPoint: rows.reduce((acc, r) => acc + (r.usedPoint ?? 0), 0),
-            paymentAmount: rows.reduce((acc, r) => acc + (r.paymentAmount ?? 0), 0),
-          },
-        ]);
-      } else {
-        setPinnedBottomRow([]);
-      }
-    } else {
-      toastError(resultMessage ?? '조회 중 오류가 발생했습니다.');
-    }
-  }, [orderListData, isSuccess]);
+  /** useQuery에 캐시된 응답 기반 메모이징 처리, useQuery의 견고한 참조 유지 메커니즘의 이점을 이용하여 함수를 통해 가공된 응답값을 렌더 사이클 독립적인 값으로 유지한다 */
+  const cachedOrderListInfo = useMemo(() => {
+    const boListAsOrderList = (orderListData?.data.body || []) as OrderMngResponseBoListItem[];
+    return {
+      rowData: [...boListAsOrderList], // 불변성 유지
+      pinnedBottomRowData:
+        boListAsOrderList.length > 0
+          ? [
+              {
+                orderNo: `합계 (${boListAsOrderList.length}건)`,
+                productAmount: boListAsOrderList.reduce((acc, r) => acc + (r.productAmount ?? 0), 0),
+                usedPoint: boListAsOrderList.reduce((acc, r) => acc + (r.usedPoint ?? 0), 0),
+                paymentAmount: boListAsOrderList.reduce((acc, r) => acc + (r.paymentAmount ?? 0), 0),
+              },
+            ]
+          : undefined,
+    };
+  }, [orderListData]);
+
+  // useEffect(() => {
+  //   if (isOrderListDataSuccess) {
+  //     const { resultCode, body, resultMessage } = orderListData.data;
+  //     if (resultCode === 200) {
+  //       const rows: OrderMngResponseBoListItem[] = body ?? [];
+  //       //setBoListAsOrderList(rows);
+  //       if (rows.length > 0) {
+  //         setPinnedBottomRow([
+  //           {
+  //             orderNo: `합계 (${rows.length}건)`,
+  //             productAmount: rows.reduce((acc, r) => acc + (r.productAmount ?? 0), 0),
+  //             usedPoint: rows.reduce((acc, r) => acc + (r.usedPoint ?? 0), 0),
+  //             paymentAmount: rows.reduce((acc, r) => acc + (r.paymentAmount ?? 0), 0),
+  //           },
+  //         ]);
+  //       } else {
+  //         setPinnedBottomRow([]);
+  //       }
+  //     } else {
+  //       toastError(resultMessage ?? '조회 중 오류가 발생했습니다.');
+  //     }
+  //   }
+  // }, [orderListData, isOrderListDataSuccess]);
 
   const reset = () => {
     onFiltersReset();
-    setRowData([]);
-    setPinnedBottomRow([]);
+
+    // setBoListAsOrderList([]);
+    // setPinnedBottomRow([]);
   };
 
   return (
     <div>
-      <Title title={menuNm ?? '주문 목록'} reset={reset} search={refetch} />
+      <Title title={menuNm ?? '주문 목록'} reset={reset} search={orderListDataRefetch} />
       <Search className={'type_1'}>
         <CustomNewDatePicker
           title={'조회기간'}
@@ -169,18 +190,19 @@ const OrderList = () => {
         />
       </Search>
       <Table>
-        <TunedGrid
+        <TunedGrid<OrderMngResponseBoListItem>
           headerHeight={35}
           onGridReady={onGridReady}
-          loading={isLoading}
-          rowData={rowData}
+          loading={isOrderListDataLoading}
+          {...cachedOrderListInfo}
+          //rowData={boListAsOrderList}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
-          pinnedBottomRowData={pinnedBottomRow}
+          //pinnedBottomRowData={pinnedBottomRow}
           rowSelection={{ mode: 'singleRow', enableClickSelection: false }}
           onRowClicked={(e) => {
             if (e.node.isRowPinned()) return;
-            setSelectedOrderId(e.data.orderId);
+            setSelectedOrderId(e.data?.orderId);
             setDetailOpen(true);
           }}
           loadingOverlayComponent={CustomGridLoading}
@@ -199,7 +221,7 @@ const OrderList = () => {
           open={detailOpen}
           onClose={() => {
             setDetailOpen(false);
-            refetch();
+            orderListDataRefetch();
           }}
         />
       )}
