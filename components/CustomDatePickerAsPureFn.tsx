@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState, useImperativeHandle, useReducer, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useImperativeHandle, useMemo } from 'react';
 import { DatePicker, Select } from 'antd';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/ko'; // 한국어 로케일 추가
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import { toastError } from './ToastMessage';
-import { useSession } from 'next-auth/react';
 import { Utils } from '../libs/utils';
+
 // 플러그인 등록
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -37,113 +37,15 @@ interface Props {
   onEnter?: () => void;
   placeholder?: string;
   required?: boolean;
-  //filters?: object;
   format?: string;
-  defaultValue?: string;
-  //onClick?: () => void;
   className?: string;
   selectType?: DatePickerSelectType;
   maxDays?: number;
   defaultType?: DatePickerSelectType;
-  //initDatePicker?: (selectedType: DatePickerSelectType, startDate: Dayjs, endDate: Dayjs) => void;
   disabled?: boolean; // 디스에이블 여부 date타입만 적용 20250326
   ref?: React.Ref<CustomNewDatePickerRefInterface>;
 
   onOpenChange?: ((open: boolean) => void) | undefined;
-}
-
-// 이하 리듀서 타입
-interface DateStatus {
-  selectedDate: Dayjs | null;
-  rangeDate: [Dayjs | null, Dayjs | null];
-  type: 'date' | 'range';
-
-  // todo action 이 아닌 State 에는 payload 를 통하여 동기화되는 값에 따라 역시 동기화되어야 하는 상태를 추가 가능
-}
-type DateStatusAction =
-  | {
-      type: 'sync_by_value';
-      payload: {
-        value: Dayjs | [Dayjs | null, Dayjs | null] | null;
-        type?: 'date' | 'range';
-      };
-    }
-  | {
-      type: 'sync_type';
-      payload: {
-        // selectedDate?: Dayjs | null;
-        // rangeDate?: [Dayjs | null, Dayjs | null];
-        type?: 'date' | 'range';
-      }; // {key: value} 꼴로 요구되는 값 전달
-    };
-
-/** 컨텐츠 요소 상태 관리 리듀서 */
-function DateStatusManagementReducerFn(state: DateStatus, action: DateStatusAction): DateStatus {
-  if (action.type == 'sync_by_value') {
-    if (state.type == 'date') {
-      if (Array.isArray(action.payload.value)) {
-        console.error('dispatch 시점에 요청한 동작에서 요구하는 데이터가 적절히 전달되지 못함');
-        return state; // default
-      }
-      // todo
-
-      if (state.selectedDate?.isSame(action.payload.value)) {
-        return state; // 동일한 경우 동기화 생략
-      }
-
-      return {
-        ...state,
-        selectedDate: action.payload.value,
-      };
-    } else if (state.type == 'range') {
-      if (!(Array.isArray(action.payload.value) && action.payload.value.length == 2)) {
-        // 배열로 전달되었으나 길이가 2가 아닌 경우
-        console.error('dispatch 시점에 요청한 동작에서 요구하는 데이터가 적절히 전달되지 못함');
-        return state; // default
-      }
-
-      // todo
-
-      // console.log(
-      //   'action.payload.value.map((date, index) => date?.isSame(state.rangeDate[index])): ',
-      //   action.payload.value.map((date, index) => date?.isSame(state.rangeDate[index])),
-      //   action.payload.value.map((date, index) => date?.isSame(state.rangeDate[index])).includes(false),
-      // );
-      if (!action.payload.value.map((date, index) => (date == null ? false : date.isSame(state.rangeDate[index]))).includes(false)) {
-        return state; // 동일한 경우 동기화 생략
-      }
-
-      if (Array.isArray(action.payload.value)) {
-        return {
-          ...state,
-          rangeDate: action.payload.value,
-        };
-      }
-
-      return {
-        ...state,
-        rangeDate: [action.payload.value as dayjs.Dayjs, action.payload.value as dayjs.Dayjs], // 앞뒤 요소를 value(동일 일자) 로 동기화
-      };
-    } else {
-      console.error('유효하지 않은 type');
-      return state; // default
-    }
-  } else if (action.type == 'sync_type') {
-    if (!(action.payload.type == 'date' || action.payload.type == 'range')) {
-      console.error('dispatch 시점에 요청한 동작에서 요구하는 데이터가 적절히 전달되지 못함');
-      return state; // default
-    }
-
-    // todo
-
-    return {
-      ...state,
-      type: action.payload.type,
-    };
-  } else {
-    console.error('유효하지 않은 action type');
-    return state; // default
-  }
 }
 
 // 이하 해당 영역에서 사용할 상수
@@ -168,35 +70,19 @@ const CustomDatePickerAsPureFn = ({
   required = false,
   //filters,
   format = 'YYYY-MM-DD (ddd)',
-  defaultValue,
-  //onClick,
   maxDays,
   selectType,
   className,
   defaultType,
-  //autoFocus = false,
-  //initDatePicker,
-  //upperComponentIsOpened,
   disabled,
   ref,
   onOpenChange,
 }: Props) => {
-  const session = useSession();
   const today = dayjs(new Date());
 
   /** 참조 */
   const datePickerRef = useRef<React.ComponentRef<typeof DatePicker>>(null);
   const isKeyboardTriggered = useRef(false); // 참인 경우 키보드로 인한 동기화 동작이 발생한 직후
-
-  // /** 이하 지역 상태는 반드시 배열의 불변성을 유지할 것 */
-  // const [dateStatus, dispatchDateStatus] = useReducer(DateStatusManagementReducerFn, {
-  //   selectedDate: null,
-  //   rangeDate: [null, null],
-  //   type: type,
-  // });
-
-  // todo 걷어내기
-  //const [tempRange, setTempRange] = useState<[Dayjs | null, Dayjs | null]>([null, null]); // RangePicker 사용 시 날짜 영역 선택 후 동기화 이전 상태를 임시로 저장하는 local state
 
   const [open, setOpen] = useState(false);
   const [dropDownValue, setDropDownValue] = useState<DatePickerSelectType>(defaultType || 'type');
@@ -238,9 +124,6 @@ const CustomDatePickerAsPureFn = ({
 
     onChange(startName, undefined);
     onChange(endName, undefined);
-    //dispatchDateStatus({ type: 'sync_by_value', payload: { value: [startDate, endDate] } });
-
-    //setTempRange([null, null]);
   };
 
   useImperativeHandle(ref, () => ({
@@ -256,17 +139,8 @@ const CustomDatePickerAsPureFn = ({
     [8, 10],
   ];
 
-  // const options2 = [
-  //   { value: 'type', label: '입력' },
-  //   { value: 'today', label: '일자' },
-  //   { value: 'week', label: '주간' },
-  //   { value: 'month', label: '월간' },
-  //   { value: 'year', label: '1년' },
-  // ].filter((option) => (selectType == defaultType ? defaultType == option.value : true)); // 한가지만 선택해야 되는경우
-
   /** selectType 인자가 주어진 경우 options 는 단일하게 고정됨 */
   const options = useMemo(
-    //() => BASE_OPTIONS.filter((option) => (selectType == defaultType ? defaultType == option.value : true)), // 한가지만 선택해야 되는경우
     () => BASE_OPTIONS.filter((option) => (selectType != undefined ? selectType == option.value : true)), // 한가지만 선택해야 되는경우
     [selectType],
   );
@@ -308,63 +182,12 @@ const CustomDatePickerAsPureFn = ({
     }
   }, [defaultType]);
 
-  // useEffect(() => {
-  //   // 외부 type 상태 변경 시 동기화
-  //   dispatchDateStatus({ type: 'sync_type', payload: { type: type || 'date' } });
-  // }, [type]);
-  //
-  // useEffect(() => {
-  //   if (dateStatus.type === 'range') {
-  //     // 'range' 타입일 때는 value가 배열 형태인지 확인
-  //     if (Array.isArray(value) && value.length === 2) {
-  //       const startDate = dayjs(value[0]);
-  //       const endDate = dayjs(value[1]);
-  //       if (startDate.isValid() && endDate.isValid()) {
-  //         dispatchDateStatus({ type: 'sync_by_value', payload: { value: [startDate, endDate] } });
-  //
-  //         setTempRange([startDate, endDate]);
-  //       } else {
-  //         dispatchDateStatus({ type: 'sync_by_value', payload: { value: [null, null] } }); // 유효하지 않으면 [null, null]
-  //       }
-  //     } else {
-  //       dispatchDateStatus({ type: 'sync_by_value', payload: { value: [null, null] } }); // value가 배열이 아니면 초기화
-  //     }
-  //   } else if (dateStatus.type === 'date') {
-  //     // value가 유효한 날짜 형식인지 체크하고 dayjs로 변환
-  //     const parsedDate = dayjs((value as string) || defaultValue);
-  //     if (parsedDate.isValid()) {
-  //       dispatchDateStatus({ type: 'sync_by_value', payload: { value: parsedDate } });
-  //     } else {
-  //       dispatchDateStatus({ type: 'sync_by_value', payload: { value: null } }); // 유효하지 않으면 null로 설정
-  //     }
-  //   }
-  // }, [value]);
-
   useEffect(() => {
     setPanelMode(dropDownValue); // 초기 dropDownValue를 panelMode에 반영
   }, [dropDownValue]);
 
-  /** 이하 둘은 리듀서 상태 변경에 따른 외부 콜백 호출 영역 */
-  // useUpdateEffect(() => {
-  //   // 오리지널은 useEffect hook 이나 최초 랜더링 시점에 불필요히 동작하여 콜백의 취지를 훼손하는걸 방지하고자 이리 처리함
-  //   if (onChange) {
-  //     onChange(name, dateStatus.selectedDate == null ? undefined : dateStatus.selectedDate.format('YYYY-MM-DD'));
-  //     isKeyboardTriggered.current = false; // 동기화(해제)
-  //   }
-  // }, [dateStatus.selectedDate]);
-  //
-  // useUpdateEffect(() => {
-  //   // 오리지널은 useEffect hook 이나 최초 랜더링 시점에 불필요히 동작하여 콜백의 취지를 훼손하는걸 방지하고자 이리 처리함
-  //   if (!dateStatus.rangeDate.includes(null) && onChange) {
-  //     if (dateStatus.rangeDate && dateStatus.rangeDate[0] && dateStatus.rangeDate[1]) {
-  //       onChange(startName, dateStatus.rangeDate[0]?.format('YYYY-MM-DD'));
-  //       onChange(endName, dateStatus.rangeDate[1]?.format('YYYY-MM-DD'));
-  //     }
-  //   }
-  // }, [dateStatus.rangeDate]);
-
   // 날짜 변경 핸들러
-  const handleOnChange = (date: Dayjs | null, _: string | null) => {
+  const handleOnDateChange = (date: Dayjs | null, _: string | null) => {
     if (!isKeyboardTriggered.current) {
       // 키보드로 인한 동기화로 인한 호출이 아닌 경우 한정으로 호출됨을 보장
       onChangeCommonHandler({ date: date });
@@ -399,8 +222,8 @@ const CustomDatePickerAsPureFn = ({
     }
   };
 
-  // 날짜 범위 계산 (주, 월, 연)
-  const handleRangeChange = (date: Dayjs | null, rangeType: DatePickerSelectType) => {
+  /** 날짜 범위 계산 (주, 월, 연) */
+  const handleOnRangeChange = (date: Dayjs | null, rangeType: DatePickerSelectType) => {
     if (!date) {
       onChangeCommonHandler({ date: [null, null] });
       return;
@@ -425,71 +248,8 @@ const CustomDatePickerAsPureFn = ({
     }
   };
 
-  const onCalendarChange = (
-    dates: [Dayjs | null, Dayjs | null],
-    _: [string, string],
-    info: {
-      range?: 'start' | 'end';
-    },
-  ) => {
-    const rangeDates = rangeDate(value);
-    if (dates && dates[0] && dates[1] && rangeDates[0] && rangeDates[1]) {
-      const fromDateValue = rangeDates[0];
-      const toDateValue = rangeDates[1];
-
-      const newBornDay = findNewDay(info.range || 'start', fromDateValue, toDateValue, dates);
-      if (!newBornDay) {
-        return;
-      }
-
-      if (Utils.isSameDay(fromDateValue, toDateValue)) {
-        const rangeDates = Utils.firstMinDay(newBornDay!, toDateValue);
-        onChangeCommonHandler({ date: rangeDates });
-      } else {
-        onChangeCommonHandler({ date: [newBornDay, newBornDay] });
-      }
-    }
-  };
-
-  const findNewDay = (range: 'start' | 'end' | undefined, targetDay: Dayjs, targetDay2: Dayjs, mainDays: [Dayjs | null, Dayjs | null]) => {
-    if (targetDay && targetDay2 && mainDays && mainDays[0] && mainDays[1]) {
-      const isDifFirstValue = Utils.isDiffDay(targetDay, mainDays[0]) && Utils.isDiffDay(targetDay2, mainDays[0]);
-      const isDifSecoundValue = Utils.isDiffDay(targetDay, mainDays[1]) && Utils.isDiffDay(targetDay2, mainDays[1]);
-
-      if (isDifSecoundValue && isDifFirstValue) {
-        if (range == 'end') {
-          return mainDays[1];
-        } else {
-          return mainDays[0];
-        }
-      }
-
-      if (Utils.isSameDay(mainDays[0], mainDays[1])) {
-        return mainDays[0];
-      }
-
-      if (isDifFirstValue) {
-        return mainDays[0];
-      }
-
-      if (isDifSecoundValue) {
-        return mainDays[1];
-      }
-
-      if (isDifSecoundValue && isDifFirstValue) {
-        if (range == 'end') {
-          return mainDays[1];
-        }
-      }
-
-      if (Utils.isSameDay(targetDay, targetDay2)) {
-        if (range == 'end') {
-          return mainDays[1];
-        }
-      }
-    }
-
-    return null;
+  const handleOnUnboundedRangeChange = (dates: [Dayjs | null, Dayjs | null] | null, _: [string, string]) => {
+    onChangeCommonHandler({ date: dates });
   };
 
   // todo tempRange 와 함께 컨펌 동작은 제거하는 걸 고려하기
@@ -552,7 +312,6 @@ const CustomDatePickerAsPureFn = ({
       const type = strPos == 0 ? 'year' : strPos == 1 ? 'month' : 'day';
       if (target === inputs[0]) {
         isKeyboardTriggered.current = true; // 동기화
-        //dispatchDateStatus({ type: 'sync_by_value', payload: { value: dayjs(firstInput).add(addAndMinus, type) } });
         onChangeCommonHandler({ date: dayjs(firstInput).add(addAndMinus, type) });
       }
 
@@ -568,7 +327,6 @@ const CustomDatePickerAsPureFn = ({
 
       setOpen(false);
       isKeyboardTriggered.current = true; // 동기화
-      //dispatchDateStatus({ type: 'sync_by_value', payload: { value: dayjs(firstInput) } });
       onChangeCommonHandler({ date: dayjs(firstInput) });
     }
   };
@@ -599,10 +357,8 @@ const CustomDatePickerAsPureFn = ({
     if (e.key == 'Delete') {
       e.preventDefault();
       if (target === inputs[0]) {
-        //dispatchDateStatus({ type: 'sync_by_value', payload: { value: [null, dateStatus.rangeDate[1]] } });
         onChangeCommonHandler({ date: [null, toDateValue] });
       } else if (target === inputs[1]) {
-        //dispatchDateStatus({ type: 'sync_by_value', payload: { value: [dateStatus.rangeDate[0], null] } });
         onChangeCommonHandler({ date: [fromDateValue, null] });
       }
       setOpen(false);
@@ -646,10 +402,8 @@ const CustomDatePickerAsPureFn = ({
       const strPos = nowPosition(selectionStart);
       const type = strPos == 0 ? 'year' : strPos == 1 ? 'month' : 'day';
       if (target === inputs[0]) {
-        //dispatchDateStatus({ type: 'sync_by_value', payload: { value: [dayjs(firstInput).add(addAndMinus, type), dayjs(secondInput)] } });
         onChangeCommonHandler({ date: [dayjs(firstInput).add(addAndMinus, type), dayjs(secondInput)] });
       } else if (target === inputs[1]) {
-        //dispatchDateStatus({ type: 'sync_by_value', payload: { value: [dayjs(firstInput), dayjs(secondInput).add(addAndMinus, type)] } });
         onChangeCommonHandler({ date: [dayjs(firstInput), dayjs(secondInput).add(addAndMinus, type)] });
       }
 
@@ -664,12 +418,10 @@ const CustomDatePickerAsPureFn = ({
       }
 
       if (Utils.isValidDate(firstInput) && Utils.isValidDate(secondInput) && firstInput.length > 8 && secondInput.length > 8) {
-        //dispatchDateStatus({ type: 'sync_by_value', payload: { value: [dayjs(firstInput), dayjs(secondInput)] } });
         onChangeCommonHandler({ date: [dayjs(firstInput), dayjs(secondInput)] });
       } else if (target === inputs[0] && firstInput.length === 8) {
         const firstDay = firstInput.substring(0, 8);
         if (Utils.isValidDate(firstDay)) {
-          //dispatchDateStatus({ type: 'sync_by_value', payload: { value: [dayjs(firstDay), dateStatus.rangeDate[1]] } });
           onChangeCommonHandler({ date: [dayjs(firstDay), toDateValue] });
 
           setTimeout(() => {
@@ -682,7 +434,6 @@ const CustomDatePickerAsPureFn = ({
       } else if (target === inputs[1] && secondInput.length === 8) {
         const secondDay = secondInput.substring(0, 8);
         if (Utils.isValidDate(secondDay)) {
-          //dispatchDateStatus({ type: 'sync_by_value', payload: { value: [dateStatus.rangeDate[0], dayjs(secondDay)] } });
           onChangeCommonHandler({ date: [fromDateValue, dayjs(secondDay)] });
           setOpen(false);
         } else {
@@ -707,7 +458,6 @@ const CustomDatePickerAsPureFn = ({
         // 하루 이동
         newDate = direction === 'prev' ? dateStatus.subtract(1, 'day') : dateStatus.add(1, 'day');
 
-        //dispatchDateStatus({ type: 'sync_by_value', payload: { value: newDate } });
         onChangeCommonHandler({ date: newDate });
         return;
       }
@@ -764,10 +514,6 @@ const CustomDatePickerAsPureFn = ({
     }
 
     // 주/월/년 이동 시 범위 상태 업데이트
-    // dispatchDateStatus({
-    //   type: 'sync_by_value',
-    //   payload: { value: [startDate, endDate] },
-    // });
     onChangeCommonHandler({ date: [startDate, endDate] });
   };
 
@@ -775,7 +521,6 @@ const CustomDatePickerAsPureFn = ({
   const handleResultClick = () => {
     const rangeDateStatus = rangeDate(value);
 
-    //if (dropDownValue === 'range' && dateStatus.rangeDate[0] && dateStatus.rangeDate[1]) {
     if (dropDownValue === 'type' && rangeDateStatus[0] && rangeDateStatus[1]) {
       setOpen(true);
     } else {
@@ -803,14 +548,8 @@ const CustomDatePickerAsPureFn = ({
     // 기본값 설정
     const startDate: Dayjs = settingDefaultValue(sel, null)[0];
     const endDate: Dayjs = settingDefaultValue(sel, null)[1];
-    //if (startDate && endDate && sel != 'date') { todo
     if (startDate && endDate) {
-      // dispatchDateStatus({
-      //   type: 'sync_by_value',
-      //   payload: { value: [dayjs(startDate), dayjs(endDate)] },
-      // });
       onChangeCommonHandler({ date: [dayjs(startDate), dayjs(endDate)] });
-      // setTempRange([dayjs(startDate), dayjs(endDate)]); // todo
     }
   };
 
@@ -830,7 +569,7 @@ const CustomDatePickerAsPureFn = ({
                     ref={datePickerRef}
                     value={!Array.isArray(value) ? dayjs(value) : undefined}
                     name={name}
-                    onChange={handleOnChange}
+                    onChange={handleOnDateChange}
                     format={format}
                     placeholder={placeholder}
                     suffixIcon={null}
@@ -877,7 +616,7 @@ const CustomDatePickerAsPureFn = ({
                 ref={datePickerRef}
                 value={selectedDate(value)}
                 name={name}
-                onChange={handleOnChange}
+                onChange={handleOnDateChange}
                 format={format}
                 onOpenChange={(isOpen) => {
                   if (onOpenChange) onOpenChange(isOpen);
@@ -975,14 +714,9 @@ const CustomDatePickerAsPureFn = ({
                     }}
                     onOpenChange={(isOpen) => {
                       if (onOpenChange) onOpenChange(isOpen);
-                      setOpen(true);
+                      setOpen(isOpen);
                     }}
-                    // renderExtraFooter={() => (
-                    //   <div className={'typeBox'}>
-                    //     <button onClick={handleConfirm}>확인</button>
-                    //   </div>
-                    // )}
-                    onCalendarChange={onCalendarChange}
+                    onChange={handleOnUnboundedRangeChange}
                     suffixIcon={null}
                     allowClear={false}
                     panelRender={(panel) => (
@@ -1059,7 +793,7 @@ const CustomDatePickerAsPureFn = ({
                   <DatePicker
                     value={selectedDate(value)}
                     name={name}
-                    onChange={(date) => handleRangeChange(date, dropDownValue)}
+                    onChange={(date) => handleOnRangeChange(date, dropDownValue)}
                     format={format}
                     picker={dropDownValue === 'week' ? 'week' : dropDownValue === 'month' ? 'month' : dropDownValue === 'year' ? 'year' : 'date'}
                     inputReadOnly
