@@ -20,7 +20,7 @@ import ImgPreviewBox, { ImgPreviewFileDet } from '../../../../components/content
 import { CustomSwitch } from '../../../../components/CustomSwitch';
 import SeasonButtonGroup from '../../../../components/SeasonButtonGroup';
 import { FileDet } from '../../../../generated';
-import CustomDatePickerAsPureFn from '../../../../components/CustomDatePickerAsPureFn';
+import CustomDatePickerAsPartiallyStateFulFn from '../../../../components/CustomDatePickerAsPartiallyStateFulFn';
 
 type ProductViewFilter = {
   fromDate: string;
@@ -255,7 +255,7 @@ const ProductView = () => {
         {/*  onChange={onChangeFilters}*/}
         {/*  value={[filters.fromDate, filters.toDate]}*/}
         {/*/>*/}
-        <CustomDatePickerAsPureFn
+        <CustomDatePickerAsPartiallyStateFulFn
           title={'조회기간'}
           type={'range'}
           startName={'fromDate'}
