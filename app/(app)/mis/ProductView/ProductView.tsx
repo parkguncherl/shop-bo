@@ -20,12 +20,12 @@ import ImgPreviewBox, { ImgPreviewFileDet } from '../../../../components/content
 import { CustomSwitch } from '../../../../components/CustomSwitch';
 import SeasonButtonGroup from '../../../../components/SeasonButtonGroup';
 import { FileDet } from '../../../../generated';
+import CustomDatePickerAsPureFn from '../../../../components/CustomDatePickerAsPureFn';
 
 type ProductViewFilter = {
   fromDate: string;
   toDate: string;
 };
-
 
 type ProductViewItem = {
   prodId: number;
@@ -155,7 +155,7 @@ const ProductView = () => {
       maxWidth: 130,
       cellStyle: GridSetting.CellStyle.RIGHT,
       suppressHeaderMenuButton: true,
-      valueFormatter: (p) => p.value != null ? p.value.toLocaleString() + '원' : '0원',
+      valueFormatter: (p) => (p.value != null ? p.value.toLocaleString() + '원' : '0원'),
     },
     {
       field: 'purchaseCnt',
@@ -247,7 +247,15 @@ const ProductView = () => {
     <div className="imgPopBox">
       <Title title={menuNm ?? 'MIS 상품 분석'} reset={reset} search={refetch} />
       <Search className={'type_1'}>
-        <CustomNewDatePicker
+        {/*<CustomNewDatePicker*/}
+        {/*  title={'조회기간'}*/}
+        {/*  type={'range'}*/}
+        {/*  startName={'fromDate'}*/}
+        {/*  endName={'toDate'}*/}
+        {/*  onChange={onChangeFilters}*/}
+        {/*  value={[filters.fromDate, filters.toDate]}*/}
+        {/*/>*/}
+        <CustomDatePickerAsPureFn
           title={'조회기간'}
           type={'range'}
           startName={'fromDate'}
@@ -258,11 +266,13 @@ const ProductView = () => {
         <dl>
           <dd>
             <div className="formBox">
-              {([
-                { label: '1주일', days: 7 },
-                { label: '2주일', days: 14 },
-                { label: '1개월', days: 30 },
-              ] as const).map((item, i, arr) => (
+              {(
+                [
+                  { label: '1주일', days: 7 },
+                  { label: '2주일', days: 14 },
+                  { label: '1개월', days: 30 },
+                ] as const
+              ).map((item, i, arr) => (
                 <button
                   key={item.label}
                   type="button"
