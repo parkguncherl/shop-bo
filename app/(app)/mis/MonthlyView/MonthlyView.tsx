@@ -239,10 +239,7 @@ const MonthlyView = () => {
           const period = params[0].axisValue;
           return params
             .map((p) => {
-              const val =
-                p.seriesName === '총구매금액'
-                  ? p.value.toLocaleString() + '원'
-                  : p.value.toLocaleString() + '건';
+              const val = p.seriesName === '총구매금액' ? p.value.toLocaleString() + '원' : p.value.toLocaleString() + '건';
               return `${p.marker}${p.seriesName}: <b>${val}</b>`;
             })
             .join('<br/>')
@@ -271,8 +268,7 @@ const MonthlyView = () => {
           name: '총구매금액',
           nameTextStyle: { fontSize: 11 },
           axisLabel: {
-            formatter: (v: number) =>
-              v >= 10000 ? Math.floor(v / 10000) + '만' : v.toLocaleString(),
+            formatter: (v: number) => (v >= 10000 ? Math.floor(v / 10000) + '만' : v.toLocaleString()),
           },
         },
       ],
@@ -287,10 +283,7 @@ const MonthlyView = () => {
             show: true,
             position: 'top',
             fontSize: 10,
-            formatter: (p: any) =>
-              p.value >= 10000
-                ? Math.floor(p.value / 10000) + '만'
-                : p.value.toLocaleString(),
+            formatter: (p: any) => (p.value >= 10000 ? Math.floor(p.value / 10000) + '만' : p.value.toLocaleString()),
           },
         },
         {
@@ -311,10 +304,9 @@ const MonthlyView = () => {
   const periodLabel = filters.viewType === 'monthly' ? '월' : '주차';
 
   return (
-    <div className="imgPopBox">
+    <div>
       <Title title={menuNm ?? 'MIS 판매 실적'} reset={reset} search={refetch} />
       <Search className={'type_1'}>
-        {/* 월별/주차별 콤보 */}
         <dl>
           <dt>조회 유형</dt>
           <dd>
@@ -357,92 +349,65 @@ const MonthlyView = () => {
         />
       </Search>
 
-      <div style={{ display: 'flex', gap: 16, padding: '0 16px 16px', alignItems: 'flex-start' }}>
-        {/* 왼쪽: 실적 그리드 (상단) + 상세 그리드 (하단) */}
-        <div style={{ flex: '0 0 auto', width: 440, display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {/* 상단: 실적 요약 */}
-          <div>
-            <p style={{ margin: '0 0 6px 2px', fontSize: 13, fontWeight: 600, color: '#333' }}>
-              {periodLabel}별 판매 실적
-              {selectedPeriod && (
-                <span style={{ marginLeft: 8, fontWeight: 400, color: '#888', fontSize: 12 }}>
-                  (클릭한 행: {selectedPeriod})
-                </span>
-              )}
-            </p>
-            <TunedGrid
-              headerHeight={35}
-              onGridReady={onTopGridReady}
-              loading={isStatLoading}
-              rowData={statData}
-              columnDefs={statColumnDefs}
-              defaultColDef={defaultColDef}
-              rowSelection={{ mode: 'singleRow', enableClickSelection: true }}
-              onRowClicked={onStatRowClicked}
-              loadingOverlayComponent={CustomGridLoading}
-              noRowsOverlayComponent={CustomNoRowsOverlay}
-              className={'default'}
-              domLayout={'autoHeight'}
-            />
-          </div>
-
-          {/* 하단: 상품 상세 (ProductView 동일 컬럼) */}
-          <div>
-            <p style={{ margin: '0 0 6px 2px', fontSize: 13, fontWeight: 600, color: '#333' }}>
-              상품별 상세 실적
-              {selectedPeriod
-                ? ` — ${selectedPeriod}`
-                : (
-                  <span style={{ fontWeight: 400, color: '#aaa', fontSize: 12, marginLeft: 6 }}>
-                    위 표에서 행을 클릭하세요
-                  </span>
-                )}
-            </p>
-            <TunedGrid
-              headerHeight={35}
-              onGridReady={onBottomGridReady}
-              loading={isDetailLoading}
-              rowData={detailData}
-              columnDefs={detailColumnDefs}
-              defaultColDef={defaultColDef}
-              loadingOverlayComponent={CustomGridLoading}
-              noRowsOverlayComponent={CustomNoRowsOverlay}
-              className={'default'}
-              domLayout={'autoHeight'}
-            />
-          </div>
+      <div className="layoutBox">
+        {/* 1열: 기간별 실적 요약 */}
+        <div className="layout30">
+          <p style={{ margin: '0 0 6px 2px', fontSize: 13, fontWeight: 600, color: '#333' }}>
+            {periodLabel}별 판매 실적
+            {selectedPeriod && <span style={{ marginLeft: 8, fontWeight: 400, color: '#888', fontSize: 12 }}>({selectedPeriod})</span>}
+          </p>
+          <TunedGrid
+            headerHeight={35}
+            onGridReady={onTopGridReady}
+            loading={isStatLoading}
+            rowData={statData}
+            columnDefs={statColumnDefs}
+            defaultColDef={defaultColDef}
+            rowSelection={{ mode: 'singleRow', enableClickSelection: true }}
+            onRowClicked={onStatRowClicked}
+            loadingOverlayComponent={CustomGridLoading}
+            noRowsOverlayComponent={CustomNoRowsOverlay}
+            className={'default'}
+            domLayout={'autoHeight'}
+          />
         </div>
 
-        {/* 오른쪽: 차트 */}
-        <div
-          style={{
-            flex: 1,
-            minWidth: 0,
-            border: '1px solid #e8e8e8',
-            borderRadius: 4,
-            background: '#fff',
-            padding: '12px 8px',
-          }}
-        >
-          <p style={{ margin: '0 0 8px 8px', fontSize: 13, fontWeight: 600, color: '#333' }}>
-            {periodLabel}별 판매 실적 차트
+        {/* 2열: 상품별 상세 실적 */}
+        <div className="layout30">
+          <p style={{ margin: '0 0 6px 2px', fontSize: 13, fontWeight: 600, color: '#333' }}>
+            상품별 상세 실적
+            {selectedPeriod ? (
+              <span style={{ marginLeft: 6, fontWeight: 400, color: '#555', fontSize: 12 }}>— {selectedPeriod}</span>
+            ) : (
+              <span style={{ fontWeight: 400, color: '#aaa', fontSize: 12, marginLeft: 6 }}>행을 클릭하세요</span>
+            )}
           </p>
-          {statData.length > 0 ? (
-            <ReactECharts option={chartOption} style={{ height: 500 }} />
-          ) : (
-            <div
-              style={{
-                height: 500,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#aaa',
-                fontSize: 13,
-              }}
-            >
-              데이터가 없습니다.
-            </div>
-          )}
+          <TunedGrid
+            headerHeight={35}
+            onGridReady={onBottomGridReady}
+            loading={isDetailLoading}
+            rowData={detailData}
+            columnDefs={detailColumnDefs}
+            defaultColDef={defaultColDef}
+            loadingOverlayComponent={CustomGridLoading}
+            noRowsOverlayComponent={CustomNoRowsOverlay}
+            className={'default'}
+            domLayout={'autoHeight'}
+          />
+        </div>
+
+        {/* 3열: 차트 */}
+        <div className="layout40">
+          <p style={{ margin: '0 0 6px 2px', fontSize: 13, fontWeight: 600, color: '#333' }}>{periodLabel}별 판매 실적 차트</p>
+          <div style={{ border: '1px solid #e8e8e8', borderRadius: 4, background: '#fff', padding: '8px' }}>
+            {statData.length > 0 ? (
+              <ReactECharts option={chartOption} style={{ height: 460 }} />
+            ) : (
+              <div style={{ height: 460, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaa', fontSize: 13 }}>
+                데이터가 없습니다.
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
