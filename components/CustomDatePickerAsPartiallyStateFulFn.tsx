@@ -6,6 +6,7 @@ import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import { toastError } from './ToastMessage';
 import { Utils } from '../libs/utils';
+import weekday from 'dayjs/plugin/weekday';
 
 // 플러그인 등록
 dayjs.extend(utc);
@@ -14,9 +15,6 @@ dayjs.extend(timezone);
 dayjs.tz.setDefault('Asia/Seoul');
 dayjs.extend(weekday); // weekday 플러그인 확장
 dayjs.locale('ko'); // 기본 한국어 로케일 사용
-
-import weekday from 'dayjs/plugin/weekday';
-import useUpdateEffect from '../customHook/useUpdateEffect'; // week 시작일 설정
 
 export type DatePickerSelectType = 'today' | 'week' | 'month' | 'year' | 'decade' | 'type';
 
@@ -57,7 +55,7 @@ const BASE_OPTIONS: { value: DatePickerSelectType; label: string }[] = [
   { value: 'year', label: '1년' },
 ];
 
-const CustomDatePickerAsPureFn = ({
+const CustomDatePickerAsPartiallyStateFulFn = ({
   title,
   startName,
   endName,
@@ -85,8 +83,10 @@ const CustomDatePickerAsPureFn = ({
   const isKeyboardTriggered = useRef(false); // 참인 경우 키보드로 인한 동기화 동작이 발생한 직후
 
   const [open, setOpen] = useState(false);
-  const [dropDownValue, setDropDownValue] = useState<DatePickerSelectType>(defaultType || 'type');
-  const [panelMode, setPanelMode] = useState(dropDownValue);
+  //const [dropDownValue, setDropDownValue] = useState<DatePickerSelectType>(defaultType || 'type');
+  //const [panelMode, setPanelMode] = useState(dropDownValue);
+
+  const [dateSelectType, setDateSelectType] = useState<DatePickerSelectType>(defaultType || 'type');
 
   const selectedDate = (value: null | string | [string | null, string | null]): Dayjs | null => {
     if (type === 'date') {
@@ -118,9 +118,10 @@ const CustomDatePickerAsPureFn = ({
     return [null, null];
   };
 
-  const handleInitDatePicker = (type: DatePickerSelectType, startDate: Dayjs, endDate: Dayjs) => {
+  const handleInitDatePicker = (type: DatePickerSelectType, _: Dayjs, __: Dayjs) => {
     setOpen(false);
-    setDropDownValue(type);
+    //setDropDownValue(type);
+    setDateSelectType(type);
 
     onChange(startName, undefined);
     onChange(endName, undefined);
@@ -178,13 +179,14 @@ const CustomDatePickerAsPureFn = ({
   useEffect(() => {
     setOpen(false);
     if (defaultType) {
-      setDropDownValue(defaultType);
+      //setDropDownValue(defaultType);
+      setDateSelectType(defaultType);
     }
   }, [defaultType]);
 
-  useEffect(() => {
-    setPanelMode(dropDownValue); // 초기 dropDownValue를 panelMode에 반영
-  }, [dropDownValue]);
+  // useEffect(() => {
+  //   setPanelMode(dropDownValue); // 초기 dropDownValue를 panelMode에 반영
+  // }, [dropDownValue]);
 
   // 날짜 변경 핸들러
   const handleOnDateChange = (date: Dayjs | null, _: string | null) => {
@@ -251,13 +253,6 @@ const CustomDatePickerAsPureFn = ({
   const handleOnUnboundedRangeChange = (dates: [Dayjs | null, Dayjs | null] | null, _: [string, string]) => {
     onChangeCommonHandler({ date: dates });
   };
-
-  // todo tempRange 와 함께 컨펌 동작은 제거하는 걸 고려하기
-  // const handleConfirm = () => {
-  //   onChangeCommonHandler(tempRange); // tempRange 값으로 dispatch
-  //
-  //   setOpen(false);
-  // };
 
   const nowPosition = (inPositon: number) => {
     for (let i = 0; i < daySelectArray.length; i++) {
@@ -519,32 +514,35 @@ const CustomDatePickerAsPureFn = ({
 
   // 결과날짜 클릭시 달력띄우기
   const handleResultClick = () => {
-    const rangeDateStatus = rangeDate(value);
+    setOpen(true);
 
-    if (dropDownValue === 'type' && rangeDateStatus[0] && rangeDateStatus[1]) {
-      setOpen(true);
-    } else {
-      if (dropDownValue === 'year') {
-        setPanelMode('year');
-      } else if (dropDownValue === 'month') {
-        setPanelMode('month');
-      } else if (dropDownValue === 'week') {
-        setPanelMode('week');
-      } else if (dropDownValue === 'today') {
-        setPanelMode('today');
-      } else if (dropDownValue === 'decade') {
-        setPanelMode('decade');
-      }
-
-      setTimeout(() => {
-        setOpen(true);
-      }, 100);
-    }
+    // const rangeDateStatus = rangeDate(value);
+    //
+    // if (dropDownValue === 'type' && rangeDateStatus[0] && rangeDateStatus[1]) {
+    //   setOpen(true);
+    // } else {
+    //   if (dropDownValue === 'year') {
+    //     setPanelMode('year');
+    //   } else if (dropDownValue === 'month') {
+    //     setPanelMode('month');
+    //   } else if (dropDownValue === 'week') {
+    //     setPanelMode('week');
+    //   } else if (dropDownValue === 'today') {
+    //     setPanelMode('today');
+    //   } else if (dropDownValue === 'decade') {
+    //     setPanelMode('decade');
+    //   }
+    //
+    //   setTimeout(() => {
+    //     setOpen(true);
+    //   }, 100);
+    // }
   };
 
   // 드롭다운 변경시
   const handleOnChangeSelectedType = (sel: DatePickerSelectType) => {
-    setDropDownValue(sel); // 드롭다운 값 변경
+    //setDropDownValue(sel); // 드롭다운 값 변경
+    setDateSelectType(sel); // 드롭다운 값 변경
     // 기본값 설정
     const startDate: Dayjs = settingDefaultValue(sel, null)[0];
     const endDate: Dayjs = settingDefaultValue(sel, null)[1];
@@ -668,7 +666,7 @@ const CustomDatePickerAsPureFn = ({
           ) : (
             <dt>
               <Select
-                value={dropDownValue}
+                value={dateSelectType}
                 onChange={handleOnChangeSelectedType}
                 variant="borderless"
                 classNames={{
@@ -686,8 +684,8 @@ const CustomDatePickerAsPureFn = ({
             </dt>
           )}
           <dd>
-            <div className={`formBox ${dropDownValue === 'type' ? 'type' : ''} border`}>
-              {dropDownValue === 'type' ? (
+            <div className={`formBox ${dateSelectType === 'type' ? 'type' : ''} border`}>
+              {dateSelectType === 'type' ? (
                 // "직접입력" 선택 시 범위 선택기 사용
                 <>
                   <DatePicker.RangePicker
@@ -701,7 +699,6 @@ const CustomDatePickerAsPureFn = ({
                         if (e.target instanceof HTMLInputElement) {
                           const input: HTMLInputElement = e.target;
                           const selectionStart = input.selectionStart || 0;
-                          console.log('park input selectionStart', selectionStart, input);
                           if (0 <= selectionStart && selectionStart <= 4) {
                             moveSelection(0, input);
                           } else if (5 <= selectionStart && selectionStart <= 7) {
@@ -793,9 +790,9 @@ const CustomDatePickerAsPureFn = ({
                   <DatePicker
                     value={selectedDate(value)}
                     name={name}
-                    onChange={(date) => handleOnRangeChange(date, dropDownValue)}
+                    onChange={(date) => handleOnRangeChange(date, dateSelectType)}
                     format={format}
-                    picker={dropDownValue === 'week' ? 'week' : dropDownValue === 'month' ? 'month' : dropDownValue === 'year' ? 'year' : 'date'}
+                    picker={dateSelectType === 'week' ? 'week' : dateSelectType === 'month' ? 'month' : dateSelectType === 'year' ? 'year' : 'date'}
                     inputReadOnly
                     open={open}
                     onOpenChange={(isOpen) => {
@@ -806,9 +803,9 @@ const CustomDatePickerAsPureFn = ({
                     needConfirm
                     suffixIcon={null}
                     allowClear={false}
-                    onPanelChange={(date, mode) => {
-                      setPanelMode(mode); // 현재 패널 모드를 업데이트
-                    }}
+                    // onPanelChange={(date, mode) => {
+                    //   setPanelMode(mode); // 현재 패널 모드를 업데이트
+                    // }}
                     cellRender={(currentValue) => {
                       const current = dayjs(currentValue);
                       const now = dayjs();
@@ -816,7 +813,7 @@ const CustomDatePickerAsPureFn = ({
                       let isToday: boolean;
                       let displayText: string;
 
-                      switch (panelMode) {
+                      switch (dateSelectType) {
                         case 'decade': {
                           const startDecade = Math.floor(current.year() / 10) * 10;
                           const endDecade = startDecade + 9;
@@ -843,7 +840,7 @@ const CustomDatePickerAsPureFn = ({
                       }
 
                       return (
-                        <div className={`ant-picker-cell-inner ${isToday ? 'ant-picker-cell-today' : ''} ${panelMode === 'decade' ? 'decade' : ''}`}>
+                        <div className={`ant-picker-cell-inner ${isToday ? 'ant-picker-cell-today' : ''} ${dateSelectType === 'decade' ? 'decade' : ''}`}>
                           {displayText}
                         </div>
                       );
@@ -851,7 +848,7 @@ const CustomDatePickerAsPureFn = ({
                   />
                   {rangeDate(value)[0] && rangeDate(value)[1] ? (
                     <>
-                      {panelMode === 'today' ? (
+                      {dateSelectType === 'today' ? (
                         <span className={'resultDate'} onClick={handleResultClick}>
                           <span>{(rangeDate(value) as [Dayjs, Dayjs])[0].format(format)}</span>
                         </span>
@@ -870,7 +867,7 @@ const CustomDatePickerAsPureFn = ({
                   <button
                     className={'left'}
                     onClick={() => {
-                      handleClickPrevNext(dropDownValue, 'prev');
+                      handleClickPrevNext(dateSelectType, 'prev');
                     }}
                   >
                     왼쪽
@@ -878,7 +875,7 @@ const CustomDatePickerAsPureFn = ({
                   <button
                     className={'right'}
                     onClick={() => {
-                      handleClickPrevNext(dropDownValue, 'next');
+                      handleClickPrevNext(dateSelectType, 'next');
                     }}
                   >
                     오른쪽
@@ -892,4 +889,4 @@ const CustomDatePickerAsPureFn = ({
     </div>
   );
 };
-export default CustomDatePickerAsPureFn;
+export default CustomDatePickerAsPartiallyStateFulFn;
