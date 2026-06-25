@@ -25,10 +25,6 @@ type OrderFilter = {
 
 const today = dayjs().format('YYYY-MM-DD');
 
-const formatWon = (params: any) => {
-  if (params.value == null) return '-';
-  return Number(params.value).toLocaleString() + '원';
-};
 
 /** BO 주문 목록 */
 const OrderList = () => {
@@ -94,7 +90,7 @@ const OrderList = () => {
       minWidth: 120,
       cellStyle: GridSetting.CellStyle.RIGHT,
       suppressHeaderMenuButton: true,
-      valueFormatter: formatWon,
+      cellRenderer: 'NUMBER_COMMA',
     },
     {
       field: 'usedPoint',
@@ -102,7 +98,7 @@ const OrderList = () => {
       minWidth: 110,
       cellStyle: GridSetting.CellStyle.RIGHT,
       suppressHeaderMenuButton: true,
-      valueFormatter: formatWon,
+      cellRenderer: 'NUMBER_COMMA',
     },
     {
       field: 'paymentAmount',
@@ -110,7 +106,7 @@ const OrderList = () => {
       minWidth: 120,
       cellStyle: GridSetting.CellStyle.RIGHT,
       suppressHeaderMenuButton: true,
-      valueFormatter: formatWon,
+      cellRenderer: 'NUMBER_COMMA',
     },
   ];
 

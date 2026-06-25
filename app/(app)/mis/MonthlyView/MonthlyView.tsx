@@ -127,8 +127,8 @@ const MonthlyView = () => {
   const statColumnDefs: ColDef<SalesStatItem>[] = [
     {
       headerName: 'no',
-      minWidth: 55,
-      maxWidth: 55,
+      minWidth: 37,
+      maxWidth: 37,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
       valueGetter: (params) => (params.node?.rowIndex != null ? params.node.rowIndex + 1 : ''),
@@ -136,23 +136,25 @@ const MonthlyView = () => {
     {
       field: 'period',
       headerName: filters.viewType === 'monthly' ? '월' : '주차',
-      minWidth: 110,
+      minWidth: 75,
+      maxWidth: 75,
       suppressHeaderMenuButton: true,
       cellStyle: GridSetting.CellStyle.CENTER,
     },
     {
       field: 'totalPaymentAmt',
-      headerName: '총구매금액',
-      minWidth: 120,
+      headerName: '금액',
+      minWidth: 70,
+      maxWidth: 70,
       cellStyle: GridSetting.CellStyle.RIGHT,
       suppressHeaderMenuButton: true,
-      valueFormatter: (p) => (p.value != null ? p.value.toLocaleString() + '원' : '0원'),
+      cellRenderer: 'NUMBER_COMMA',
     },
     {
       field: 'purchaseCnt',
-      headerName: '구매건수',
-      minWidth: 90,
-      maxWidth: 100,
+      headerName: '건수',
+      minWidth: 50,
+      maxWidth: 50,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
     },
@@ -162,8 +164,8 @@ const MonthlyView = () => {
   const detailColumnDefs: ColDef<ProductViewItem>[] = [
     {
       headerName: 'no',
-      minWidth: 55,
-      maxWidth: 55,
+      minWidth: 37,
+      maxWidth: 37,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
       valueGetter: (params) => (params.node?.rowIndex != null ? params.node.rowIndex + 1 : ''),
@@ -172,46 +174,47 @@ const MonthlyView = () => {
       field: 'prodNm',
       headerName: '상품명',
       minWidth: 160,
+      maxWidth: 160,
       suppressHeaderMenuButton: true,
     },
     {
       field: 'totalPaymentAmt',
-      headerName: '총구매금액',
-      minWidth: 110,
-      maxWidth: 130,
+      headerName: '금액',
+      minWidth: 60,
+      maxWidth: 60,
       cellStyle: GridSetting.CellStyle.RIGHT,
       suppressHeaderMenuButton: true,
-      valueFormatter: (p) => (p.value != null ? p.value.toLocaleString() + '원' : '0원'),
+      cellRenderer: 'NUMBER_COMMA',
     },
     {
       field: 'purchaseCnt',
-      headerName: '구매건수',
-      minWidth: 90,
-      maxWidth: 100,
+      headerName: '건수',
+      minWidth: 50,
+      maxWidth: 50,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
     },
     {
       field: 'cartCnt',
       headerName: '장바구니',
-      minWidth: 90,
-      maxWidth: 100,
+      minWidth: 60,
+      maxWidth: 60,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
     },
     {
       field: 'pageViewCnt',
       headerName: '페이지뷰',
-      minWidth: 90,
-      maxWidth: 100,
+      minWidth: 60,
+      maxWidth: 60,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
     },
     {
       field: 'totalScore',
       headerName: '총점',
-      minWidth: 80,
-      maxWidth: 90,
+      minWidth: 60,
+      maxWidth: 60,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
     },
@@ -351,7 +354,7 @@ const MonthlyView = () => {
 
       <div className="layoutBox">
         {/* 1열: 기간별 실적 요약 */}
-        <div className="layout30">
+        <div className="layout20">
           <p style={{ margin: '0 0 6px 2px', fontSize: 13, fontWeight: 600, color: '#333' }}>
             {periodLabel}별 판매 실적
             {selectedPeriod && <span style={{ marginLeft: 8, fontWeight: 400, color: '#888', fontSize: 12 }}>({selectedPeriod})</span>}
@@ -373,11 +376,11 @@ const MonthlyView = () => {
         </div>
 
         {/* 2열: 상품별 상세 실적 */}
-        <div className="layout30">
+        <div className="layout40">
           <p style={{ margin: '0 0 6px 2px', fontSize: 13, fontWeight: 600, color: '#333' }}>
             상품별 상세 실적
             {selectedPeriod ? (
-              <span style={{ marginLeft: 6, fontWeight: 400, color: '#555', fontSize: 12 }}>— {selectedPeriod}</span>
+              <span style={{ marginLeft: 6, fontWeight: 400, color: '#555', fontSize: 12 }}> {selectedPeriod}</span>
             ) : (
               <span style={{ fontWeight: 400, color: '#aaa', fontSize: 12, marginLeft: 6 }}>행을 클릭하세요</span>
             )}
