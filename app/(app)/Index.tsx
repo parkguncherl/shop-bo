@@ -27,7 +27,9 @@ type DailySalesStat = {
   todayPaymentAmt: number;
   yesterdayPurchaseCnt: number;
   yesterdayPaymentAmt: number;
+  todayCancelCnt: number;
   todayCancelAmt: number;
+  yesterdayCancelCnt: number;
   yesterdayCancelAmt: number;
 };
 
@@ -51,7 +53,9 @@ const Dashboard = () => {
     todayPaymentAmt: 0,
     yesterdayPurchaseCnt: 0,
     yesterdayPaymentAmt: 0,
+    todayCancelCnt: 0,
     todayCancelAmt: 0,
+    yesterdayCancelCnt: 0,
     yesterdayCancelAmt: 0,
   };
 
@@ -211,7 +215,7 @@ const Dashboard = () => {
         <div style={{ display: 'flex', gap: 12 }}>
           {/* 금일 판매 */}
           <div style={{ ...cardStyle, borderLeft: '3px solid #5b8ff9' }}>
-            <div style={cardLabel}>금일 총판매량 / 금액</div>
+            <div style={cardLabel}>오늘 총판매량 / 금액</div>
             <div style={cardValue}>
               <span style={{ color: '#5b8ff9' }}>{daily.todayPurchaseCnt.toLocaleString()}</span>
               <span style={cardUnit}>건</span>
@@ -222,7 +226,7 @@ const Dashboard = () => {
           </div>
           {/* 어제 판매 */}
           <div style={cardStyle}>
-            <div style={cardLabel}>어제 총판매량 / 금액</div>
+            <div style={cardLabel}>어제 판매량 / 금액</div>
             <div style={cardValue}>
               <span style={{ color: '#5b8ff9' }}>{daily.yesterdayPurchaseCnt.toLocaleString()}</span>
               <span style={cardUnit}>건</span>
@@ -233,16 +237,22 @@ const Dashboard = () => {
           </div>
           {/* 금일 취소 */}
           <div style={{ ...cardStyle, borderLeft: '3px solid #f56c6c' }}>
-            <div style={cardLabel}>금일 취소금액</div>
+            <div style={cardLabel}>금일 취소량 / 금액</div>
             <div style={cardValue}>
+              <span style={{ color: '#f56c6c' }}>{daily.todayCancelCnt.toLocaleString()}</span>
+              <span style={cardUnit}>건</span>
+              <span style={{ color: '#aaa', margin: '0 6px' }}>/</span>
               <span style={{ color: '#f56c6c' }}>{fmt(daily.todayCancelAmt)}</span>
               <span style={cardUnit}>원</span>
             </div>
           </div>
           {/* 어제 취소 */}
           <div style={{ ...cardStyle, borderLeft: '3px solid #f0a0a0' }}>
-            <div style={cardLabel}>어제 취소금액</div>
+            <div style={cardLabel}>어제 취소량 / 금액</div>
             <div style={cardValue}>
+              <span style={{ color: '#f56c6c' }}>{daily.yesterdayCancelCnt.toLocaleString()}</span>
+              <span style={cardUnit}>건</span>
+              <span style={{ color: '#aaa', margin: '0 6px' }}>/</span>
               <span style={{ color: '#f56c6c' }}>{fmt(daily.yesterdayCancelAmt)}</span>
               <span style={cardUnit}>원</span>
             </div>
