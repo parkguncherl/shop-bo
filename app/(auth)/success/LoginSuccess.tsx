@@ -54,7 +54,7 @@ const LoginSuccess = () => {
       localStorage.setItem(LOCAL_STORAGE_WMS_HISTORY, JSON.stringify(favHistoryList));
     }
 
-    router.push('/product/productMng'); // 리다이렉트
+    router.push('/'); // 리다이렉트
   };
 
   const processAfterFailure = async () => {
