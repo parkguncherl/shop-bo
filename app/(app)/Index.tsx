@@ -205,7 +205,7 @@ const Dashboard = () => {
     <div style={{ padding: '20px 24px', background: '#f5f6fa', minHeight: '100%' }}>
       {/* ── 상단: 인사 + 현황 카드 ── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#222' }}>{session?.data?.user.userNm ?? ''} 님 안녕하세요</h2>
+        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#222', whiteSpace: 'nowrap', flexShrink: 0 }}>{session?.data?.user.userNm ?? ''} 님 안녕하세요</h2>
 
         <div style={{ display: 'flex', gap: 12 }}>
           {/* 어제 판매 */}
