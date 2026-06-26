@@ -3,14 +3,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Search, Table, Title } from '../../../../components';
 import { Pagination, TableHeader, toastError } from '../../../../components';
-import { ContactControllerApiSelectContactPagingRequest, ContactResponsePaging } from '../../../../generated';
+import { ContactResponsePaging } from '../../../../generated';
 import { ColDef, ColGroupDef, RowDoubleClickedEvent } from 'ag-grid-community';
 import { useQuery } from '@tanstack/react-query';
 import { useCommonStore, useContactState } from '../../../../stores';
 import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
 import { AccessLogDeatilPop } from '../../../../components/popup/system/accessLog';
 import useFilters from '../../../../hooks/useFilters';
-import { DefaultOptions, Placeholder } from '../../../../libs/const';
+import { Placeholder } from '../../../../libs/const';
 import { authApi } from '../../../../libs';
 import TunedGrid, { TunedGridRef } from '../../../../components/grid/TunedGrid';
 import CustomGridLoading from '../../../../components/CustomGridLoading';
@@ -33,12 +33,19 @@ const AccessLog = () => {
   ]);
 
   /** 필터 */
-  const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<ContactControllerApiSelectContactPagingRequest>({});
+  const [filters, onChangeFilters, onFiltersReset] = useFilters({
+    loginId: undefined,
+    userNm: undefined,
+    uriNm: undefined,
+    uri: undefined,
+    tranType: undefined,
+    partnerId: undefined,
+  });
 
   /** 초기화 버튼 클릭 시 */
-  const reset = async () => {
-    await onFiltersReset();
-    await setPaging({
+  const reset = () => {
+    onFiltersReset();
+    setPaging({
       curPage: 1,
     });
   };
@@ -94,10 +101,10 @@ const AccessLog = () => {
   const {
     data: response,
     isSuccess: isAccessLogSuccess,
-    isLoading,
+    //isLoading,
     refetch: accessLogRefetch,
   } = useQuery({
-    queryKey: ['/contact/paging', paging.curPage],
+    queryKey: ['/contact/paging', paging.curPage, filters.tranType],
     queryFn: () =>
       authApi.get('/contact/paging', {
         params: {
@@ -120,11 +127,8 @@ const AccessLog = () => {
     }
   }, [response, isAccessLogSuccess, setPaging]);
 
-  const onEnter = async () => {
-    setPaging({
-      curPage: 1,
-    });
-    await onSearch();
+  const onEnter = () => {
+    onSearch();
   };
 
   useEffect(() => {
@@ -137,35 +141,27 @@ const AccessLog = () => {
   }, []);
 
   /** 검색 버튼 클릭 시 */
-  const search = async () => {
-    await onSearch();
+  const search = () => {
+    onSearch();
   };
 
-  const onSearch = async () => {
-    await accessLogRefetch();
+  const onSearch = () => {
+    setPaging({
+      curPage: 1,
+    });
+    accessLogRefetch();
+  };
+
+  const onReset = () => {
+    reset();
+    setPaging({
+      curPage: 1,
+    });
   };
 
   return (
     <div>
-      <Title
-        title={upMenuNm && menuNm ? `${menuNm}` : ''}
-        reset={async () => {
-          await reset();
-          setPaging({
-            curPage: 1,
-          });
-          //await refetch();
-          await onSearch();
-        }}
-        search={async () => {
-          setPaging({
-            curPage: 1,
-          });
-          //await refetch();
-          await onSearch();
-        }}
-        filters={filters}
-      />
+      <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} reset={onReset} search={onSearch} filters={filters} />
       <Search className={'type_4'}>
         <Search.Input
           title={'ID(e-mail)'}
@@ -177,7 +173,7 @@ const AccessLog = () => {
           filters={filters}
         />
         <Search.Input
-          title={'이름'}
+          title={'사용자명'}
           name={'userNm'}
           placeholder={Placeholder.Default}
           value={filters.userNm}
@@ -188,7 +184,8 @@ const AccessLog = () => {
         <Search.DropDown
           title={'종류'}
           name={'tranType'}
-          defaultOptions={[...DefaultOptions.Select]}
+          //defaultOptions={[...DefaultOptions.Select]}
+          // codeUpper={'50050'} // todo 백앤드 페이징 조회 영역에서는 분명히 50050 으로 명시되어 있으나 code 테이블 조회에서는 조회되지 아니함, 추후 적절한 상위코드 할당 후 역시 정의할 시 수정할 것
           enumName={'TranType'}
           value={filters.tranType || ''}
           onChange={onChangeFilters}
@@ -202,25 +199,32 @@ const AccessLog = () => {
           onEnter={onEnter}
           filters={filters}
         />
+        <Search.Input
+          title={'uri'}
+          name={'uri'}
+          placeholder={'특정 uri를 통한 접속이력 검색...'}
+          value={filters.uri}
+          onChange={onChangeFilters}
+          onEnter={onEnter}
+          filters={filters}
+        />
       </Search>
       <Table>
         <TableHeader count={paging.totalRowCount || 0} paging={paging} setPaging={setPaging} search={search}></TableHeader>
-        <div className={'ag-theme-alpine wmsDefault'}>
-          <TunedGrid
-            ref={gridRef}
-            rowSelection={{
-              mode: 'singleRow',
-              enableClickSelection: true,
-            }}
-            rowData={(response?.data?.body?.rows as ContactResponsePaging[]) || []}
-            columnDefs={columnDefs}
-            defaultColDef={defaultColDef}
-            paginationPageSize={paging.pageRowCount}
-            onRowDoubleClicked={onRowClicked}
-            loadingOverlayComponent={CustomGridLoading}
-            noRowsOverlayComponent={CustomNoRowsOverlay}
-          />
-        </div>
+        <TunedGrid
+          ref={gridRef}
+          rowSelection={{
+            mode: 'singleRow',
+            enableClickSelection: true,
+          }}
+          rowData={(response?.data?.body?.rows as ContactResponsePaging[]) || []}
+          columnDefs={columnDefs}
+          defaultColDef={defaultColDef}
+          paginationPageSize={paging.pageRowCount}
+          onRowDoubleClicked={onRowClicked}
+          loadingOverlayComponent={CustomGridLoading}
+          noRowsOverlayComponent={CustomNoRowsOverlay}
+        />
         <Pagination pageObject={paging} setPaging={setPaging} />
       </Table>
       {modalType.type === 'DETAIL' && modalType.active && <AccessLogDeatilPop />}

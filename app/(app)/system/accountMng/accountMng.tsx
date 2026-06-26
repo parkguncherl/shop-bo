@@ -3,8 +3,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { Search, Table, Title } from '../../../../components';
-import { Button, Pagination, TableHeader, toastError } from '../../../../components';
-import { AccountPagingFilter, useAccountStore } from '../../../../stores';
+import { Pagination, TableHeader, toastError } from '../../../../components';
+import { useAccountStore } from '../../../../stores';
 import { UserResponsePaging } from '../../../../generated';
 import { CellDoubleClickedEvent, ColDef } from 'ag-grid-community';
 import { useQuery } from '@tanstack/react-query';
@@ -23,13 +23,13 @@ import TunedGrid from '../../../../components/grid/TunedGrid';
 /** 시스템 - 계정관리 페이지 */
 const AccountMng = () => {
   /** Grid Api */
-  const { gridApi, gridColumnApi, onGridReady } = useAgGridApi();
+  const { onGridReady } = useAgGridApi();
 
   /** 공통 스토어 - State */
   const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
 
   /** 공통 스토어 - State */
-  const [menuUpdYn, menuExcelYn] = useCommonStore((s) => [s.menuUpdYn, s.menuExcelYn]);
+  const [menuUpdYn] = useCommonStore((s) => [s.menuUpdYn]);
 
   /** 계정관리 스토어 - State */
   const [paging, setPaging, selectedUser, setSelectedUser, modalType, openModal] = useAccountStore((s) => [
@@ -41,11 +41,22 @@ const AccountMng = () => {
     s.openModal,
   ]);
 
-  const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<AccountPagingFilter>({
-    partnerNm: '',
+  const [filters, onChangeFilters, onFiltersReset] = useFilters({
+    loginId: undefined,
+    userNm: undefined,
+    authCd: undefined,
+    phoneNo: undefined,
+    compNm: undefined,
+    omsWmsTp: undefined,
+    belongNm: undefined,
+    deptNm: undefined,
+    positionNm: undefined,
+    useYn: undefined,
+    myAuthCd: undefined,
+    partnerId: undefined,
   });
 
-  const [loginId, setLoginId] = useState<string | undefined>(undefined);
+  //const [loginId, setLoginId] = useState<string | undefined>(undefined);
 
   /** 계정관리 필드별 설정 */
   const [columnDefs] = useState<ColDef[]>([
@@ -106,7 +117,7 @@ const AccountMng = () => {
     isLoading: accountListIsInLoading,
     refetch: accountsRefetch,
   } = useQuery({
-    queryKey: ['/user/paging', paging.curPage],
+    queryKey: ['/user/paging', paging.curPage, filters.phoneNo, filters.authCd, filters.useYn, filters.omsWmsTp],
     queryFn: (): any =>
       authApi.get('/user/paging', {
         params: {
@@ -128,9 +139,9 @@ const AccountMng = () => {
     }
   }, [accounts, isAccountListSuccess, setPaging]);
 
-  useEffect(() => {
-    search();
-  }, [filters]);
+  // useEffect(() => {
+  //   search();
+  // }, [filters]);
 
   /** 선택된 사용자 정보 조회 */
   const {
@@ -140,10 +151,10 @@ const AccountMng = () => {
     isFetching: gridUserIsFetching,
     refetch: gridUserRefetch,
   } = useQuery({
-    queryKey: ['/user/' + loginId],
-    queryFn: () => authApi.get(`/user/${loginId}`),
-    enabled: !!loginId,
-    staleTime: 0,
+    queryKey: ['/user/' + filters.loginId],
+    queryFn: () => authApi.get(`/user/${filters.loginId}`),
+    enabled: !!filters.loginId,
+    //staleTime: 0,
     // onSuccess: (e) => {
     //   const { resultCode, body, resultMessage } = e.data;
     //   if (resultCode === 200) {
@@ -273,7 +284,8 @@ const AccountMng = () => {
             mode: 'singleRow',
           }}
           onRowClicked={(e) => {
-            setLoginId(e.data.loginId);
+            //setLoginId(e.data.loginId);
+            onChangeFilters('loginId', e.data.loginId);
             gridUserRefetch();
           }}
           onCellDoubleClicked={onCellDoubleClicked}
