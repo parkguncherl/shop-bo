@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { authApi } from '../libs';
-import { ApiResponseListCodeDropDown, ApiResponseListEnumResponse } from '../generated';
+import { ApiResponseListCodeDropDown } from '../generated';
 import { useQuery } from '@tanstack/react-query';
 import { toastError } from './ToastMessage';
 import { DropDownOption } from '../types/DropDownOptions';

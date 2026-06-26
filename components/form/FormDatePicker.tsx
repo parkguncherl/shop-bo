@@ -1,6 +1,6 @@
 import { useController, FieldValues } from 'react-hook-form';
 import { DropDownOption } from '../../types/DropDownOptions';
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import { TControl } from '../../types/Control';
 import DatePickerAtom from '../atom/DatePickerAtom';
 import { DatePicker } from 'antd';
@@ -88,7 +88,7 @@ function FormDatePicker<T extends FieldValues>({ ref, ...props }: TProps<T>) {
                 <DatePicker.YearPicker
                   name={name}
                   onChange={controlChange}
-                  value={value ? dayjs(value) : ''}
+                  value={value ? dayjs(value) : ''} // 실제로는 Dayjs 요구되나 타입 정의 수준에서의 불일치로 인한 오류이니 타입스크립트 컴파일 시점 에러는 무시하기
                   disabledDate={disabledDate}
                   onOpenChange={hideUnavailableYears}
                   ref={ref}
