@@ -27,6 +27,8 @@ type DailySalesStat = {
   todayPaymentAmt: number;
   yesterdayPurchaseCnt: number;
   yesterdayPaymentAmt: number;
+  todayCancelAmt: number;
+  yesterdayCancelAmt: number;
 };
 
 const today = dayjs().format('YYYY-MM-DD');
@@ -49,12 +51,14 @@ const Dashboard = () => {
     todayPaymentAmt: 0,
     yesterdayPurchaseCnt: 0,
     yesterdayPaymentAmt: 0,
+    todayCancelAmt: 0,
+    yesterdayCancelAmt: 0,
   };
 
   /* ── ProductView TOP 10 ── */
   const { data: productData } = useQuery({
     queryKey: ['/mis/productViewList/dashboard', yearStart, today],
-    queryFn: () => authApi.get('/mis/productViewList', { params: { fromDate: yearStart, toDate: today } }),
+    queryFn: () => authApi.get('/mis/productViewList', { params: { fromDate: yearStart, toDate: today, orderStatus: 'P' } }),
   });
   const [productRows, setProductRows] = useState<ProductViewItem[]>([]);
   useEffect(() => {
@@ -68,7 +72,7 @@ const Dashboard = () => {
     queryKey: ['/mis/salesStatList/dashboard', sixMonthsAgo, today],
     queryFn: () =>
       authApi.get('/mis/salesStatList', {
-        params: { viewType: 'monthly', fromDate: sixMonthsAgo, toDate: today },
+        params: { viewType: 'monthly', fromDate: sixMonthsAgo, toDate: today, orderStatus: 'P' },
       }),
   });
   const [statRows, setStatRows] = useState<SalesStatItem[]>([]);
@@ -204,7 +208,7 @@ const Dashboard = () => {
         <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#222' }}>{session?.data?.user.userNm ?? ''} 님 안녕하세요</h2>
 
         <div style={{ display: 'flex', gap: 12 }}>
-          {/* 어제 */}
+          {/* 어제 판매 */}
           <div style={cardStyle}>
             <div style={cardLabel}>어제 총판매량 / 금액</div>
             <div style={cardValue}>
@@ -215,7 +219,15 @@ const Dashboard = () => {
               <span style={cardUnit}>원</span>
             </div>
           </div>
-          {/* 금일 */}
+          {/* 어제 취소 */}
+          <div style={{ ...cardStyle, borderLeft: '3px solid #f0a0a0' }}>
+            <div style={cardLabel}>어제 취소금액</div>
+            <div style={cardValue}>
+              <span style={{ color: '#f56c6c' }}>{fmt(daily.yesterdayCancelAmt)}</span>
+              <span style={cardUnit}>원</span>
+            </div>
+          </div>
+          {/* 금일 판매 */}
           <div style={{ ...cardStyle, borderLeft: '3px solid #5b8ff9' }}>
             <div style={cardLabel}>금일 총판매량 / 금액</div>
             <div style={cardValue}>
@@ -223,6 +235,14 @@ const Dashboard = () => {
               <span style={cardUnit}>건</span>
               <span style={{ color: '#aaa', margin: '0 6px' }}>/</span>
               <span style={{ color: '#e86452' }}>{fmt(daily.todayPaymentAmt)}</span>
+              <span style={cardUnit}>원</span>
+            </div>
+          </div>
+          {/* 금일 취소 */}
+          <div style={{ ...cardStyle, borderLeft: '3px solid #f56c6c' }}>
+            <div style={cardLabel}>금일 취소금액</div>
+            <div style={cardValue}>
+              <span style={{ color: '#f56c6c' }}>{fmt(daily.todayCancelAmt)}</span>
               <span style={cardUnit}>원</span>
             </div>
           </div>
