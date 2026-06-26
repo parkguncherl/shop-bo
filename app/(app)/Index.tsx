@@ -220,14 +220,6 @@ const Dashboard = () => {
               <span style={cardUnit}>원</span>
             </div>
           </div>
-          {/* 어제 취소 */}
-          <div style={{ ...cardStyle, borderLeft: '3px solid #f0a0a0' }}>
-            <div style={cardLabel}>어제 취소금액</div>
-            <div style={cardValue}>
-              <span style={{ color: '#f56c6c' }}>{fmt(daily.yesterdayCancelAmt)}</span>
-              <span style={cardUnit}>원</span>
-            </div>
-          </div>
           {/* 금일 판매 */}
           <div style={{ ...cardStyle, borderLeft: '3px solid #5b8ff9' }}>
             <div style={cardLabel}>금일 총판매량 / 금액</div>
@@ -236,6 +228,14 @@ const Dashboard = () => {
               <span style={cardUnit}>건</span>
               <span style={{ color: '#aaa', margin: '0 6px' }}>/</span>
               <span style={{ color: '#e86452' }}>{fmt(daily.todayPaymentAmt)}</span>
+              <span style={cardUnit}>원</span>
+            </div>
+          </div>
+          {/* 어제 취소 */}
+          <div style={{ ...cardStyle, borderLeft: '3px solid #f0a0a0' }}>
+            <div style={cardLabel}>어제 취소금액</div>
+            <div style={cardValue}>
+              <span style={{ color: '#f56c6c' }}>{fmt(daily.yesterdayCancelAmt)}</span>
               <span style={cardUnit}>원</span>
             </div>
           </div>
