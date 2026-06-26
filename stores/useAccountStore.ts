@@ -28,8 +28,8 @@ export type AccountPagingFilter = Pick<
 interface AccountState {
   paging: PageObject;
   setPaging: (pagingInfo: PageObject | undefined) => void;
-  selectedUser: UserResponseSelectByLoginId | undefined;
-  setSelectedUser: (user: UserResponseSelectByLoginId) => void;
+  // selectedUser: UserResponseSelectByLoginId | undefined;
+  // setSelectedUser: (user: UserResponseSelectByLoginId) => void;
   modalType: { type: ModalType; active: boolean };
   openModal: (type: ModalType) => void;
   closeModal: (type: ModalType) => void;
@@ -61,12 +61,12 @@ const initialStateCreator: StateCreator<AccountState & AccountApiState, any> = (
         },
       }));
     },
-    selectedUser: undefined,
-    setSelectedUser: (user) => {
-      set((state) => ({
-        selectedUser: user,
-      }));
-    },
+    // selectedUser: undefined,
+    // setSelectedUser: (user) => {
+    //   set((state) => ({
+    //     selectedUser: user,
+    //   }));
+    // },
     modalType: { type: 'ADD', active: false },
     openModal: (type) => {
       set((state) => ({
