@@ -1,9 +1,8 @@
 import { UserRequestCreateUseYn, UserRequestDelete, UserRequestPasswordInit, UserRequestUpdate, UserResponseSelectByLoginId } from '../../../../generated';
 import { useAccountStore, useCommonStore } from '../../../../stores';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React, { useEffect, useRef, useState } from 'react';
 import { PopupContent } from '../../PopupContent';
-import { PopupSearchBox, PopupSearchType } from '../../content';
 import { PopupFooter } from '../../PopupFooter';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import { DefaultOptions, Placeholder } from '../../../../libs/const';
@@ -13,12 +12,11 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '../../../../libs';
 import FormInput from '../../../form/FormInput';
 import FormDropDown from '../../../form/FormDropDown';
-import { Input } from '../../../Input';
 import Loading from '../../../Loading';
 import { PopupLayout } from '../../PopupLayout';
-import { useSession } from 'next-auth/react';
-import { DropDownOption } from '../../../../types/DropDownOptions';
-import { TunedReactSelector } from '../../../TunedReactSelector';
+import PopupFormBox from '../../content/PopupFormBox';
+import PopupFormType from '../../content/PopupFormType';
+import PopupFormGroup from '../../content/PopupFormGroup';
 
 export type AccountRequestUpdateFields = {
   id: number;
@@ -36,26 +34,29 @@ export type AccountRequestUpdateFields = {
   orgPartnerNm?: string | null;
 };
 
-interface Props {
+interface AccountModPopProps {
+  open: boolean;
+  onClose: () => void;
   data: UserResponseSelectByLoginId;
 }
 
 /** 시스템 - 계정관리 - 수정 팝업 */
-export const AccountModPop = ({ data }: Props) => {
-  console.log('AccountModPop data: ==>', data);
-  const session = useSession();
-  const authCd = parseInt(session.data?.user.authCd || '');
-  const defaultOption = { value: '0', label: '전체' };
-  const [partnerOption, setPartnerOption] = useState<any>([defaultOption]);
+export const AccountModPop = ({ data, open, onClose }: AccountModPopProps) => {
+  //const session = useSession();
+  //const authCd = parseInt(session.data?.user.authCd || '');
+  //const defaultOption = { value: '0', label: '전체' };
+  //const [partnerOption, setPartnerOption] = useState<any>([defaultOption]);
+
   const el = useRef<HTMLDListElement | null>(null);
   const {
     watch,
-    getValues,
-    setValue,
+    // getValues,
+    // setValue,
     handleSubmit,
     control,
-    formState: { errors, isValid },
-    clearErrors,
+    reset,
+    // formState: { errors, isValid },
+    // clearErrors,
   } = useForm<AccountRequestUpdateFields>({
     resolver: yupResolver(YupSchema.AccountRequestForUpdate()), // 완료
     defaultValues: {
@@ -68,13 +69,13 @@ export const AccountModPop = ({ data }: Props) => {
       belongNm: data.belongNm,
       deptNm: data.deptNm || '',
       positionNm: data.positionNm || '',
-      orgPartnerId: data.orgPartnerId ?? 0,
+      //orgPartnerId: data.orgPartnerId ?? 0,
     },
     mode: 'onSubmit',
   });
 
   /** 계정관리 스토어 - State */
-  const [modalType, closeModal, selectedUser] = useAccountStore((s) => [s.modalType, s.closeModal, s.selectedUser]);
+  //const [modalType, closeModal, selectedUser] = useAccountStore((s) => [s.modalType, s.closeModal, s.selectedUser]);
 
   /** 계정관리 양식 관리 스토어 - API */
   const [updateUser, deleteUser, sendMailUser, updatePasswordInit, createAuthForPartner] = useAccountStore((s) => [
@@ -89,8 +90,8 @@ export const AccountModPop = ({ data }: Props) => {
   const [menuUpdYn, menuExcelYn] = useCommonStore((s) => [s.menuUpdYn, s.menuExcelYn]);
 
   const [confirmModal, setConfirmModal] = useState(false);
-  const [userAuthCd, setUserAuthCd] = useState<number>(data.authCd ? Number(data.authCd) : 0);
-  const [partnerList, setPartnerList] = useState([]);
+  // const [userAuthCd, setUserAuthCd] = useState<number>(data.authCd ? Number(data.authCd) : 0);
+  // const [partnerList, setPartnerList] = useState([]);
 
   const queryClient = useQueryClient();
 
@@ -102,7 +103,8 @@ export const AccountModPop = ({ data }: Props) => {
         if (e.data.resultCode === 200) {
           toastSuccess('저장되었습니다.');
           await queryClient.invalidateQueries({ queryKey: ['/user/paging'] });
-          closeModal('MOD');
+          //closeModal('MOD');
+          onClose();
           // if (getCookie('gguangggLocalStoriageId') == data.loginId) {
           //   window.location.reload();
           // }
@@ -124,7 +126,8 @@ export const AccountModPop = ({ data }: Props) => {
         if (e.data.resultCode === 200) {
           toastSuccess('삭제되었습니다.');
           await queryClient.invalidateQueries({ queryKey: ['/user/paging'] }); // 즐겨찾기 영역 cached fetch 무효화
-          closeModal('MOD');
+          //closeModal('MOD');
+          onClose();
 
           // sendMailUserMutate({
           //   loginId: data.loginId,
@@ -164,7 +167,8 @@ export const AccountModPop = ({ data }: Props) => {
         if (e.data.resultCode === 200) {
           toastSuccess('비밀번호가 초기화되었습니다.' || '');
           await queryClient.invalidateQueries({ queryKey: ['/user/paging'] });
-          closeModal('MOD');
+          //closeModal('MOD');
+          onClose();
         } else {
           toastError(e.data.resultMessage);
           throw new Error(e.data.resultMessage);
@@ -183,7 +187,8 @@ export const AccountModPop = ({ data }: Props) => {
         if (e.data.resultCode === 200) {
           toastSuccess('권한이 생성되었습니다.' || '');
           await queryClient.invalidateQueries({ queryKey: ['/user/paging'] });
-          closeModal('MOD');
+          //closeModal('MOD');
+          onClose();
         } else {
           toastError(e.data.resultMessage);
           throw new Error(e.data.resultMessage);
@@ -225,12 +230,27 @@ export const AccountModPop = ({ data }: Props) => {
   };
 
   // 기본값 설정
-  const initialPartnerList = [
-    { key: 0, label: '선택', value: '선택' }, // 기본값 추가
-    ...partnerList, // 실제 파트너 리스트
-  ];
+  // const initialPartnerList = [
+  //   { key: 0, label: '선택', value: '선택' }, // 기본값 추가
+  //   ...partnerList, // 실제 파트너 리스트
+  // ];
 
   // 세션
+
+  /** 전달되는 data 인자에 따른 rhf 동기화 */
+  useEffect(() => {
+    reset({
+      id: data.id,
+      loginId: data.loginId,
+      userNm: data.userNm,
+      phoneNo: data?.phoneNo,
+      authCd: data.authCd,
+      useYn: data.useYn,
+      belongNm: data.belongNm,
+      deptNm: data.deptNm || '',
+      positionNm: data.positionNm || '',
+    });
+  }, [data]);
 
   return (
     <dl ref={el}>
@@ -238,9 +258,10 @@ export const AccountModPop = ({ data }: Props) => {
         <PopupLayout
           width={820}
           isEscClose={false}
-          open={modalType.type === 'MOD' && modalType.active}
+          open={open}
           title={menuUpdYn ? '계정 수정' : '계정 조회'}
-          onClose={() => closeModal('MOD')}
+          //onClose={() => closeModal('MOD')}
+          onClose={onClose}
           footer={
             menuUpdYn && (
               <PopupFooter>
@@ -260,7 +281,11 @@ export const AccountModPop = ({ data }: Props) => {
                     <button className={'btn btnBlue'} onClick={handleSubmit(onValid)}>
                       저장
                     </button>
-                    <button className={'btn '} onClick={() => closeModal('MOD')}>
+                    <button
+                      className={'btn '}
+                      //onClick={() => closeModal('MOD')}
+                      onClick={onClose}
+                    >
                       닫기
                     </button>
                   </div>
@@ -271,68 +296,76 @@ export const AccountModPop = ({ data }: Props) => {
           }
         >
           <PopupContent>
-            <PopupSearchBox>
-              <PopupSearchType className={'type_2'}>
-                <Input title={'ID(e-mail)'} value={data.loginId} disable={true} />
-                <FormInput<AccountRequestUpdateFields> control={control} name={'userNm'} label={'이름'} placeholder={Placeholder.Input || ''} required={true} />
-              </PopupSearchType>
-              <PopupSearchType className={'type_2'}>
-                <FormInput<AccountRequestUpdateFields>
-                  control={control}
-                  name={'phoneNo'}
-                  label={'휴대전화 번호'}
-                  placeholder={Placeholder.PhoneNo || ''}
-                  required={true}
-                />
-              </PopupSearchType>
-              <PopupSearchType className={'type_2'}>
-                <FormDropDown<AccountRequestUpdateFields>
-                  control={control}
-                  title={'권한'}
-                  name={'authCd'}
-                  defaultOptions={[...DefaultOptions.Select]}
-                  codeUpper={'10020'}
-                  required={true}
-                  onChange={(name, value) => {
-                    setUserAuthCd(value ? Number(value) : 0);
-                  }}
-                />
-                <FormDropDown<AccountRequestUpdateFields> control={control} title={'상태' || ''} name={'useYn'} codeUpper={'10030'} required={true} />
-              </PopupSearchType>
-              <PopupSearchType className={'type_2'}>
-                <FormInput<AccountRequestUpdateFields>
-                  control={control}
-                  name={'belongNm'}
-                  label={'소속'}
-                  placeholder={Placeholder.Input || ''}
-                  required={true}
-                />
-                <FormInput<AccountRequestUpdateFields> control={control} name={'deptNm'} label={'부서'} placeholder={Placeholder.Input || ''} />
-              </PopupSearchType>
-              <PopupSearchType className={'type_2'}>
-                <FormInput<AccountRequestUpdateFields> control={control} name={'positionNm'} label={'직책'} placeholder={Placeholder.Input || ''} />
-              </PopupSearchType>
-              <PopupSearchType className={'type_2'}>
-                <dl>
-                  <dt>등록자</dt>
-                  <dd>{selectedUser?.creUserNm ? selectedUser?.creUserNm : 'system'}</dd>
-                </dl>
-                <dl>
-                  <dt>등록시간</dt>
-                  <dd>{selectedUser?.creTm}</dd>
-                </dl>
-              </PopupSearchType>
-              <PopupSearchType className={'type_2'}>
-                <dl>
-                  <dt>수정자</dt>
-                  <dd>{selectedUser?.updUserNm ? selectedUser?.updUserNm : 'system'}</dd>
-                </dl>
-                <dl>
-                  <dt>수정시간</dt>
-                  <dd>{selectedUser?.updTm}</dd>
-                </dl>
-              </PopupSearchType>
-            </PopupSearchBox>
+            <PopupFormBox>
+              <PopupFormGroup>
+                <PopupFormType className={'type1'}>
+                  <FormInput label={'ID(e-mail)'} name={'loginId'} control={control} disable={true} />
+                  <FormInput<AccountRequestUpdateFields>
+                    control={control}
+                    name={'userNm'}
+                    label={'이름'}
+                    placeholder={Placeholder.Input || ''}
+                    required={true}
+                  />
+                </PopupFormType>
+                <PopupFormType className={'type1'}>
+                  <FormInput<AccountRequestUpdateFields>
+                    control={control}
+                    name={'phoneNo'}
+                    label={'휴대전화 번호'}
+                    placeholder={Placeholder.PhoneNo || ''}
+                    required={true}
+                  />
+                </PopupFormType>
+                <PopupFormType className={'type2'}>
+                  <FormDropDown<AccountRequestUpdateFields>
+                    control={control}
+                    title={'권한'}
+                    name={'authCd'}
+                    defaultOptions={[...DefaultOptions.Select]}
+                    codeUpper={'10020'}
+                    required={true}
+                    // onChange={(name, value) => {
+                    //   setUserAuthCd(value ? Number(value) : 0);
+                    // }}
+                  />
+                  <FormDropDown<AccountRequestUpdateFields> control={control} title={'상태' || ''} name={'useYn'} codeUpper={'10030'} required={true} />
+                </PopupFormType>
+                <PopupFormType className={'type2'}>
+                  <FormInput<AccountRequestUpdateFields>
+                    control={control}
+                    name={'belongNm'}
+                    label={'소속'}
+                    placeholder={Placeholder.Input || ''}
+                    required={true}
+                  />
+                  <FormInput<AccountRequestUpdateFields> control={control} name={'deptNm'} label={'부서'} placeholder={Placeholder.Input || ''} />
+                </PopupFormType>
+                <PopupFormType className={'type1'}>
+                  <FormInput<AccountRequestUpdateFields> control={control} name={'positionNm'} label={'직책'} placeholder={Placeholder.Input || ''} />
+                </PopupFormType>
+                <PopupFormType className={'type2'}>
+                  <dl>
+                    <dt>등록자</dt>
+                    <dd>{data?.creUserNm ? data?.creUserNm : 'system'}</dd>
+                  </dl>
+                  <dl>
+                    <dt>등록시간</dt>
+                    <dd>{data?.creTm}</dd>
+                  </dl>
+                </PopupFormType>
+                <PopupFormType className={'type2'}>
+                  <dl>
+                    <dt>수정자</dt>
+                    <dd>{data?.updUserNm ? data?.updUserNm : 'system'}</dd>
+                  </dl>
+                  <dl>
+                    <dt>수정시간</dt>
+                    <dd>{data?.updTm}</dd>
+                  </dl>
+                </PopupFormType>
+              </PopupFormGroup>
+            </PopupFormBox>
           </PopupContent>
           {(updateIsLoading || deleteIsLoading || updatePasswordInitIsLoading) && <Loading />}
         </PopupLayout>

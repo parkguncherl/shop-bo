@@ -2,7 +2,6 @@ import { useAccountStore } from '../../../../stores';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useEffect, useRef, useState } from 'react';
 import { PopupContent } from '../../PopupContent';
-import { PopupSearchBox, PopupSearchType } from '../../content';
 import { PopupFooter } from '../../PopupFooter';
 import { toastError, toastSuccess } from '../../../ToastMessage';
 import { UserRequestCreate, UserRequestCreateUseYn } from '../../../../generated';
@@ -15,6 +14,9 @@ import FormDropDown from '../../../form/FormDropDown';
 import Loading from '../../../Loading';
 import { PopupLayout } from '../../PopupLayout';
 import { useSession } from 'next-auth/react';
+import PopupFormGroup from '../../content/PopupFormGroup';
+import PopupFormBox from '../../content/PopupFormBox';
+import PopupFormType from '../../content/PopupFormType';
 
 export type AccountRequestCreateFields = {
   loginId: string;
@@ -31,19 +33,24 @@ export type AccountRequestCreateFields = {
   orgPartnerNm?: string | null;
 };
 
+interface AccountAddPopProps {
+  open: boolean;
+  onClose: () => void;
+}
+
 /** 시스템 - 계정관리 - 신규 팝업 */
-export const AccountAddPop = () => {
+export const AccountAddPop = ({ open, onClose }: AccountAddPopProps) => {
   const session = useSession();
   const el = useRef<HTMLDListElement | null>(null);
 
   const {
-    watch,
+    //watch,
     handleSubmit,
-    getValues,
+    //getValues,
     setValue,
     control,
-    formState: { errors, isValid },
-    clearErrors,
+    //formState: { errors, isValid },
+    //clearErrors,
   } = useForm<AccountRequestCreateFields>({
     resolver: yupResolver<AccountRequestCreateFields>(YupSchema.AccountRequest()), // 완료
     defaultValues: {
@@ -58,7 +65,7 @@ export const AccountAddPop = () => {
   });
 
   /** 계정관리 스토어 - State */
-  const [modalType, closeModal] = useAccountStore((s) => [s.modalType, s.closeModal]);
+  //const [modalType, closeModal] = useAccountStore((s) => [s.modalType, s.closeModal]);
 
   /** 계정관리 양식 관리 스토어 - API */
   const [insertUser, sendMailUser] = useAccountStore((s) => [s.insertUser, s.sendMailUser]);
@@ -99,7 +106,8 @@ export const AccountAddPop = () => {
           await queryClient.invalidateQueries({
             queryKey: ['/user/paging'],
           });
-          closeModal('ADD');
+          //closeModal('ADD');
+          onClose();
 
           // if (body) {
           //   sendMailUserMutate({
@@ -168,9 +176,11 @@ export const AccountAddPop = () => {
         <PopupLayout
           width={820}
           isEscClose={false}
-          open={modalType.type === 'ADD' && modalType.active}
+          //open={modalType.type === 'ADD' && modalType.active}
+          open={open}
           title={'신규 계정 생성'}
-          onClose={() => closeModal('ADD')}
+          //onClose={() => closeModal('ADD')}
+          onClose={onClose}
           footer={
             <PopupFooter>
               <div className={'btnArea between'}>
@@ -179,7 +189,7 @@ export const AccountAddPop = () => {
                   <button className={'btn btnBlue'} onClick={handleSubmit(onValid)}>
                     저장
                   </button>
-                  <button className={'btn '} onClick={() => closeModal('ADD')}>
+                  <button className={'btn '} onClick={onClose}>
                     닫기
                   </button>
                 </div>
@@ -188,72 +198,74 @@ export const AccountAddPop = () => {
           }
         >
           <PopupContent>
-            <PopupSearchBox>
-              <PopupSearchType className={'type_2'}>
-                <FormInput<AccountRequestCreateFields>
-                  control={control}
-                  name={'loginId'}
-                  label={'ID(e-mail)'}
-                  placeholder={Placeholder.Input}
-                  required={true}
-                />
-                <FormInput<AccountRequestCreateFields> control={control} name={'userNm'} label={'이름'} placeholder={Placeholder.Input} required={true} />
-              </PopupSearchType>
-              <PopupSearchType className={'type_2'}>
-                <FormInput<AccountRequestCreateFields>
-                  control={control}
-                  onChange={(e) => {
-                    // e.target.value = e.target.value.replace(/[^0-9]/g, '').replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`);
-                    // setValue('phoneNo', e.target.value.replace(/[^0-9]/g, '')); // 문자열에서 숫자만을 추출(하이픈 제외)하여 요청시 보낼 데이터로 설정, 유효성 검증 통과
-                  }}
-                  name={'phoneNo'}
-                  label={'전화번호'}
-                  placeholder={Placeholder.PhoneNo}
-                  required={true}
-                />
-                <FormDropDown<AccountRequestCreateFields>
-                  control={control}
-                  title={'권한'}
-                  name={'authCd'}
-                  defaultOptions={[...DefaultOptions.Select]}
-                  codeUpper={'10020'}
-                  required={true}
-                />
-              </PopupSearchType>
-              <PopupSearchType className={'type_2'}>
-                <FormDropDown<AccountRequestCreateFields> control={control} title={'상태'} name={'useYn'} codeUpper={'10280'} required={true} />
-                <FormInput<AccountRequestCreateFields> control={control} name={'belongNm'} label={'소속'} placeholder={Placeholder.Input} required={true} />
-              </PopupSearchType>
-              <PopupSearchType className={'type_2'}>
-                <FormInput<AccountRequestCreateFields> control={control} name={'deptNm'} label={'부서'} placeholder={Placeholder.Input} />
-                <FormInput<AccountRequestCreateFields> control={control} name={'positionNm'} label={'직책'} placeholder={Placeholder.Input} />
-              </PopupSearchType>
-              {authCd > 399 ? ( // 화주 이상만(관리자만) 보이게 처리
-                <PopupSearchType className={'type_2'}>
+            <PopupFormBox>
+              <PopupFormGroup>
+                <PopupFormType className={'type2'}>
+                  <FormInput<AccountRequestCreateFields>
+                    control={control}
+                    name={'loginId'}
+                    label={'ID(e-mail)'}
+                    placeholder={Placeholder.Input}
+                    required={true}
+                  />
+                  <FormInput<AccountRequestCreateFields> control={control} name={'userNm'} label={'이름'} placeholder={Placeholder.Input} required={true} />
+                </PopupFormType>
+                <PopupFormType className={'type2'}>
+                  <FormInput<AccountRequestCreateFields>
+                    control={control}
+                    onChange={(e) => {
+                      // e.target.value = e.target.value.replace(/[^0-9]/g, '').replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`);
+                      // setValue('phoneNo', e.target.value.replace(/[^0-9]/g, '')); // 문자열에서 숫자만을 추출(하이픈 제외)하여 요청시 보낼 데이터로 설정, 유효성 검증 통과
+                    }}
+                    name={'phoneNo'}
+                    label={'전화번호'}
+                    placeholder={Placeholder.PhoneNo}
+                    required={true}
+                  />
                   <FormDropDown<AccountRequestCreateFields>
                     control={control}
-                    title={'화주설정'}
-                    name={'orgPartnerNm'}
-                    options={initialPartnerList}
-                    required={false}
-                    onChange={(name, value) => {
-                      // 선택된 label을 사용하여 partnerList에서 key 값을 찾기
-                      const selectedOption: any = partnerList.find((opt: any) => {
-                        return opt.label === value;
-                      });
-                      if (selectedOption) {
-                        // orgPartnerId 업데이트
-                        setValue('orgPartnerId', selectedOption.key);
-                      } else {
-                        setValue('orgPartnerId', 0);
-                      }
-                    }}
+                    title={'권한'}
+                    name={'authCd'}
+                    defaultOptions={[...DefaultOptions.Select]}
+                    codeUpper={'10020'}
+                    required={true}
                   />
-                </PopupSearchType>
-              ) : (
-                ''
-              )}
-            </PopupSearchBox>
+                </PopupFormType>
+                <PopupFormType className={'type2'}>
+                  <FormDropDown<AccountRequestCreateFields> control={control} title={'상태'} name={'useYn'} codeUpper={'10280'} required={true} />
+                  <FormInput<AccountRequestCreateFields> control={control} name={'belongNm'} label={'소속'} placeholder={Placeholder.Input} required={true} />
+                </PopupFormType>
+                <PopupFormType className={'type2'}>
+                  <FormInput<AccountRequestCreateFields> control={control} name={'deptNm'} label={'부서'} placeholder={Placeholder.Input} />
+                  <FormInput<AccountRequestCreateFields> control={control} name={'positionNm'} label={'직책'} placeholder={Placeholder.Input} />
+                </PopupFormType>
+                {authCd > 399 ? ( // 화주 이상만(관리자만) 보이게 처리
+                  <PopupFormType className={'type1'}>
+                    <FormDropDown<AccountRequestCreateFields>
+                      control={control}
+                      title={'화주설정'}
+                      name={'orgPartnerNm'}
+                      options={initialPartnerList}
+                      required={false}
+                      onChange={(name, value) => {
+                        // 선택된 label을 사용하여 partnerList에서 key 값을 찾기
+                        const selectedOption: any = partnerList.find((opt: any) => {
+                          return opt.label === value;
+                        });
+                        if (selectedOption) {
+                          // orgPartnerId 업데이트
+                          setValue('orgPartnerId', selectedOption.key);
+                        } else {
+                          setValue('orgPartnerId', 0);
+                        }
+                      }}
+                    />
+                  </PopupFormType>
+                ) : (
+                  ''
+                )}
+              </PopupFormGroup>
+            </PopupFormBox>
           </PopupContent>
           {isPending && <Loading />}
         </PopupLayout>

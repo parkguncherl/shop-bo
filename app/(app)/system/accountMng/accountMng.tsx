@@ -47,13 +47,14 @@ const AccountMng = () => {
   const [menuUpdYn] = useCommonStore((s) => [s.menuUpdYn]);
 
   /** 계정관리 스토어 - State */
-  const [paging, setPaging, modalType, openModal] = useAccountStore((s) => [
+  const [paging, setPaging, modalType, openModal, closeModal] = useAccountStore((s) => [
     s.paging,
     s.setPaging,
     // s.selectedUser,
     // s.setSelectedUser,
     s.modalType,
     s.openModal,
+    s.closeModal,
   ]);
 
   const [filters, onChangeFilters, onFiltersReset] = useFilters({
@@ -328,10 +329,12 @@ const AccountMng = () => {
         </div>
         <Pagination pageObject={paging} setPaging={setPaging} />
       </Table>
-      {menuUpdYn && modalType.type === 'ADD' && modalType.active && <AccountAddPop />}
-      {!userByLoginIdIsFetching && !userByLoginIdIsLoading && modalType.type === 'MOD' && modalType.active && (
-        <AccountModPop data={targetedUserByLoginId(userByLoginId) || {}} />
-      )}
+      {/*{menuUpdYn && modalType.type === 'ADD' && modalType.active && <AccountAddPop />}*/}
+      {/*{!userByLoginIdIsFetching && !userByLoginIdIsLoading && modalType.type === 'MOD' && modalType.active && (*/}
+      {/*  <AccountModPop data={targetedUserByLoginId(userByLoginId) || {}} />*/}
+      {/*)}*/}
+      <AccountAddPop open={modalType.type === 'ADD' && modalType.active} onClose={() => closeModal('ADD')} />
+      <AccountModPop data={targetedUserByLoginId(userByLoginId) || {}} open={modalType.type === 'MOD' && modalType.active} onClose={() => closeModal('MOD')} />
       {menuUpdYn && !userByLoginIdIsFetching && !userByLoginIdIsLoading && modalType.type === 'UNLOCK' && modalType.active && (
         <AccountUnLockPop data={targetedUserByLoginId(userByLoginId) || {}} />
       )}
