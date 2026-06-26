@@ -181,7 +181,6 @@ const CustomNewDatePicker = ({
   ref,
   onOpenChange,
 }: Props) => {
-  const session = useSession();
   const today = dayjs(new Date());
 
   /** 참조 */

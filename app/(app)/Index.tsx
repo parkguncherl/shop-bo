@@ -4,8 +4,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { useQuery } from '@tanstack/react-query';
 import { authApi } from '../../libs';
-import { useAuthStore } from '../../stores/useAuthStore';
 import dayjs from 'dayjs';
+import { useSession } from 'next-auth/react';
 
 type ProductViewItem = {
   prodId: number;
@@ -34,14 +34,10 @@ const yearStart = dayjs().startOf('year').format('YYYY-MM-DD');
 const sixMonthsAgo = dayjs().subtract(5, 'month').startOf('month').format('YYYY-MM-DD');
 
 const fmt = (v: number) =>
-  v >= 100000000
-    ? (v / 100000000).toFixed(1) + '억'
-    : v >= 10000
-    ? Math.floor(v / 10000).toLocaleString() + '만'
-    : v.toLocaleString();
+  v >= 100000000 ? (v / 100000000).toFixed(1) + '억' : v >= 10000 ? Math.floor(v / 10000).toLocaleString() + '만' : v.toLocaleString();
 
 const Dashboard = () => {
-  const user = useAuthStore((s) => s.user);
+  const session = useSession();
 
   /* ── 금일/어제 현황 ── */
   const { data: dailyData } = useQuery({
@@ -104,10 +100,38 @@ const Dashboard = () => {
         },
       ],
       series: [
-        { name: '구매건수', type: 'bar', yAxisIndex: 0, data: top10.map((d) => d.purchaseCnt), itemStyle: { color: '#5b8ff9' }, label: { show: true, position: 'top', fontSize: 10, formatter: '{c}' } },
-        { name: '장바구니건수', type: 'bar', yAxisIndex: 0, data: top10.map((d) => d.cartCnt), itemStyle: { color: '#61ddaa' }, label: { show: true, position: 'top', fontSize: 10, formatter: '{c}' } },
-        { name: '페이지뷰', type: 'bar', yAxisIndex: 1, data: top10.map((d) => d.pageViewCnt), itemStyle: { color: '#f6bd16' }, label: { show: true, position: 'top', fontSize: 10, formatter: '{c}' } },
-        { name: '총점', type: 'bar', yAxisIndex: 0, data: top10.map((d) => d.totalScore), itemStyle: { color: '#e86452' }, label: { show: true, position: 'top', fontSize: 10, formatter: '{c}' } },
+        {
+          name: '구매건수',
+          type: 'bar',
+          yAxisIndex: 0,
+          data: top10.map((d) => d.purchaseCnt),
+          itemStyle: { color: '#5b8ff9' },
+          label: { show: true, position: 'top', fontSize: 10, formatter: '{c}' },
+        },
+        {
+          name: '장바구니건수',
+          type: 'bar',
+          yAxisIndex: 0,
+          data: top10.map((d) => d.cartCnt),
+          itemStyle: { color: '#61ddaa' },
+          label: { show: true, position: 'top', fontSize: 10, formatter: '{c}' },
+        },
+        {
+          name: '페이지뷰',
+          type: 'bar',
+          yAxisIndex: 1,
+          data: top10.map((d) => d.pageViewCnt),
+          itemStyle: { color: '#f6bd16' },
+          label: { show: true, position: 'top', fontSize: 10, formatter: '{c}' },
+        },
+        {
+          name: '총점',
+          type: 'bar',
+          yAxisIndex: 0,
+          data: top10.map((d) => d.totalScore),
+          itemStyle: { color: '#e86452' },
+          label: { show: true, position: 'top', fontSize: 10, formatter: '{c}' },
+        },
       ],
     };
   }, [top10]);
@@ -175,12 +199,9 @@ const Dashboard = () => {
 
   return (
     <div style={{ padding: '20px 24px', background: '#f5f6fa', minHeight: '100%' }}>
-
       {/* ── 상단: 인사 + 현황 카드 ── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#222' }}>
-          {user?.userNm ?? ''} 님 안녕하세요
-        </h2>
+        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#222' }}>{session?.data?.user.userNm ?? ''} 님 안녕하세요</h2>
 
         <div style={{ display: 'flex', gap: 12 }}>
           {/* 어제 */}
@@ -213,21 +234,13 @@ const Dashboard = () => {
         {/* 왼쪽: TOP 10 */}
         <div style={chartBoxStyle}>
           <p style={chartTitle}>잘 팔리는 상품 TOP 10 (총점 기준)</p>
-          {top10.length > 0 ? (
-            <ReactECharts option={top10ChartOption} style={{ height: 380 }} />
-          ) : (
-            <EmptyChart />
-          )}
+          {top10.length > 0 ? <ReactECharts option={top10ChartOption} style={{ height: 380 }} /> : <EmptyChart />}
         </div>
 
         {/* 오른쪽: 월별 실적 */}
         <div style={chartBoxStyle}>
           <p style={chartTitle}>월별 판매 실적 차트</p>
-          {statRows.length > 0 ? (
-            <ReactECharts option={monthlyChartOption} style={{ height: 380 }} />
-          ) : (
-            <EmptyChart />
-          )}
+          {statRows.length > 0 ? <ReactECharts option={monthlyChartOption} style={{ height: 380 }} /> : <EmptyChart />}
         </div>
       </div>
     </div>
@@ -235,9 +248,7 @@ const Dashboard = () => {
 };
 
 const EmptyChart = () => (
-  <div style={{ height: 380, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontSize: 13 }}>
-    데이터가 없습니다.
-  </div>
+  <div style={{ height: 380, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontSize: 13 }}>데이터가 없습니다.</div>
 );
 
 const cardStyle: React.CSSProperties = {

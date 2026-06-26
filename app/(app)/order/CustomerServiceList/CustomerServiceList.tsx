@@ -29,11 +29,20 @@ type FilterType = {
 };
 
 // ─── 메시지 버블 ──────────────────────────────────────────────────────────────
-function MessageBubble({ msg, getFileUrl }: { msg: ComuResponseMessage; getFileUrl: (name: string) => Promise<string> }) {
+function MessageBubble({
+  msg,
+  getFileUrl,
+  onDelete,
+}: {
+  msg: ComuResponseMessage;
+  getFileUrl: (name: string) => Promise<string>;
+  onDelete?: (msgId: number) => void;
+}) {
   const isAdmin = msg.reqYn === 'N'; // 관리자가 보낸 메시지 → 오른쪽
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const { selectFileList } = useCommonStore();
   const [lightbox, setLightbox] = useState<string | null>(null);
+  const [hovered, setHovered] = useState(false);
 
   useEffect(() => {
     if (!msg.fileId) return;
@@ -45,7 +54,11 @@ function MessageBubble({ msg, getFileUrl }: { msg: ComuResponseMessage; getFileU
   }, [msg.fileId]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: isAdmin ? 'flex-end' : 'flex-start', marginBottom: 12 }}>
+    <div
+      style={{ display: 'flex', flexDirection: 'column', alignItems: isAdmin ? 'flex-end' : 'flex-start', marginBottom: 12 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       {!isAdmin && <span style={{ fontSize: 11, color: '#888', marginBottom: 2, marginLeft: 4 }}>{msg.creUser}</span>}
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, flexDirection: isAdmin ? 'row-reverse' : 'row' }}>
         {!isAdmin && <div style={avatarStyle}>{msg.creUser?.slice(0, 1) ?? 'U'}</div>}
@@ -70,6 +83,26 @@ function MessageBubble({ msg, getFileUrl }: { msg: ComuResponseMessage; getFileU
           )}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: isAdmin ? 'flex-end' : 'flex-start', gap: 2, alignSelf: 'flex-end' }}>
+          {isAdmin && onDelete && (
+            <button
+              onClick={() => onDelete(msg.id!)}
+              style={{
+                display: hovered ? 'flex' : 'none',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'rgba(0,0,0,0.18)',
+                border: 'none',
+                borderRadius: 4,
+                color: '#fff',
+                fontSize: 11,
+                padding: '2px 6px',
+                cursor: 'pointer',
+                marginBottom: 2,
+              }}
+            >
+              삭제
+            </button>
+          )}
           {isAdmin && (
             <span style={{ fontSize: 10, color: msg.readYn === 'Y' ? '#333' : '#bbb' }}>
               {msg.readYn === 'Y' ? '읽음' : '안읽음'}
@@ -276,6 +309,21 @@ const CustomerServiceList = () => {
     }
   };
 
+  const handleDeleteMessage = async (msgId: number) => {
+    if (!confirm('이 메시지를 삭제하시겠습니까?')) return;
+    try {
+      const { data } = await authApi.delete(`/comuMng/message/${msgId}`);
+      if (data?.resultCode === 200) {
+        // 스레드 새로고침
+        if (selectedItem) await loadThread(selectedItem);
+      } else {
+        toastError(data?.resultMessage ?? '삭제 실패');
+      }
+    } catch (e: any) {
+      toastError(e?.message ?? '삭제 중 오류가 발생했습니다.');
+    }
+  };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []).slice(0, 5 - imageFiles.length);
     setImageFiles((prev) => [...prev, ...files]);
@@ -399,7 +447,9 @@ const CustomerServiceList = () => {
                 ) : (selectedThread.messages ?? []).length === 0 ? (
                   <div style={{ textAlign: 'center', color: '#bbb', paddingTop: 40 }}>메시지가 없습니다.</div>
                 ) : (
-                  (selectedThread.messages ?? []).map((msg) => <MessageBubble key={msg.id} msg={msg} getFileUrl={getFileUrl} />)
+                  (selectedThread.messages ?? []).map((msg) => (
+                    <MessageBubble key={msg.id} msg={msg} getFileUrl={getFileUrl} onDelete={handleDeleteMessage} />
+                  ))
                 )}
                 <div ref={bottomRef} />
               </div>
