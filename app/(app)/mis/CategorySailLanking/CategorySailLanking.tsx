@@ -15,7 +15,7 @@ import TunedGrid from '../../../../components/grid/TunedGrid';
 import { authApi } from '../../../../libs';
 import dayjs from 'dayjs';
 import ReactECharts from 'echarts-for-react';
-import CustomDatePickerAsPureFn from '../../../../components/CustomDatePickerAsPureFn';
+import CustomDatePickerAsPartiallyStateFulFn from '../../../../components/CustomDatePickerAsPartiallyStateFulFn';
 
 type CategoryViewFilter = {
   fromDate: string;
@@ -209,7 +209,7 @@ const CategorySailLanking = () => {
     <div>
       <Title title={menuNm ?? 'MIS 카테고리 분석'} reset={reset} search={refetch} />
       <Search className={'type_1'}>
-        <CustomDatePickerAsPureFn
+        <CustomDatePickerAsPartiallyStateFulFn
           title={'조회기간'}
           type={'range'}
           startName={'fromDate'}
@@ -282,9 +282,7 @@ const CategorySailLanking = () => {
           {top10.length > 0 ? (
             <ReactECharts option={chartOption} style={{ height: 400 }} />
           ) : (
-            <div style={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaa', fontSize: 13 }}>
-              데이터가 없습니다.
-            </div>
+            <div style={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaa', fontSize: 13 }}>데이터가 없습니다.</div>
           )}
         </div>
       </div>
