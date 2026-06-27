@@ -16,7 +16,7 @@
 }
 
 .ag-theme-quartz {
-  --ag-header-background-color: #6b21a8;
+  --ag-header-background-color: #3d1457;
   --ag-header-foreground-color: #ffffff;
   --ag-header-column-separator-color: rgba(255, 255, 255, 0.2);
   --ag-header-column-resize-handle-color: rgba(255, 255, 255, 0.3);
@@ -51,16 +51,16 @@
 }
 .ag-row-selected { // 선택된 row
   &::before {
-    background-color: #ebf3fc !important;
+    background-color: #ede0f7 !important;
   }
   &.ag-row-hover { // 선택된 row를 hover했을시
     &::before {
-      background: #cfe4fa !important;
+      background: #dcc5f0 !important;
     }
   }
   &.ag-row-focus { // 선택된 row를 focus했을시
     &::before {
-      background: #cfe4fa !important;
+      background: #dcc5f0 !important;
     }
   }
 }
@@ -96,11 +96,11 @@
 }
 
 .ag-theme-quartz .ag-cell.ag-cell-focus {
-  background-color: #f1f9ff !important;
+  background-color: #f3eafd !important;
 }
 
 .ag-theme-quartz .ag-cell-focus:not(.ag-cell-range-selected) {
-  background-color: #f1f9ff !important;
+  background-color: #f3eafd !important;
 }
 
 // 미송
@@ -416,17 +416,17 @@
   background-color: #fff !important;
 }
 .ag-cell.ag-cell-range-selected:not(.ag-cell-range-single-cell).ag-cell-range-right {
-  border-right-color: var(--main-color) !important;
+  border-right-color: #6b21a8 !important;
   border-right-width: 1px !important;
 }
 .ag-cell.ag-cell-range-selected:not(.ag-cell-range-single-cell).ag-cell-range-bottom {
-  border-bottom-color: var(--main-color) !important;
+  border-bottom-color: #6b21a8 !important;
 }
 .ag-cell.ag-cell-range-selected:not(.ag-cell-range-single-cell).ag-cell-range-left {
-  border-left-color: var(--main-color) !important;
+  border-left-color: #6b21a8 !important;
 }
 .ag-cell.ag-cell-range-selected:not(.ag-cell-range-single-cell).ag-cell-range-top {
-  border-top-color: var(--main-color) !important;
+  border-top-color: #6b21a8 !important;
 }
 
 // 그리드 내 검색 결과 cell
