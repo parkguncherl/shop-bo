@@ -1,0 +1,343 @@
+﻿// 결제거래, 입금 화면 css
+.paymentBox {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  & .paymentDiv {
+    display: flex;
+    position: relative;
+    padding: 15px 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    & > dl {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px 0;
+      & > dt {
+        display: flex;
+        align-items: center;
+        width: 100px;
+        min-height: 29.6px;
+        font-size: var(--m-size);
+        font-weight: 200;
+        &.strong {
+          font-weight: 500;
+          & + dd {
+            & > span {
+              font-weight: 500;
+              & span {
+                font-weight: 500;
+                margin-right: 7px;
+              }
+            }
+          }
+        }
+        &.balance {
+          font-weight: 500;
+          font-size: 20px;
+          & + dd {
+            & > span {
+              padding-right: 10px;
+              font-weight: 500;
+              font-size: 20px;
+            }
+          }
+        }
+      }
+      & > dd {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        width: calc(100% - 100px);
+        & > span {
+          display: flex;
+          position: relative;
+          align-items: baseline;
+          justify-content: flex-end;
+          width: 190px;
+          gap: 5px;
+          & > dl {
+            width: calc(100% - 18px);
+            & > dd {
+              display: flex;
+              justify-content: flex-end;
+              width: 100%;
+              & .formBox.border { // 금액
+                border-color: transparent !important;
+                width: 150px; // input 크기
+                & input {
+                  padding: 0 23px 0 5px;
+                  font-size: var(--m-size);
+                  font-weight: 200;
+                }
+              }
+            }
+          }
+          & > span {
+            position: absolute;
+            top: 52%;
+            right: 10px;
+            transform: translateY(-50%);
+          }
+
+          & > .formBox.border { // 날짜
+            border-color: transparent !important;
+            width: 100%;
+            & input {
+              padding: 0 5px;
+              font-size: var(--m-size);
+              font-weight: 200;
+              text-align: right;
+            }
+          }
+        }
+        & > em {
+          display: flex;
+          padding: 2px 11px;
+          border-radius: 15px;
+          background-color: #ffe8e9;
+          color: #ce3f48;
+          font-weight: 300;
+          font-style: normal;
+          font-size: var(--xs-size);
+        }
+        & > .formBox.border {
+          width: 120px;
+          border: none !important;
+          & .ant-select {
+            position: relative;
+            & .ant-select-selector {
+              padding: 0;
+              border: none !important;
+              & .ant-select-selection-search {
+                width: 0;
+              }
+              & .ant-select-selection-item {
+                display: none;
+              }
+              & .ant-select-selection-placeholder {
+                display: none;
+              }
+            }
+            & .ant-select-arrow {
+              left: 11px;
+            }
+          }
+        }
+      }
+    }
+    &.etc {
+      padding: 0 20px;
+    }
+    & .etcBox { // 비고
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      position: relative;
+      & > button {
+        position: absolute;
+        top: 3px;
+        left: 0;
+        z-index: 4;
+      }
+      & .formBox {
+        width: 100%;
+        border: none !important;
+        padding-left: 75px;
+        & .ant-select {
+          max-width: 100%;
+        }
+      }
+    }
+    &.disabled {
+      &::after {
+        content: "";
+        display: block;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: transparent;
+        cursor: no-drop;
+        z-index: 10;
+      }
+      & dl {
+        & dt {
+          color: #aaa;
+        }
+        & dd {
+          & span {
+            color: #aaa;
+          }
+          & input {
+            color: #aaa;
+          }
+        }
+      }
+    }
+  }
+  &.pay {
+    & .paymentDiv {
+      & > dl {
+        & > dd {
+          & > span {
+            width: 100%;
+            & input {
+              max-width: 100%;
+            }
+          }
+        }
+        & .balance {
+          & + dd {
+            & > span {
+              font-weight: 500;
+              font-size: 20px;
+            }
+          }
+        }
+      }
+      &.pay {
+        flex-direction: column;
+        gap: 10px;
+        & ul {
+          display: flex;
+          justify-content: space-between;
+          & li {
+            & dl {
+              display: flex;
+              align-items: center;
+              gap: 10px;
+            }
+          }
+        }
+      }
+      &.factorySettle {
+        flex-direction: column;
+        & > dl {
+          & > dd {
+            &.txt > span {
+              & strong {
+                font-weight: 300;
+              }
+              & span {
+                position: inherit;
+                top: inherit;
+                right: inherit;
+                transform: translateY(0);
+              }
+            }
+            & > span {
+              & .formBox {
+                margin-right: -10px;
+              }
+              & > span {
+                right: 0;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  &.vat {
+    & .paymentDiv {
+      & > dl {
+        & > dd {
+          display: flex;
+          justify-content: flex-end;
+          & > span {
+            width: 100%;
+            & input {
+              max-width: 100%;
+            }
+          }
+          // 소매처
+          & .formBox.selBtn {
+            width: 250px;
+            & .formBox.border {
+              border-color: transparent;
+            }
+          }
+
+        }
+        & .balance {
+          & + dd {
+            & > span {
+              font-weight: 500;
+              font-size: 20px;
+            }
+            & .formBox.border.price {
+              border-color: transparent;
+              & input {
+                font-weight: 500;
+                font-size: 20px;
+                padding-right: 28px;
+                height: auto;
+              }
+              & .priceTxt {
+                font-weight: 500;
+                font-size: 20px;
+                right: 10px;
+              }
+            }
+          }
+        }
+        & dt.datePicker {
+          width: 0;
+          & + dd {
+            width: 100%;
+            & .datePickerBox {
+              width: 100%;
+              & dl {
+                width: 100%;
+                & dt {
+                  width: 100px;
+                  & .ant-select {
+                    margin-left: -12px;
+                    & .ant-select-selection-item {
+                      font-size: var(--m-size);
+                      font-weight: 200;
+                    }
+                  }
+                }
+                & dd {
+                  display: flex;
+                  justify-content: flex-end;
+                  width: calc(100% - 100px);
+                  & .formBox.border {
+                    border-color: transparent;
+                    min-width: 250px;
+                    gap: 0;
+                  }
+                }
+              }
+            }
+          }
+          &.date {
+            & + dd {
+              & .datePickerBox {
+                & dl {
+                  & dd {
+                    & .formBox.border {
+                      min-width: 0;
+                      width: 132px;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+.paySwitch { // pay 스위치
+  background: #bbb;
+  &:hover:not(.ant-switch-disabled) {
+    background: #aaa;
+  }
+}
+

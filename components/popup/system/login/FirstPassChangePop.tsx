@@ -4,7 +4,7 @@ import { PopupContent, PopupFooter, PopupLayout } from '../../index';
 import { toastError } from '../../../index';
 import { useAuthStore } from '../../../../stores';
 import { useMutation } from '@tanstack/react-query';
-import styles from '../../../../styles/delete/popup.module.scss';
+import styles from '../../../../styles/popup/popup.module.scss';
 
 interface Props {
   loginId: string;

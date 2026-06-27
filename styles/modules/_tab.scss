@@ -1,0 +1,105 @@
+﻿// tab 탭
+.tabBox {
+  & .tabHeader {
+    display: flex;
+    border-bottom: 1px solid #333;
+    align-items: center;
+    justify-content: space-between;
+    & .tabBtnArea {
+      display: flex;
+      gap: 10px;
+      padding-bottom: 10px;
+      & button {
+        display: flex;
+        background: transparent;
+        font-size: var(--l-size);
+        font-weight: 500;
+        line-height: 16px;
+        color: #999;
+        transition: .2s;
+        cursor: pointer;
+        &:hover,
+        &.on {
+          color: #333;
+          font-weight: 600;
+        }
+      }
+    }
+    & .formBox {
+      padding-bottom: 10px;
+    }
+  }
+  & .tabContent {
+    & > div {
+      display: none;
+      &.on {
+        display: block;
+      }
+    }
+    & .previewBox {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #fff;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+  }
+}
+.antTabBox {
+  & .ant-tabs-nav {
+    margin-bottom: 10px;
+    &::before {
+      border: none;
+    }
+    & .ant-tabs-nav-wrap {
+      & .ant-tabs-nav-list {
+        & .ant-tabs-tab { // 탭 아이템
+          padding: 5px 15px;
+          & .ant-tabs-tab-btn {
+            font-family: "NotoSansKR", sans-serif;
+            color: #333;
+          }
+          & + .ant-tabs-tab {
+            margin: 0;
+          }
+          &.ant-tabs-tab-active {
+            //& .ant-tabs-tab-btn {
+            //  color: #fff;
+            //}
+          }
+        }
+        & .ant-tabs-ink-bar { // 탭 바
+          background-color: var(--background-color);
+          height: 100%;
+          border-radius: 10px;
+          z-index: -1;
+        }
+      }
+    }
+  }
+}
+.popupContent {
+  & .ant-tabs-nav {
+    margin-bottom: 0;
+  }
+}
+
+// 그리드 검색결과
+.noRowsOverlayBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  color: #999;
+  &::before {
+    content: "";
+    display: block;
+    width: 100px;
+    height: 100px;
+    background: url(../../public/images/ico_searchResult.svg) no-repeat center;
+    background-size: 80% auto;
+  }
+}
+

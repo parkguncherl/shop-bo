@@ -50,7 +50,7 @@
       font-weight: 800;
       letter-spacing: 0.1em;
       color: #fff;
-      background-color: #6b21a8;
+      background-color: var(--purple);
       border-radius: 10px;
     }
   }
@@ -224,15 +224,15 @@
       }
     }
     :global(.ant-checkbox-checked .ant-checkbox-inner) {
-      background-color: #6b21a8;
-      border-color: #6b21a8;
+      background-color: var(--purple);
+      border-color: var(--purple);
     }
     :global(.ant-checkbox-checked::after) {
-      border-color: #6b21a8;
+      border-color: var(--purple);
     }
     :global(.ant-checkbox:hover .ant-checkbox-inner),
     :global(.ant-checkbox-input:focus + .ant-checkbox-inner) {
-      border-color: #6b21a8;
+      border-color: var(--purple);
     }
   }
   .clickbtn {
@@ -241,7 +241,7 @@
     align-items: center;
     width: 100%;
     height: 50px;
-    background-color: #6b21a8;
+    background-color: var(--purple);
     border-radius: 5px;
     font-size: 17px;
     font-weight: 400;
@@ -250,7 +250,7 @@
     font-family: 'NotoSansKR';
     transition: .2s;
     &:hover {
-      background-color: #581c87;
+      background-color: var(--purple-hover);
     }
   }
   .etc_btn {
@@ -315,13 +315,13 @@
     & .btnArea {
       & button {
         width: 100%;
-        background-color: #6b21a8;
-        border-color: #6b21a8;
+        background-color: var(--purple);
+        border-color: var(--purple);
         color: #fff !important;
         height: 40px;
         &:hover {
-          background-color: #581c87;
-          border-color: #581c87;
+          background-color: var(--purple-hover);
+          border-color: var(--purple-hover);
         }
       }
     }

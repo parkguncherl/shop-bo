@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../../../styles/delete/popup.module.scss';
+import styles from '../../../styles/popup/popup.module.scss';
 import { CustomInput } from '../../CustomInput';
 import { DropDown } from '../../DropDown';
 import SearchBar from '../../search/SearchBar';

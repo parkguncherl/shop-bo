@@ -1,0 +1,301 @@
+﻿// 이미지 팝업박스
+.imagePopBox {
+  & .imageContainer {
+    display: flex;
+    position: relative;
+    & .image {
+      display: flex;
+      position: relative;
+      justify-content: center;
+      align-items: center;
+      height: 550px;
+      padding: 5px 30px;
+      width: 100%;
+      & img {
+        max-height: 100%;
+        max-width: 100%;
+      }
+      & span {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 50px;
+        height: 40px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, .4);
+        font-size: 20px;
+        font-weight: 900;
+        color: #fff;
+      }
+    }
+    & .prevBtn,
+    & .nextBtn {
+      position: absolute;
+      top: 50%;
+      width: 20px;
+      height: 30px;
+      transform: translateY(-50%);
+      text-indent: -9999em;
+      cursor: pointer;
+      background: transparent;
+      z-index: 3;
+      &::after {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 10px;
+        height: 10px;
+        border: 1px solid #333;
+        border-width: 0 2px 2px 0;
+      }
+    }
+    & .prevBtn {
+      left: 0;
+      &::after {
+        transform: rotate(135deg);
+        top: 9px;
+        left: 8px;
+      }
+    }
+    & .nextBtn {
+      right: 0;
+      &::after {
+        transform: rotate(-45deg);
+        top: 9px;
+        left: 2px;
+      }
+    }
+    & .etcBtnArea {
+      display: flex;
+      gap: 10px;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+    }
+  }
+}
+
+/* styles.css 또는 컴포넌트 내의 스타일링 영역에 추가 */
+.select-container {
+  margin: 16px 0; /* 상하 여백 추가 */
+}
+
+select {
+  width: 100%; /* 부모 요소의 폭에 맞게 조절 */
+  padding: 8px; /* 안쪽 여백 추가 */
+  border: 1px solid #ccc; /* 테두리 스타일 추가 */
+  border-radius: 4px; /* 둥근 모서리 */
+  font-size: 16px; /* 글자 크기 조절 */
+}
+
+option {
+  padding: 8px; /* 항목 안쪽 여백 추가 */
+}
+
+// 마이페이지 - 도매정보
+.storeInfoDiv {
+  display: flex;
+  justify-content: space-between;
+  & .left {
+    width: 35%;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    & img {
+      display: flex;
+      width: 100%;
+    }
+  }
+  & .right {
+    width: calc(65% - 20px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px 30px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    background-color: #f5f5f5;
+    & .smallTitle {
+      font-size: var(--xl-size);
+      margin-bottom: 10px;
+    }
+    & dl {
+      display: flex;
+      &::before {
+        content: " · ";
+        margin-right: 10px;
+      }
+      & dt {
+        width: 120px;
+        font-weight: 500;
+        font-size: var(--m-size);
+      }
+      & dd {
+        font-size: var(--s-size);
+      }
+    }
+  }
+}
+
+// datalist select
+.list {
+  width: 100%;
+  & span[class*="-A11yText"] {
+    display: none;
+  }
+  & div[class*="-control"] {
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+    box-shadow: none;
+    transition: .2s;
+    min-height: 28px;
+    &:hover {
+      border-color: var(--main-color);
+    }
+    & div[class*="-ValueContainer"] {
+      & div[class*="-placeholder"] {
+        font-size: var(--s-size);
+      }
+      & div[class*="-singleValue"] {
+        font-size: var(--s-size);
+      }
+      & div[class*="-Input"] {
+        grid-template-columns: none;
+        margin: 0;
+        padding: 0;
+        & input {
+          font-size: var(--s-size) !important;
+          grid-area: 1 !important;
+        }
+      }
+    }
+  }
+  & div[class*="IndicatorsContainer"] {
+    & div[class*="-indicatorContainer"] {
+      padding: 0 8px;
+    }
+  }
+
+}
+
+// 커스텀 캘린더
+.customCalendar {
+  border: 1px solid #ddd !important;
+  border-radius: 8px !important;
+  & div[class*="triangle"] {
+    &::before,
+    &::after {
+      border-bottom-color: #fff !important;
+    }
+  }
+  & div[class*="month-container"] {
+    padding: 15px 15px 15px 15px;
+    border-radius: 8px;
+    & > div {
+      background-color: #fff;
+      padding: 0 0 10px 0;
+      border-bottom-color: #fff !important;
+      &:last-child {
+        border-bottom: none;
+        padding: 0;
+        margin: 0;
+        & div[class*="selected"] {
+          background-color: var(--main-color);
+          font-weight: 300;
+          color: #fff;
+        }
+      }
+    }
+  }
+  & .datePickerHeader {
+    display: flex;
+    position: relative;
+    & span {
+      display: flex !important;
+      justify-content: flex-start;
+      width: 100% !important;
+      height: auto !important;
+      background-color: transparent !important;
+      margin: 0 !important;
+      font-size: 20px;
+      letter-spacing: .5px;
+      text-indent: 5px;
+      font-weight: 500;
+      color: #333;
+    }
+    & button {
+      display: block;
+      position: absolute;
+      top: 50%;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      background-color: #fff;
+      transform: translateY(-50%);
+      &::before {
+        content: "";
+        display: block;
+        width: 20px;
+        height: 20px;
+        background: no-repeat center;
+        background-size: 100% auto;
+      }
+      &:nth-child(1) {
+        right: 25px;
+        &::before {
+          background-image: url(../../public/images/ico_downArow.svg);
+          transform: rotate(90deg);
+        }
+      }
+      &:nth-child(3) {
+        right: 0;
+        &::before {
+          background-image: url(../../public/images/ico_downArow.svg);
+          transform: rotate(-90deg);
+        }
+      }
+    }
+    & button.today {
+      position: absolute;
+      top: inherit;
+      bottom: -230px;
+      right: 50%;
+      transform: translateX(50%);
+      background-color: #fff;
+      border: 1px solid #ddd;
+      padding: 5px 10px;
+      border-radius: 5px;
+      display: flex;
+      width: 100px;
+      height: 28px;
+      align-items: center;
+      justify-content: center;
+      &::before {
+        display: none;
+      }
+    }
+  }
+  & .react-datepicker__day-names {
+    padding-top: 10px;
+    & > div {
+      font-weight: 400;
+      color: #333;
+    }
+  }
+  & .react-datepicker__month {
+    border: none;
+    & .react-datepicker__week {
+      & .react-datepicker__day {
+        border-radius: 50%;
+        &.react-datepicker__day--outside-month {
+          opacity: .2;
+        }
+      }
+    }
+  }
+}
+

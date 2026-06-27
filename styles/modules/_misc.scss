@@ -1,0 +1,321 @@
+﻿// 데이터리스트 커스텀
+.dataListSelect {
+  min-width: 150px;
+  border: 1px solid #ddd;
+  border-radius: 3px !important;
+  &:hover {
+    border-color: transparent;
+  }
+  & .dataListControl {
+    min-height: 28px !important;
+    padding: 0 10px;
+    border: 2px solid transparent;
+    border-radius: 3px !important;
+    box-shadow: none;
+    &:hover {
+      border-color: var(--hover-color);
+    }
+    &.css-t3ipsp-control {
+      border-color: var(--focus-color);
+    }
+    & div[class*="ValueContainer"] {
+      display: flex;
+      padding: 0;
+      margin: 0;
+    }
+    & div[class*="singleValue"],
+    & div[class*="placeholder"]{
+      display: flex;
+      padding: 0;
+      margin: 0;
+      font-size: var(--s-size);
+      color: #ccc;
+    }
+    & div[class*="-Input"] {
+      display: flex;
+      padding: 0;
+      margin: 0;
+      width: 10px;
+    }
+    & div[class*="IndicatorsContainer"] {
+      & span[class*="indicatorSeparator"] {
+        display: none;
+      }
+      & div[class*="indicatorContainer"] {
+        padding: 0;
+      }
+    }
+  }
+}
+// 옵션메뉴
+.dataListMenu {
+  & .dataListMenuList {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    & .dataListOpt {
+      font-size: var(--s-size);
+      padding: 5px;
+      border-radius: 5px;
+      background-color: #fff;
+      cursor: pointer;
+      transition: .2s;
+      &:hover {
+        background-color: #F2F4F6;
+      }
+      &.selected {
+        background-color: #E6F4FF;
+        color: #333;
+      }
+    }
+  }
+}
+
+// 상품관리 이미지목록
+.productImgBox {
+  position: absolute;
+  bottom: 50px;
+  right: -1px;
+  width: 1px;
+  height: 200px;
+  background-color: var(--background-color);
+  padding: 20px 30px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  opacity: 0;
+  transition: .4s;
+  &.on {
+    width: 250px;
+    right: 15px;
+    opacity: 1;
+    &.onSize {
+      height: calc(100% - 133px);
+      width: 400px;
+      & .swiper .swiper-wrapper .swiper-slide img {
+        height: auto;
+        width: 100%;
+      }
+    }
+  }
+  & .swiper {
+    height: 100%;
+    & .swiper-wrapper { // 슬라이드 wrap
+      height: 100%;
+      & .swiper-slide { // 슬라이드 아이템
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        height: 100%;
+        & img {
+          height: 100%;
+        }
+      }
+    }
+
+    // 페이지네이션
+    & .swiper-pagination {
+      & .swiper-pagination-bullet {
+        background-color: var(--background-color);
+        &.swiper-pagination-bullet-active {
+          background-color: var(--main-color);
+        }
+      }
+    }
+  }
+
+  // 버튼
+  & .imgBoxBtn {
+    & > button {
+      display: flex;
+      position: absolute;
+      top: 50%;
+      background: transparent no-repeat center;
+      background-size: 100% auto;
+      width: 15px;
+      height: 40px;
+      cursor: pointer;
+      margin-top: -10px;
+      z-index: 10;
+    }
+    & .imgBoxPrev {
+      background-image: url(../../public/images/ico_leftArow1.svg);
+      left: 7px;
+    }
+    & .imgBoxNext {
+      background-image: url(../../public/images/ico_rightArow1.svg);
+      right: 7px;
+    }
+    & button.swiper-button-disabled {
+      opacity: 0;
+    }
+  }
+
+  // 노이미지
+  & .noImage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: var(--m-size);
+    color: #bbb;
+    gap: 10px;
+    &::before {
+      content: "";
+      display: block;
+      width: 55px;
+      height: 55px;
+      background: url(../../public/images/ico_searchResult_gray.svg) no-repeat center;
+    }
+  }
+
+  // 리사이즈 버튼
+  & .imgResizeBtn {
+    display: block;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background: transparent no-repeat center;
+    background-size: 100% auto;
+    cursor: pointer;
+    &.big {background-image: url(../../public/images/ico_big.svg);}
+    &.small {background-image: url(../../public/images/ico_small.svg);}
+  }
+}
+
+// 그리드 셀스타일 (병합시)
+.ag-header-cell-comp-wrapper {
+  justify-content: center;
+  color: #fff;
+}
+.ag-header-row:not(:first-child) .ag-header-cell:not(.ag-header-span-height.ag-header-span-total), .ag-header-row:not(:first-child) .ag-header-group-cell.ag-header-group-cell-with-group {
+  border-top: none !important;
+}
+
+// 셀렉트박스 (선택하는거)
+.error {
+  & .formBox.border {
+    & .ant-select-selector {
+      border-color: #E94C56;
+    }
+  }
+}
+
+// 버튼 컨테이너를 relative로 설정
+.shortcut-button-container {
+  position: relative;
+  display: inline-block;
+}
+
+.shortcut-button {
+  // 기존 버튼 스타일은 그대로 유지
+  position: relative;
+
+  // 배지가 있을 때 오른쪽 여백만 추가 (위쪽 여백 제거)
+  &[data-count]:not([data-count="0"]):not([data-count=""]) {
+    margin-right: 8px;
+    // margin-top 제거하여 버튼이 아래로 밀리지 않도록 함
+  }
+
+  // 배지 스타일
+  &[data-count]:not([data-count="0"]):not([data-count=""]):after {
+    content: attr(data-count);
+    position: absolute;
+    top: -8px;
+    right: -8px;
+
+    // 카카오톡 스타일 배지 디자인 (CSS 변수 사용)
+    background-color: var(--badge-color, #ff4444);
+    color: white;
+    border-radius: 50%;
+
+    // 최소 크기 설정 (더 작게)
+    min-width: 16px;
+    min-height: 16px;
+
+    // 텍스트 중앙 정렬
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    // 폰트 설정 (더 작게)
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1;
+
+    // 그림자 효과
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+
+    // 애니메이션 효과 (선택사항)
+    transform: scale(1);
+    transition: transform 0.2s ease;
+
+    // 숫자가 두 자리 이상일 때 패딩 추가 (더 작게)
+    padding: 1px 4px;
+
+    // z-index로 다른 요소들 위에 표시
+    z-index: 10;
+  }
+
+  // 배지 호버 효과 (선택사항)
+  &:hover[data-count]:not([data-count="0"]):not([data-count=""]):after {
+    transform: scale(1.1);
+  }
+
+  // 숫자가 99를 초과할 때 "99+"로 표시
+  &[data-count="100"]:after,
+  &[data-count="101"]:after,
+  &[data-count="102"]:after,
+  &[data-count="103"]:after,
+  &[data-count="104"]:after,
+  &[data-count="105"]:after,
+  &[data-count="106"]:after,
+  &[data-count="107"]:after,
+  &[data-count="108"]:after,
+  &[data-count="109"]:after {
+    content: "99+";
+  }
+  // 더 많은 숫자들도 필요하면 추가하거나 JavaScript로 처리
+}
+
+// 더 구체적인 선택자 사용
+.shortcut-button.btn_exist-data {
+  color: #2e2ef4 !important;
+}
+
+.shortcut-button.border-blue-thick {
+  border: 3px solid #007BFF !important; // 또는 blue, 또는 원하는 색상 코드
+}
+
+// 버튼이 비활성화되었을 때 배지도 흐리게
+.shortcut-button.opacity-50[data-count]:not([data-count="0"]):not([data-count=""]):after {
+  opacity: 0.5;
+}
+
+// 다크 모드 지원 (선택사항)
+@media (prefers-color-scheme: dark) {
+  .shortcut-button[data-count]:not([data-count="0"]):not([data-count=""]):after {
+    background-color: #ff5555;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  }
+}
+
+// 반응형 디자인 (선택사항)
+@media (max-width: 768px) {
+  .shortcut-button[data-count]:not([data-count="0"]):not([data-count=""]):after {
+    top: -5px;
+    right: -5px;
+    min-width: 14px;
+    min-height: 14px;
+    font-size: 9px;
+  }
+}
+dl.imgToggle {
+  dt { min-width: unset; width: auto; }
+  dd .formBox .ant-segmented {
+    .ant-segmented-item-label { padding: 0 6px; font-size: 11px; }
+  }
+}

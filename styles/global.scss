@@ -16,13 +16,13 @@
 }
 
 .ag-theme-quartz {
-  --ag-header-background-color: #3d1457;
+  --ag-header-background-color: var(--purple-dark);
   --ag-header-foreground-color: #ffffff;
   --ag-header-column-separator-color: rgba(255, 255, 255, 0.2);
   --ag-header-column-resize-handle-color: rgba(255, 255, 255, 0.3);
-  --ag-active-color: #6b21a8;
-  --ag-range-selection-border-color: #6b21a8;
-  --ag-checkbox-checked-color: #6b21a8;
+  --ag-active-color: var(--purple);
+  --ag-range-selection-border-color: var(--purple);
+  --ag-checkbox-checked-color: var(--purple);
 }
 .ag-row {
   &::before {
@@ -416,17 +416,17 @@
   background-color: #fff !important;
 }
 .ag-cell.ag-cell-range-selected:not(.ag-cell-range-single-cell).ag-cell-range-right {
-  border-right-color: #6b21a8 !important;
+  border-right-color: var(--purple) !important;
   border-right-width: 1px !important;
 }
 .ag-cell.ag-cell-range-selected:not(.ag-cell-range-single-cell).ag-cell-range-bottom {
-  border-bottom-color: #6b21a8 !important;
+  border-bottom-color: var(--purple) !important;
 }
 .ag-cell.ag-cell-range-selected:not(.ag-cell-range-single-cell).ag-cell-range-left {
-  border-left-color: #6b21a8 !important;
+  border-left-color: var(--purple) !important;
 }
 .ag-cell.ag-cell-range-selected:not(.ag-cell-range-single-cell).ag-cell-range-top {
-  border-top-color: #6b21a8 !important;
+  border-top-color: var(--purple) !important;
 }
 
 // 그리드 내 검색 결과 cell

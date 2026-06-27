@@ -1,0 +1,222 @@
+﻿// 레이아웃 비율
+.layoutBox {
+  display: flex;
+  justify-content: space-between;
+  & .layout70 {
+    width: calc(70% - 5px);
+  }
+  & .layout60 {
+    width: calc(60% - 5px);
+    & .searchArea {
+      & > div {
+        height: auto;
+        & dl {
+          width: 70%;
+        }
+      }
+    }
+  }
+  & .layout50 {
+    width: calc(50% - 5px);
+  }
+  & .layout40 {
+    width: calc(40% - 5px);
+  }
+  & .layout30 {
+    width: calc(30% - 5px);
+  }
+  & .layout20 {
+    width: calc(20% - 5px);
+  }
+  & .layout600 {width: 600px;}
+  & .layout100-600 {width:calc(100% - 610px);}
+  & .layout100 {width: 100% !important;}
+  & div.row {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    & > .left,
+    & > .right {
+      width: calc(50% - 5px);
+    }
+  }
+}
+
+// radioSwitch
+.chkSwitch {
+  display: flex;
+  position: relative;
+  height: 22px;
+  & label {
+    display: flex;
+    cursor: pointer;
+    & span {
+      position: absolute;
+      width: 22px;
+      font-size: var(--xs-size);
+      font-weight: 400;
+      transition: .2s;
+    }
+    & span:first-child {
+      top: 4px;
+      right: 6px;
+    }
+    & span:last-child {
+      top: 4px;
+      right: 26px;
+    }
+  }
+  & input {
+    display: none;
+    position: absolute;
+    right: -9999em;
+  }
+  & input ~ label {
+    &::before {
+      content: "";
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 56px;
+      height: 26px;
+      border-radius: 23px;
+      background-color: #ddd;
+      transition: .2s;
+    }
+    &::after {
+      content: "";
+      display: block;
+      position: absolute;
+      top: 3px;
+      right: 32px;
+      width: 19px;
+      height: 19px;
+      border-radius: 50%;
+      background-color: #0064ed;
+      transition: .2s;
+    }
+    & span:last-child {
+      opacity: 0;
+    }
+  }
+  & input:checked ~ label {
+    &::after {
+      right: 4px;
+    }
+    & span:first-child {
+      opacity: 0;
+    }
+    & span:last-child {
+      opacity: 1;
+    }
+  }
+}
+.titleBox { // 미출관리
+  & .chkSwitch {
+    position: absolute;
+    top: 27px;
+    right: 128px;
+    & label {
+      & span {
+        position: absolute;
+        width: 25px;
+        font-size: var(--m-size);
+        font-weight: 400;
+        transition: .2s;
+      }
+      & span:first-child {
+        top: 6px;
+        right: 8px;
+      }
+      & span:last-child {
+        top: 6px;
+        right: 35px;
+      }
+    }
+    & input ~ label {
+      &::before {
+        top: 0;
+        right: 0;
+        width: 70px;
+        height: 35px;
+        border-radius: 23px;
+        background-color: #ddd;
+        transition: .2s;
+      }
+      &::after {
+        top: 4px;
+        right: 37px;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background-color: #0064ed;
+        transition: .2s;
+      }
+      & span:last-child {
+        opacity: 0;
+      }
+    }
+    & input:checked ~ label {
+      &::after {
+        right: 6px;
+      }
+      & span:first-child {
+        opacity: 0;
+      }
+      & span:last-child {
+        opacity: 1;
+      }
+    }
+  }
+}
+// graph
+.graphBox {
+  display: flex;
+  gap: 10px;
+  border-top: 1px solid #333;
+  background-color: #fff;
+  padding: 20px;
+  box-sizing: border-box;
+  & .echarts-for-react {
+    width: 100%;
+  }
+  & .btnArea {
+    flex-direction: column;
+    justify-content: space-between;
+    & button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      border-radius: 5px;
+      background-color: #f5f5f5;
+      width: 90px;
+      word-break: keep-all;
+      transition: .2s;
+      cursor: pointer;
+      &:hover {
+        background-color: #ddd;
+      }
+    }
+  }
+  &.asnMng {
+    & .echarts-for-react {
+      width: calc(100% - 100px);
+    }
+  }
+  &.expense {
+    height: calc(100% - 40px);
+    & .echarts-for-react {
+      height: 100% !important;
+    }
+  }
+  &.settlement {
+    & .echarts-for-react {
+      height: 442px !important;
+    }
+  }
+}
+
+
+

@@ -1,0 +1,274 @@
+﻿// 결제거래 css
+.formBox.payment.selBtn {
+  & > div {
+    display: flex;
+    width: calc(100% - 35px);
+    position: relative;
+    & dl {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      z-index: 1;
+      width: calc(100% - 30px);
+      & dt {
+        display: none;
+      }
+      & dd {
+        height: 100%;
+        & .formBox {
+          height: 100%;
+          border-color: transparent;
+          & .ant-input-affix-wrapper {
+            height: 100%;
+            background-color: transparent;
+            border-color: transparent;
+            & input {
+              max-width: 100%;
+              background-color: transparent;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.popBody {
+  & .formBox {
+    & .ant-select,
+    & input {
+      width: 100%;
+      max-width: 250px;
+    }
+  }
+  & .popInpWidth100 {
+    & dl {
+      width: 100%;
+    }
+    & .ant-select,
+    & input {
+      max-width: 100%;
+    }
+  }
+  & .inpBtn {
+    & dl {
+      min-width: 0 !important;
+      & dt {
+        display: none;
+      }
+      & dd {
+        width: 100%;
+        padding: 0;
+      }
+    }
+    & .btnBlack {
+      width: 55px;
+    }
+
+  }
+}
+.ant-select.focus {
+  &.ant-select-focused.ant-select-outlined:not(.ant-select-disabled):not(.ant-select-custmize-input):not(.ant-pagination-size-changer) .ant-select-selector {
+    box-shadow: none;
+    border-color: var(--focus-color);
+  }
+}
+.searchArea {
+  & > div {
+    padding-top: 2px;
+  }
+  & .formBox {
+    & .ant-input-affix-wrapper { // input
+      padding-left: 20px;
+      &::after {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 9px;
+        text-indent: -9999em;
+        width: 13px;
+        height: 12px;
+        background: url(../../public/images/ico_search_gray.svg) no-repeat center;
+        transform: translateY(-50%);
+      }
+      & input {
+        font-weight: 200;
+      }
+    }
+    & .ant-select {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+  & .formBox.inpChk {
+
+    & > input {
+      width: calc(100% - 92px);
+    }
+  }
+
+  & .formBox {
+    & .ant-select {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+  & .formBox.inpChk {
+
+    & > input {
+      width: calc(100% - 92px);
+    }
+  }
+  .formBox .selBox .ant-space-item .ant-select {
+    height: auto;
+  }
+  .formBox .selBox .ant-space-item .ant-select .ant-select-selector {
+  }
+  .formBox .selBox .ant-space-item .ant-select .ant-select-selector .ant-select-selection-item {
+    height: 22px;
+  }
+  .formBox .selBox .ant-space-item .ant-select-selection-item-content {
+    font-size: var(--s-size);
+  }
+
+  & .type_2 {
+    & dl {
+      & dt {
+        & .ant-select {
+          height: 25px;
+          & .ant-select-selector {
+            padding: 0;
+            height: 25px;
+            border: none;
+            inset-inline-start: 0;
+            inset-inline-end: 0;
+            & .ant-select-selection-item {
+              font-size: var(--s-size);
+              color: #333;
+            }
+            & .ant-select-selection-search-input {
+              height: 25px;
+            }
+            & .ant-select-selection-search {
+              width: 100%;
+              inset-inline-start: 0;
+              inset-inline-end: 0;
+            }
+          }
+          & .ant-select-arrow {
+            inset-inline-end: 0;
+            & svg {
+              font-size: 11px;
+              color: #333;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+.searchOption.ant-select-dropdown {
+  padding: 5px 10px;
+  & .ant-select-item.ant-select-item-option {
+    padding: 5px;
+    & .ant-select-item-option-content {
+      font-size: var(--xs-size);
+    }
+  }
+}
+.ant-select-item {
+  padding: 5px 6px;
+  & .ant-select-item-option-content { // 신규 아이콘
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    & span {
+      display: flex;
+      font-size: 11px;
+      padding: 1px 8px;
+      border-radius: 15px;
+      color: #fff;
+      background-color: var(--blue-color);
+    }
+  }
+}
+.ant-select-dropdown {
+  padding: 10px 5px 10px 5px;
+  color: #333;
+  & .ant-select-item {
+    padding: 5px 5px 5px 0px;
+  }
+  & .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+    background-color: var(--background-color);
+  }
+  & .ant-select-item-empty {
+    font-size: var(--s-size);
+    word-break: keep-all;
+  }
+}
+.selectOpt { // 구분1 셀렉터
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  width: 100%;
+  & strong {
+    font-size: var(--s-size);
+    color: #333;
+    font-weight: 200;
+  }
+  & button {
+    display: block;
+    text-indent: -9999em;
+    padding: 0;
+    cursor: pointer;
+    background-color: transparent;
+    &::before {
+      content: "";
+      display: block;
+      width: 20px;
+      height: 20px;
+      background: url(../../public/images/ico_minus.svg) no-repeat center;
+      background-size: 80% auto;
+      cursor: pointer;
+    }
+  }
+}
+.ant-select-selector {
+  & .selectOpt {
+    & button {
+      display: none;
+    }
+  }
+}
+.selectAdd {
+  margin-top: 5px;
+  & button {
+    display: flex;
+    align-items: center;
+    background-color: transparent;
+    font-size: var(--s-size);
+    width: 100%;
+    border-radius: 5px;
+    gap: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: .2s;
+    &::before {
+      content: "";
+      display: block;
+      width: 20px;
+      height: 20px;
+      background: url(../../public/images/ico_plus.svg) no-repeat center;
+      background-size: 80% auto;
+      cursor: pointer;
+    }
+    &:hover {
+      background-color: var(--background-color);
+    }
+  }
+}
+.ant-input {
+  font-family: 'NotoSansKR', sans-serif !important;
+}

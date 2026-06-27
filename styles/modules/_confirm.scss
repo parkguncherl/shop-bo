@@ -1,0 +1,58 @@
+﻿// confirm 메세지
+.confirmMsg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  & span {
+    &.big {
+      display: flex;
+      justify-content: center;
+      font-size: 25px;
+      font-weight: 500;
+    }
+    &.small {
+      display: flex;
+      justify-content: center;
+      font-size: var(--xl-size);
+    }
+    & strong {
+      font-size: 25px;
+      font-weight: 500;
+      color: var(--main-color);
+      margin-left: 4px;
+    }
+  }
+
+  &.arrows {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    font-size: var(--xl-size);
+    & .top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      & span {
+        font-size: 20px;
+        font-weight: 500;
+      }
+      & em {
+        display: block;
+        width: 30px;
+        height: 30px;
+        background: url(../../public/images/ico_rightArrow3.svg) no-repeat center;
+        text-indent: -9999em;
+      }
+    }
+  }
+  & .notice {
+    font-size: var(--xs-size);
+    background-color: #ffe8e9;
+    color: #ce3f48;
+    padding: 3px 10px;
+    border-radius: 10px;
+  }
+}
+

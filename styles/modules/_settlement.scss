@@ -1,0 +1,574 @@
+﻿// 매장정산
+.settlement {
+  gap: 30px;
+  & .layout30 {width: calc(30% - 15px);}
+  & .layout70 {width: calc(70% - 15px);}
+  // 정산
+  & > div {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    & > .btnArea {
+      gap: 10px;
+      & button {
+        flex: 1;
+        font-size: var(--xl-size);
+        padding: 20px 0;
+        height: 65px;
+        gap: 5px;
+        border-radius: 15px;
+        border: none;
+        &::before {
+          content: "";
+          display: flex;
+          width: 17px;
+          height: 17px;
+          background: no-repeat center;
+          background-size: auto 100%;
+        }
+        &:hover {
+          background-color: #fff;
+        }
+        &:active {
+          background-color: #BDBDBD;
+        }
+        &.plus::before {background-image: url(../../public/images/ico_plus.svg)}
+        &.minus::before {background-image: url(../../public/images/ico_minus.svg)}
+      }
+    }
+    & .settlementContent {
+      padding: 20px;
+      border-radius: 15px;
+      background-color: #fff;
+      height: calc(100vh - 297px);
+      min-height: 470px;
+      & .date {
+        box-sizing: border-box;
+        width: calc(100% + 15px);
+        padding-bottom: 15px;
+        padding-right: 10px;
+        & .datePickerBox {
+          width: 100%;
+          & .formBox {
+            width: 100%;
+            border: 1px solid #ddd;
+          }
+        }
+      }
+      & > .list {
+        overflow: auto;
+        width: calc(100% + 15px);
+        padding-right: 10px;
+        box-sizing: border-box;
+        max-height: calc(100% - 39.6px);
+        & > ul { // 1depth
+          display: flex;
+          flex-direction: column;
+          gap: 30px;
+          & > li {
+            display: flex;
+            flex-direction: column;
+            & > button {
+              display: flex;
+              position: relative;
+              justify-content: space-between;
+              background-color: #fff;
+              padding-right: 25px;
+              box-sizing: border-box;
+              cursor: pointer;
+              & strong, & span {
+                font-size: var(--xl-size);
+                font-weight: 400;
+              }
+              &::after {
+                content: "";
+                display: block;
+                position: absolute;
+                top: 50%;
+                right: 0;
+                margin-top: -5px;
+                width: 11px;
+                height: 10px;
+                background: url(../../public/images/ico_downArow.svg) no-repeat center;
+                background-size: 100% auto;
+                transition: .2s;
+              }
+            }
+            & > ul { // 2depth
+              display: flex;
+              position: relative;
+              flex-direction: column;
+              padding: 0 0 0 30px;
+              margin: 10px;
+              box-sizing: border-box;
+              gap: 3px;
+              overflow: hidden;
+              max-height: 0;
+              transition: .5s;
+              &::before {
+                content: "";
+                display: block;
+                position: absolute;
+                top: 0;
+                left: 6px;
+                width: 1px;
+                height: 100%;
+                background-color: #ddd;
+              }
+              & li {
+                display: flex;
+                justify-content: space-between;
+                & strong, & span {
+                  font-size: var(--xs-size);
+                  font-weight: 200;
+                  color: #666;
+                }
+              }
+            }
+            &.on {
+              &:nth-child(1) > ul {
+                max-height: 60px;
+              }
+              &:nth-child(2) > ul {
+                max-height: 60px;
+              }
+              &:nth-child(3) > ul {
+                max-height: 60px;
+              }
+              &:nth-child(4) > ul {
+                max-height: 188px;
+              }
+              & > button {
+                &::after {
+                  transform: rotate(180deg);
+                }
+              }
+            }
+          }
+        }
+        /* 스크롤바 전체 스타일링 */
+        &::-webkit-scrollbar {
+          width: 8px;
+        }
+        &::-webkit-scrollbar {
+          height: 8px;
+        }
+        /* 스크롤바 track 스타일링 (배경) */
+        &::-webkit-scrollbar-track,
+        .ag-body-vertical-scroll-viewport::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 10px;
+        }
+        /* 스크롤바 thumb 스타일링 (드래그 가능한 부분) */
+        &::-webkit-scrollbar-thumb,
+        &::-webkit-scrollbar-thumb {
+          background: #888;
+          border-radius: 10px;
+        }
+        /* 스크롤바 thumb 반경 설정 */
+        &::-webkit-scrollbar-thumb:hover,
+        &::-webkit-scrollbar-thumb:hover {
+          background: #555;
+        }
+      }
+    }
+  }
+  // 달력
+  & .calendar {
+    & .ant-picker-calendar {
+      height: 100%;
+      background: transparent;
+      // 달력 헤더
+      & .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12.5px 30px;
+        box-sizing: border-box;
+        height: 65px;
+        background-color: #fff;
+        border-radius: 15px;
+        margin-bottom: 10px;
+        & .left {
+          display: flex;
+          gap: 20px;
+          & span {
+            font-size: 20px;
+            font-weight: 500;
+          }
+          & .btnArea {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+            & button {
+              display: flex;
+              position: relative;
+              width: 25px;
+              height: 25px;
+              cursor: pointer;
+              background-color: var(--background-color);
+              text-indent: -9999em;
+              box-sizing: border-box;
+              border-radius: 5px;
+              &::before {
+                content: "";
+                display: flex;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 9px;
+                height: 9px;
+                background: no-repeat center;
+                background-size: 100% auto;
+                margin-top: -5px;
+              }
+              &:nth-child(1)::before {background-image: url(../../public/images/ico_downArow.svg); transform: rotate(90deg); margin-left: -5px;}
+              &:nth-child(2)::before {background-image: url(../../public/images/ico_downArow.svg); transform: rotate(-90deg); margin-left: -4px;}
+            }
+          }
+        }
+        & .right {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          position: relative;
+          & span:first-child {
+            position: absolute;
+            top: 26px;
+            right: 0;
+            font-size: 11px;
+            min-width: 200px;
+            text-align: right;
+            &.red {
+              color: var(--red-color);
+            }
+            &.blue {
+              color: var(--blue-color);
+            }
+          }
+          & span:last-child {
+            font-size: 20px;
+            font-weight: 400;
+          }
+        }
+      }
+      // 헤더 바텀
+      & .headerBottom {
+        display: flex;
+        justify-content: space-between;
+        border-radius: 15px 15px 0 0;
+        background-color: #fff;
+        padding: 20px 30px 0 30px;
+        & .left {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          & span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: var(--s-size);
+            &::before {
+              content: "";
+              display: block;
+              width: 15px;
+              height: 15px;
+              border-radius: 50%;
+            }
+            &.red::before {background-color: var(--red-color);}
+            &.blue::before {background-color: var(--blue-color);}
+          }
+        }
+        & .right {
+          font-size: var(--s-size);
+        }
+      }
+      // 달력
+      & .ant-picker-panel {
+        //height: 604px;
+        height: calc(100vh - 268px - 30.44px);
+        min-height: 490px;
+        border-radius: 0 0 15px 15px;
+        overflow: hidden;
+        box-sizing: border-box;
+        padding: 20px 30px;
+        & .ant-picker-date-panel {
+          height: 100%;
+          max-height: 600px;
+          & .ant-picker-body {
+            padding: 0;
+            height: 100%;
+            & table.ant-picker-content {
+              height: 100% !important;
+              & thead {
+                & tr {
+                  & th {
+                    flex: 1;
+                    padding: 5px 6px 25px;
+                    justify-content: flex-start;
+                    color: #333;
+                  }
+                }
+              }
+              & tbody {
+                height: 100%;
+                & tr {
+                  flex: 1;
+                  & td {
+                    flex: 1;
+                    & .ant-picker-cell-inner { // 셀
+                      display: flex;
+                      flex-direction: column;
+                      gap: 10px;
+                      height: 100%;
+                      margin: 0;
+                      border: none;
+                      max-height: 85.75px;
+                      padding: 6px;
+                      border-radius: 5px;
+                      & .ant-picker-calendar-date-value { // 달력 날짜
+                        height: auto;
+                        line-height: 1;
+                        text-align: left;
+                        box-sizing: border-box;
+                      }
+                      & .ant-picker-calendar-date-content { // 달력 이벤트 내용
+                        height: calc(100% - 19px);
+                        & span {
+                          &.red {color: var(--red-color);}
+                          &.blue {color: var(--blue-color);}
+                        }
+                        & .events {
+                          display: flex;
+                          flex-direction: column;
+                          line-height: 1.2;
+                          & li {
+                            font-size: var(--s-size);
+                            font-weight: 400;
+                          }
+                        }
+                        /* 스크롤바 전체 스타일링 */
+                        &::-webkit-scrollbar {
+                          width: 8px;
+                        }
+                        &::-webkit-scrollbar {
+                          height: 8px;
+                        }
+                        /* 스크롤바 track 스타일링 (배경) */
+                        &::-webkit-scrollbar-track,
+                        .ag-body-vertical-scroll-viewport::-webkit-scrollbar-track {
+                          background: #f1f1f1;
+                          border-radius: 10px;
+                        }
+                        /* 스크롤바 thumb 스타일링 (드래그 가능한 부분) */
+                        &::-webkit-scrollbar-thumb,
+                        &::-webkit-scrollbar-thumb {
+                          background: #888;
+                          border-radius: 10px;
+                        }
+                        /* 스크롤바 thumb 반경 설정 */
+                        &::-webkit-scrollbar-thumb:hover,
+                        &::-webkit-scrollbar-thumb:hover {
+                          background: #555;
+                        }
+                      }
+                      // today
+                      &.ant-picker-calendar-date-today {
+                        position: relative;
+                        background-color: #fff;
+                        & .ant-picker-calendar-date-value {
+                          color: #333;
+                        }
+                        &::after {
+                          content: "오늘";
+                          display: flex;
+                          position: absolute;
+                          top: 3px;
+                          left: 27px;
+                          min-width: 36px;
+                          padding: 5px 8px;
+                          background-color: var(--main-color);
+                          border-radius: 15px;
+                          font-size: 11px;
+                          line-height: 1;
+                          color: #fff;
+                        }
+                      }
+                    }
+
+                    // 선택된 셀
+                    &.ant-picker-cell-selected {
+                      & .ant-picker-cell-inner {
+                        background-color: #fff;
+                      }
+                      & .ant-picker-calendar-date-value {
+                        color: #333;
+                      }
+                    }
+
+                    &:nth-child(1) { // 일요일
+                      & .ant-picker-calendar-date-value {
+                        color: var(--blue-color);
+                      }
+                      &:not(.ant-picker-cell-in-view) {
+                        & .ant-picker-calendar-date-value {
+                          color: #d12e2e59;
+                        }
+                        & .ant-picker-calendar-date-content {
+                          & .events {
+                            & li {
+                              opacity: .3;
+                            }
+                          }
+                        }
+                      }
+                    }
+                    &:nth-child(7) { // 토요일
+                      & .ant-picker-calendar-date-value {
+                        color: var(--red-color);
+                      }
+                      &:not(.ant-picker-cell-in-view) {
+                        & .ant-picker-calendar-date-value {
+                          color: #d12e2e7a;
+                        }
+                        & .ant-picker-calendar-date-content {
+                          & .events {
+                            & li {
+                              opacity: .3;
+                            }
+                          }
+                        }
+                      }
+                    }
+                    &:not(.ant-picker-cell-in-view) { // 평일
+                      & .ant-picker-calendar-date-content {
+                        & .events {
+                          & li {
+                            opacity: .3;
+                          }
+                        }
+                      }
+                    }
+                    &:hover {
+                      & .ant-picker-cell-inner {
+                        background-color: #fff;
+                      }
+                    }
+
+                    // 해당 달 opacity
+
+                    &.ant-picker-cell {
+                      & div {
+                        & span {
+                          color: rgba(0, 0, 0, 0.25) !important;
+                        }
+                      }
+                      &.ant-picker-cell-in-view {
+                        & div {
+                          & span {
+                            color: rgba(0, 0, 0, 0.88) !important;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+
+  @media (max-height: 1100px) {
+    /* 1100픽셀 이하일 때 적용될 CSS 스타일 */
+
+  }
+  @media (max-width: 1450px) {
+    & {
+      gap: 10px;
+      & .layout30 {
+        width: calc(30% - 5px);
+        & .btnArea {
+          & button {
+            font-size: var(--s-size);
+            padding: 20px 5px;
+          }
+        }
+        & .settlementContent {
+          height: calc(100vh - 257px);
+          padding: 15px;
+          box-sizing: border-box;
+          & .list {
+            & > ul {
+              gap: 10px;
+              & > li {
+                & > button {
+                  flex-wrap: wrap;
+                  & strong {
+                    font-size: var(--s-size);
+                  }
+                  & span {
+                    font-size: var(--s-size);
+                  }
+                }
+                & ul {
+                  padding-left: 10px;
+                  margin: 10px 0;
+                  &::before {
+                    left: 0;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      & .layout70 {
+        width: calc(70% - 5px);
+        & .calendar {
+          & .header {
+            & .left {
+              & span {
+                font-size: 16px;
+              }
+              & .btnArea {
+                margin-top: 0;
+              }
+            }
+            & .right {
+              & span:first-child {
+                top: 21px;
+              }
+              & span:last-child {
+                font-size: 16px;
+              }
+            }
+          }
+          // 헤더 바텀
+          & .headerBottom {
+            padding: 10px 15px 0 15px;
+          }
+          & .ant-picker-calendar {
+            & .ant-picker-panel {
+              height: calc(100vh - 257px - 30.44px);
+              padding: 10px 15px;
+              & .ant-picker-date-panel .ant-picker-body table.ant-picker-content tbody tr td div {
+                font-size: 11px;
+              }
+              & .ant-picker-date-panel .ant-picker-body table.ant-picker-content tbody tr td .ant-picker-cell-inner {
+                padding: 6px 4px;
+                &.ant-picker-calendar-date-today::after {
+                  left: 22px;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

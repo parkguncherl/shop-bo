@@ -1,0 +1,395 @@
+﻿// 파일 업로드
+.fileBoxDiv {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+  position: relative;
+  margin: 20px 0;
+  padding: 20px;
+  box-sizing: border-box;
+  border: 5px dashed #ddd;
+  gap: 10px;
+  transition: .2s;
+
+  &.isDragging {
+    border-color: var(--main-color);
+  }
+  & input {
+    position: absolute;
+    top: -99999em;
+  }
+  & > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-width: 200px;
+    gap: 10px;
+    & .ico_upload {
+      display: block;
+      width: 30px;
+      height: 30px;
+      background: url(../../public/images/ico_upload.svg) no-repeat center;
+    }
+  }
+  & label {
+    display: flex;
+    padding: 5px 20px;
+    background-color: var(--main-color);
+    color: #fff;
+    border-radius: 40px;
+    cursor: pointer;
+  }
+  & .imagePreview {
+    display: flex;
+    flex-wrap: wrap;
+    & li {
+      display: flex;
+      position: relative;
+      padding: 10px;
+      box-sizing: border-box;
+      & .img {
+        display: flex;
+        justify-content: center;
+        border-radius: 5px;
+        width: 100px;
+        height: 100px;
+        overflow: hidden;
+        & img {
+          transition: .2s;
+          height: 100%;
+        }
+      }
+      & span {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        line-height: 12px;
+        font-size: var(--xs-size);
+      }
+      & button {
+        display: flex;
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        padding: 3px 10px;
+        background-color: #fff;
+        border-radius: 2px;
+        border: 1px solid #ddd;
+        font-size: var(--xs-size);
+        cursor: pointer;
+      }
+      &:hover {
+        & .img {
+          & img {
+            filter: blur(2px);
+          }
+        }
+        & span {
+          display: block;
+        }
+      }
+    }
+  }
+  &.between {
+    justify-content: space-between;
+  }
+  &.one {
+    & .imagePreview {
+      & li {
+        gap: 10px;
+        align-items: center;
+        & .img {
+          width: 70px;
+          height: 70px;
+        }
+        & > .info {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          justify-content: space-between;
+          height: 100%;
+          padding: 5px 0;
+          box-sizing: inherit;
+          gap: 5px;
+        }
+        & span {
+          display: block;
+          position: inherit;
+          top: inherit;
+          left: inherit;
+          transform: translate(0);
+          font-size: var(--m-size);
+          line-height: inherit;
+        }
+        & button {
+          position: inherit;
+        }
+      }
+    }
+  }
+  &.hide {
+    & > div {
+      display: none;
+    }
+  }
+}
+
+// 이미지 미리보기
+.imageView {
+  display: flex;
+  position: relative;
+  & dl {
+    align-items: flex-start !important;
+    height: 100%;
+    & dt {
+      display: flex;
+      height: 100%;
+      align-items: center;
+    }
+    & dd {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      & img {
+        max-height: 200px;
+      }
+    }
+  }
+}
+
+// 이미지 보기
+.fileBoxArea {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  flex: 1;
+  flex-direction: row;
+  padding: 3px;
+  gap: 3px;
+  & > div {
+    position: relative;
+    & .deleteBtn {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      top: 50%;
+      right: 3px;
+      width: 20px;
+      height: 20px;
+      background-color: transparent;
+      transform: translateY(-50%);
+      cursor: pointer;
+      transition: .2s;
+      & span {
+        display: flex;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 50%;
+        height: 2px;
+        background-color: #333;
+        &:nth-child(1) {
+          transform: translate(-50%, -50%) rotate(45deg);
+        }
+        &:nth-child(2) {
+          transform: translate(-50%, -50%) rotate(-45deg);
+        }
+      }
+    }
+    &:hover .deleteBtn {
+      display: flex;
+    }
+  }
+  & span {
+    color: #333;
+    font-weight: 300;
+    font-size: var(--xs-size);
+  }
+  & > div ~ .etcTxt {
+    display: none;
+  }
+  &.group {
+    flex-direction: row;
+    gap: 15px;
+    & > div {
+      display: flex;
+      gap: 5px;
+      & img {
+        width: auto;
+        height: 50px;
+        border: 1px solid #ddd;
+        background-color: #ddd;
+      }
+      & span {
+        display: flex;
+        width: 60px;
+      }
+    }
+  }
+  &.pop {
+    padding-top: 10px;
+    & > div {
+      width: 100%;
+      & > a {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        & > span {
+          display: flex;
+          width: auto;
+        }
+      }
+    }
+  }
+}
+.imgArea { // 상품등록 이미지 슬라이드
+  display: flex;
+  position: relative;
+  padding: 0px 35px;
+  background-color: #fff;
+  margin-top: 10px;
+  & .img {
+    display: flex;
+    width: 100%;
+    padding: 0 12px;
+    overflow: hidden;
+    box-sizing: border-box;
+    & > div {
+      display: flex;
+      width: auto;
+      height: 80px;
+      gap: 12px;
+      transition: .2s;
+    }
+    & > div > div {
+      display: flex;
+      position: relative;
+      flex-direction: column;
+      width: 120px;
+      height: 80px;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+      cursor: pointer;
+      overflow: hidden;
+      background-color: #ddd;
+      &::after {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 80px;
+        transition: .2s;
+      }
+      & img {
+        display: block;
+        width: auto;
+        height: 80px;
+        cursor: pointer;
+      }
+      & span {
+        display: flex;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+        word-break: break-all;
+        font-size: var(--xs-size);
+        color: #fff;
+        text-align: center;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        cursor: pointer;
+        transition: .2s;
+        z-index: 1;
+      }
+      & .num {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        width: 20px;
+        height: 15px;
+        top: 10px;
+        left: 10px;
+        color: #fff;
+        background-color: rgba(0, 0, 0, 0.4);
+        font-size: var(--m-size);
+        font-weight: 900;
+        opacity: 1;
+      }
+      & .deleteBtn {
+        display: block;
+        position: absolute;
+        top: 3px;
+        right: 3px;
+        font-size: var(--xs-size);
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--background-color) url(../../public/images/ico_close_blue.svg) no-repeat center;
+        text-indent: -9999em;
+        background-size: auto 8px;
+        cursor: pointer;
+        z-index: 2;
+        transition: .2s;
+      }
+      &:hover {
+        &::after {
+          background-color: rgba(0,0,0,0.5);
+        }
+        & span {
+          opacity: 1;
+        }
+        & .deleteBtn {
+          //display: block;
+        }
+      }
+    }
+  }
+  & > button {
+    display: flex;
+    position: absolute;
+    top: 50%;
+    width: 20px;
+    height: 20px;
+    background-color: transparent;
+    text-indent: -9999em;
+    transform: translateY(-50%);
+    cursor: pointer;
+    &::after {
+      content: "";
+      display: block;
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border: 2px solid #333;
+      border-width: 0 2px 2px 0;
+    }
+    &.prevBtn {
+      left: 10px;
+      &::after {
+        top: 5px;
+        left: 7px;
+        transform: rotate(135deg);
+      }
+    }
+    &.nextBtn {
+      right: 10px;
+      &::after {
+        top: 5px;
+        left: 2px;
+        transform: rotate(-45deg);
+      }
+    }
+  }
+}
+

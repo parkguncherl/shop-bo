@@ -1,6 +1,6 @@
 import React, { ReactElement, ReactNode } from 'react';
 import { IComponentProps } from '../types/IComponentProps';
-import styles from '../styles/delete/button.module.scss';
+import styles from '../styles/components/button.module.scss';
 //import classNames from 'classnames/bind';
 
 //const cx = classNames.bind(styles);

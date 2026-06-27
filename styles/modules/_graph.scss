@@ -1,0 +1,172 @@
+﻿// 그래프 영역
+.graphArea {
+  & .smallTitle {
+    min-height: 28px;
+    & .left {
+      & .graphTitle {
+        font-weight: 500;
+        color: var(--main-color);
+      }
+      & button {
+        position: relative;
+        width: 20px;
+        height: 20px;
+        text-indent: -9999em;
+        background-color: transparent;
+        cursor: pointer;
+        &::after {
+          content: "";
+          display: block;
+          position: absolute;
+          top: 45%;
+          left: 50%;
+          width: 7px;
+          height: 7px;
+          border: 1px solid #333;
+          border-width: 2px 0 0 2px;
+          transform: translate(-50%, -50%) rotate(-135deg);
+          transition: .2s;
+        }
+      }
+    }
+    & .right {
+      & .datePickerBox.range dl {
+        width: 295px;
+        & dt {
+          width: 70px;
+          & .ant-select-selector,
+          & .ant-select-content {
+            background-color: transparent;
+          }
+        }
+      }
+    }
+  }
+  & .graphBox {
+    height: 0;
+    overflow: hidden;
+    padding: 0;
+    transition: .4s;
+  }
+  //
+  //& .ag-theme-quartz {
+  //  transition: .5s;
+  //  height: calc(100vh - 268px);
+  //}
+
+  &.on {
+    & .graphBox {
+      height: auto;
+      padding: 20px;
+      overflow: inherit;
+    }
+    & .smallTitle {
+      & .left {
+        & button {
+          &::after {
+            top: 67%;
+            transform: translate(-50%, -50%) rotate(45deg);
+          }
+        }
+      }
+    }
+
+    & .ag-theme-quartz {
+      height: calc(100vh - 731px);
+    }
+  }
+}
+.ag-grid-txt {
+  width: 100%;
+  text-align: center;
+  color: #fff;
+}
+.TxtShowBox {
+  width: 100%;
+  height: 300px;
+  overflow: auto;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  border-radius: 3px;
+  font-size: var(--s-size);
+  box-sizing: border-box;
+  margin: 0;
+  padding: 4px 11px;
+  font-family: 'NotoSansKR', sans-serif;
+  color: #333;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  /* 스크롤바 track 스타일링 (배경) */
+  &::-webkit-scrollbar-track,
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+  /* 스크롤바 thumb 스타일링 (드래그 가능한 부분) */
+  &::-webkit-scrollbar-thumb,
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+  }
+
+  /* 스크롤바 thumb 반경 설정 */
+  &::-webkit-scrollbar-thumb:hover,
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+}
+
+// ag그리드 아이콘 (트리)
+.ag-group-contracted {
+  margin: 0 10px !important;
+  & .ag-icon {
+    &::before {
+      content: "";
+      display: block;
+      width: 16px;
+      height: 16px;
+      background: url(../../public/images/ico_downArow.svg) no-repeat center;
+      background-size: 70% auto;
+      transform: rotate(-90deg);
+      transition: .2s;
+    }
+  }
+  &.ag-hidden {
+    display: flex !important;
+    & .ag-icon {
+      &::before {
+        content: "";
+        display: block;
+        width: 16px;
+        height: 16px;
+        background: url(../../public/images/ico_downArow.svg) no-repeat center;
+        background-size: 70% auto;
+        transform: rotate(0);
+      }
+    }
+  }
+}
+.ag-group-expanded {
+  display: none !important;
+}
+.ag-cell-wrapper.ag-row-group-leaf-indent {
+  margin-left: 0 !important;
+  padding: 0 9px 0 0 !important;
+  justify-content: flex-end;
+  & .ag-icon {
+    display: none;
+  }
+  & .ag-group-contracted{
+    margin: 0 !important;
+  }
+}
+
+

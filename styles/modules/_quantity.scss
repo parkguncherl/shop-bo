@@ -1,0 +1,306 @@
+﻿// 권종별 수량 입력
+.cashTit {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 10px;
+  &.minus {
+    gap: 7px;
+    &::before {
+      content: "";
+      display: flex;
+      width: 20px;
+      height: 20px;
+      background: url(../../public/images/ico_minus.svg) no-repeat center;
+      background-size: 100% auto;
+    }
+  }
+}
+.quantityInputDiv {
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+  & dt {
+    width: 56px;
+    padding-right: 10px;
+    box-sizing: border-box;
+    text-align: right;
+    font-size: var(--s-size);
+    color: #333;
+  }
+  & dd {
+    position: relative;
+    width: calc(100% - 56px);
+    & input {
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      height: 36px;
+      padding: 0 25px 0 10px;
+      box-sizing: border-box;
+      text-align: right;
+      color: #333;
+      transition: .2s;
+      &:hover,
+      &:focus {
+        outline: none;
+        border-color: var(--main-color);
+      }
+    }
+    & span {
+      position: absolute;
+      top: 53%;
+      right: 10px;
+      font-size: var(--xs-size);
+      color: #333;
+      transform: translateY(-50%);
+    }
+  }
+  & .title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+    margin: 10px 0;
+    gap: 3px 0;
+    & dt {
+      width: 57px;
+      text-align: left;
+      &:nth-child(1) {
+        font-weight: 500;
+        font-size: var(--m-size);
+        padding: 5px 0;
+      }
+    }
+    & dd {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      width: calc(100% - 57px);
+      &:nth-child(2) {
+        padding: 5px 0;
+        & * {
+          font-weight: 500;
+          font-size: var(--m-size);
+        }
+      }
+      & span {
+        position: inherit;
+        top: inherit;
+        right: inherit;
+        transform: translateY(0);
+        font-size: var(--s-size);
+      }
+      & strong {
+        font-size: var(--s-size);
+        font-weight: 300;
+        margin-right: 5px;
+      }
+      &.red {
+        & span, & strong {
+          color: var(--red-color);
+        }
+      }
+      &.blue {
+        & span, & strong {
+          color: var(--blue-color);
+        }
+      }
+    }
+  }
+  & .inputDiv {
+    & ul {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      & li {
+        display: flex;
+        gap: 10px;
+        & dl {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          & dd {
+
+
+          }
+        }
+      }
+    }
+  }
+}
+
+.ant-modal {
+  // 모달 - confirm
+  &.confirm {
+    & .ant-modal-content {
+      padding: 40px;
+    }
+    & .ant-modal-close {
+      display: none;
+    }
+  }
+  // 모달 - 로그아웃
+  &.logout {
+    & .react-draggable {
+      & .ant-modal-content {
+        padding: 40px;
+        border-radius: 15px;
+        & .ant-modal-header {}
+        & .ant-modal-body {
+          & > div {
+            display: flex;
+            height: auto;
+            align-items: center;
+            justify-content: center;
+            & > div {
+              display: flex;
+              justify-content: center;
+              font-size: var(--xl-size);
+              font-weight: 500;
+            }
+          }
+        }
+        & .ant-modal-footer {
+          margin-top: 20px;
+          & .right {
+            width: 100%;
+            & button {
+              height: auto;
+              flex: 1;
+              padding: 13px 0;
+              border-radius: 10px;
+              font-size: var(--xl-size);
+              &.btn {
+                background-color: #F0F4F7;
+                border: none;
+                &:hover {
+                  background-color: #D1D4D9;
+                }
+              }
+              &.btnBlue {
+                background-color: #F24352;
+                border: none;
+                &:hover {
+                  background-color: #B2333C;
+                  color: #CFA9AA;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 모달 - 새로운 소매처 등록
+  &.newSellerPop {
+    & .react-draggable {
+      & .ant-modal-content {
+        & .ant-modal-close {
+          display: none;
+        }
+        & .ant-modal-body {
+          & > div {
+            & > div {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 10px;
+              & span {
+                display: flex;
+                font-size: 25px;
+                color: #000;
+                font-weight: 500;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+// 우클릭 팝업
+.rightClickMenu {
+  display: none;
+  position: fixed;
+  flex-direction: column;
+  top: 0;
+  left: 0;
+  background: #fff;
+  padding: 5px 0px;
+  border-radius: 4px;
+  z-index: 1000;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+  min-width: 110px;
+  & li {
+    width: 100%;
+    & button {
+      cursor: pointer;
+      padding: 6px 20px;
+      width: 100%;
+      transition: .2s;
+      font-size: var(--xs-size);
+      background-color: #fff;
+      text-align: left;
+      &:hover {
+        background-color: #f2f2f2;
+      }
+    }
+  }
+  &.on {
+    display: flex;
+  }
+}
+.previewBox {
+  & .rightClickMenu {
+    max-width: 130px;
+  }
+}
+
+// 우클릭 팝업
+.rightClickMenuLog {
+  display: none;
+  position: fixed;
+  flex-direction: column;
+  top: 0;
+  left: 0;
+  background: #fff;
+  padding: 5px 0px;
+  border-radius: 4px;
+  z-index: 1000;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+  min-width: 110px;
+  & li {
+    width: 100%;
+    & button {
+      cursor: pointer;
+      padding: 6px 20px;
+      width: 100%;
+      transition: .2s;
+      font-size: var(--xs-size);
+      background-color: #fff;
+      text-align: left;
+      &:hover {
+        background-color: #f2f2f2;
+      }
+    }
+  }
+  &.on {
+    display: flex;
+  }
+}
+.previewBoxLog {
+  & .rightClickMenuLog {
+    max-width: 130px;
+  }
+}
+

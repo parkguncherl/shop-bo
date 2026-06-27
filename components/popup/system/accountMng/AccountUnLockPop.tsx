@@ -12,7 +12,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '../../../../libs';
 import FormInput from '../../../form/FormInput';
 import { Label } from '../../../Label';
-import styles from '../../../../styles/delete/popup.module.scss';
+import styles from '../../../../styles/popup/popup.module.scss';
 import Loading from '../../../Loading';
 import { PopupLayout } from '../../PopupLayout';
 

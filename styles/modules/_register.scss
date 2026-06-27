@@ -1,0 +1,241 @@
+﻿// 등록/수정 페이지 디자인
+.popTopRight { // 오른쪽 위 데이트피커
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: -42px;
+  margin-bottom: 15px;
+  & dt {
+    & label {
+      font-size: var(--s-size);
+      font-weight: 400;
+    }
+  }
+}
+.popTopRight.sel {
+  display: flex;
+  justify-content: flex-end;
+  & .formBox.border {
+    border-color: transparent;
+    min-width: 150px;
+  }
+}
+.popupFormBox {
+  padding: 20px 0;
+  // div on
+  & > div.tab {
+    display: none;
+    &.on {
+      display: block;
+    }
+  }
+
+  &.productMng {min-height: 395px; box-sizing: border-box;}
+  & .imgDiv {
+    display: flex;
+    & .left {
+      position: relative;
+      & .imageView {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--background-color);
+        width: 170px;
+        height: 186px;
+        cursor: pointer;
+        border-radius: 10px;
+        &::before {
+          content: "";
+          display: flex;
+          background: url(../../public/images/ico_noImage.svg) no-repeat center;
+          background-size: 50px auto;
+          width: 50px;
+          height: 50px;
+        }
+        &::after {
+          content: "이미지 추가";
+          color: #8C95A0;
+          font-weight: 500;
+        }
+        & img {
+          width: 100%;
+          min-height: 100%;
+        }
+        & + dl {
+          display: none;
+        }
+      }
+      & span {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: var(--xs-size);
+        color: #aaa;
+      }
+      &.view {
+        & .imageView {
+          &::before {
+            display: none;
+          }
+          &::after {
+            display: none;
+          }
+        }
+        & span {
+          display: none;
+        }
+      }
+    }
+    & .right {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      width: calc(100% - 170px);
+      box-sizing: border-box;
+      padding: 10px 0 10px 20px;
+      & dl {
+        & dt {
+          font-size: var(--m-size);
+        }
+      }
+    }
+  }
+
+  // dl,dt,dd
+  & dl {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    & dt {
+      display: flex;
+      align-items: center;
+      width: 100px;
+      font-size: var(--xs-size);
+      font-weight: 400;
+      & label {
+        font-weight: 400;
+      }
+      & .edit {
+        font-size: var(--xs-size);
+        width: 22px;
+        height: 20px;
+        background: url(../../public/images/ico_memo_b.svg) no-repeat center;
+        background-size: auto 15px;
+        text-indent: -9999em;
+        cursor: pointer;
+        margin-left: 5px;
+      }
+    }
+    & dd {
+      width: calc(100% - 100px);
+      & .formBox.border {
+        border-color: transparent;
+      }
+    }
+  }
+
+  // 그룹
+  & .popupFormGroup {
+    & h4 {
+      display: flex;
+      font-size: var(--xs-size);
+      font-weight: 300;
+      padding: 5px 10px;
+      box-sizing: border-box;
+      background-color: var(--background-color);
+      border-top: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+      margin: 20px 0 10px;
+    }
+
+    & > div {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 0 20px;
+      box-sizing: border-box;
+      & > div { // 전체
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        width: 100%;
+        min-height: 30px;
+        & input, // 공통 input, select
+        & .ant-select {
+          max-width: 100%;
+        }
+      }
+      & .type1 { // 한줄
+        & dd {
+          width: 60%;
+        }
+      }
+      & .type2 { // 두줄
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        & dl {
+          width: 50%;
+          & dd {
+            width: calc(100% - 100px);
+          }
+        }
+      }
+      & .type3 { // 세줄
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        & dl {
+          & dt {
+            width: 45px;
+          }
+          & dd {
+            width: calc(100% - 45px);
+          }
+        }
+        &.retail {
+          & dl {
+            width: 135px;
+          }
+          & dl:nth-child(1) {
+            width: 250px;
+            & .formBox {
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+  // 제작상품 chk
+  & .productTxtChk {
+    display: flex;
+    & .txtChk {
+      width: 100px;
+      & .ant-checkbox-wrapper {
+        & span:nth-child(2) {
+          font-size: var(--xs-size);
+          font-weight: 400;
+        }
+      }
+    }
+    & .selInp {
+      width: 60%;
+      & .searchInputBox {
+        border-color: transparent;
+      }
+      & .formBox.border {
+        border-color: transparent;
+      }
+    }
+  }
+  & .sel2 {
+    width: 100%;
+  }
+}
+

@@ -1,0 +1,61 @@
+﻿// 주문등록 focus
+.searchInputBox {
+  position: relative;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+  &.focus,
+  &:hover {
+    border-color: transparent;
+  }
+  & .ant-select-single {
+    width: 100%;
+    height: 35px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    & .ant-select-selector {
+      width: 100%;
+      height: 35px !important;
+      box-shadow: none !important;
+      & .ant-select-selection-search {
+        display: flex;
+        box-sizing: border-box;
+
+      }
+    }
+    &.ant-select .ant-select-arrow {
+      display: none !important;
+    }
+  }
+}
+
+// 비고인쇄 영역
+
+.ant-input-outlined,
+.ant-input-outlined {
+  box-shadow: none !important;
+}
+
+// 텍스트
+.txtBold {
+  font-weight: 600 !important;
+}
+.txtBlue {
+  color: var(--main-color) !important;
+}
+.txtGray {
+  color: #999 !important;
+}
+.txtRed {
+  color: var(--red-color) !important;
+}
+.txtItalic {
+  font-style: italic;
+  text-decoration: underline;
+  color: #aaa;
+}
+.agnL {text-align: left !important;}
+.agnC {text-align: center !important;}
+.agnR {text-align: right !important;}
+

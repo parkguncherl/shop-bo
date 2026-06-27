@@ -1,0 +1,146 @@
+﻿// 주문등록 숨김처리
+.isOrderOn {
+  & > div {
+    & > aside {
+      transform: translateX(-620px);
+      width: 0;
+      padding: 0;
+      & > div {
+        width: 600px;
+      }
+    }
+    & > .content {
+      width: 100%;
+
+      &::after {
+        display: none;
+      }
+    }
+  }
+}
+// 제목
+.bigTitle {
+  display: flex;
+  gap: 10px;
+  font-weight: 500;
+  color: #666;
+  font-size: 20px;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  white-space: nowrap;
+  height: 30px;
+  & .left {
+    display: flex;
+  }
+  & strong {
+    font-weight: 500;
+    color: #666;
+    font-size: 20px;
+  }
+  & .util {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 10px;
+    & button {
+      display: flex;
+      width: 30px;
+      height: 30px;
+      border-radius: 5px;
+      text-indent: -9999em;
+      cursor: pointer;
+      transition: .2s;
+      &:active {
+        background-color: #BDBDBD;
+        transform: scale(.9);
+      }
+    }
+    & .refresh {
+      position: relative;
+      background-color: #fff;
+      &::after {
+        content: "";
+        display: flex;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        background: transparent url(../../public/images/ico_refresh.svg) no-repeat center;
+        width: 20px;
+        height: 20px;
+        margin-top: -10px;
+        margin-left: -10px;
+      }
+      &.on {
+        &::after {
+          animation: spin .5s linear;
+        }
+      }
+    }
+    & .favorite {
+      background: #fff url(../../public/images/ico_favorite_off.svg) no-repeat center;
+      &.on {
+        background: #fff  url(../../public/images/ico_favorite.svg) no-repeat center;
+      }
+    }
+  }
+  & .edit {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+    padding: 5px 15px 5px 15px;
+    font-size: var(--l-size);
+    border-radius: 50px;
+    background-color: var(--background-hover-color);
+    margin-top: -17px;
+    & .ant-spin {
+      & .ant-spin-dot {
+        width: 17px;
+        height: 17px;
+      }
+    }
+  }
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.smallTitle {
+  display: flex;
+  align-items: flex-end;
+  height: 30px;
+  font-size: var(--l-size);
+  font-weight: 500;
+  color: #333;
+  gap: 10px;
+  &.between {
+    justify-content: space-between;
+    & .left {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-size: var(--l-size);
+      font-weight: 500;
+      color: #333;
+      min-height: 29px;
+    }
+    & strong {
+      font-size: var(--l-size);
+      font-weight: 500;
+      color: #333;
+    }
+  }
+  &.line {
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+  }
+}
+.titleBox {
+  margin-bottom: 20px;
+}
+

@@ -1,0 +1,578 @@
+﻿// input
+.formBox {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  position: relative;
+  &.border {
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+    border-radius: 3px;
+    &:hover,
+    &.focus {
+      border-color: transparent;
+    }
+  }
+  &.borderNone {
+    & input, & select, & textarea {
+      &:hover{
+        border-color: transparent;
+      }
+      &:focus {
+        border-color: transparent;
+      }
+    }
+  }
+  &.wrap {
+    flex-wrap: wrap;
+  }
+  & input, & select, & textarea {
+    width: 100%;
+    height: 28px;
+    border: 2px solid transparent;
+    background-color: #fff;
+    border-radius: 3px;
+    font-size: var(--s-size);
+    box-sizing: border-box;
+    margin: 0;
+    padding: 4px 11px;
+    font-family: 'NotoSansKR', sans-serif;
+    font-weight: 200;
+    color: #333;
+    outline: none;
+    resize: none;
+    &::placeholder {
+      color: #ccc !important;
+    }
+    &:hover{
+      border-color: var(--hover-color);
+    }
+    &:focus {
+      border-color: var(--focus-color);
+    }
+    &:disabled,
+    &:read-only{
+      background-color: #f5f5f5;
+      color: #999;
+    }
+  }
+  // antInput
+  & .ant-input-affix-wrapper {
+    padding: 0;
+    border-radius: 3px;
+    border: 2px solid transparent;
+    box-sizing: border-box;
+    & input,
+    & textarea {
+      height: auto;
+      border: none;
+      background-color: #fff;
+      border-radius: 3px;
+      font-size: var(--s-size);
+      box-sizing: border-box;
+      margin: 0;
+      padding: 2px 28px 2px 11px;
+      font-family: "NotoSansKR", sans-serif;
+      color: #333;
+      outline: none;
+      resize: none;
+    }
+    &:hover {
+      border-color: var(--hover-color);
+    }
+    &.ant-input-affix-wrapper-focused {
+      border-color: var(--focus-color);
+    }
+    & .ant-input-suffix {
+      position: absolute;
+      top: 45%;
+      right: 8px;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      & .ant-input-clear-icon {
+        width: 100%;
+        height: 100%;
+        & .anticon.anticon-close-circle {
+          width: 100%;
+          height: 100%;
+          & svg {
+            width: 100%;
+            height: 100%;
+          }
+        }
+      }
+    }
+    & .anticon.ant-input-password-icon {
+      margin-left: -11px;
+      margin-top: 2px;
+    }
+    &.ant-input-affix-wrapper-disabled {
+      background-color: rgba(0, 0, 0, 0.02);
+      & input {
+        background-color: rgba(0, 0, 0, 0.02);
+        color: #999;
+      }
+    }
+  }
+  & textarea {
+    min-height: 50px;
+  }
+  & .selBox {
+    //width: 100%; // 커스텀 가능하게 삭제 2025-06-18 박근철
+    & .ant-select {
+      width: 100%;
+      height: auto !important;
+      font-size: var(--s-size);
+      //border: 1px solid #ddd;
+      border-radius: 3px;
+      box-sizing: border-box;
+      &:hover {
+        border-color: transparent;
+        & .ant-select-selector {
+          border-color: var(--hover-color) !important;
+        }
+      }
+      & .ant-select-selector {
+        border-radius: 3px;
+        height: 100%;
+        box-sizing: border-box;
+        background-color: #fff;
+        padding: 0 11px;
+        font-size: var(--xs-size);
+        color: #333;
+        border: 2px solid transparent;
+        & .ant-select-selection-item {
+          font-size: var(--s-size);
+          height: 28px;
+        }
+      }
+    }
+    .ant-select-open.ant-select-focused .ant-select-selector {
+      border-color: var(--focus-color) !important;
+      box-shadow: none !important;
+    }
+    & select {
+      width: 100%;
+    }
+  }
+  & .ant-select {
+    width: 100%;
+    max-width: 256px;
+  }
+  &.disabled {
+    cursor: no-drop;
+    &:hover {
+      border-color: #ddd;
+    }
+    & .ant-input-outlined.ant-input-disabled {
+      &:hover {
+        border-color: transparent;
+        background-color: rgba(0, 0, 0, 0.02);
+      }
+      & input {
+        padding-right: 11px;
+      }
+    }
+    & .ant-select-disabled {
+      & .ant-select-selection-item {
+        color: #999;
+      }
+    }
+  }
+  & .ant-picker { // 데이트피커
+    width: 100%;
+    border-radius: 3px;
+    height: 28px;
+    & input {
+      font-size: var(--s-size);
+    }
+    &.ant-picker-outlined {
+      border: 2px solid transparent;
+      &:focus,
+      &:focus-within {
+        border-color: var(--focus-color);
+        box-shadow: none;
+      }
+      &:hover {
+        border-color: var(--hover-color);
+        box-shadow: none;
+      }
+    }
+  }
+  &.focus {
+    & .ant-picker-outlined {
+      border-color: var(--focus-color);
+      box-shadow: none;
+      &:hover {
+        border-color: var(--focus-color);
+      }
+    }
+  }
+  & .ant-select-single {
+    height: 28px !important;
+    & .ant-select-selector {
+      height: 28px !important;
+      border-radius: 3px !important;
+      border: 2px solid transparent;
+      & .ant-select-selection-placeholder {
+        font-size: var(--s-size);
+      }
+      & .ant-select-selection-search-input {
+        height: 28px !important;
+      }
+    }
+
+  }
+  &.full {
+    & .ant-select {
+      max-width: 100%;
+    }
+  }
+  &.hidden {
+    display: flex;
+    justify-content: space-between;
+    & input {
+      display: none;
+    }
+    & .etcTxt {
+      color: #aaa;
+    }
+    & .fileBoxArea {
+      & .etcTxt {
+        color: #aaa;
+      }
+    }
+  }
+  &.block {
+    display: block;
+  }
+  &.sel2 {
+    & .formBox {
+      flex: 1;
+    }
+  }
+  & .ant-space {
+    width: 100%;
+    & .ant-space-item {
+      width: 100%;
+      & .ant-select-selection-item-content {
+        display: flex;
+        font-size: var(--xs-size);
+      }
+      & .ant-select-multiple .ant-select-selection-item {
+        height: auto;
+        line-height: 23px;
+      }
+    }
+  }
+  &.price {
+    & input {
+      text-align: right;
+    }
+  }
+  &.etc { // 구분1 관련
+    & input {
+      margin-left: -14px;
+      font-size: var(--xs-size);
+      font-weight: 400;
+    }
+  }
+
+  // form 조합
+  &.inpChk {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  &.inpSel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    & .ant-select {
+      width: 100px !important;
+    }
+  }
+  &.txtChk {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+    & .chkBox {
+      margin-top: -2px;
+    }
+    &.center {
+      justify-content: center;
+    }
+  }
+  &.selBtn,
+  &.inpBtn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    & > *:nth-child(1) {
+      position: relative;
+      width: calc(100% - 60px);
+      &:hover {
+        & .ant-select {
+          border-color: transparent;
+          & .ant-select-selector {
+            border-color: var(--hover-color);
+          }
+        }
+      }
+    }
+    & button {
+      width: 55px;
+    }
+    & .btnBlack {
+      height: 87px;
+    }
+    & dl {
+      & textarea {
+        height: 87px;
+      }
+    }
+    ~ .inpBtn {
+      display: none;
+      margin-top: 5px;
+      & input {
+        max-width: 100%;
+      }
+      &.on {
+        display: flex;
+      }
+    }
+  }
+  &.selBtn {
+    & > div {
+      display: flex;
+      width: 100%;
+      height: 30px;
+      & > .formBox {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        width: calc(100% - 35px);
+        height: 100%;
+        & input {
+          background-color: transparent;
+        }
+        &.borderNone {
+          &::after {
+            content: "";
+            display: block;
+            width: 100%;
+            height: 22px;
+            position: absolute;
+            top: 4px;
+            left: 7px;
+            background-color: #fff;
+            z-index: -1;
+          }
+        }
+      }
+      & .ant-select {
+        max-width: 100%;
+        height: 30px !important;
+        width: calc(100% + 2px) !important;
+        border: 1px solid #ddd;
+        box-sizing: border-box;
+        border-radius: 3px;
+        & .ant-select-selector {
+          height: 28px !important;
+          background-color: #fff;
+        }
+        &.ant-select-single.ant-select-outlined:not(.ant-select-disabled):not(.ant-select-customize-input):not(.ant-pagination-size-changer):hover {
+          border-color: transparent;
+        }
+        &.focus.ant-select-focused.ant-select-outlined:not(.ant-select-disabled):not(.ant-select-custmize-input):not(.ant-pagination-size-changer) {
+          border-color: transparent;
+        }
+      }
+    }
+    &.disabled {
+      & .ant-select-selector {
+        background-color: #f5f5f5;
+      }
+    }
+  }
+
+  &.selInp {
+    flex-wrap: wrap;
+    width: 400px;
+    & .searchInputBox {
+      width: calc(100% - 130px);
+      & .ant-select { // 상품수정 제작
+        z-index: -1;
+      }
+    }
+    & .formBox {
+      flex-wrap: wrap;
+      & input {
+        width: 120px;
+      }
+    }
+  }
+
+  &.fileBox {
+    position: relative;
+    & .ant-input-affix-wrapper {
+      display: none;
+    }
+    & input[type=text] {
+      width: calc(100% - 91px);
+    }
+    & label {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0 12px;
+      height: 30px;
+      border-radius: 5px;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      box-sizing: border-box;
+      font-size: var(--s-size);
+      color: #666;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    & input.fileInp {
+      display: none;
+    }
+    & button.cancle {
+      display: flex;
+      position: absolute;
+      top: 50%;
+      left: 220px;
+      text-indent: -9999em;
+      padding: 0;
+      width: 25px;
+      height: 25px;
+      background: transparent;
+      border: none;
+      margin-top: -12px;
+      &::before,
+      &::after {
+        content: "";
+        display: block;
+        position: absolute;
+        width: 12px;
+        height: 2px;
+        background-color: #333;
+        border-radius: 2px;
+      }
+      &::before {
+        transform: rotate(45deg);
+      }
+      &::after {
+        transform: rotate(-45deg);
+      }
+    }
+  }
+
+  &.pwdBox {
+    position: relative;
+    & input {
+      max-width: 100% !important;
+    }
+    & .ico_eye {
+      display: block;
+      position: absolute;
+      border: none;
+      top: 50%;
+      right: 5px;
+      width: 28px;
+      height: 21px;
+      border-radius: 4px;
+      background: url(../../public/ico/ico_pweye.svg) no-repeat center;
+      transform: translateY(-50%);
+      cursor: pointer;
+      &.on {
+        background: #666 url(../../public/ico/ico_pweye_on.svg) no-repeat center;
+      }
+    }
+  }
+
+  & .ant-segmented {
+    background-color: var(--background-color);
+
+    // 기본 상태 (선택되지 않은 항목)
+    .ant-segmented-item:not(.ant-segmented-item-selected) .ant-segmented-item-label {
+      font-size: var(--xs-size);
+      color: #999; // 회색
+    }
+
+    // 선택된 항목
+    .ant-segmented-item-selected {
+      background-color: #4F5967;
+
+      .ant-segmented-item-label {
+        color: #fff; // 흰색
+      }
+    }
+
+    .ant-segmented-thumb {
+      background-color: #4F5967;
+    }
+  }
+
+  // formInput priceTxt
+  &.priceTxt {
+    & input {
+      padding-right: 43px;
+    }
+    & .priceTxt {
+      position: absolute;
+      top: 50%;
+      right: 29px;
+      transform: translateY(-50%);
+      z-index: 10;
+    }
+  }
+}
+// 멀티 select
+.ant-select-outlined:not(.ant-select-customize-input) .ant-select-selector {
+  border: 2px solid transparent;
+  border-radius: 5px;
+}
+.ant-select-selection-item-content {
+  display: flex;
+  font-size: var(--xs-size);
+}
+.ant-select-multiple .ant-select-selection-item {
+  height: auto;
+  line-height: 23px;
+}
+.ant-select-item.ant-select-item-option {
+  flex-direction: row-reverse;
+  gap: 10px;
+}
+
+// 검색select+버튼(예: 혼용율, 구분1)
+.ant-select-outlined:not(.ant-select-disabled):not(.ant-select-customize-input):not(.ant-pagination-size-changer):hover .ant-select-selector {
+  box-shadow: none;
+  border-color: var(--hover-color);
+}
+.ant-select-focused.ant-select-outlined:not(.ant-select-disabled):not(.ant-select-custmize-input):not(.ant-pagination-size-changer) .ant-select-selector {
+  box-shadow: none;
+  border-color: var(--focus-color);
+}
+.focus {
+  & .ant-select {
+    border-color: transparent !important;
+    & .ant-select-selector {
+      box-shadow: none !important;
+      border-color: var(--focus-color) !important;
+    }
+  }
+}
+.searchInputBox {
+  &.focus {
+    & .ant-input-affix-wrapper-focused {
+      border-color: var(--focus-color) !important;
+    }
+  }
+}

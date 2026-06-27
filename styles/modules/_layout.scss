@@ -1,0 +1,270 @@
+﻿// layout
+
+.appLayout {
+  & header {
+    background-color: #6c3fc5;
+
+    .historyTab {
+      left: 167px;
+      width: calc(100% - 270px);
+    }
+  }
+  & .favoriteBox {
+    right: 50px;
+  }
+
+  & .container {
+    position: relative;
+    justify-content: flex-end;
+    & aside {
+      background-color: #fff;
+      width: 182px;
+      margin: 20px 0 0 20px;
+      border-radius: 10px 10px 0 0;
+      padding: 10px;
+      box-sizing: border-box;
+      z-index: 2;
+      & > nav {
+        margin-top: 20px;
+        & > ul { /* 1depth */
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          & > li {
+            & > a {
+              display: flex;
+              align-items: center;
+              padding: 10px;
+              border-radius: 5px;
+              transition: .2s;
+              gap: 10px;
+              cursor: pointer;
+              & > span {
+                display: flex;
+                width: 25px;
+                height: 20px;
+                background: no-repeat center;
+                background-size: 18px auto;
+                &.ico_system {background-image: url(../../public/images/ico_system_off.svg); background-size: 22px auto;}
+                &.ico_order {background-image: url(../../public/images/ico_system_off.svg)}
+                &.ico_omsInfo {background-image: url(../../public/images/ico_omsInfo_off.svg)}
+                &.ico_mis {background-image: url(../../public/images/ico_mis_off.svg)}
+                &.ico_orderTran {background-image: url(../../public/images/ico_orderTran_off.svg)}
+                &.ico_orderMng {background-image: url(../../public/images/ico_orderMng_off.svg)}
+                &.ico_product {background-image: url(../../public/images/ico_product_off.svg); background-size: auto 19px;}
+                &.ico_factory {background-image: url(../../public/images/ico_factory_off.svg)}
+                &.ico_mobile {background-image: url(../../public/images/ico_moblie_off.svg)}
+                &.ico_sims {background-image: url(../../public/images/ico_sims_off.svg); background-size: auto 22px;}
+                &.ico_mulyu {background-image: url(../../public/images/ico_mulyu_off.svg); background-size: 20px auto;}
+                &.ico_fee {background-image: url(../../public/images/ico_fee_off.svg); background-size: 20px auto;}
+                &.ico_ibgo {background-image: url(../../public/images/ico_ibgo_off.svg); background-size: 23px auto;}
+                &.ico_chulgo {background-image: url(../../public/images/ico_chulgo_off.svg); background-size: 22px auto;}
+                &.ico_search {background-image: url(../../public/images/ico_search_off.svg); background-size: 21px 19px;}
+                &.ico_info {background-image: url(../../public/images/ico_info_off.svg)}
+                &.ico_testPage {background-image: url(../../public/images/ico_testPage_off.svg); background-size: 17px auto;}
+              }
+              & > strong {
+                color: #333;
+                font-size: var(--m-size);
+                font-weight: 400;
+              }
+            }
+            &:hover > a,
+            &.on > a {
+              background-color: #f5f5f5;
+              & > span {
+                &.ico_system {background-image: url(../../public/images/ico_system_on.svg); background-size: 22px auto;}
+                &.ico_order {background-image: url(../../public/images/ico_omsInfo_on.svg)}
+                &.ico_omsInfo {background-image: url(../../public/images/ico_omsInfo_on.svg)}
+                &.ico_mis {background-image: url(../../public/images/ico_mis_on.svg)}
+                &.ico_orderTran {background-image: url(../../public/images/ico_orderTran_on.svg)}
+                &.ico_orderMng {background-image: url(../../public/images/ico_orderMng_on.svg)}
+                &.ico_product {background-image: url(../../public/images/ico_product_on.svg); background-size: auto 19px;}
+                &.ico_factory {background-image: url(../../public/images/ico_factory_on.svg)}
+                &.ico_mobile {background-image: url(../../public/images/ico_mobile_on.svg)}
+                &.ico_sims {background-image: url(../../public/images/ico_sims_on.svg); background-size: auto 22px;}
+                &.ico_mulyu {background-image: url(../../public/images/ico_mulyu_on.svg); background-size: 20px auto;}
+                &.ico_fee {background-image: url(../../public/images/ico_fee_on.svg); background-size: 20px auto;}
+                &.ico_ibgo {background-image: url(../../public/images/ico_ibgo_on.svg); background-size: 23px auto;}
+                &.ico_chulgo {background-image: url(../../public/images/ico_chulgo_on.svg); background-size: 22px auto;}
+                &.ico_search {background-image: url(../../public/images/ico_search_on.svg); background-size: 21px 19px;}
+                &.ico_info {background-image: url(../../public/images/ico_info_on.svg)}
+                &.ico_testPage {background-image: url(../../public/images/ico_testPage_on.svg); background-size: 17px auto;}
+              }
+            }
+            &.on > a {
+              border-radius: 5px 5px 0 0 !important;
+            }
+            & > ul { /* 2depth */
+              display: flex;
+              flex-direction: column;
+              background-color: #f5f5f5;
+              border-radius: 0 0 5px 5px;
+              height: 0;
+              overflow: hidden;
+              transition: .2s;
+              & > li {
+                padding-left: 35px;
+                & > a {
+                  font-size: var(--s-size);
+                  color: #999;
+                  &:hover {
+                    color: var(--main-color);
+                    font-weight: 500;
+                  }
+                  cursor: pointer;
+                }
+              }
+            }
+            &.on > ul { /* 2depth */
+              height: auto;
+              padding: 0 10px 10px 10px;
+            }
+          }
+        }
+      }
+      & > ul {
+        display: flex;
+        flex-direction: column;
+        background-color: #6c3fc5;
+        border-radius: 5px;
+        padding: 10px;
+        box-sizing: border-box;
+        gap: 9px 5px;
+        & > li {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 5px;
+          font-size: var(--m-size);
+          font-weight: 200;
+          color: #fff;
+          min-height: 20px;
+          &::before {
+            content: "";
+            display: block;
+            width: 20px;
+            height: 20px;
+            background: no-repeat center;
+          }
+          &.ico_user::before {background-image: url(../../public/images/ico_user.svg)}
+          &.ico_user {
+            .brief_user_info {
+              cursor: pointer;
+            }
+          }
+          &.ico_store::before {background-image: url(../../public/images/ico_store.svg)}
+          &.ico_store {
+            border: 1px solid #fff;
+            border-radius: 40px;
+            padding: 5px 0;
+          }
+          &.ico_date {
+            & div {
+              display: flex;
+              gap: 10px;
+              & span {
+                font-size: var(--s-size);
+              }
+            }
+            &::before {
+              display: none;
+            }
+          }
+          &.ico_mulyu::before {background-image: url(../../public/images/ico_mulyu.svg); width: 18px; height: 15px; background-size: auto 100%;}
+          &.ico_mulyu {
+            position: relative;
+            justify-content: flex-start;
+            border: 1px solid #fff;
+            border-radius: 5px;
+            padding: 9px 5px;
+            box-sizing: border-box;
+            & dl {
+              display: flex;
+              flex-direction: column;
+              font-size: var(--xs-size);
+              width: calc(100% - 43px);
+              & dt {
+                cursor: pointer;
+                width: 100%;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                box-sizing: border-box;
+              }
+              & dd {
+                display: none;
+              }
+            }
+            & > button {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              position: absolute;
+              top: 50%;
+              right: 5px;
+              width: 20px;
+              height: 20px;
+              background-color: transparent;
+              cursor: pointer;
+              transform: translateY(-50%);
+              & span {
+                display: block;
+                width: 6px;
+                height: 6px;
+                border: 1px solid #fff;
+                border-width: 2px 0 0 2px;
+                transform: rotate(-135deg);
+                margin-top: -2px;
+              }
+            }
+            &.on {
+              background-color: #fff;
+              border-radius: 5px;
+              &::before {background-image: url(../../public/images/ico_mulyu_b.svg);}
+              & dl {
+                position: absolute;
+                top: 0;
+                left: 0;
+                color: #333;
+                width: calc(100% + 2px);
+                margin-left: -1px;
+                background-color: #fff;
+                box-shadow: 0px 0px 9px 1px rgba(0, 0, 0, 0.2);
+                padding: 5px 10px 5px 10px;
+                box-sizing: border-box;
+                border-radius: 5px;
+                & dd {
+                  display: block;
+                  cursor: pointer;
+                }
+                & > * {
+                  padding: 4px 5px;
+                  box-sizing: border-box;
+                  &:hover {
+                    background-color: #f5f5f5;
+                  }
+                }
+              }
+              & button {
+                & span {
+                  border-color: #333;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    .content {
+      width: calc(100% - 182px - 30px);
+      &::after {
+        display: none;
+      }
+    }
+  }
+
+  & footer {
+    margin-top: 50px;
+  }
+}

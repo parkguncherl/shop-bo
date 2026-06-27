@@ -1,18 +1,24 @@
 @charset "UTF-8";
+@use "tokens/colors" as *;
+
 /* ============================================================
     파일정의 : reset.scss
 ============================================================ */
 
 :root {
   /* color */
-  --main-color: #0070C0;
-  --black-color: #333;
-  --red-color: #D12E2E;
-  --blue-color: #0091ff;
-  --hover-color: #8bcfff;
-  --focus-color: #6b21a8;
-  --background-color: #f2f4f6;
-  --background-hover-color: #d1d6db;
+  --main-color: #{$color-primary};
+  --black-color: #{$color-black};
+  --red-color: #{$color-red};
+  --blue-color: #{$color-blue};
+  --hover-color: #{$color-blue-hover};
+  --focus-color: #{$color-purple};
+  --background-color: #{$color-bg};
+  --background-hover-color: #{$color-bg-hover};
+  /* purple */
+  --purple: #{$color-purple};
+  --purple-dark: #{$color-purple-dark};
+  --purple-hover: #{$color-purple-hover};
   /* font size */
   --xs-size: 0.75rem; /* 12px */
   --s-size: 0.813rem; /* 13px */
@@ -21,27 +27,27 @@
   --xl-size: 1rem; /* 16px */
 
   /* Ag-Grid Colors */
-  --ag-grid-peach: #FFCECE;
-  --ag-grid-apricot: #FFE4BC;
-  --ag-grid-lightGreen: #BCEDBB;
-  --ag-grid-lightGray: #DFDFDF;
-  --ag-grid-lightYellow: #FEFFCE;
-  --ag-grid-lightPink: #F2CEFF;
-  --ag-grid-lightBlue: #CEDFFF;
-  --ag-grid-lightViolet: #ebdeff;
-  --ag-grid-lightSkyblue: #e0f3ff;
-  --ag-grid-lightGreen2: #CEFFF9;
+  --ag-grid-peach: #{$ag-peach};
+  --ag-grid-apricot: #{$ag-apricot};
+  --ag-grid-lightGreen: #{$ag-light-green};
+  --ag-grid-lightGray: #{$ag-light-gray};
+  --ag-grid-lightYellow: #{$ag-light-yellow};
+  --ag-grid-lightPink: #{$ag-light-pink};
+  --ag-grid-lightBlue: #{$ag-light-blue};
+  --ag-grid-lightViolet: #{$ag-light-violet};
+  --ag-grid-lightSkyblue: #{$ag-light-skyblue};
+  --ag-grid-lightGreen2: #{$ag-light-green2};
 
-  --ag-grid-focus-peach: #ffbfbf;
-  --ag-grid-focus-apricot: #ffd985;
-  --ag-grid-focus-lightGreen: #bdffbb;
-  --ag-grid-focus-lightGray: #c8c8c8;
-  --ag-grid-focus-lightYellow: #fff7a5;
-  --ag-grid-focus-lightPink: #ffb1f2;
-  --ag-grid-focus-lightBlue: #82abfd;
-  --ag-grid-focus-lightViolet: #dac7ff;
-  --ag-grid-focus-lightSkyblue: #b4e3ff;
-  --ag-grid-focus-lightGreen2: #a9fff3;
+  --ag-grid-focus-peach: #{$ag-focus-peach};
+  --ag-grid-focus-apricot: #{$ag-focus-apricot};
+  --ag-grid-focus-lightGreen: #{$ag-focus-light-green};
+  --ag-grid-focus-lightGray: #{$ag-focus-light-gray};
+  --ag-grid-focus-lightYellow: #{$ag-focus-light-yellow};
+  --ag-grid-focus-lightPink: #{$ag-focus-light-pink};
+  --ag-grid-focus-lightBlue: #{$ag-focus-light-blue};
+  --ag-grid-focus-lightViolet: #{$ag-focus-light-violet};
+  --ag-grid-focus-lightSkyblue: #{$ag-focus-light-skyblue};
+  --ag-grid-focus-lightGreen2: #{$ag-focus-light-green2};
 }
 
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video, input, select, button, textarea {

@@ -1,0 +1,608 @@
+﻿// ag-grid 체크박스
+
+// 미리보기 활성화
+.makePreviewArea {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  & .gridBox {
+    flex-direction: row;
+    justify-content: space-between;
+    & .titleBox {
+      margin-bottom: 0;
+    }
+  }
+  & .tblPreview {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    //gap: 10px;
+    transition: .2s;
+    & .tblBox {
+      display: block;
+      //&.preview { 테이블 통일로 인한 css삭제 20240923
+      //  display: none;
+      //}
+    }
+  }
+  // sample.tsx 에서 묶음을 나타내기 위한 값
+  & .cell-span {
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    background-color: #fff;
+    &:first-child {
+      border-left: none;
+    }
+    + .cell-span {
+      border-left: none;
+    }
+
+  }
+  & .ag-row-hover {
+    & .cell-span {
+      background-color: #E8F4FE;
+    }
+  }
+  & .ag-row-focus {
+    & .cell-span {
+      background-color: #CCE2F2;
+    }
+  }
+  & .ag-row {
+    + .ag-row {
+      & .cell-span {
+        border-top: none;
+        border-left: none;
+      }
+    }
+  }
+  & .previewBox {
+    display: none;
+    width: 300px;
+    height: calc(100vh - 306px);
+    min-height: 338px;
+    padding: 20px 15px 20px 15px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    overflow: auto;
+    & .noRowsOverlayBox {
+      height: 100%;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--m-size);
+    }
+    // 전표
+    & .chitBox {
+      & .header {
+        & h4 {
+          text-align: center;
+          font-size: 20px;
+          font-weight: 500;
+          color: #333;
+          margin-bottom: 10px;
+        }
+        & .info {
+          display: flex;
+          justify-content: space-between;
+          & li {
+            width: 33%;
+            font-size: var(--s-size);
+            color: #333;
+            &:nth-child(2) {
+              text-align: center;
+            }
+            &:last-child {
+              text-align: right;
+            }
+          }
+        }
+      }
+
+      & .container {
+        & table {
+          width: 100%;
+          border-top: 1px solid #333;
+          margin-top: 5px;
+          & th {
+            padding: 5px 0;
+            border-bottom: 1px solid #333;
+            font-size: var(--s-size);
+            font-weight: 500;
+            color: #333;
+          }
+          & td {
+            vertical-align: middle;
+            padding: 2px;
+            border-bottom: 1px dashed #333;
+            font-size: var(--s-size);
+            color: #333;
+          }
+          & tbody {
+            & tr {
+              & th {
+                background-color: #f5f5f5;
+                font-size: var(--s-size);
+                border-bottom: none;
+              }
+            }
+            & .groupRow {
+              & td {
+                border-bottom: none;
+                padding-top: 0;
+              }
+              &:last-child {
+                border-bottom: 1px dashed #333;
+              }
+              & + .groupWrap {
+                & th {
+                  border-top: 1px solid #333;
+                }
+              }
+            }
+            & .groupTit {
+              &:first-child {
+                & td {
+                  border-top: none;
+                }
+              }
+              & td {
+                border-top: 1px dashed #333;
+                border-bottom: none;
+                padding-bottom: 0;
+              }
+            }
+            & .groupFooter {
+              & th {
+                border-top: 1px dashed #333;
+                border-bottom: 1px solid #333;
+              }
+            }
+          }
+          & tfoot {
+            background-color: #eaeaea;
+            & th {
+              border-top: 1px solid #333;
+            }
+          }
+          & .tfoot {
+            background-color: #f5f5f5;
+            & td {
+              padding: 5px 2px;
+              border-top: 1px solid #333;
+              border-bottom: 1px solid #333;
+              font-weight: 500;
+            }
+            & + .groupTit {
+              & td {
+                border-top: none;
+              }
+            }
+          }
+        }
+      }
+
+      // 미송, 샘플 내역
+      &.state {
+        & .header {
+          & h4 {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 10px;
+            & span {
+              font-size: var(--xs-size);
+            }
+          }
+          & .info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            & li {
+              text-align: center;
+              font-size: var(--xs-size);
+              color: #333;
+              &:last-child {
+                width: 60px; /* 폭을 약간 늘림 */
+                line-height: 1.2; /* 줄간격 조정 */
+              }
+              &:first-child {
+                width: 60px;
+              }
+            }
+          }
+        }
+        & .container {
+          & table {
+            width: 100%;
+            border-top: 1px solid #333;
+            margin-top: 5px;
+            & tfoot {
+              background-color: #eaeaea;
+              & th {
+                border-top: 1px solid #333;
+              }
+            }
+          }
+        }
+      }
+      // 매장분 반납
+      &.return {
+        & .header {
+          & .info {
+            & li {
+              width: 100%;
+              display: flex;
+              justify-content: flex-end;
+              gap: 10px;
+              & strong {
+                font-weight: 400;
+              }
+            }
+          }
+        }
+      }
+    }
+    & dl {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 15px;
+      background-color: #f5f5f5;
+      margin-top: 10px;
+      & dt {
+        width: 40%;
+        font-size: var(--l-size);
+        font-weight: 500;
+        color: #333;
+      }
+      & dd {
+        width: 60%;
+        text-align: right;
+        font-size: var(--l-size);
+        color: #333;
+      }
+    }
+  }
+  &.preview {
+    & .tblPreview {
+      width: calc(100% - 300px - 10px);
+      & .tblBox {
+        display: block;
+        //&.preview {
+        //  display: block;
+        //}
+      }
+    }
+    & .layoutBox {
+      width: calc(100% - 300px - 10px);
+      & .tblPreview {
+        width: 100%;
+      }
+      & .layout70 {width: calc(70% - 5px);}
+      & .layout30 {width: calc(30% - 5px);}
+      &.pickinginfo {width: 100%;}
+      & div[class^="layout"][class*="0"] {
+        transition: .4s;
+        &.hide {
+          display: none;
+        }
+        &.show {
+          width: 100%;
+        }
+      }
+    }
+    & .previewBox {
+      display: flex;
+      flex-direction: column;
+    }
+    & .layoutPrivewBox {
+      display: flex;
+      justify-content: space-between;
+      & .previewBox {
+        height: auto;
+      }
+    }
+  }
+}
+.wms {
+  & .makePreviewArea {
+    & .previewBox {
+      height: 100%;
+    }
+  }
+}
+// orderReg 미리보기
+aside[class*="orderBox"] {
+  & .previewBox {
+    position: fixed;
+    top: 0;
+    left: -9999em;
+    //left: 0;
+    width: 300px;
+    box-sizing: border-box;
+    background-color: #fff;
+  }
+  & .printComponent {
+    //top: 200px;
+  }
+}
+
+// historyTab
+.historyTab {
+  display: flex;
+  flex-direction: row-reverse;
+  position: absolute;
+  top: 14px;
+  left: 608px;
+  font-size: 12px;
+  width: calc(100% - 765px);
+  & .historyBox {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 36px;
+    & .list {
+      display: flex;
+      overflow: hidden;
+      width: calc(100% - 58px);
+      padding-left: 8px;
+      box-sizing: border-box;
+      & > div {
+        transition: .2s;
+        & > div {
+          display: flex;
+          gap: 5px;
+          transition: .2s;
+          position: relative;
+
+          & .sortable-fallback {
+            opacity: 0 !important;
+            background: #4a90e2 !important;
+            top: -9999px;
+            pointer-events: none;
+            z-index: 9999;
+          }
+          & > div { // 탭 아이템
+            position: relative;
+            width: 137px;
+            min-width: 137px;
+            height: 28px;
+            margin-top: 3px;
+            border-radius: 5px;
+            padding: 5px 10px;
+            box-sizing: border-box;
+            color: #fff;
+            &::after {
+              content: "";
+              display: block;
+              position: absolute;
+              top: 50%;
+              right: -5px;
+              width: 5px;
+              height: 50%;
+              background: url(../../public/images/ico_line.svg) no-repeat center;
+              background-size: 2px auto;
+              margin-top: -7px;
+              opacity: 1;
+              transition: .3s;
+            }
+            &.hover {
+              background-color: rgba(237, 237, 237, 0.1);
+              &::after {
+                opacity: 0;
+              }
+            }
+            &.notHover {
+              &::after {
+                opacity: 0;
+              }
+            }
+            &.on { // 활성화
+              background-color: transparent;
+              height: 36px;
+              padding: 7px 7px 6px 11px;
+              box-sizing: border-box;
+              margin: 0 2px 0 2px;
+              color: #666;
+              &::before {
+                content: "";
+                display: block;
+                position: absolute;
+                top: 1px;
+                left: -19px;
+                width: 176px;
+                height: 36px;
+                background: url(../../public/images/img_menuTabBg.svg) no-repeat center;
+                z-index: -1;
+              }
+              &::after {
+                opacity: 0;
+              }
+              & button {
+                top: 7px;
+                right: 8px;
+                & span {
+                  background-color: #666;
+                }
+              }
+            }
+            & > div {
+              cursor: default;
+              font-weight: 400;
+            }
+          }
+          & button {
+            display: flex;
+            position: absolute;
+            top: 4px;
+            right: 5px;
+            width: 20px;
+            height: 20px;
+            background: transparent;
+            cursor: pointer;
+            & span {
+              display: flex;
+              position: absolute;
+              top: 9px;
+              left: 4px;
+              width: 70%;
+              height: 1px;
+              border-radius: 2px;
+              background-color: #fff;
+              &:nth-child(1) {
+                transform: rotate(45deg);
+              }
+              &:nth-child(2) {
+                transform: rotate(-45deg);
+              }
+            }
+          }
+        }
+      }
+    }
+    & .listBtn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      & button {
+        display: flex;
+        position: relative;
+        text-indent: -9999em;
+        background: transparent;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        &::after {
+          content: "";
+          display: block;
+          position: absolute;
+          top: 4px;
+          width: 7px;
+          height: 7px;
+          border: 2px solid #aaa;
+          border-width: 0 2px 2px 0;
+        }
+        &:nth-child(1)::after {
+          transform: rotate(135deg);
+          left: 9px;
+        }
+        &:nth-child(2)::after {
+          transform: rotate(-45deg);
+          left: 3px;
+        }
+        &:hover::after {
+          border-color: #fff;
+        }
+      }
+    }
+  }
+}
+.favoriteBox {
+  position: absolute;
+  top: 14px;
+  right: 95px;
+  min-width: 30px;
+  & .tabMenuListAdd {
+    position: absolute;
+    top: 6px;
+    right: 78px;
+    & button { // 기존에는 a 태그 기준이였으나 변경
+      display: flex;
+      padding: 5px 10px;
+      background: #f5f5f5;
+      border-radius: 30px;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 300;
+      transition: .2s;
+      color: #666;
+    }
+    &:hover {
+      & button { // 기존에는 a 태그 기준이였으나 변경
+        background-color: #ddd;
+      }
+    }
+  }
+  & .favoriteBtn {
+    display: flex;
+    position: absolute;
+    top: -4px;
+    right: 16px;
+    width: 30px;
+    height: 30px;
+    background: url(../../public/images/ico_headerFavorite_off.svg) no-repeat center;
+    background-size: auto 70%;
+    text-indent: -9999em;
+    color: #333;
+    cursor: pointer;
+  }
+  & ul {
+    display: none;
+    position: absolute;
+    top: -9px;
+    right: 8px;
+    width: 220px;
+    background-color: #fff;
+    padding: 35px 10px 10px 10px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    z-index: 1;
+    & li {
+      & a {
+        display: flex;
+        padding: 4px 3px 4px 30px;
+        background: url(../../public/images/ico_page.svg) no-repeat 10px center;
+        font-size: var(--s-size);
+        border-radius: 5px;
+        color: #333;
+        &:hover {
+          background-color: #f5f5f5;
+        }
+      }
+      & span {
+        display: flex;
+        padding: 10px 0;
+        justify-content: center;
+        color: #aaa;
+      }
+    }
+  }
+  &.on {
+    & .tabMenuListAdd {}
+    & .favoriteBtn {
+      display: block;
+      position: absolute;
+      top: -4px;
+      right: 16px;
+      z-index: 2;
+      background-image: url(../../public/images/ico_headerFavorite_on.svg);
+      &::after {
+        content: "즐겨찾기";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: -167px;
+        width: 50px;
+        line-height: 28px;
+        text-indent: 0;
+        font-size: var(--s-size);
+        font-weight: 400;
+        color: #333;
+        z-index: 3;
+      }
+    }
+    & ul {
+      display: block;
+    }
+  }
+}
+
+.category .ag-cell-value, .ag-group-value {
+  overflow: inherit !important;
+}

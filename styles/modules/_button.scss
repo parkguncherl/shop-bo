@@ -1,0 +1,529 @@
+﻿// 버튼
+.btnArea {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.btnArea.right {
+  justify-content: flex-end;
+}
+.btnArea.between {
+  width: 100%;
+  justify-content: space-between;
+  & > div {
+    display: flex;
+    gap: 10px;
+  }
+}
+.btnArea.center {
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+.btnArea.big {
+  gap: 10px;
+  & button {
+    padding: 0 20px;
+    height: 35px;
+    font-size: var(--l-size);
+  }
+}
+.btnBoxGroup {
+  display: flex;
+  gap: 5px;
+}
+.btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 12px;
+  height: 30px;
+  border-radius: 5px;
+  //background-color: #fff;
+  //border: 1px solid #ddd;
+  box-sizing: border-box;
+  font-size: var(--s-size);
+  color: #333;
+  cursor: pointer;
+  transition: .2s;
+  font-weight: 400;
+  outline: 2px solid transparent;
+  &:hover {
+    //outline: none;
+    //background-color: #eee;
+  }
+  &:active {
+    transform: scale(.9);
+    background-color: #BDBDBD;
+  }
+  &:disabled {
+    background-color: #e6e6e6;
+    color: #aaa;
+    cursor: no-drop;
+    &:active {
+      transform: scale(1);
+    }
+  }
+}
+.btn.white {
+  background-color: #f2f4f6;
+  &:active {
+    background-color: #BDBDBD;
+  }
+}
+.ant-modal-content { // 팝업일때 기본버튼
+  & .btn {
+    background-color: #f2f4f6;
+    &:hover {
+      background-color: #d1d6db;
+    }
+    &:focus {
+      //outline: 2px solid var(--focus-color);
+      transform: scale(1.1);
+      box-shadow: 0 0 4px 2px rgba(0, 0, 0, 0.2);
+    }
+  }
+}
+.tblBtn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  font-size: var(--s-size);
+  color: #999;
+  margin: 0 !important;
+  transition: .2s;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f5f5f5;
+    color: #333;
+  }
+  &:active {
+    transform: scale(.9);
+  }
+
+  &.btnGray {
+    background-color: #999;
+    color: #fff;
+    &:hover {
+      background-color: #666;
+    }
+  }
+}
+.btnGray.btn {
+  background-color: #ddd;
+  border: 1px solid #ddd;
+  &:hover {
+    background-color: #999;
+    color: #fff;
+  }
+  &.on {
+    background-color: var(--main-color);
+    border-color: var(--main-color);
+    color: #fff;
+  }
+  &:active {
+    transform: scale(.9);
+  }
+}
+.btnBlue.btn {
+  background-color: var(--main-color);
+  border: 1px solid var(--main-color);
+  color: #fff;
+  &:hover {
+    background-color: var(--main-color);
+    border-color: var(--main-color);
+    color: #fff;
+  }
+  &:active {
+    transform: scale(.9);
+  }
+  &:disabled {
+    background-color: #8fc2ff;
+    border-color: #8fc2ff;
+    color: #fff;
+    cursor: no-drop;
+    &:active {
+      transform: scale(1);
+    }
+  }
+}
+.btnPurple.btn {
+  background-color: #6c3fc5;
+  border: 1px solid #6c3fc5;
+  color: #fff;
+  &:hover {
+    background-color: #5a33a8;
+    border-color: #5a33a8;
+    color: #fff;
+  }
+  &:active {
+    transform: scale(.9);
+  }
+  &:disabled {
+    background-color: #b49de0;
+    border-color: #b49de0;
+    color: #fff;
+    cursor: no-drop;
+    &:active {
+      transform: scale(1);
+    }
+  }
+}
+.btnRed.btn {
+  background-color: #fff;
+  border: 1px solid var(--red-color);
+  color: var(--red-color);
+  &:hover {
+    background-color: var(--red-color);
+    border-color: var(--red-color);
+    color: #fff;
+  }
+  &:active {
+    transform: scale(.9);
+  }
+}
+.btnBlack.btn {
+  background-color: #333;
+  border: 1px solid #333;
+  color: #fff;
+  &:hover {
+    background-color: #000;
+    border-color: #000;
+    color: #fff;
+  }
+  &:active {
+    transform: scale(.9);
+  }
+}
+.btn.orderReg {
+  background-color: transparent;
+  border: none;
+  &:hover {
+    color: #333;
+  }
+  &.on {
+    &:hover {
+      color: #fff;
+    }
+  }
+  &:active {
+    transform: scale(.9);
+  }
+}
+.btn.orderRegRight {
+  background-color: transparent;
+  border: none;
+  &:hover {
+    color: #333;
+  }
+  &.on {
+    background-color: #4f5967;
+    &:hover {
+      color: #fff;
+    }
+  }
+  &:active {
+    transform: scale(.9);
+  }
+}
+.btn.rowAdd {
+  position: relative;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  margin: 0 auto;
+  border-radius: 50%;
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -53%);
+    background: url(../../public/images/ico_plus.svg) no-repeat center;
+    background-size: 100% auto;
+    width: 100%;
+    height: 100%;
+  }
+  &:hover {
+    background-color: transparent;
+  }
+  &:active {
+    transform: scale(.9);
+  }
+}
+.btn.rowRemove {
+  position: relative;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  margin: 0 auto;
+  border-radius: 50%;
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -53%);
+    background: url(../../public/images/ico_minus.svg) no-repeat center;
+    background-size: 100% auto;
+    width: 100%;
+    height: 100%;
+  }
+  &:hover {
+    background-color: transparent;
+  }
+  &:active {
+    transform: scale(.9);
+  }
+}
+.btn.on,
+.btn.btnGray.disabled.on{
+  border-color: var(--main-color);
+  background-color: var(--main-color);
+  color: #fff;
+}
+.btn.btnGray.disabled {
+  background-color: #ddd;
+  border-color: #ddd;
+  color: #999;
+}
+.btn.hold {
+  position: relative;
+  & span {
+    display: flex;
+    position: absolute;
+    top: -3px;
+    right: -7px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: var(--red-color);
+    align-items: center;
+    justify-content: center;
+    line-height: 13px;
+    font-size: 10px;
+    font-weight: 500;
+    color: #fff;
+  }
+  &:active {
+    transform: scale(.9);
+  }
+}
+.btn.icoPrint {
+  text-indent: -9999em;
+  background: #fff url(../../public/images/ico_print.svg) no-repeat center;
+  width: 45px;
+  &:active {
+    transform: scale(.9);
+  }
+}
+
+.btn.icoPrint2 {
+  position: relative;
+  padding-left: 40px;
+  background: none;
+  text-indent: 0;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 5px;
+  &:active {
+    transform: scale(.9);
+  }
+}
+
+.btn.icoPrint2 .prefix-text {
+  margin-right: 1px;
+}
+
+.btn.icoPrint2 .icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  background: url(../../public/images/ico_print.svg) no-repeat center;
+  background-size: contain;
+  pointer-events: none;
+}
+
+.btn.add {
+  gap: 4px;
+  padding: 0 15px !important;
+  &::before {
+    content: "";
+    display: block;
+    width: 13px;
+    height: 13px;
+    background: url(../../public/images/ico_add.svg) no-repeat center;
+  }
+  &:hover {
+    outline: none;
+    background-color: #eee;
+  }
+  &:active {
+    transform: scale(.9);
+  }
+}
+.btn.edit {
+  gap: 4px;
+  padding: 0 15px !important;
+  &::before {
+    content: "";
+    display: block;
+    width: 13px;
+    height: 13px;
+    background: url(../../public/images/ico_edit.svg) no-repeat center;
+  }
+  &:hover {
+    outline: none;
+    background-color: #eee;
+  }
+  &:active {
+    transform: scale(.9);
+  }
+}
+.btn.delete {
+  gap: 4px;
+  padding: 0 15px !important;
+  &::before {
+    content: "";
+    display: block;
+    width: 13px;
+    height: 13px;
+    background: url(../../public/images/ico_delete.svg) no-repeat center;
+  }
+  &:hover {
+    outline: none;
+    background-color: #eee;
+  }
+  &:active {
+    transform: scale(.9);
+  }
+}
+.btn.receipt {
+  gap: 5px;
+  background-color: #fff;
+  &::before {
+    content: "";
+    display: block;
+    background: url(../../public/images/ico_receipt_off.svg) no-repeat center;
+    width: 16px;
+    height: 18px;
+  }
+  &:hover {
+    outline: none;
+    background-color: #eee;
+  }
+  &:active {
+    transform: scale(.9);
+  }
+}
+.btn.download {
+  display: flex;
+  gap: 8px;
+  padding: 0 4px 0 7px;
+  & span {
+    display: block;
+    width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  &::before {
+    content: "";
+    display: block;
+    width: 19px;
+    height: 16px;
+    background: url(../../public/images/ico_download.svg) no-repeat center;
+    background-size: auto 100%;
+  }
+  &:active {
+    transform: scale(.9);
+  }
+}
+.btn.excelDownload {
+  gap: 5px;
+  &::before {
+    content: "";
+    display: block;
+    width: 25px;
+    height: 22px;
+    background: no-repeat center;
+    background-size: 25px auto;
+    background-image: url(../../public/images/ico_excel_download.svg);
+  }
+  &.disabled {
+    cursor: default;
+    &::before {
+      background-image: url(../../public/images/ico_excel_download_dis.svg);
+    }
+  }
+  &:active {
+    transform: scale(.9);
+  }
+}
+.btn.excelUpload {
+  gap: 5px;
+  &::before {
+    content: "";
+    display: block;
+    width: 25px;
+    height: 22px;
+    background: no-repeat center;
+    background-size: 25px auto;
+    background-image: url(../../public/images/ico_excel_upload.svg);
+  }
+  &.disabled {
+    cursor: default;
+    &::before {
+      background-image: url(../../public/images/ico_excel_upload_dis.svg);
+    }
+  }
+  &:active {
+    transform: scale(.9);
+  }
+}
+.newWindow {
+  transition: .2s;
+  line-height: 27px;
+  //&::after { 20241107 새창버튼 아이콘 삭제
+  //  content: "";
+  //  display: block;
+  //  width: 14px;
+  //  height: 12px;
+  //  background: url(../../public/images/ico_newBrowser.svg) no-repeat center;
+  //}
+  &:hover {
+    background-color: #ddd;
+  }
+  & button {
+    background: transparent;
+    cursor: pointer;
+    &:hover {
+      color: var(--main-color);
+    }
+  }
+}
+
+button[class*="btn_"] {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 15px;
+  height: 30px;
+  border-radius: 5px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+  font-size: var(--s-size);
+  color: #666;
+  cursor: pointer;
+}
+
