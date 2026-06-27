@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+﻿import React, { useEffect, useRef, useState } from 'react';
 import { authApi } from '../../../libs';
 import { ApiResponseListAuthResponseEntity, MenuRequestWithAuth, MenuResponseWithAuth } from '../../../generated';
 import { PopupContent, PopupFooter, PopupLayout } from '../index';
@@ -193,7 +193,7 @@ export const UserAuthPop = () => {
         footer={
           <PopupFooter>
             <div className={'btnArea'}>
-              <button className="btn btnBlue" onClick={updateAuthFn}>
+              <button className="btn btnPurple" onClick={updateAuthFn}>
                 저장
               </button>
               <button className="btn" onClick={() => closeModal('USER_AUTH_MOD')}>

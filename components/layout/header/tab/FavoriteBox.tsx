@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { redirect, RedirectType } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { HistoryType, useCommonStore, useMypageStore } from '../../../../stores';
 import { LOCAL_STORAGE_WMS_HISTORY } from '../../../../libs/const';
 import { useQuery } from '@tanstack/react-query';
@@ -16,6 +16,7 @@ import { authApi } from '../../../../libs';
 const FavoriteBox = () => {
   /** 참조 */
   const containerRef = useRef<HTMLDivElement>(null); // 즐겨찾기 div 영역
+  const router = useRouter();
 
   /** 전역상태 */
   const [favoriteList, setFavoriteList] = useMypageStore((s) => [s.favoriteList, s.setFavoriteList]); // todo 현재는 다른 영역에서의 사용이 식별되어 전역 상태 유지하나 이후 불필요하다 여겨질 시 즉시 지역 상태로 전환할 것!
@@ -54,7 +55,7 @@ const FavoriteBox = () => {
   const handleFavoriteLink = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, menuUri: string | undefined) => {
     e.preventDefault();
     if (menuUri) {
-      redirect(menuUri, RedirectType.push);
+      router.push(menuUri);
     }
   };
 

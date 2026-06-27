@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+﻿import React, { useEffect, useRef, useState } from 'react';
 import { MenuRequestUpdate, MenuResponsePaging } from '../../../../generated';
 import { PopupContent, PopupFooter, PopupLayout } from '../../index';
 import { PopupSearchBox, PopupSearchType } from '../../content';
@@ -132,7 +132,7 @@ export const MenuModPop = ({ data, callback }: Props) => {
                   <button className={'btn'} onClick={(e) => setConfirmModal(true)}>
                     {'삭제'}
                   </button>
-                  <button className={'btn btnBlue'} onClick={handleSubmit(onValid)}>
+                  <button className={'btn btnPurple'} onClick={handleSubmit(onValid)}>
                     {'저장'}
                   </button>
                   <button

@@ -7,7 +7,7 @@
 
 .appLayout {
   & header {
-    background-color: var(--main-color);
+    background-color: #6c3fc5;
 
     .historyTab {
       left: 167px;
@@ -131,7 +131,7 @@
       & > ul {
         display: flex;
         flex-direction: column;
-        background-color: var(--main-color);
+        background-color: #6c3fc5;
         border-radius: 5px;
         padding: 10px;
         box-sizing: border-box;
@@ -567,6 +567,28 @@
   &:disabled {
     background-color: #8fc2ff;
     border-color: #8fc2ff;
+    color: #fff;
+    cursor: no-drop;
+    &:active {
+      transform: scale(1);
+    }
+  }
+}
+.btnPurple.btn {
+  background-color: #6c3fc5;
+  border: 1px solid #6c3fc5;
+  color: #fff;
+  &:hover {
+    background-color: #5a33a8;
+    border-color: #5a33a8;
+    color: #fff;
+  }
+  &:active {
+    transform: scale(.9);
+  }
+  &:disabled {
+    background-color: #b49de0;
+    border-color: #b49de0;
     color: #fff;
     cursor: no-drop;
     &:active {

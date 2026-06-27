@@ -582,7 +582,7 @@ const ProductMng = () => {
                 </div>
                 <div className="right">
                   <button
-                    className={'btn btnBlue'}
+                    className={'btn btnPurple'}
                     onClick={() => {
                       openModal('PROD_INFO_ADD');
                     }}
@@ -599,7 +599,7 @@ const ProductMng = () => {
                   {/*  {`${selectedRowsData == undefined ? '상세정보 추가할 품목 선택' : '상세정보'}`}*/}
                   {/*</button>*/}
                   <button
-                    className={`btn ${selectedRowsData != undefined && 'btnBlue'}`}
+                    className={`btn ${selectedRowsData != undefined && 'btnPurple'}`}
                     disabled={selectedRowsData == undefined}
                     onClick={() => {
                       openModal('PROD_DET_INFO');
@@ -608,7 +608,7 @@ const ProductMng = () => {
                     {`${selectedRowsData == undefined ? '품목 데이터 선택' : '품목상세 목록 출력'}`}
                   </button>
                   <button
-                    className={`btn ${selectedRowsData != undefined && 'btnBlue'}`}
+                    className={`btn ${selectedRowsData != undefined && 'btnPurple'}`}
                     disabled={selectedRowsData == undefined}
                     onClick={() => {
                       if (selectedRowsData && selectedRowsData.id) {
@@ -698,7 +698,7 @@ const ProductMng = () => {
                       <div className="left"></div>
                       <div className="right">
                         <button
-                          className={'btn btnBlue'}
+                          className={'btn btnPurple'}
                           onClick={() => {
                             openModal('INIT_BOARD');
                           }}
@@ -706,7 +706,7 @@ const ProductMng = () => {
                           {'빈 캔버스'}
                         </button>
                         <button
-                          className={'btn btnBlue'}
+                          className={'btn btnPurple'}
                           onClick={() => {
                             openModal('IMG_UPLOAD');
                           }}

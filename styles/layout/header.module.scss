@@ -2,16 +2,14 @@
 
 .header {
   display: flex;
-  position: sticky;
-  top: 0;
-  left: 0;
+  position: relative;
   align-items: center;
   justify-content: space-between;
   width: 100%;
   height: 50px;
   padding: 0 30px;
   box-sizing: border-box;
-  background-color: #3f4b56;
+  background-color: #6c3fc5;
   z-index: 3;
   & .left {
     display: flex;
@@ -23,10 +21,7 @@
     box-sizing: border-box;
     & h1 a {
       display: flex;
-      width: 95px;
-      height: 21px;
-      text-indent: -9999em;
-      background: url(../../public/images/logo.svg) no-repeat center;
+      align-items: center;
     }
     & > ul {
       display: flex;

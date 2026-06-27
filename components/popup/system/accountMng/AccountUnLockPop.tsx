@@ -96,7 +96,7 @@ export const AccountUnLockPop = ({ data }: Props) => {
           footer={
             <PopupFooter>
               <div className={'btnArea'}>
-                <button className={'btn btnBlue'} onClick={handleSubmit(onValid)}>
+                <button className={'btn btnPurple'} onClick={handleSubmit(onValid)}>
                   {'저장'}
                 </button>
               </div>

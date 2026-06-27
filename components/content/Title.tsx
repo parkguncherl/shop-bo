@@ -2,7 +2,7 @@ import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { TitleCategory } from './TitleCategory';
 import { useMypageStore } from '../../stores';
 import { ApiResponseListSelectFavorites } from '../../generated';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { authApi } from '../../libs';
 import { toastError, toastSuccess } from '../ToastMessage';
 import CustomShortcutButton, { COMMON_SHORTCUTS } from '../CustomShortcutButton';
@@ -26,12 +26,12 @@ interface Props {
 export const Title = ({ title, search, reset, children, detail, className }: PropsWithChildren<Props>) => {
   const [favoriteList, setFavoriteList, modFavorite] = useMypageStore((s) => [s.favoriteList, s.setFavoriteList, s.modFavorite]);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const queryClient = useQueryClient();
 
   const {
     data: favoriteData,
-    refetch: favRefetch,
     isSuccess: isFavSuccess,
-  } = useQuery({ queryKey: [], queryFn: () => authApi.get<ApiResponseListSelectFavorites>('/mypage/favorites', {}) });
+  } = useQuery({ queryKey: ['favoriteList'], queryFn: () => authApi.get<ApiResponseListSelectFavorites>('/mypage/favorites', {}) });
 
   useEffect(() => {
     if (isFavSuccess) {
@@ -73,12 +73,10 @@ export const Title = ({ title, search, reset, children, detail, className }: Pro
         if (e.data.resultCode === 200) {
           if (isFavorite) {
             toastSuccess('즐겨찾기에서 삭제 되었습니다.');
-            setIsFavorite(false);
           } else {
             toastSuccess('즐겨찾기에 추가되었습니다.');
-            setIsFavorite(true);
           }
-          await favRefetch();
+          await queryClient.invalidateQueries({ queryKey: ['favoriteList'] });
         } else {
           toastError(e.data.resultMessage);
         }

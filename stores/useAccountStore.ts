@@ -7,7 +7,6 @@ import {
   UserRequestCreate,
   UserRequestUpdate,
   UserRequestDelete,
-  UserControllerApiSelectUserPagingRequest,
   ApiResponseUserResponseSelect,
   UserRequestEmail,
   UserRequestUnLock,
@@ -19,11 +18,6 @@ import { authApi } from '../libs';
 import { StateCreator } from 'zustand/esm';
 
 type ModalType = 'ADD' | 'MOD' | 'UNLOCK';
-
-export type AccountPagingFilter = Pick<
-  UserControllerApiSelectUserPagingRequest,
-  'userNm' | 'authCd' | 'phoneNo' | 'belongNm' | 'deptNm' | 'positionNm' | 'useYn' | 'partnerNm' | 'omsWmsTp'
->;
 
 interface AccountState {
   paging: PageObject;
@@ -44,7 +38,6 @@ interface AccountApiState {
   updateUserUnLock: (userRequest: UserRequestUnLock) => AxiosPromise<ApiResponse>;
   updatePasswordInit: (userRequest: UserRequestUpdate) => AxiosPromise<ApiResponse>;
   selectUserByLoginId: (loginId: string) => AxiosPromise<ApiResponseUserResponseSelectByLoginId>;
-  createAuthForPartner: (userId: number) => AxiosPromise<ApiResponse>;
 }
 
 const initialStateCreator: StateCreator<AccountState & AccountApiState, any> = (set, get, api) => {
@@ -107,10 +100,6 @@ const initialStateCreator: StateCreator<AccountState & AccountApiState, any> = (
     selectUserByLoginId: (id) => {
       return authApi.get('/user/' + id);
     },
-    createAuthForPartner: (id) => {
-      return authApi.get('/user/createAuthForPartner/' + id);
-    },
-
     onClear: () => {
       set(() => initialStateCreator(set, get, api), true);
     },

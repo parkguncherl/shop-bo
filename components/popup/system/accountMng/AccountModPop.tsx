@@ -1,4 +1,4 @@
-import { UserRequestCreateUseYn, UserRequestDelete, UserRequestPasswordInit, UserRequestUpdate, UserResponseSelectByLoginId } from '../../../../generated';
+﻿import { UserRequestCreateUseYn, UserRequestDelete, UserRequestPasswordInit, UserRequestUpdate, UserResponseSelectByLoginId } from '../../../../generated';
 import { useAccountStore, useCommonStore } from '../../../../stores';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React, { useEffect, useRef, useState } from 'react';
@@ -78,13 +78,7 @@ export const AccountModPop = ({ data, open, onClose }: AccountModPopProps) => {
   //const [modalType, closeModal, selectedUser] = useAccountStore((s) => [s.modalType, s.closeModal, s.selectedUser]);
 
   /** 계정관리 양식 관리 스토어 - API */
-  const [updateUser, deleteUser, sendMailUser, updatePasswordInit, createAuthForPartner] = useAccountStore((s) => [
-    s.updateUser,
-    s.deleteUser,
-    s.sendMailUser,
-    s.updatePasswordInit,
-    s.createAuthForPartner,
-  ]);
+  const [updateUser, deleteUser, sendMailUser, updatePasswordInit] = useAccountStore((s) => [s.updateUser, s.deleteUser, s.sendMailUser, s.updatePasswordInit]);
 
   /** 공통 스토어 - State */
   const [menuUpdYn, menuExcelYn] = useCommonStore((s) => [s.menuUpdYn, s.menuExcelYn]);
@@ -179,26 +173,6 @@ export const AccountModPop = ({ data, open, onClose }: AccountModPopProps) => {
     },
   });
 
-  /** 계정 비밀번호 초기화 */
-  const { mutate: createAuthForPartnerMutate } = useMutation({
-    mutationFn: createAuthForPartner,
-    onSuccess: async (e) => {
-      try {
-        if (e.data.resultCode === 200) {
-          toastSuccess('권한이 생성되었습니다.' || '');
-          await queryClient.invalidateQueries({ queryKey: ['/user/paging'] });
-          //closeModal('MOD');
-          onClose();
-        } else {
-          toastError(e.data.resultMessage);
-          throw new Error(e.data.resultMessage);
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    },
-  });
-
   /** 계정관리 수정, 비밀번호초기화 버튼 클릭 시 */
   const updatePasswordFn = () => {
     updatePasswordInitMutate({
@@ -206,16 +180,6 @@ export const AccountModPop = ({ data, open, onClose }: AccountModPopProps) => {
       loginId: watch('loginId'),
       phoneNo: watch('phoneNo'),
     } as UserRequestPasswordInit);
-  };
-
-  /** 계정관리 수정, 비밀번호초기화 버튼 클릭 시 */
-  const createAuthForPartnerFn = () => {
-    const authCd = watch('authCd');
-    if (authCd >= '400') {
-      toastError('oms 사용자에게만 권한을 줄수 있습니다.');
-    } else {
-      createAuthForPartnerMutate(watch('id'));
-    }
   };
 
   /** 삭제 버튼 클릭 시 */
@@ -270,15 +234,12 @@ export const AccountModPop = ({ data, open, onClose }: AccountModPopProps) => {
                     <button className={'btn'} onClick={updatePasswordFn}>
                       비밀번호 초기화
                     </button>
-                    <button className={'btn'} onClick={createAuthForPartnerFn} disabled={watch('authCd') !== '399'}>
-                      oms 권한 모두 주기
-                    </button>
                   </div>
                   <div className="right">
                     <button className={'btn'} onClick={(e) => setConfirmModal(true)} disabled={deleteIsLoading}>
                       삭제
                     </button>
-                    <button className={'btn btnBlue'} onClick={handleSubmit(onValid)}>
+                    <button className={'btn btnPurple'} onClick={handleSubmit(onValid)}>
                       저장
                     </button>
                     <button

@@ -1,4 +1,4 @@
-import ModalLayout from './ModalLayout';
+﻿import ModalLayout from './ModalLayout';
 import React, { PropsWithChildren } from 'react';
 import { PopupFooter } from './popup';
 import styled from 'styled-components';
@@ -26,7 +26,7 @@ export function DeleteConfirmModal({ dispTitle, open, width, style, onConfirm, o
             {isLoading ? (
               <button className={'btn'}>{'처리중'}</button>
             ) : (
-              <button className={'btn btnBlue'} onClick={onConfirm}>
+              <button className={'btn btnPurple'} onClick={onConfirm}>
                 {'확인'}
               </button>
             )}

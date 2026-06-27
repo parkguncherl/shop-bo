@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 /**
  화주정보
  /wms/system/partnerMng
@@ -196,7 +196,7 @@ const PartnerMng = () => {
         </div>
         <div className={'btnArea'}>
           <button
-            className={'btn btnBlue'}
+            className={'btn btnPurple'}
             onClick={() => {
               setSelectedPartner({});
               openModal('ADD');

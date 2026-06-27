@@ -1,4 +1,4 @@
-import ModalLayout from './ModalLayout';
+﻿import ModalLayout from './ModalLayout';
 import React, { PropsWithChildren, ReactNode, useEffect, useRef } from 'react';
 import { PopupFooter } from './popup';
 import styled from 'styled-components';
@@ -200,7 +200,7 @@ export function ConfirmModal<FT extends FieldValues>({
           </div>
           <div className="right">
             <button
-              className={'btn btnBlue'}
+              className={'btn btnPurple'}
               ref={buttonConfConfirmRef}
               tabIndex={0}
               onClick={() => {

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+﻿import React, { useRef, useState } from 'react';
 import { PopupFooter } from '../PopupFooter';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -97,10 +97,10 @@ function ChangePasswordPop({ open = false, onClose }: Props) {
       footer={
         <PopupFooter>
           {/*<div className={'btnBox'} onClick={form.handleSubmit(onValid)}>
-            <Button className={'btn btnBlue'}>{'변경'}</Button>
+            <Button className={'btn btnPurple'}>{'변경'}</Button>
           </div>*/}
           <div className="right">
-            <TunedButtonAtom onClick={form.handleSubmit(onValid)} ref={chgBtnRef} clickPreventTime={-1} className={'btn btnBlue'}>
+            <TunedButtonAtom onClick={form.handleSubmit(onValid)} ref={chgBtnRef} clickPreventTime={-1} className={'btn btnPurple'}>
               변경
             </TunedButtonAtom>
             <button className={'btn'} onClick={onClose}>

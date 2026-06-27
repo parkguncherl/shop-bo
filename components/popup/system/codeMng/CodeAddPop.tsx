@@ -1,4 +1,4 @@
-import { CodeRequestCreate, CodeResponsePaging } from '../../../../generated';
+﻿import { CodeRequestCreate, CodeResponsePaging } from '../../../../generated';
 import React, { useRef } from 'react';
 import { PopupContent } from '../../PopupContent';
 import { PopupSearchBox, PopupSearchType } from '../../content';
@@ -105,7 +105,7 @@ export const CodeAddPop = ({ data }: Props) => {
             <PopupFooter>
               <div className={'btnArea'}>
                 <button
-                  className={'btn btnBlue'}
+                  className={'btn btnPurple'}
                   onClick={(e) => {
                     handleSubmit(onValid, onInvalid)(e);
                   }}

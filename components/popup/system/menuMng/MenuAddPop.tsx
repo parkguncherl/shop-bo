@@ -101,7 +101,7 @@ export const MenuAddPop = ({ data, callback }: Props) => {
           footer={
             <PopupFooter>
               <div className={'btnArea'}>
-                <button className={'btn btnBlue'} onClick={handleSubmit(onValid)}>
+                <button className={'btn btnPurple'} onClick={handleSubmit(onValid)}>
                   저장
                 </button>
                 <button className={'btn'} onClick={() => closeModal('ADD')}>

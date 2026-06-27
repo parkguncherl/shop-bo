@@ -1,4 +1,4 @@
-import { CodeRequestDelete, CodeRequestUpdate, CodeResponsePaging } from '../../../../generated';
+﻿import { CodeRequestDelete, CodeRequestUpdate, CodeResponsePaging } from '../../../../generated';
 import { useCodeStore, useCommonStore } from '../../../../stores';
 import React, { useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -154,7 +154,7 @@ export const CodeModPop = ({ data }: Props) => {
               ? menuUpdYn && (
                   <PopupFooter>
                     <div className={'btnArea'}>
-                      <button className={'btn btnBlue'} onClick={handleSubmit(onValid)}>
+                      <button className={'btn btnPurple'} onClick={handleSubmit(onValid)}>
                         {'저장'}
                       </button>
                       <button className={'btn '} onClick={() => closeModal('MOD')}>
@@ -166,7 +166,7 @@ export const CodeModPop = ({ data }: Props) => {
               : menuUpdYn && (
                   <PopupFooter>
                     <div className={'btnArea'}>
-                      <button className={'btn btnBlue'} onClick={handleSubmit(onValid)}>
+                      <button className={'btn btnPurple'} onClick={handleSubmit(onValid)}>
                         {'저장'}
                       </button>
                       <button className={'btn '} onClick={() => closeModal('MOD')}>

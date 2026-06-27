@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { useCommonStore } from '../../../../stores';
 
 export interface SrcElement {
@@ -72,7 +72,7 @@ const EnumElement = ({ srcElement, toUpperReqHandler, oneStepMovementReqHandler,
             <div className={'btnArea between'}>
               <div className={'left'}>
                 {toUpperReqHandler && (
-                  <button className={'btn btnBlue'} onClick={(e) => toUpperReqHandler({ ...e, srcElement: srcElement })}>
+                  <button className={'btn btnPurple'} onClick={(e) => toUpperReqHandler({ ...e, srcElement: srcElement })}>
                     맨 위로
                   </button>
                 )}
@@ -85,7 +85,7 @@ const EnumElement = ({ srcElement, toUpperReqHandler, oneStepMovementReqHandler,
               <div className={'right'}>
                 {oneStepMovementReqHandler && (
                   <>
-                    <button className={'btn btnBlue'} onClick={(e) => oneStepMovementReqHandler({ ...e, srcElement: srcElement, direction: 'up' })}>
+                    <button className={'btn btnPurple'} onClick={(e) => oneStepMovementReqHandler({ ...e, srcElement: srcElement, direction: 'up' })}>
                       위로
                     </button>
                     <button className={'btn'} onClick={(e) => oneStepMovementReqHandler({ ...e, srcElement: srcElement, direction: 'down' })}>

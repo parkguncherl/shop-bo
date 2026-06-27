@@ -144,7 +144,7 @@ const AccountMng = () => {
   /** 계정관리 필드별 설정 */
   const columnDefs = useMemo<ColDef[]>(
     () => [
-      { field: 'no', headerName: 'NO', minWidth: 60, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
+      { field: 'no', headerName: 'NO', minWidth: 37, maxWidth: 37, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
       { field: 'loginId', headerName: 'ID(e-mail)', minWidth: 200, suppressHeaderMenuButton: true },
       { field: 'userNm', headerName: '이름', minWidth: 100, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
       { field: 'authNm', headerName: '권한[화주]', minWidth: 100, suppressHeaderMenuButton: true },
@@ -251,43 +251,6 @@ const AccountMng = () => {
           value={filters.useYn || ''}
           onChange={onChangeFilters}
         />
-        <Search.DropDown
-          title={'사용자구분'}
-          name={'omsWmsTp'}
-          defaultOptions={[
-            { value: 'O', label: 'OMS 사용자' },
-            { value: 'W', label: 'WMS 사용자' },
-          ]}
-          value={filters.omsWmsTp || ''}
-          onChange={onChangeFilters}
-        />
-        {/*        <Search.Input
-          title={'소속'}
-          name={'belongNm'}
-          placeholder={Placeholder.Default}
-          value={filters.belongNm}
-          onChange={onChangeFilters}
-          onEnter={search}
-          filters={filters}
-        />
-        <Search.Input
-          title={'부서'}
-          name={'deptNm'}
-          placeholder={Placeholder.Default}
-          value={filters.deptNm}
-          onChange={onChangeFilters}
-          onEnter={search}
-          filters={filters}
-        />
-        <Search.Input
-          title={'직책'}
-          name={'positionNm'}
-          placeholder={Placeholder.Default}
-          value={filters.positionNm}
-          onChange={onChangeFilters}
-          onEnter={search}
-          filters={filters}
-        />*/}
       </Search>
       <Table>
         <TableHeader count={paging.totalRowCount || 0} paging={paging} setPaging={setPaging} search={search}></TableHeader>

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+﻿import React, { useRef, useState } from 'react';
 import { Button } from '../../../Button';
 import { PopupContent, PopupFooter, PopupLayout } from '../../index';
 import { toastError } from '../../../index';
@@ -84,7 +84,7 @@ export const FirstPassChangePop = ({ loginId, changeType }: Props) => {
               <button className={'btn pop_close'} onClick={stayPassword} disabled={changePasswordIsLoading}>
                 {changeType === 'F' ? '취소' : '6개월후변경'}
               </button>
-              <button className={'btn btnBlue'} onClick={changePass} disabled={changePasswordIsLoading}>
+              <button className={'btn btnPurple'} onClick={changePass} disabled={changePasswordIsLoading}>
                 변경
               </button>
             </div>

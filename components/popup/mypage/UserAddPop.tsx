@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toastError, toastSuccess } from '../../ToastMessage';
 import { useAccountStore, useMypageStore } from '../../../stores';
@@ -93,7 +93,7 @@ const UserAddPop = () => {
       footer={
         <PopupFooter>
           <div className="btnArea">
-            <button className="btn btnBlue" title="저장" onClick={handleSubmit(onSubmit)}>
+            <button className="btn btnPurple" title="저장" onClick={handleSubmit(onSubmit)}>
               저장
             </button>
             <button className="btn" title="닫기" onClick={() => closeModal('USER_ADD')}>

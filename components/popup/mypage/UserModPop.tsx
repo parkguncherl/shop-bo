@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -114,7 +114,7 @@ const UserModPop = () => {
       footer={
         <PopupFooter>
           <div className="btnArea">
-            <button className="btn btnBlue" title="저장" onClick={handleSubmit(onSubmit)}>
+            <button className="btn btnPurple" title="저장" onClick={handleSubmit(onSubmit)}>
               저장
             </button>
             <button className="btn" title="닫기" onClick={() => closeModal('USER_ADD')}>

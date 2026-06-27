@@ -1,4 +1,4 @@
-import { useAccountStore } from '../../../../stores';
+﻿import { useAccountStore } from '../../../../stores';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useEffect, useRef, useState } from 'react';
 import { PopupContent } from '../../PopupContent';
@@ -75,8 +75,8 @@ export const AccountAddPop = ({ open, onClose }: AccountAddPopProps) => {
 
   /** 화주리스트 조회하기 */
   const { data: partner, isSuccess: isListSuccess } = useQuery({
-    queryKey: [`/partner/upperPartner`],
-    queryFn: () => authApi.get(`/partner/upperPartner`, {}),
+    queryKey: [`/partner/list`],
+    queryFn: () => authApi.get(`/partner/list`, {}),
   });
   useEffect(() => {
     if (isListSuccess) {
@@ -186,7 +186,7 @@ export const AccountAddPop = ({ open, onClose }: AccountAddPopProps) => {
               <div className={'btnArea between'}>
                 <div className="left"></div>
                 <div className="right">
-                  <button className={'btn btnBlue'} onClick={handleSubmit(onValid)}>
+                  <button className={'btn btnPurple'} onClick={handleSubmit(onValid)}>
                     저장
                   </button>
                   <button className={'btn '} onClick={onClose}>

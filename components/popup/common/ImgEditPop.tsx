@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+﻿import React, { useRef, useState } from 'react';
 import { PopupFooter } from '../PopupFooter';
 import { PopupContent } from '../PopupContent';
 import { PopupLayout } from '../PopupLayout';
@@ -63,7 +63,7 @@ const ImgEditPop = ({ open, onClose, imgProps, onFileIsExportedByConf }: ImgEdit
             <div className="btnArea between">
               <div className="left">
                 <button
-                  className="btn btnBlue"
+                  className="btn btnPurple"
                   onClick={() => {
                     canvasByKonvaRef.current?.customs.api.addNewText();
                   }}
@@ -72,7 +72,7 @@ const ImgEditPop = ({ open, onClose, imgProps, onFileIsExportedByConf }: ImgEdit
                 </button>
 
                 <button
-                  className="btn btnBlue"
+                  className="btn btnPurple"
                   onClick={() => {
                     canvasByKonvaRef.current?.customs.api.addNewDimensionLine();
                   }}
@@ -81,7 +81,7 @@ const ImgEditPop = ({ open, onClose, imgProps, onFileIsExportedByConf }: ImgEdit
                 </button>
 
                 <button
-                  className={'btn ' + (!preview ? 'btnBlue' : '')}
+                  className={'btn ' + (!preview ? 'btnPurple' : '')}
                   onClick={() => {
                     setPreview(!preview);
                   }}
@@ -89,7 +89,7 @@ const ImgEditPop = ({ open, onClose, imgProps, onFileIsExportedByConf }: ImgEdit
                   {!preview ? '미리보기' : '편집'}
                 </button>
                 <button
-                  className="btn btnBlue"
+                  className="btn btnPurple"
                   disabled={!preview}
                   onClick={() => {
                     canvasByKonvaRef.current.customs.api.exportAsFile().then((file: File | null) => {

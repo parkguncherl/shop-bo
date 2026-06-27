@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { CellDoubleClickedEvent, ColDef } from 'ag-grid-community';
@@ -291,7 +291,7 @@ const CodeMng = () => {
           className={'wmsDefault'}
         />
         <div className={'btnArea'}>
-          <button className={'btn btnBlue'} onClick={() => openModal('ADD')}>
+          <button className={'btn btnPurple'} onClick={() => openModal('ADD')}>
             신규
           </button>
           {menuExcelYn && (
