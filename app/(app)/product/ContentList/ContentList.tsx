@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Search, Table, Title, toastSuccess } from '../../../../components';
@@ -349,7 +349,7 @@ const ContentList = () => {
             <div className="btnArea between">
               <div className="left">
                 <button
-                  className={'btn btn_blue'}
+                  className={'btn btnPurple'}
                   onClick={() => {
                     openModal('ADD');
                   }}
@@ -357,7 +357,7 @@ const ContentList = () => {
                   {'신규'}
                 </button>
                 <button
-                  className={selectedRowsData == undefined ? 'btn' : 'btn btn_blue'}
+                  className={selectedRowsData == undefined ? 'btn' : 'btn btnPurple'}
                   disabled={selectedRowsData == undefined}
                   onClick={() => {
                     openModal('MOD', selectedRowsData);
@@ -366,7 +366,7 @@ const ContentList = () => {
                   {'수정'}
                 </button>
                 <button
-                  className={'btn btn_blue'}
+                  className={'btn btnPurple'}
                   onClick={() => {
                     const selectedRows = gridRef.current?.api.getSelectedRows();
                     if (selectedRows && selectedRows.length > 0) {
@@ -379,7 +379,7 @@ const ContentList = () => {
                   {'삭제'}
                 </button>
                 <button
-                  className={selectedRowsData == undefined ? 'btn' : 'btn btn_blue'}
+                  className={selectedRowsData == undefined ? 'btn' : 'btn btnPurple'}
                   disabled={selectedRowsData == undefined}
                   onClick={() => openModal('PREVIEW', selectedRowsData)}
                 >
@@ -388,7 +388,7 @@ const ContentList = () => {
               </div>
               <div className="right">
                 <button
-                  className={'btn btn_blue'}
+                  className={'btn btnPurple'}
                   onClick={() => {
                     if (selectedRowsData) {
                       openModal('ADD_PROD');
@@ -436,7 +436,7 @@ const ContentList = () => {
               <div className="left"></div>
               <div className="right">
                 <button
-                  className={'btn btn_blue'}
+                  className={'btn btnPurple'}
                   onClick={() => {
                     // todo
                   }}

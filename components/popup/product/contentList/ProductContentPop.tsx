@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from 'react';
+﻿import React, { useEffect, useReducer, useState } from 'react';
 import { PopupFooter } from '../../PopupFooter';
 import { PopupContent } from '../../PopupContent';
 import { PopupLayout } from '../../PopupLayout';
@@ -338,7 +338,7 @@ const ProductContentPop = ({ open, onClose, onSuccess, mode = 'ADD', productCont
             <div className="btnArea between">
               <div className="left">
                 <button
-                  className={mode == 'SHOW' ? 'btn' : 'btn btn_blue'}
+                  className={mode == 'SHOW' ? 'btn' : 'btn btnPurple'}
                   onClick={() => {
                     const title = getValues('title');
                     const content = getValues('content');

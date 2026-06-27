@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { Title, toastError, toastSuccess } from '../../../../components';
@@ -132,7 +132,7 @@ const ProductContents = () => {
                 <div className={'btn-wrapper'}>
                   <div className={'btn-per-wrapper'}>
                     <button
-                      className={'btn btn_blue'}
+                      className={'btn btnPurple'}
                       onClick={() => {
                         if (errors.content == undefined) {
                           openModal('ADD_CONF');

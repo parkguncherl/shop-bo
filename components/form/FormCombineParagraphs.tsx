@@ -1,4 +1,4 @@
-import { BaseTextAreaAtom, BaseTextAreaAtomProps } from '../atom/BaseTextAreaAtom';
+﻿import { BaseTextAreaAtom, BaseTextAreaAtomProps } from '../atom/BaseTextAreaAtom';
 import { Control, FieldError, FieldPathByValue, FieldValues, PathValue, useController } from 'react-hook-form';
 import React, { useEffect, useReducer, useRef, useState } from 'react';
 import { toastError } from '../ToastMessage';
@@ -444,7 +444,7 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
                             <div className={'btnArea between'}>
                               {contentElement.fileInfo.file?.name && <p>{contentElement.fileInfo.file.name}</p>}
                               <button
-                                className="btn btn_blue"
+                                className="btn btnPurple"
                                 onClick={() => {
                                   controlChange([...value.filter((prev: ContentElement) => prev.id != contentElement.id)]); // 지움 동작
                                 }}
@@ -675,7 +675,7 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
                                 <div className={'btnArea between'}>
                                   {contentElement.fileInfo.file?.name && <p>{contentElement.fileInfo.file.name}</p>}
                                   <button
-                                    className="btn btn_blue"
+                                    className="btn btnPurple"
                                     onClick={() => {
                                       controlChange([...value.filter((prev: ContentElement) => prev.id != contentElement.id)]); // 지움 동작
                                     }}

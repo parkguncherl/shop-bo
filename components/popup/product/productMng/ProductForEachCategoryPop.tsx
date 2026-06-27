@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { PopupFooter } from '../../PopupFooter';
 import { PopupContent } from '../../PopupContent';
 import { PopupLayout } from '../../PopupLayout';
@@ -373,7 +373,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
             <div className="btnArea between">
               <div className="left">
                 <button
-                  className={`btn ${selectedProductInfoByCategory != undefined && filtersForProdInfoByCategory.categoryId && 'btn_blue'}`}
+                  className={`btn ${selectedProductInfoByCategory != undefined && filtersForProdInfoByCategory.categoryId && 'btnPurple'}`}
                   disabled={selectedProductInfoByCategory == undefined || !filtersForProdInfoByCategory.categoryId}
                   onClick={() => {
                     setModalsStatus({
@@ -408,7 +408,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                   {'카테고리에서 삭제'}
                 </button>
                 <button
-                  className={`btn ${selectedProductInfo != undefined && filtersForProdInfoByCategory.categoryId && 'btn_blue'}`}
+                  className={`btn ${selectedProductInfo != undefined && filtersForProdInfoByCategory.categoryId && 'btnPurple'}`}
                   disabled={selectedProductInfo == undefined || !filtersForProdInfoByCategory.categoryId}
                   onClick={() => {
                     setModalsStatus({

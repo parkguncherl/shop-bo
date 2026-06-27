@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { PopupFooter } from '../../PopupFooter';
 import { PopupContent } from '../../PopupContent';
 import { PopupLayout } from '../../PopupLayout';
@@ -175,7 +175,7 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
             <div className="btnArea between">
               <div className="left">
                 <button
-                  className="btn btn_blue"
+                  className="btn btnPurple"
                   onClick={() => {
                     handleSubmit(onValid, onInvalid)(); // 함수를 반환하므로 다음과 같이, 호출하여야
                   }}

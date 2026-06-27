@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { PopupFooter } from '../../PopupFooter';
 import { PopupContent } from '../../PopupContent';
 import { PopupLayout } from '../../PopupLayout';
@@ -123,7 +123,7 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
             <div className="btnArea between">
               <div className="left">
                 <button
-                  className="btn btn_blue"
+                  className="btn btnPurple"
                   onClick={() => {
                     const title = getValues('title');
                     const content = getValues('content');

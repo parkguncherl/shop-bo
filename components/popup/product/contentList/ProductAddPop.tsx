@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { PopupFooter } from '../../PopupFooter';
 import { PopupContent } from '../../PopupContent';
 import { PopupLayout } from '../../PopupLayout';
@@ -321,7 +321,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
               <div></div>
               <div className="right">
                 <button
-                  className="btn btn_blue"
+                  className="btn btnPurple"
                   onClick={() => {
                     if (selectedRowsDataList.length == 0) {
                       toastError('추가하고자 하는 품목을 하나 이상 선택하십시요.');

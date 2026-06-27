@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { PopupFooter } from '../../PopupFooter';
 import { PopupContent } from '../../PopupContent';
 import { PopupLayout } from '../../PopupLayout';
@@ -386,7 +386,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
               <div className="left">
                 <button
                   className={`btn ${
-                    productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length != 0 ? (isValid ? 'btn_blue' : '') : 'btn_blue'
+                    productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length != 0 ? (isValid ? 'btnPurple' : '') : 'btnPurple'
                   }`}
                   disabled={productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length != 0 ? !isValid : false}
                   onClick={() => {
@@ -406,7 +406,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
                   {productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length == 0 ? '신규 작성' : isValid ? '제출' : '작성중..'}
                 </button>
                 <button
-                  className={`btn ${productInfo != undefined && selectedRowsData != undefined && 'btn_blue'}`}
+                  className={`btn ${productInfo != undefined && selectedRowsData != undefined && 'btnPurple'}`}
                   disabled={productInfo == undefined || selectedRowsData == undefined}
                   onClick={() => {
                     if (selectedRowsData?.id) {

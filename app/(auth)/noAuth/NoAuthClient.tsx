@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useRouter } from 'next/navigation';
 
 /**
@@ -23,7 +23,7 @@ const NoAuthClient = () => {
             </button>
           </div>
           <div className={'btn_box'}>
-            <button className={'btn_blue'} onClick={() => router.push('/', undefined)}>
+            <button className={'btnPurple'} onClick={() => router.push('/', undefined)}>
               {'홈 바로가기'}
             </button>
           </div>

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { Search, Table, Title, toastSuccess } from '../../../../components';
@@ -590,7 +590,7 @@ const ProductMng = () => {
                     품목추가
                   </button>
                   {/*<button*/}
-                  {/*  className={`btn ${selectedRowsData != undefined && 'btn_blue'}`}*/}
+                  {/*  className={`btn ${selectedRowsData != undefined && 'btnPurple'}`}*/}
                   {/*  disabled={selectedRowsData == undefined}*/}
                   {/*  onClick={() => {*/}
                   {/*    openModal('PROD_DET_INFO_ADD');*/}
