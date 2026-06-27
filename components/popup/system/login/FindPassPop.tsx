@@ -83,7 +83,7 @@ export const FindPassPop = () => {
                 </div>
               </div>
               <div className={styles.btnArea}>
-                <button className="btn blueBtn" onClick={findPass} disabled={onFindPasswordIsLoading}>
+                <button className="btn btnPurple" onClick={findPass} disabled={onFindPasswordIsLoading}>
                   {'임시 비밀번호 발송'}
                 </button>
               </div>

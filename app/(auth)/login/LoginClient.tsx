@@ -233,7 +233,7 @@ const LoginClient = () => {
         <form>
           <div className={styles.content}>
             <div className={styles.logo}>
-              <span className={styles.img}></span>
+              GGUANGGU
             </div>
             <div className={`${styles.login_inp} ${validAccount ? styles.id_pw_close : styles.id_pw_open}`}>
               <div className={styles.inp_id}>

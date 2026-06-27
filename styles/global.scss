@@ -9,8 +9,20 @@
 @use "components";
 @use "form/form.module";
 
-.ag-theme-alpine, .ag-theme-alpine-dark, .ag-theme-alpine-auto-dark {
+@import "ag-grid-community/styles/ag-theme-quartz.css";
+
+.ag-theme-quartz, .ag-theme-quartz-dark, .ag-theme-quartz-auto-dark {
   //--ag-alpine-active-color: var(--main-color) !important; // 카피 앤 페이스트 컬러
+}
+
+.ag-theme-quartz {
+  --ag-header-background-color: #6b21a8;
+  --ag-header-foreground-color: #ffffff;
+  --ag-header-column-separator-color: rgba(255, 255, 255, 0.2);
+  --ag-header-column-resize-handle-color: rgba(255, 255, 255, 0.3);
+  --ag-active-color: #6b21a8;
+  --ag-range-selection-border-color: #6b21a8;
+  --ag-checkbox-checked-color: #6b21a8;
 }
 .ag-row {
   &::before {
@@ -76,23 +88,23 @@
   }
 }
 
-.ag-theme-alpine .ag-ltr .ag-grid-refund { // 반품
+.ag-theme-quartz .ag-ltr .ag-grid-refund { // 반품
   color: var(--red-color) !important;
   //& .ag-cell {
   //  font-weight: 600 !important;
   //}
 }
 
-.ag-theme-alpine .ag-cell.ag-cell-focus {
+.ag-theme-quartz .ag-cell.ag-cell-focus {
   background-color: #f1f9ff !important;
 }
 
-.ag-theme-alpine .ag-cell-focus:not(.ag-cell-range-selected) {
+.ag-theme-quartz .ag-cell-focus:not(.ag-cell-range-selected) {
   background-color: #f1f9ff !important;
 }
 
 // 미송
-.ag-theme-alpine .ag-ltr .ag-grid-beforeDelivery { // 미송
+.ag-theme-quartz .ag-ltr .ag-grid-beforeDelivery { // 미송
   color: #0064ed !important;
   //& .ag-cell {
   //  font-weight: 600 !important;
@@ -105,7 +117,7 @@
 }
 
 // 미출
-.ag-theme-alpine .ag-ltr .ag-grid-notDelivered { // 미출
+.ag-theme-quartz .ag-ltr .ag-grid-notDelivered { // 미출
   color: #999 !important;
   background-color: #ddd !important;
   //& .ag-cell {
@@ -113,16 +125,16 @@
   //}
 }
 
-.ag-theme-alpine .ag-ltr .ag-row-focus.ag-grid-refund { // 반품 선택시
+.ag-theme-quartz .ag-ltr .ag-row-focus.ag-grid-refund { // 반품 선택시
   //background-color: rgb(182, 85, 75) !important;
 }
-.ag-theme-alpine .ag-ltr .ag-row-focus.ag-grid-beforeDelivery { // 미송 선택시
+.ag-theme-quartz .ag-ltr .ag-row-focus.ag-grid-beforeDelivery { // 미송 선택시
   //background-color: rgb(117, 147, 88) !important;
 }
-.ag-theme-alpine .ag-ltr .ag-row-focus.ag-grid-sample { // 샘플 선택시
+.ag-theme-quartz .ag-ltr .ag-row-focus.ag-grid-sample { // 샘플 선택시
   //background-color: rgb(185, 103, 185) !important;
 }
-.ag-theme-alpine .ag-ltr .ag-row-focus.ag-grid-notDelivered { // 미출 선택시
+.ag-theme-quartz .ag-ltr .ag-row-focus.ag-grid-notDelivered { // 미출 선택시
   background-color: #ccc !important;
 }
 .ag-checkbox-cell {
@@ -152,16 +164,16 @@
 .ag-grid-lightSkyBlue { background-color: var(--ag-grid-lightSkyblue); }
 .ag-grid-lightGreen2 { background-color: var(--ag-grid-lightGreen2); }
 
-.ag-theme-alpine .ag-grid-peach {&::before{background-color: var(--ag-grid-peach) !important;} &:hover{&::before{background-color: var(--ag-grid-focus-peach) !important;}}}
-.ag-theme-alpine .ag-grid-apricot {&::before{background-color: var(--ag-grid-apricot) !important;} &:hover{&::before{background-color: var(--ag-grid-focus-apricot) !important;}}}
-.ag-theme-alpine .ag-grid-lightGreen {&::before{background-color: var(--ag-grid-lightGreen) !important;} &:hover{&::before{background-color: var(--ag-grid-focus-lightGreen) !important;}}}
-.ag-theme-alpine .ag-grid-lightGray {&::before{background-color: var(--ag-grid-lightGray) !important;} &:hover{&::before{background-color: var(--ag-grid-focus-lightGray) !important;}}}
-.ag-theme-alpine .ag-grid-lightYellow {&::before{background-color: var(--ag-grid-lightYellow) !important;} &:hover{&::before{background-color: var(--ag-grid-focus-lightYellow) !important;}}}
-.ag-theme-alpine .ag-grid-lightPink {&::before{background-color: var(--ag-grid-lightPink) !important;} &:hover{&::before{background-color: var(--ag-grid-focus-lightPink) !important;}}}
-.ag-theme-alpine .ag-grid-lightBlue {&::before{background-color: var(--ag-grid-lightBlue) !important;} &:hover{&::before{background-color: var(--ag-grid-focus-lightBlue) !important;}}}
-.ag-theme-alpine .ag-grid-lightViolet {&::before{background-color: var(--ag-grid-lightViolet) !important;} &:hover{&::before{background-color: var(--ag-grid-focus-lightViolet) !important;}}}
-.ag-theme-alpine .ag-grid-lightSkyBlue {&::before{background-color: var(--ag-grid-lightSkyblue) !important;} &:hover{&::before{background-color: var(--ag-grid-focus-lightSkyblue) !important;}}}
-.ag-theme-alpine .ag-grid-lightGreen2 {&::before{background-color: var(--ag-grid-lightGreen2) !important;} &:hover{&::before{background-color: var(--ag-grid-focus-lightGreen2) !important;}}}
+.ag-theme-quartz .ag-grid-peach {&::before{background-color: var(--ag-grid-peach) !important;} &:hover{&::before{background-color: var(--ag-grid-focus-peach) !important;}}}
+.ag-theme-quartz .ag-grid-apricot {&::before{background-color: var(--ag-grid-apricot) !important;} &:hover{&::before{background-color: var(--ag-grid-focus-apricot) !important;}}}
+.ag-theme-quartz .ag-grid-lightGreen {&::before{background-color: var(--ag-grid-lightGreen) !important;} &:hover{&::before{background-color: var(--ag-grid-focus-lightGreen) !important;}}}
+.ag-theme-quartz .ag-grid-lightGray {&::before{background-color: var(--ag-grid-lightGray) !important;} &:hover{&::before{background-color: var(--ag-grid-focus-lightGray) !important;}}}
+.ag-theme-quartz .ag-grid-lightYellow {&::before{background-color: var(--ag-grid-lightYellow) !important;} &:hover{&::before{background-color: var(--ag-grid-focus-lightYellow) !important;}}}
+.ag-theme-quartz .ag-grid-lightPink {&::before{background-color: var(--ag-grid-lightPink) !important;} &:hover{&::before{background-color: var(--ag-grid-focus-lightPink) !important;}}}
+.ag-theme-quartz .ag-grid-lightBlue {&::before{background-color: var(--ag-grid-lightBlue) !important;} &:hover{&::before{background-color: var(--ag-grid-focus-lightBlue) !important;}}}
+.ag-theme-quartz .ag-grid-lightViolet {&::before{background-color: var(--ag-grid-lightViolet) !important;} &:hover{&::before{background-color: var(--ag-grid-focus-lightViolet) !important;}}}
+.ag-theme-quartz .ag-grid-lightSkyBlue {&::before{background-color: var(--ag-grid-lightSkyblue) !important;} &:hover{&::before{background-color: var(--ag-grid-focus-lightSkyblue) !important;}}}
+.ag-theme-quartz .ag-grid-lightGreen2 {&::before{background-color: var(--ag-grid-lightGreen2) !important;} &:hover{&::before{background-color: var(--ag-grid-focus-lightGreen2) !important;}}}
 
 .ag-grid-log-tree-child { margin-left: 15px !important; color: #939393 !important;}// 로그 영역 트리 자식 요소들에 적용되는 스타일 (박근철)
 .ag-grid-log-tree {&::before{background-color: #f2effd !important;}} // 로그 영역 트리 자식 요소들에 적용되는 스타일
@@ -170,26 +182,26 @@
 .ag-row-selected.ag-grid-log {&::before{background-color: #ebf3fc !important;}}
 .ag-grid-log-created {&::before{background-color: #f1f1f1 !important;}} // 데이터 상태가 '생성' 일 시
 
-.ag-theme-alpine .ag-ltr .ag-row-focus.ag-grid-peach::before { background-color: var(--ag-grid-focus-peach) !important; }
-.ag-theme-alpine .ag-ltr .ag-row-focus.ag-grid-apricot::before { background-color: var(--ag-grid-focus-apricot) !important; }
-.ag-theme-alpine .ag-ltr .ag-row-focus.ag-grid-lightGreen::before { background-color: var(--ag-grid-focus-lightGreen) !important; }
-.ag-theme-alpine .ag-ltr .ag-row-focus.ag-grid-lightGray::before { background-color: var(--ag-grid-focus-lightGray) !important; }
-.ag-theme-alpine .ag-ltr .ag-row-focus.ag-grid-lightYellow::before { background-color: var(--ag-grid-focus-lightYellow) !important; }
-.ag-theme-alpine .ag-ltr .ag-row-focus.ag-grid-lightPink::before { background-color: var(--ag-grid-focus-lightPink) !important; }
-.ag-theme-alpine .ag-ltr .ag-row-focus.ag-grid-lightBlue::before { background-color: var(--ag-grid-focus-lightBlue) !important; }
-.ag-theme-alpine .ag-ltr .ag-row-focus.ag-grid-lightViolet::before { background-color: var(--ag-grid-focus-lightViolet) !important; }
-.ag-theme-alpine .ag-ltr .ag-row-focus.ag-grid-lightSkyBlue::before { background-color: var(--ag-grid-focus-lightSkyblue) !important; }
-.ag-theme-alpine .ag-ltr .ag-row-focus.ag-grid-lightGreen2::before { background-color: var(--ag-grid-focus-lightGreen2) !important; }
+.ag-theme-quartz .ag-ltr .ag-row-focus.ag-grid-peach::before { background-color: var(--ag-grid-focus-peach) !important; }
+.ag-theme-quartz .ag-ltr .ag-row-focus.ag-grid-apricot::before { background-color: var(--ag-grid-focus-apricot) !important; }
+.ag-theme-quartz .ag-ltr .ag-row-focus.ag-grid-lightGreen::before { background-color: var(--ag-grid-focus-lightGreen) !important; }
+.ag-theme-quartz .ag-ltr .ag-row-focus.ag-grid-lightGray::before { background-color: var(--ag-grid-focus-lightGray) !important; }
+.ag-theme-quartz .ag-ltr .ag-row-focus.ag-grid-lightYellow::before { background-color: var(--ag-grid-focus-lightYellow) !important; }
+.ag-theme-quartz .ag-ltr .ag-row-focus.ag-grid-lightPink::before { background-color: var(--ag-grid-focus-lightPink) !important; }
+.ag-theme-quartz .ag-ltr .ag-row-focus.ag-grid-lightBlue::before { background-color: var(--ag-grid-focus-lightBlue) !important; }
+.ag-theme-quartz .ag-ltr .ag-row-focus.ag-grid-lightViolet::before { background-color: var(--ag-grid-focus-lightViolet) !important; }
+.ag-theme-quartz .ag-ltr .ag-row-focus.ag-grid-lightSkyBlue::before { background-color: var(--ag-grid-focus-lightSkyblue) !important; }
+.ag-theme-quartz .ag-ltr .ag-row-focus.ag-grid-lightGreen2::before { background-color: var(--ag-grid-focus-lightGreen2) !important; }
 
-.ag-theme-alpine .ag-ltr .ag-grid-deposit { // 입금
+.ag-theme-quartz .ag-ltr .ag-grid-deposit { // 입금
   color: var(--red-color) !important;
   & .ag-cell {
     font-weight: 500 !important;
   }
 }
 
-.ag-theme-alpine .ag-row.ag-grid-pinned-row, // grid footer
-.ag-theme-alpine .ag-row.ag-row-pinned {
+.ag-theme-quartz .ag-row.ag-grid-pinned-row, // grid footer
+.ag-theme-quartz .ag-row.ag-row-pinned {
   color: #555 !important;  // 예시로 폰트 색상도 같이 적용
   &::before {
     background-color: #e8e8e8 !important;
@@ -207,7 +219,7 @@
     font-weight: 500 !important;
   }
 }
-.ag-theme-alpine .ag-row.ag-row.ag-row-canceled-row {
+.ag-theme-quartz .ag-row.ag-row.ag-row-canceled-row {
   color: #959595 !important;
   /* 취소선 추가 */
   &::after {
@@ -740,14 +752,14 @@
 
 /* 병합된 셀의 스타일 */
 /* rowSpan=0인 셀의 내용을 완전히 숨김 */
-.ag-theme-alpine .merged-cell[row-index]:not([row-span="1"]) {
+.ag-theme-quartz .merged-cell[row-index]:not([row-span="1"]) {
   opacity: 0;  /* 내용을 투명하게 */
   pointer-events: none;  /* 마우스 이벤트 무시 */
   border-bottom: 1px solid gray !important;
 }
 
 /* 병합된 셀의 기본 스타일 유지 */
-.ag-theme-alpine .merged-cell {
+.ag-theme-quartz .merged-cell {
   background-color: inherit;
   display: flex;
   align-items: center;
@@ -755,18 +767,18 @@
 }
 
 /* hover 효과는 그대로 유지 */
-.ag-theme-alpine .ag-row:hover .merged-cell {
+.ag-theme-quartz .ag-row:hover .merged-cell {
   background-color: var(--ag-row-hover-color, #f5f5f5);
 }
 
 /* Set Filter 전체 팝업 배경 */
-.ag-theme-alpine .ag-set-filter {
+.ag-theme-quartz .ag-set-filter {
   background-color: white;
 }
 
 
 /* placeholder 숨기기 예솔체크 */
-.ag-theme-alpine
+.ag-theme-quartz
 .ag-wrapper.ag-input-wrapper.ag-text-field-input-wrapper
 .ag-input-field-input.ag-text-field-input::placeholder {
   color: transparent; /* 글자 색 없애기 */
@@ -776,14 +788,14 @@
 
 
 /* 검색 input wrapper */
-.ag-theme-alpine .ag-wrapper.ag-input-wrapper.ag-text-field-input-wrapper {
+.ag-theme-quartz .ag-wrapper.ag-input-wrapper.ag-text-field-input-wrapper {
   background-color: #ffffff !important; /* 불투명 화이트 */
   border-radius: 4px;                   /* 둥근 모서리 */
   padding: 2px;
 }
 
 /* 실제 input */
-.ag-theme-alpine .ag-wrapper.ag-input-wrapper.ag-text-field-input-wrapper
+.ag-theme-quartz .ag-wrapper.ag-input-wrapper.ag-text-field-input-wrapper
 .ag-input-field-input.ag-text-field-input {
   background-color: #ffffff !important; /* 불투명 화이트 */
   color: black !important;              /* 글자 검정 */
@@ -794,7 +806,7 @@
 
 
 /* 비포커스 상태 */
-.ag-theme-alpine .ag-wrapper.ag-input-wrapper.ag-text-field-input-wrapper
+.ag-theme-quartz .ag-wrapper.ag-input-wrapper.ag-text-field-input-wrapper
 > .ag-input-field-input.ag-text-field-input {
   background-color: #ffffff !important; /* 비포커스 상태 배경색상 */
   color: black !important;
@@ -805,7 +817,7 @@
 }
 
 /* 포커스 상태 */
-.ag-theme-alpine .ag-wrapper.ag-input-wrapper.ag-text-field-input-wrapper
+.ag-theme-quartz .ag-wrapper.ag-input-wrapper.ag-text-field-input-wrapper
 > .ag-input-field-input.ag-text-field-input:focus {
   background-color: #ffffff !important; /* 포커스 상태 색상 */
   outline: none;
@@ -814,7 +826,7 @@
 }
 
 /* 메뉴 리스트 전체 배경 */
-.ag-theme-alpine .ag-menu-list.ag-focus-managed {
+.ag-theme-quartz .ag-menu-list.ag-focus-managed {
   background-color: #ffffff !important; /* 불투명 화이트 */
   color: black !important;
   border: 1px solid #ccc;

@@ -173,7 +173,7 @@ const PartnerMng = () => {
 
       <Table>
         <TableHeader count={paging.totalRowCount || 0} paging={paging} setPaging={setPaging} search={search}></TableHeader>
-        <div className={'ag-theme-alpine wmsDefault'}>
+        <div className={'ag-theme-quartz wmsDefault'}>
           <TunedGrid
             headerHeight={35}
             onGridReady={onGridReady}

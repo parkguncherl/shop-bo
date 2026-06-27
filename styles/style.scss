@@ -958,14 +958,14 @@ button[class*="btn_"] {
 
   & .columnGridArea {
     & .InfoGrid {
-      & .ag-theme-alpine {
+      & .ag-theme-quartz {
         transition: .3s;
       }
     }
     & .DetailGrid {
       height: 0;
       overflow: hidden;
-      & .ag-theme-alpine {
+      & .ag-theme-quartz {
         height: 0; // 하단 그리드 높이
         transition: .3s;
       }
@@ -977,14 +977,14 @@ button[class*="btn_"] {
     }
     &.show {
       & .InfoGrid {
-        & .ag-theme-alpine {
+        & .ag-theme-quartz {
           height: 300px; // 상단 그리드 높이
         }
       }
       & .DetailGrid {
         height: auto;
         overflow: inherit;
-        & .ag-theme-alpine {
+        & .ag-theme-quartz {
           height: 300px; // 하단 그리드 높이
         }
       }
@@ -1016,7 +1016,7 @@ button[class*="btn_"] {
     }
   }
   // 그리드 크기지정
-  .ag-theme-alpine {
+  .ag-theme-quartz {
     min-height: 0;
     height: 720px; // 정보창 기본크기
     border-color: transparent;
@@ -1115,7 +1115,7 @@ button[class*="btn_"] {
   }
   //@media (max-height: 1100px) {
   //  /* 1100픽셀 이하일 때 적용될 CSS 스타일 */
-  //  .ag-theme-alpine {
+  //  .ag-theme-quartz {
   //    height: calc(100vh - 268px); // 정보창 기본크기
   //    &.orderReg {
   //      //height: calc(100vh - 547px); // 주문관리
@@ -1221,7 +1221,7 @@ button[class*="btn_"] {
 // wms그리드 min-height
 .wms {
   .gridBox {
-    .ag-theme-alpine {
+    .ag-theme-quartz {
       min-height: 289px;
       position: relative;
       & div[class*="loading_grid_loading_box_"] {
@@ -1234,7 +1234,7 @@ button[class*="btn_"] {
   }
 }
 .wms {
-  & .ag-theme-alpine {
+  & .ag-theme-quartz {
     & .ag-popup {
       position: absolute;
       width: 100% !important;
@@ -1430,7 +1430,7 @@ button[class*="btn_"] {
       }
     }
   }
-  & .ag-theme-alpine {
+  & .ag-theme-quartz {
     border: none;
     border-top: 1px solid #ddd;
   }
@@ -1479,7 +1479,7 @@ button[class*="btn_"] {
   border: none !important;
 }
 // 상품집계
-.grid .ag-theme-alpine {}
+.grid .ag-theme-quartz {}
 
 // 그리드 커스텀
 [class*=ag-theme-] {
@@ -1531,7 +1531,7 @@ button[class*="btn_"] {
   padding-right: 5px !important;
   padding-left: 5px !important;
 }
-.ag-theme-alpine {
+.ag-theme-quartz {
   min-height: 500px;
   height: calc(100vh - 400px);
   border: 1px solid #ddd;
@@ -7050,7 +7050,7 @@ option {
     transition: .4s;
   }
   //
-  //& .ag-theme-alpine {
+  //& .ag-theme-quartz {
   //  transition: .5s;
   //  height: calc(100vh - 268px);
   //}
@@ -7072,7 +7072,7 @@ option {
       }
     }
 
-    & .ag-theme-alpine {
+    & .ag-theme-quartz {
       height: calc(100vh - 731px);
     }
   }

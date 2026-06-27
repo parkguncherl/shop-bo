@@ -10,14 +10,11 @@ import { ColDef } from 'ag-grid-community';
 import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toastError, toastSuccess } from '../../../ToastMessage';
-import ModalLayout from '../../../ModalLayout';
 import { useAgGridApi } from '../../../../hooks';
 import Loading from '../../../Loading';
-import { AgGridReact } from 'ag-grid-react';
 import { Table } from '../../../content';
-import CustomGridLoading from '../../../CustomGridLoading';
-import CustomNoRowsOverlay from '../../../CustomNoRowsOverlay';
 import { PopupLayout } from '../../PopupLayout';
+import TunedGrid from '../../../grid/TunedGrid';
 
 interface Props {
   data: CodeResponsePaging;
@@ -226,27 +223,18 @@ export const CodeMngDetailPop = ({ data }: Props) => {
         <div className={'mt10'}>
           <Table>
             <TableHeader count={lowerCodes?.data?.body?.length || 0}></TableHeader>
-            <div className={'ag-theme-alpine wmsPop'}>
-              <AgGridReact
-                onGridReady={onGridReady}
-                rowData={(lowerCodes?.data?.body as CodeResponseLowerSelect[]) || []}
-                gridOptions={{ rowHeight: 24, headerHeight: 35 }}
-                columnDefs={columnDefs}
-                defaultColDef={{
-                  ...defaultColDef,
-                  singleClickEdit: true,
-                }}
-                rowSelection={'multiple'}
-                rowDragManaged={true}
-                rowDragMultiRow={true}
-                rowDragEntireRow={true}
-                rowMultiSelectWithClick={true}
-                onRowClicked={(e) => setLastRowIndex(e.rowIndex)}
-                loading={isLoading}
-                loadingOverlayComponent={CustomGridLoading}
-                noRowsOverlayComponent={CustomNoRowsOverlay}
-              />
-            </div>
+            <TunedGrid<CodeResponseLowerSelect, never>
+              onGridReady={onGridReady}
+              rowData={(lowerCodes?.data?.body as CodeResponseLowerSelect[]) || []}
+              gridOptions={{ rowHeight: 24, headerHeight: 35 }}
+              columnDefs={columnDefs}
+              rowSelection={{ mode: 'multiRow', enableClickSelection: true }}
+              rowDragManaged={true}
+              rowDragMultiRow={true}
+              rowDragEntireRow={true}
+              onRowClicked={(e) => setLastRowIndex(e.rowIndex)}
+              loading={isLoading}
+            />
           </Table>
         </div>
       </PopupContent>

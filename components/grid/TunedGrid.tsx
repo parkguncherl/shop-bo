@@ -136,9 +136,6 @@ const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ 
     PERCENTAGE: GridSetting.CellRenderer.PERCENTAGE,
   };
 
-  /** 사용하고자 하는 전역 상태 하의 요소들 */
-  const [selectGridColumnState, updateGridColumnState] = useCommonStore((s) => [s.selectGridColumnState, s.updateGridColumnState]);
-
   /** 참조 및 외부 노출 ref 속성 실 구현 */
   const gridRef = useRef<AgGridReact>(null);
 
@@ -324,6 +321,7 @@ const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ 
   };
 
   const onColumnMoved = (event: ColumnMovedEvent) => {
+    /*
     if (event.finished && !props.preventPersonalizedColumnSetting && props.gridId) {
       const currentColumns = event.api.getColumnDefs();
       if (currentColumns) {
@@ -335,10 +333,12 @@ const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ 
         });
       }
     }
+*/
   };
 
   const onColumnVisible = (event: ColumnVisibleEvent) => {
     if (!props.preventPersonalizedColumnSetting && props.gridId) {
+      /*
       const currentColumns = event.api.getColumnDefs();
       if (currentColumns) {
         // undefined 체크 추가
@@ -348,6 +348,7 @@ const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ 
           columnState: serializableColumns,
         });
       }
+*/
     }
   };
 
@@ -586,7 +587,7 @@ const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ 
   }, [...pagingDeps]); // 배열 자체가 아닌 내부 요소들을 전개해서 등록(이를 통해 리 랜더링 시의 부수 효과로 hook 이 동작하는 걸 방지)
 
   return (
-    <div className={`ag-theme-alpine ${props.className}`} onWheel={props.onWheel} onKeyDown={onKeyDown} onKeyUp={onKeyUp} tabIndex={-1}>
+    <div className={`ag-theme-quartz ${props.className}`} onWheel={props.onWheel} onKeyDown={onKeyDown} onKeyUp={onKeyUp} tabIndex={-1}>
       <AgGridReact<P>
         {...props}
         columnDefs={columnDefs.map(withCommonKeyboardSuppress)} // React 상태컬럼 방향키로 헤더까지 안올라가게 수정 2025-08-27
@@ -632,8 +633,8 @@ const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ 
                     }
                 : props.rowSelection) || 'multiple' // 그 외에는 인자로 받은 값 사용 혹은 기본값 사용
         } // Ctrl 키를 누른 상태에서 요구되는 별도 동작에 대처하고자 다음과 같이 처리함
-        onColumnMoved={onColumnMoved}
-        onColumnVisible={onColumnVisible}
+        //onColumnMoved={onColumnMoved}
+        //onColumnVisible={onColumnVisible}
         localeText={AG_GRID_LOCALE_KO}
         autoSizeStrategy={{
           type: 'fitCellContents',
