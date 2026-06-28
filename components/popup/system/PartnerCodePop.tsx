@@ -108,6 +108,15 @@ export const PartnerCodePop = ({ partnerCodeUpper, activated, title, codeName, o
       suppressHeaderMenuButton: true,
     },
     {
+      headerName: '코드',
+      field: 'codeCd',
+      sortable: true,
+      width: 50,
+      editable: true,
+      cellStyle: GridSetting.CellStyle.CENTER,
+      suppressHeaderMenuButton: true,
+    },
+    {
       headerName: '명칭',
       field: 'codeNm',
       sortable: true,
@@ -162,7 +171,7 @@ export const PartnerCodePop = ({ partnerCodeUpper, activated, title, codeName, o
       console.log('selectedRows ==>', selectedRows);
       if (selectedRows.length > 0) {
         savePartnerCodeMutate({
-          createType: 'NO_CODECD_AUTO_INCREMENT',
+          //createType: 'NO_CODECD_AUTO_INCREMENT',
           partnerCodeLowerSelectList: selectedRows,
         });
       } else {

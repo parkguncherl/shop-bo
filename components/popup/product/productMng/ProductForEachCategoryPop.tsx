@@ -21,7 +21,7 @@ import { GridSetting } from '../../../../libs/ag-grid';
 import { ColDef, RowDragEndEvent } from 'ag-grid-community';
 import useFilters from '../../../../hooks/useFilters';
 import { Search } from '../../../content';
-import { PARTNER_CODE_CATEGORI } from '../../../../libs/const';
+import { PARTNER_CODE } from '../../../../libs/const';
 import { usePartnerCodeStore } from '../../../../stores/usePartnerCodeStore';
 import { ConfirmModal } from '../../../ConfirmModal';
 import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
@@ -226,7 +226,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
   /** 하위코드 목록 조회 */
   const { data: categories, isSuccess: isCategoriesSuccess } = useQuery({
     queryKey: [],
-    queryFn: () => selectLowerPartnerCodeByCodeUpper(PARTNER_CODE_CATEGORI.categories.code, 'PROD'),
+    queryFn: () => selectLowerPartnerCodeByCodeUpper(PARTNER_CODE.categories.code, 'PROD'),
     enabled: open,
   });
 

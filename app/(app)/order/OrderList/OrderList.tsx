@@ -24,7 +24,9 @@ type OrderFilter = {
 };
 
 const today = dayjs().format('YYYY-MM-DD');
-
+const startOfWeek = dayjs()
+  .subtract((dayjs().day() + 6) % 7, 'day')
+  .format('YYYY-MM-DD');
 
 /** BO 주문 목록 */
 const OrderList = () => {
@@ -32,7 +34,7 @@ const OrderList = () => {
   const menuNm = useCommonStore((s) => s.menuNm);
 
   const [filters, onChangeFilters, onFiltersReset] = useFilters<OrderFilter>({
-    fromDate: today,
+    fromDate: startOfWeek,
     toDate: today,
   });
 
@@ -178,7 +180,7 @@ const OrderList = () => {
         <CustomNewDatePicker
           title={'조회기간'}
           type={'range'}
-          defaultType={'today'}
+          defaultType={'week'}
           startName={'fromDate'}
           endName={'toDate'}
           onChange={onChangeFilters}

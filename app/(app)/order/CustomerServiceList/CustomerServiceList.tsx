@@ -17,6 +17,9 @@ import CustomNewDatePicker from '../../../../components/CustomNewDatePicker';
 import dayjs from 'dayjs';
 import { Utils } from '../../../../libs/utils';
 import { ComuResponseBoListItem, ComuResponseMessage, ComuResponseThread } from '../../../../generated';
+import { PartnerCodePop } from '../../../../components/popup/system/PartnerCodePop';
+import { PARTNER_CODE } from '../../../../libs/const';
+import { usePartnerCodeStore } from '../../../../stores/usePartnerCodeStore';
 
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
 
@@ -103,11 +106,7 @@ function MessageBubble({
               삭제
             </button>
           )}
-          {isAdmin && (
-            <span style={{ fontSize: 10, color: msg.readYn === 'Y' ? '#333' : '#bbb' }}>
-              {msg.readYn === 'Y' ? '읽음' : '안읽음'}
-            </span>
-          )}
+          {isAdmin && <span style={{ fontSize: 10, color: msg.readYn === 'Y' ? '#333' : '#bbb' }}>{msg.readYn === 'Y' ? '읽음' : '안읽음'}</span>}
           <span style={{ fontSize: 10, color: '#aaa' }}>{Utils.formatMonthDayTime(msg.creTm)}</span>
         </div>
       </div>
@@ -126,14 +125,17 @@ function MessageBubble({
 
 // ─── 메인 컴포넌트 ────────────────────────────────────────────────────────────
 
-const startOfWeek = dayjs().startOf('week').add(1, 'day').format('YYYY-MM-DD');
+// 0=일, 1=월 ... 6=토 → ISO 기준 이번 주 월요일 계산
+const startOfWeek = dayjs()
+  .subtract((dayjs().day() + 6) % 7, 'day')
+  .format('YYYY-MM-DD');
 const today = dayjs().format('YYYY-MM-DD');
 
 const CustomerServiceList = () => {
   const { onGridReady } = useAgGridApi();
   const menuNm = useCommonStore((s) => s.menuNm);
   const getFileUrl = useCommonStore((s) => s.getFileUrl);
-
+  const [partnerCodeModals, partnerCodeOpenModal, partnerCodeCloseModal] = usePartnerCodeStore((s) => [s.modals, s.openModal, s.closeModal]);
   const [filters, onChangeFilters, onFiltersReset] = useFilters<FilterType>({
     comuType: '',
     paymentStatus: '',
@@ -398,25 +400,34 @@ const CustomerServiceList = () => {
       </Search>
 
       {/* 본문 — 좌(그리드) / 우(채팅) 분할 */}
-      <div style={{ display: 'flex', flex: 1, gap: 12, overflow: 'hidden', padding: '0 0 12px' }}>
-        {/* 좌: 그리드 */}
-        <div style={{ flex: '0 0 70%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <Table>
-            <TunedGrid
-              headerHeight={35}
-              onGridReady={onGridReady}
-              rowData={rowData}
-              columnDefs={columnDefs}
-              defaultColDef={defaultColDef}
-              loadingOverlayComponent={CustomGridLoading}
-              noRowsOverlayComponent={CustomNoRowsOverlay}
-              className={'wmsDefault'}
-              rowSelection={{ mode: 'singleRow', enableClickSelection: false }}
-              onRowClicked={(e) => {
-                if (e.data) loadThread(e.data);
-              }}
-            />
-          </Table>
+      <div style={{ display: 'flex', flex: 1, gap: 12, overflow: 'hidden', padding: '0 0 0' }}>
+        {/* 좌: 그리드 + 버튼 */}
+        <div style={{ flex: '0 0 70%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+          <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+            <Table>
+              <TunedGrid
+                headerHeight={35}
+                onGridReady={onGridReady}
+                rowData={rowData}
+                columnDefs={columnDefs}
+                defaultColDef={defaultColDef}
+                loadingOverlayComponent={CustomGridLoading}
+                noRowsOverlayComponent={CustomNoRowsOverlay}
+                className={'wmsDefault'}
+                rowSelection={{ mode: 'singleRow', enableClickSelection: false }}
+                onRowClicked={(e) => {
+                  if (e.data) loadThread(e.data);
+                }}
+              />
+            </Table>
+          </div>
+          <div className={'btnBox'}>
+            <div className={'left'}>
+              <button className={'btn btnGray'} onClick={() => partnerCodeOpenModal('PARTNER_CODE_OPEN')}>
+                질의응답
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* 우: 채팅 패널 */}
@@ -447,9 +458,7 @@ const CustomerServiceList = () => {
                 ) : (selectedThread.messages ?? []).length === 0 ? (
                   <div style={{ textAlign: 'center', color: '#bbb', paddingTop: 40 }}>메시지가 없습니다.</div>
                 ) : (
-                  (selectedThread.messages ?? []).map((msg) => (
-                    <MessageBubble key={msg.id} msg={msg} getFileUrl={getFileUrl} onDelete={handleDeleteMessage} />
-                  ))
+                  (selectedThread.messages ?? []).map((msg) => <MessageBubble key={msg.id} msg={msg} getFileUrl={getFileUrl} onDelete={handleDeleteMessage} />)
                 )}
                 <div ref={bottomRef} />
               </div>
@@ -524,6 +533,13 @@ const CustomerServiceList = () => {
           )}
         </div>
       </div>
+      <PartnerCodePop
+        partnerCodeUpper={PARTNER_CODE.orderQuestion.code}
+        title={'질의등답 코드관리'}
+        activated={partnerCodeModals?.type === 'PARTNER_CODE_OPEN' && partnerCodeModals.active}
+        codeName={PARTNER_CODE.orderQuestion.name}
+        onCloseRequestEmerged={() => partnerCodeCloseModal('PARTNER_CODE_OPEN')}
+      />
     </div>
   );
 };
