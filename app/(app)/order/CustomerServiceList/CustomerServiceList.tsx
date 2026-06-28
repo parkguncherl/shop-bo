@@ -144,20 +144,6 @@ const CustomerServiceList = () => {
     toDate: today,
   });
 
-  const { data: comuTypesData } = useQuery({
-    queryKey: ['/code/lower/10130'],
-    queryFn: () => authApi.get('/code/lower/10130'),
-    staleTime: 1000 * 60 * 10,
-  });
-  const comuTypes: { codeCd: string; codeNm: string }[] = (comuTypesData?.data?.body ?? []).filter((c: { codeCd: string; codeNm: string }) =>
-    String(c.codeCd ?? '').startsWith('A'),
-  );
-
-  const { data: paymentStatusData } = useQuery({
-    queryKey: ['/code/lower/10070'],
-    queryFn: () => authApi.get('/code/lower/10070'),
-    staleTime: 1000 * 60 * 10,
-  });
 
   const [rowData, setRowData] = useState<ComuResponseBoListItem[]>([]);
   const [selectedThread, setSelectedThread] = useState<ComuResponseThread | null>(null);
@@ -375,28 +361,20 @@ const CustomerServiceList = () => {
           placeholder={'상품명 검색'}
           onEnter={() => refetch()}
         />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <label style={{ fontSize: 13, whiteSpace: 'nowrap', fontWeight: 600, color: '#555' }}>문의종류</label>
-          <select value={filters.comuType} onChange={(e) => onChangeFilters('comuType', e.target.value)} style={selectStyle}>
-            <option value="">전체</option>
-            {comuTypes.map((t) => (
-              <option key={t.codeCd} value={t.codeCd}>
-                {t.codeNm}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <label style={{ fontSize: 13, whiteSpace: 'nowrap', fontWeight: 600, color: '#555' }}>결제상태</label>
-          <select value={filters.paymentStatus} onChange={(e) => onChangeFilters('paymentStatus', e.target.value)} style={selectStyle}>
-            <option value="">전체</option>
-            {(paymentStatusData?.data?.body ?? []).map((c: { codeCd: string; codeNm: string }) => (
-              <option key={c.codeCd} value={c.codeCd}>
-                {c.codeNm}
-              </option>
-            ))}
-          </select>
-        </div>
+        <Search.DropDown
+          title={'문의종류'}
+          name={'comuType'}
+          codeUpper={'10130'}
+          value={filters.comuType}
+          onChange={onChangeFilters}
+        />
+        <Search.DropDown
+          title={'결제상태'}
+          name={'paymentStatus'}
+          codeUpper={'10070'}
+          value={filters.paymentStatus}
+          onChange={onChangeFilters}
+        />
       </Search>
 
       {/* 본문 — 좌(그리드) / 우(채팅) 분할 */}
@@ -570,16 +548,6 @@ const bubbleStyle: React.CSSProperties = {
   wordBreak: 'break-word',
 };
 
-const selectStyle: React.CSSProperties = {
-  height: 32,
-  padding: '0 8px',
-  fontSize: 13,
-  border: '1px solid #d0d0d0',
-  borderRadius: 6,
-  background: '#fff',
-  color: '#333',
-  minWidth: 110,
-};
 
 const iconBtnStyle: React.CSSProperties = {
   background: 'none',

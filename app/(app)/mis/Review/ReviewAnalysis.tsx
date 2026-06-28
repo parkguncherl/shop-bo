@@ -68,7 +68,7 @@ const ReviewAnalysis = () => {
     queryFn: async () => {
       const api = new PartnerCodeControllerApi();
       const res = await api.selectDropdownByPartnerCodeUpper(undefined, 'P0001');
-      return res.data.body ?? [];
+      return (res.data.body ?? []).map((c) => ({ key: String(c.id), value: String(c.id), label: c.codeNm ?? '' }));
     },
   });
 
@@ -198,19 +198,6 @@ const ReviewAnalysis = () => {
           onChange={onChangeFilters}
           value={[filters.fromDate, filters.toDate]}
         />
-        <div className={'searchBox'}>
-          <p className={'searchTitle'}>카테고리</p>
-          <select
-            className={'input'}
-            value={filters.categoryId}
-            onChange={(e) => onChangeFilters('categoryId', e.target.value)}
-          >
-            <option value={''}>전체</option>
-            {(categoryData ?? []).map((c: any) => (
-              <option key={c.id} value={c.id}>{c.codeNm}</option>
-            ))}
-          </select>
-        </div>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginLeft: 8 }}>
           {PERIOD_PRESETS.map((p) => (
             <button key={p.label} className={'btn btnGray'} style={{ height: 32, padding: '0 12px', fontSize: 12 }} onClick={() => applyPreset(p)}>
@@ -218,6 +205,14 @@ const ReviewAnalysis = () => {
             </button>
           ))}
         </div>
+        <Search.DropDown
+          title={'카테고리'}
+          name={'categoryId'}
+          value={filters.categoryId}
+          onChange={onChangeFilters}
+          defaultOptions={categoryData ?? []}
+          showAll={true}
+        />
       </Search>
 
       {!isLoading && grandTotal > 0 && (

@@ -11,6 +11,7 @@ import { defaultColDef, GridSetting } from '../../../libs/ag-grid';
 import TunedGrid from '../../grid/TunedGrid';
 import CustomNoRowsOverlay from '../../CustomNoRowsOverlay';
 import CustomGridLoading from '../../CustomGridLoading';
+import { Table } from '../../content/Table';
 import type { OrderResponseInfo } from '../../../generated/src/model/order-response-info';
 import type { OrderResponseItem } from '../../../generated/src/model/order-response-item';
 
@@ -176,17 +177,19 @@ export const OrderDetailPop = ({ orderId, open, onClose }: Props) => {
             </tbody>
           </table>
 
-          <div style={{ height: 180 }}>
-            <TunedGrid
-              headerHeight={35}
-              rowData={detail.items ?? []}
-              columnDefs={columnDefs}
-              defaultColDef={defaultColDef}
-              loading={isLoading}
-              loadingOverlayComponent={CustomGridLoading}
-              noRowsOverlayComponent={CustomNoRowsOverlay}
-              className={'wmsDefault'}
-            />
+          <div style={{ height: 350 }}>
+            <Table>
+              <TunedGrid
+                headerHeight={35}
+                rowData={detail.items ?? []}
+                columnDefs={columnDefs}
+                defaultColDef={defaultColDef}
+                loading={isLoading}
+                loadingOverlayComponent={CustomGridLoading}
+                noRowsOverlayComponent={CustomNoRowsOverlay}
+                className={'wmsDefault'}
+              />
+            </Table>
           </div>
         </div>
       )}
