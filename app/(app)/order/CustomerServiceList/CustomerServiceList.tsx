@@ -359,7 +359,7 @@ const CustomerServiceList = () => {
       {/* 검색 영역 */}
       <Search className={'type_1'}>
         <CustomNewDatePicker
-          title={'구매일'}
+          title={'조회기간'}
           type={'range'}
           defaultType={'week'}
           startName={'fromDate'}

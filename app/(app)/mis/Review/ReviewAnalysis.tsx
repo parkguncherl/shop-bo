@@ -1,219 +1,266 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { authApi } from '../../../../libs';
+import { ColDef } from 'ag-grid-community';
+import { Search, Table, Title } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
-import { Title } from '../../../../components';
+import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
+import { useAgGridApi } from '../../../../hooks';
+import TunedGrid from '../../../../components/grid/TunedGrid';
+import CustomNoRowsOverlay from '../../../../components/CustomNoRowsOverlay';
+import CustomGridLoading from '../../../../components/CustomGridLoading';
+import CustomNewDatePicker from '../../../../components/CustomNewDatePicker';
+import useFilters from '../../../../hooks/useFilters';
+import { authApi } from '../../../../libs';
 import ReactECharts from 'echarts-for-react';
+import dayjs from 'dayjs';
+import { PartnerCodeControllerApi } from '../../../../generated';
 
-// ─── 코드 정의 ────────────────────────────────────────────────────────────────
+// ─── 상수 ─────────────────────────────────────────────────────────────────────
 
-const HEIGHT_CODES: Record<string, string> = {
-  '1': '155이하',
-  '3': '155~159',
-  '5': '160~164',
-  '7': '165이상',
+const today = dayjs().format('YYYY-MM-DD');
+const oneMonthAgo = dayjs().subtract(1, 'month').format('YYYY-MM-DD');
+
+const FIT_PALETTE = ['#7c3aed', '#0f766e', '#b45309', '#be123c', '#1d4ed8', '#065f46'];
+
+// fitGroup별 색상 — 안쪽 링에 칠하고, 바깥 자식은 같은 색 투명도 변형
+const childColor = (hex: string, idx: number, total: number) => {
+  // total 개수에 따라 opacity 0.35 ~ 0.9 사이로 분배
+  const alpha = Math.round(((0.9 - 0.35) * (1 - idx / Math.max(total - 1, 1)) + 0.35) * 255)
+    .toString(16)
+    .padStart(2, '0');
+  return hex + alpha;
 };
 
-const WEIGHT_CODES: Record<string, string> = {
-  '1': '50이하',
-  '3': '56~59',
-  '5': '60~64',
-  '7': '65이상',
-};
-
-const FIT_GROUP_ORDER = ['적당해요', '작아요', '커요'];
-
-const HEIGHT_COLORS = ['#7c3aed', '#a78bfa', '#c4b5fd', '#ddd6fe'];
-const WEIGHT_COLORS = ['#0f766e', '#14b8a6', '#5eead4', '#99f6e4'];
+const PERIOD_PRESETS = [
+  { label: '3개월', months: 3 },
+  { label: '6개월', months: 6 },
+  { label: '1년', months: 12 },
+];
 
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
 
 type ReviewFitItem = {
   fitGroup: string;
-  myHeight: string;
-  myWeight: string;
+  myHeightWeightNm: string;
   cnt: number;
 };
 
-// ─── 차트 옵션 빌더 ───────────────────────────────────────────────────────────
+type FilterType = { fromDate: string; toDate: string; categoryId: string };
 
-function buildChartOption(
-  title: string,
-  groups: string[],
-  series: { name: string; data: { value: number; cnt: number }[]; color: string }[],
-) {
-  return {
-    title: { text: title, left: 0, textStyle: { fontSize: 14, fontWeight: 600, color: '#333' } },
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: { type: 'shadow' },
-      formatter: (params: any[]) => {
-        const lines = params
-          .filter((p) => p.value > 0)
-          .map((p) => `${p.marker}${p.seriesName}: <b>${p.value.toFixed(1)}%</b> (${p.data.cnt}건)`)
-          .join('<br/>');
-        return `<b>${params[0]?.axisValue}</b><br/>${lines}`;
-      },
-    },
-    legend: { top: 28, type: 'scroll', textStyle: { fontSize: 12 } },
-    grid: { left: 70, right: 24, top: 80, bottom: 16 },
-    xAxis: {
-      type: 'value',
-      max: 100,
-      axisLabel: { formatter: '{value}%', fontSize: 11 },
-      splitLine: { lineStyle: { color: '#f0f0f0' } },
-    },
-    yAxis: {
-      type: 'category',
-      data: groups,
-      axisLabel: { fontSize: 12, fontWeight: 600 },
-      axisTick: { show: false },
-    },
-    series: series.map((s) => ({
-      name: s.name,
-      type: 'bar',
-      stack: 'total',
-      itemStyle: { color: s.color, borderRadius: 0 },
-      label: {
-        show: true,
-        formatter: (p: any) => (p.value >= 5 ? `${p.value.toFixed(1)}%` : ''),
-        fontSize: 11,
-        color: '#fff',
-        fontWeight: 600,
-      },
-      data: s.data,
-      barMaxWidth: 40,
-    })),
-  };
-}
+type GridRow = {
+  no: number;
+  fitGroup: string;
+  myHeightWeightNm: string;
+  cnt: number;
+  pct: string;
+};
 
 // ─── 메인 컴포넌트 ────────────────────────────────────────────────────────────
 
 const ReviewAnalysis = () => {
+  const { onGridReady } = useAgGridApi();
   const menuNm = useCommonStore((s) => s.menuNm);
+  const [filters, onChangeFilters] = useFilters<FilterType>({ fromDate: oneMonthAgo, toDate: today, categoryId: '' });
+  const { data: categoryData } = useQuery({
+    queryKey: ['partnerCode', 'P0001'],
+    queryFn: async () => {
+      const api = new PartnerCodeControllerApi();
+      const res = await api.selectDropdownByPartnerCodeUpper(undefined, 'P0001');
+      return res.data.body ?? [];
+    },
+  });
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['/mis/reviewFitAnalysis'],
-    queryFn: () => authApi.get('/mis/reviewFitAnalysis'),
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['/mis/reviewFitAnalysis', filters],
+    queryFn: () => authApi.get('/mis/reviewFitAnalysis', { params: filters }),
   });
 
   const items: ReviewFitItem[] = data?.data?.body ?? [];
 
-  // 전체 건수
-  const grandTotal = useMemo(() => items.reduce((sum, r) => sum + r.cnt, 0), [items]);
+  // ── 집계 ──────────────────────────────────────────────────────────────────
+  const grandTotal = useMemo(() => items.reduce((s, r) => s + r.cnt, 0), [items]);
 
-  // 그룹별 건수
-  const groupTotals = useMemo(() => {
-    const map: Record<string, number> = {};
-    for (const item of items) {
-      map[item.fitGroup] = (map[item.fitGroup] ?? 0) + item.cnt;
-    }
-    return map;
+  // fitGroup 순서 (등장 순서 유지)
+  const fitGroups = useMemo(() => {
+    const seen = new Set<string>();
+    items.forEach((r) => seen.add(r.fitGroup));
+    return [...seen];
   }, [items]);
 
-  // ── 키 차트 데이터 ──────────────────────────────────────────────────────────
-  const heightChartOption = useMemo(() => {
-    const hCodes = Object.keys(HEIGHT_CODES);
-    const series = hCodes.map((hCode, i) => ({
-      name: `키 ${HEIGHT_CODES[hCode]}`,
-      color: HEIGHT_COLORS[i],
-      data: FIT_GROUP_ORDER.map((grp) => {
-        const cnt = items
-          .filter((r) => r.fitGroup === grp && r.myHeight === hCode)
-          .reduce((s, r) => s + r.cnt, 0);
-        const groupTotal = groupTotals[grp] ?? 0;
-        const pct = groupTotal > 0 ? Math.round((cnt / groupTotal) * 1000) / 10 : 0;
-        return { value: pct, cnt };
-      }),
-    }));
-    return buildChartOption('키 분포 (그룹 내 %)', FIT_GROUP_ORDER, series.map((s, i) => ({ ...s, color: HEIGHT_COLORS[i] })));
-  }, [items, groupTotals]);
+  const groupTotals = useMemo(() => {
+    const m: Record<string, number> = {};
+    items.forEach((r) => { m[r.fitGroup] = (m[r.fitGroup] ?? 0) + r.cnt; });
+    return m;
+  }, [items]);
 
-  // ── 몸무게 차트 데이터 ──────────────────────────────────────────────────────
-  const weightChartOption = useMemo(() => {
-    const wCodes = Object.keys(WEIGHT_CODES);
-    const series = wCodes.map((wCode, i) => ({
-      name: `몸무게 ${WEIGHT_CODES[wCode]}kg`,
-      color: WEIGHT_COLORS[i],
-      data: FIT_GROUP_ORDER.map((grp) => {
-        const cnt = items
-          .filter((r) => r.fitGroup === grp && r.myWeight === wCode)
-          .reduce((s, r) => s + r.cnt, 0);
-        const groupTotal = groupTotals[grp] ?? 0;
-        const pct = groupTotal > 0 ? Math.round((cnt / groupTotal) * 1000) / 10 : 0;
-        return { value: pct, cnt };
-      }),
+  // ── 그리드 데이터 ──────────────────────────────────────────────────────────
+  const rowData: GridRow[] = useMemo(() => {
+    return items.map((r, i) => ({
+      no: i + 1,
+      fitGroup: r.fitGroup,
+      myHeightWeightNm: r.myHeightWeightNm,
+      cnt: r.cnt,
+      pct: grandTotal > 0 ? `${((r.cnt / grandTotal) * 100).toFixed(1)}%` : '0.0%',
     }));
-    return buildChartOption('몸무게 분포 (그룹 내 %)', FIT_GROUP_ORDER, series.map((s, i) => ({ ...s, color: WEIGHT_COLORS[i] })));
-  }, [items, groupTotals]);
+  }, [items, grandTotal]);
+
+  const columnDefs: ColDef<GridRow>[] = [
+    { headerName: 'NO', field: 'no', minWidth: 55, maxWidth: 65, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
+    { headerName: '사이즈', field: 'fitGroup', minWidth: 100, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
+    { headerName: '키 / 몸무게', field: 'myHeightWeightNm', minWidth: 160, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
+    { headerName: '건수', field: 'cnt', minWidth: 80, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER, cellRenderer: 'NUMBER_COMMA' },
+    { headerName: '비율', field: 'pct', minWidth: 80, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
+  ];
+
+  // ── 차트: 가로 스택 바 (Y=사이즈 그룹, 시리즈=키/몸무게 조합) ──────────────
+  const stackBarOption = useMemo(() => {
+    // 키/몸무게 조합 목록 (cnt 내림차순 정렬)
+    const comboMap = new Map<string, number>();
+    items.forEach((r) => { comboMap.set(r.myHeightWeightNm, (comboMap.get(r.myHeightWeightNm) ?? 0) + r.cnt); });
+    const combos = [...comboMap.entries()].sort((a, b) => b[1] - a[1]).map(([k]) => k);
+
+    const COLORS = [
+      '#7c3aed', '#a78bfa', '#c4b5fd', '#ddd6fe',
+      '#0f766e', '#14b8a6', '#5eead4', '#99f6e4',
+      '#b45309', '#fbbf24', '#fde68a',
+      '#be123c', '#fb7185', '#fecdd3',
+    ];
+
+    const series = combos.map((combo, i) => ({
+      name: combo,
+      type: 'bar',
+      stack: 'total',
+      label: {
+        show: true,
+        formatter: (p: any) => p.value > 0 ? combo : '',
+        fontSize: 11,
+        color: '#fff',
+        fontWeight: 600,
+      },
+      emphasis: { focus: 'series' },
+      itemStyle: { color: COLORS[i % COLORS.length] },
+      data: fitGroups.map((grp) =>
+        items.filter((r) => r.fitGroup === grp && r.myHeightWeightNm === combo)
+             .reduce((s, r) => s + r.cnt, 0)
+      ),
+    }));
+
+    return {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: (params: any[]) => {
+          const total = params.reduce((s: number, p: any) => s + (p.value as number), 0);
+          const lines = params
+            .filter((p) => p.value > 0)
+            .map((p) => {
+              const pct = total > 0 ? ((p.value / total) * 100).toFixed(1) : '0.0';
+              return `${p.marker}${p.seriesName}: <b>${p.value.toLocaleString()}건</b> (${pct}%)`;
+            })
+            .join('<br/>');
+          return `<b>${params[0]?.axisValue}</b> 합계 ${total.toLocaleString()}건<br/>${lines}`;
+        },
+      },
+      legend: { type: 'scroll', bottom: 0, textStyle: { fontSize: 11 } },
+      grid: { left: 80, right: 24, top: 16, bottom: 60 },
+      xAxis: { type: 'value', axisLabel: { formatter: (v: number) => v.toLocaleString(), fontSize: 11 } },
+      yAxis: {
+        type: 'category',
+        data: fitGroups,
+        axisLabel: { fontSize: 12, fontWeight: 'bold' },
+        axisTick: { show: false },
+      },
+      series,
+    };
+  }, [items, fitGroups]);
+
+  // ── 기간 프리셋 ────────────────────────────────────────────────────────────
+  const applyPreset = (preset: (typeof PERIOD_PRESETS)[number]) => {
+    const to = dayjs().format('YYYY-MM-DD');
+    const from = dayjs().subtract(preset.months, 'month').format('YYYY-MM-DD');
+    onChangeFilters('fromDate', from);
+    onChangeFilters('toDate', to);
+  };
 
   return (
     <div>
-      <Title title={menuNm ?? '리뷰 분석'} />
+      <Title title={menuNm ?? '리뷰 분석'} reset={() => { onChangeFilters('fromDate', oneMonthAgo); onChangeFilters('toDate', today); }} search={refetch} />
 
-      {/* 요약 카드 */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
-        <SummaryCard label="전체 리뷰" value={grandTotal} color="#6b21a8" />
-        {FIT_GROUP_ORDER.map((grp) => (
-          <SummaryCard
-            key={grp}
-            label={grp}
-            value={groupTotals[grp] ?? 0}
-            pct={grandTotal > 0 ? ((groupTotals[grp] ?? 0) / grandTotal) * 100 : 0}
-            color={grp === '적당해요' ? '#0f766e' : grp === '작아요' ? '#c2410c' : '#b45309'}
-          />
-        ))}
-      </div>
+      <Search className={'type_1'}>
+        <CustomNewDatePicker
+          title={'조회기간'}
+          type={'range'}
+          defaultType={'month'}
+          startName={'fromDate'}
+          endName={'toDate'}
+          onChange={onChangeFilters}
+          value={[filters.fromDate, filters.toDate]}
+        />
+        <div className={'searchBox'}>
+          <p className={'searchTitle'}>카테고리</p>
+          <select
+            className={'input'}
+            value={filters.categoryId}
+            onChange={(e) => onChangeFilters('categoryId', e.target.value)}
+          >
+            <option value={''}>전체</option>
+            {(categoryData ?? []).map((c: any) => (
+              <option key={c.id} value={c.id}>{c.codeNm}</option>
+            ))}
+          </select>
+        </div>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginLeft: 8 }}>
+          {PERIOD_PRESETS.map((p) => (
+            <button key={p.label} className={'btn btnGray'} style={{ height: 32, padding: '0 12px', fontSize: 12 }} onClick={() => applyPreset(p)}>
+              {p.label}
+            </button>
+          ))}
+        </div>
+      </Search>
 
-      {isLoading ? (
-        <div style={{ padding: 40, textAlign: 'center', color: '#aaa' }}>데이터 로딩 중...</div>
-      ) : grandTotal === 0 ? (
-        <div style={{ padding: 40, textAlign: 'center', color: '#aaa' }}>리뷰 데이터가 없습니다.</div>
-      ) : (
-        <div style={{ display: 'flex', gap: 16 }}>
-          <div style={chartWrap}>
-            <ReactECharts option={heightChartOption} style={{ height: 260 }} />
-          </div>
-          <div style={chartWrap}>
-            <ReactECharts option={weightChartOption} style={{ height: 260 }} />
-          </div>
+      {!isLoading && grandTotal > 0 && (
+        <div style={{ fontSize: 13, color: '#555', marginBottom: 8 }}>
+          검색 <b>{grandTotal.toLocaleString()}건</b>
         </div>
       )}
+
+      <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+        {/* 좌: 그리드 */}
+        <div style={{ flex: '0 0 460px' }}>
+          <Table>
+            <TunedGrid<GridRow>
+              headerHeight={35}
+              onGridReady={onGridReady}
+              rowData={rowData}
+              columnDefs={columnDefs}
+              defaultColDef={defaultColDef}
+              loading={isLoading}
+              loadingOverlayComponent={CustomGridLoading}
+              noRowsOverlayComponent={CustomNoRowsOverlay}
+              className={'wmsDefault'}
+              domLayout="autoHeight"
+            />
+          </Table>
+        </div>
+
+        {/* 우: 가로 스택 바 차트 */}
+        <div style={{ flex: 1 }}>
+          <div style={chartCard}>
+            <ReactECharts option={stackBarOption} style={{ height: 480 }} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
-const chartWrap: React.CSSProperties = {
-  flex: 1,
+const chartCard: React.CSSProperties = {
   background: '#fff',
   border: '1px solid #e8e8e8',
   borderRadius: 8,
   padding: '16px 12px 12px',
 };
-
-function SummaryCard({ label, value, pct, color }: { label: string; value: number; pct?: number; color: string }) {
-  return (
-    <div
-      style={{
-        flex: 1,
-        background: '#fff',
-        border: '1px solid #e8e8e8',
-        borderRadius: 8,
-        padding: '14px 16px',
-        borderTop: `3px solid ${color}`,
-      }}
-    >
-      <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>{label}</div>
-      <div style={{ fontSize: 22, fontWeight: 700, color: '#222' }}>
-        {value.toLocaleString()}건
-      </div>
-      {pct !== undefined && (
-        <div style={{ fontSize: 12, color, fontWeight: 600, marginTop: 2 }}>{pct.toFixed(1)}%</div>
-      )}
-    </div>
-  );
-}
 
 export default ReviewAnalysis;
