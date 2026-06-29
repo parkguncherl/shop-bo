@@ -100,7 +100,7 @@ const ReceivingModPop = ({ open, item, onClose, onSuccess }: ReceivingModPopProp
   };
 
   return (
-    <div className="imgPopBox">
+    <>
       <PopupLayout
         width={700}
         open={open}
@@ -124,7 +124,7 @@ const ReceivingModPop = ({ open, item, onClose, onSuccess }: ReceivingModPopProp
           </PopupFooter>
         }
       >
-        <PopupContent>
+        <PopupContent style={{ maxHeight: 'calc(85vh - 160px)', overflowY: 'auto' }}>
           <PopupFormBox className="">
             {item && (
               <PopupFormGroup title="상품정보">
@@ -195,7 +195,7 @@ const ReceivingModPop = ({ open, item, onClose, onSuccess }: ReceivingModPopProp
         }}
         onClose={() => setOpenModConf({ open: false })}
       />
-    </div>
+    </>
   );
 };
 

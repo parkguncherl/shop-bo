@@ -134,7 +134,7 @@ const ReceivingAddPop = ({ open, onClose, onSuccess }: ReceivingAddPopProps) => 
   };
 
   return (
-    <div className="imgPopBox">
+    <>
       <PopupLayout
         width={800}
         open={open}
@@ -158,7 +158,7 @@ const ReceivingAddPop = ({ open, onClose, onSuccess }: ReceivingAddPopProps) => 
           </PopupFooter>
         }
       >
-        <PopupContent>
+        <PopupContent style={{ maxHeight: 'calc(85vh - 160px)', overflowY: 'auto' }}>
           <PopupFormBox className="">
             {/* 상품상세 검색 */}
             <PopupFormGroup title="상품상세 검색">
@@ -259,7 +259,7 @@ const ReceivingAddPop = ({ open, onClose, onSuccess }: ReceivingAddPopProps) => 
         }}
         onClose={() => setOpenAddConf({ open: false })}
       />
-    </div>
+    </>
   );
 };
 
