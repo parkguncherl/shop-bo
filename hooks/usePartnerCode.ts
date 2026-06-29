@@ -1,13 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { WebCommonControllerApi } from '../generated';
-
-const webCommonApi = new WebCommonControllerApi();
+import { authApi } from '../libs';
 
 export function usePartnerCode(partnerUpperCode: string) {
   return useQuery({
     queryKey: ['categoryList', partnerUpperCode],
     queryFn: async () => {
-      const res = await webCommonApi.partnerCodeList({partnerUpperCode: partnerUpperCode });
+      const res = await authApi.get('/partner/code/lower', { params: { partnerUpperCode } });
       return res.data.body;
     },
     enabled: !!partnerUpperCode,

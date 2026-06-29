@@ -19,7 +19,7 @@ export const FindPassPop = () => {
     onSuccess: (e) => {
       const { resultCode, resultMessage } = e.data;
       if (resultCode === 200) {
-        alert('임시 패스워드를 발급하였습니다. 문자메시지를 확인하세요.' || '');
+        alert('임시 패스워드를 발급하였습니다. 문자메시지를 확인하세요.');
         location.href = '/login';
       } else {
         toastError(resultMessage);
@@ -67,7 +67,7 @@ export const FindPassPop = () => {
                   onChange={(e) => {
                     setLoginId(e.target.value);
                   }}
-                  placeholder={'이메일로된 ID를 입력하세요' || ''}
+                  placeholder={'이메일로된 ID를 입력하세요'}
                 />
               </div>
               <div className={`${styles.formBox_group} ${styles.tel2}`}>

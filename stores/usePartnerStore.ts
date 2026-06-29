@@ -5,14 +5,14 @@ import {
   ApiResponse,
   PageResponsePartnerResponsePaging,
   PartnerResponsePaging,
-  PartnerControllerApiSelectPartnerPagingRequest,
   PartnerRequestCreate,
   PartnerRequestDelete,
   PartnerRequestUpdate,
   PageObject,
-  PartnerResponseSelect,
   PartnerRequestFilterForList,
 } from '../generated';
+type PartnerControllerApiSelectPartnerPagingRequest = any;
+type PartnerResponseSelect = any;
 import { AxiosPromise } from 'axios';
 import { authApi, authDownApi } from '../libs';
 import { StateCreator } from 'zustand';

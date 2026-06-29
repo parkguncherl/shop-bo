@@ -1,9 +1,8 @@
 import React from 'react';
-import { HomeResponseDetail } from '../../generated';
 
 interface Props {
   children: React.ReactNode;
-  rowData?: [HomeResponseDetail];
+  rowData?: [any];
 }
 
 export const Table = (props: Props) => {

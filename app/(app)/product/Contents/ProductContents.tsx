@@ -15,7 +15,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Formatter } from '../../../../libs/const';
 
 // todo export
-interface ProductContentsFields {
+export interface ProductContentsFields {
   title: string;
   content: ContentElement[];
 }
@@ -25,7 +25,7 @@ interface ProductContentsFields {
 const ProductContents = () => {
   /** 공통 스토어 - State */
   const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
-  const [modals, openModal, closeModal, insertProductContents] = useProductContentsStore((s) => [s.modals, s.openModal, s.closeModal, s.insertProductContents]);
+  const [modals, openModal, closeModal, insertProductContents] = useProductContentsStore((s) => [s.modals, s.openModal, s.closeModal, (s as any).insertProductContents]);
 
   /** 로컬 스토어 */
   const [displayMode, setDisplayMode] = useState<EnhancedTextAreasMode>('edit');
@@ -43,14 +43,14 @@ const ProductContents = () => {
     getValues,
     formState: { errors, isValid },
   } = useForm<ProductContentsFields>({
-    resolver: yupResolver(YupSchema.ProductContentsRequest()),
+    resolver: yupResolver(YupSchema.ProductContentsRequest()) as any,
     mode: 'onChange',
   });
 
   /** 상품컨텐츠 추가 요청 처리 동작 캐싱 */
   const { mutate: insertProductContentsMutate } = useMutation({
     mutationFn: insertProductContents,
-    onSuccess: async (e) => {
+    onSuccess: async (e: any) => {
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('저장되었습니다.');
@@ -71,19 +71,19 @@ const ProductContents = () => {
     const fileInfoList: FileInfo[] = [
       ...data.content.filter((content) => content.fileInfo && content.fileInfo.file).map((content) => content.fileInfo as FileInfo),
     ];
-    const uniqueFileList: File[] = Array.from(new Map(fileInfoList.map((fileInfo) => [fileInfo.file.name, fileInfo.file])).values());
+    const uniqueFileList: File[] = Array.from(new Map(fileInfoList.map((fileInfo) => [fileInfo.file!.name, fileInfo.file!])).values());
     const fileInfoIncludedContent = data.content
       .map((content) => {
-        if (content.fileInfo && content.fileInfo.file.name) {
+        if (content.fileInfo && content.fileInfo.file?.name) {
           // regex = /<<IMG\|([^>]+)>>/g;
           //return `<<IMG|${content.fileInfo.file.name}>>`; // <<IMG|image_title>>
-          return Formatter.ProductContent.ImgToken(content.fileInfo.file.name);
+          return Formatter.ProductContent.ImgToken(content.fileInfo.file!.name);
         } else {
           return content.partialContent + '\\n'; // 문단 구분을 위한 구분자 추가 ('\\n' → 문자열 \n)
         }
       })
       .join('');
-    insertProductContentsMutate({
+    (insertProductContentsMutate as any)({
       newsTitle: data.title,
       newsSubTitle: data.title, // todo
       newsContents: fileInfoIncludedContent,
@@ -113,13 +113,13 @@ const ProductContents = () => {
           <div className={'form_boxing'}>
             <div className={'headed'}>
               <div className={'title_boxing'}>
-                <FormInput<ProductContentsFields> control={control} name={'title'} inputType={'label'} placeholder={'제목'} />
+                <FormInput<ProductContentsFields> control={control as any} name={'title'} inputType={'label'} placeholder={'제목'} />
               </div>
             </div>
             <div className={'content'}>
               <div className={'content_boxing'}>
                 <FormEnhancedTextArea<ProductContentsFields>
-                  control={control}
+                  control={control as any}
                   name={'content'}
                   autoSize={{ minRows: 7, maxRows: 40 }}
                   mode={displayMode}
@@ -172,7 +172,7 @@ const ProductContents = () => {
         title={'저장 하시겠습니까?'}
         confirmText={'저장'}
         onConfirm={() => {
-          handleSubmit(onValid, onInvalid)(); // 함수를 반환하므로 다음과 같이, 호출하여야
+          handleSubmit(onValid as any, onInvalid)(); // 함수를 반환하므로 다음과 같이, 호출하여야
         }}
         onClose={() => {
           closeModal('ADD_CONF');

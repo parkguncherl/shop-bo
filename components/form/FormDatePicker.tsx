@@ -88,7 +88,7 @@ function FormDatePicker<T extends FieldValues>({ ref, ...props }: TProps<T>) {
                 <DatePicker.YearPicker
                   name={name}
                   onChange={controlChange}
-                  value={value ? dayjs(value) : ''} // 실제로는 Dayjs 요구되나 타입 정의 수준에서의 불일치로 인한 오류이니 타입스크립트 컴파일 시점 에러는 무시하기
+                  value={(value ? dayjs(value) : null) as any} // 실제로는 Dayjs 요구되나 타입 정의 수준에서의 불일치로 인한 오류이니 타입스크립트 컴파일 시점 에러는 무시하기
                   disabledDate={disabledDate}
                   onOpenChange={hideUnavailableYears}
                   ref={ref}

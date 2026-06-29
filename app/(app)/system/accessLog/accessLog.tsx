@@ -65,8 +65,8 @@ const AccessLog = () => {
   const [columnDefs] = useState<(ColDef | ColGroupDef)[]>([
     { field: 'no', headerName: 'NO', minWidth: 90, maxWidth: 100, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
     { field: 'loginId', headerName: 'ID(e-mail)', minWidth: 200, suppressHeaderMenuButton: true },
-    { field: 'userNm', headerName: '이름' || '', minWidth: 100, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
-    { field: 'authNm', headerName: '권한' || '', minWidth: 150, suppressHeaderMenuButton: true },
+    { field: 'userNm', headerName: '이름', minWidth: 100, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
+    { field: 'authNm', headerName: '권한', minWidth: 150, suppressHeaderMenuButton: true },
     {
       field: 'belongNm',
       headerName: '소속',

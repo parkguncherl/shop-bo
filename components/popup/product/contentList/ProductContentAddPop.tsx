@@ -43,7 +43,7 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
     getValues,
     //formState: { errors, isValid },
   } = useForm<ProductContentsFields>({
-    resolver: yupResolver(YupSchema.ProductContentsRequest()),
+    resolver: yupResolver(YupSchema.ProductContentsRequest()) as any,
     mode: 'onChange',
   });
 
@@ -169,11 +169,11 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
           <PopupFormBox className={''}>
             <PopupFormGroup>
               <PopupFormType className={'type1'}>
-                <FormInput<ProductContentsFields> control={control} name={'title'} label={'제목'} inputType={'label'} placeholder={'제목'} />
+                <FormInput<ProductContentsFields> control={control as any} name={'title'} label={'제목'} inputType={'label'} placeholder={'제목'} />
               </PopupFormType>
               <PopupFormType className={'type1'}>
                 <FormCombineParagraphs<ProductContentsFields>
-                  control={control}
+                  control={control as any}
                   name={'content'}
                   autoSize={{ minRows: 7, maxRows: 40 }}
                   mode={displayMode}
@@ -192,7 +192,7 @@ const ProductContentAddPop = ({ open, onClose }: ProductContentShowPopProps) => 
         title={'저장 하시겠습니까?'}
         confirmText={'저장'}
         onConfirm={() => {
-          handleSubmit(onValid, onInvalid)(); // 함수를 반환하므로 다음과 같이, 호출하여야
+          handleSubmit(onValid as any, onInvalid)(); // 함수를 반환하므로 다음과 같이, 호출하여야
         }}
         onClose={() => {
           setOpenAddConf(false);

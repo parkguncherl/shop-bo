@@ -159,7 +159,7 @@ export const AccountModPop = ({ data, open, onClose }: AccountModPopProps) => {
     onSuccess: async (e) => {
       try {
         if (e.data.resultCode === 200) {
-          toastSuccess('비밀번호가 초기화되었습니다.' || '');
+          toastSuccess('비밀번호가 초기화되었습니다.');
           await queryClient.invalidateQueries({ queryKey: ['/user/paging'] });
           //closeModal('MOD');
           onClose();
@@ -290,7 +290,7 @@ export const AccountModPop = ({ data, open, onClose }: AccountModPopProps) => {
                     //   setUserAuthCd(value ? Number(value) : 0);
                     // }}
                   />
-                  <FormDropDown<AccountRequestUpdateFields> control={control} title={'상태' || ''} name={'useYn'} codeUpper={'10030'} required={true} />
+                  <FormDropDown<AccountRequestUpdateFields> control={control} title={'상태'} name={'useYn'} codeUpper={'10030'} required={true} />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
                   <FormInput<AccountRequestUpdateFields>

@@ -4,16 +4,16 @@ import { immer } from 'zustand/middleware/immer';
 import {
   ApiResponse,
   PageObject,
-  RetailRequestPagingFilter,
-  RetailResponsePaging,
-  RetailRequestCreate,
-  RetailRequestUpdate,
-  RetailRequestFilter,
-  RetailRequestDeleteList,
-  RetailRequestUpdateSleepStatus,
-  RetailResponseDetail,
-  RetailRequestRetailAmtFilter,
 } from '../generated';
+type RetailRequestPagingFilter = any;
+type RetailResponsePaging = any;
+type RetailRequestCreate = any;
+type RetailRequestUpdate = any;
+type RetailRequestFilter = any;
+type RetailRequestDeleteList = any;
+type RetailRequestUpdateSleepStatus = any;
+type RetailResponseDetail = any;
+type RetailRequestRetailAmtFilter = any;
 import { AxiosPromise } from 'axios';
 import { authApi } from '../libs';
 import { StateCreator } from 'zustand/esm';

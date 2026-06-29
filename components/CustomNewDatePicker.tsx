@@ -990,7 +990,7 @@ const CustomNewDatePicker = ({
                     suffixIcon={null}
                     allowClear={false}
                     onPanelChange={(date, mode) => {
-                      setPanelMode(mode); // 현재 패널 모드를 업데이트
+                      setPanelMode(mode as any); // 현재 패널 모드를 업데이트
                     }}
                     cellRender={(currentValue) => {
                       const current = dayjs(currentValue);

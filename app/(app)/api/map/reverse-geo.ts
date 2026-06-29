@@ -9,7 +9,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const { latitude, longitude } = req.query;
     if (!latitude || !longitude) {
       res.statusCode = 400;
-      return res.send('위도 혹은 경도 데이터가 없습니다.' || '');
+      return res.send('위도 혹은 경도 데이터가 없습니다.');
     }
     try {
       const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&language=ko&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}&result_type=${resultType}`;

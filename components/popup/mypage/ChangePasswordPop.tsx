@@ -72,8 +72,8 @@ function ChangePasswordPop({ open = false, onClose }: Props) {
     const pass = form.getValues('modPassword');
     const pass2 = form.getValues('reModpassword');
     if (pass !== pass2) {
-      form.setError('modPassword', { type: 'onChange', message: '변경 비밀번호가 일치하지 않습니다.' || '' });
-      form.setError('reModpassword', { type: 'onChange', message: '변경 비밀번호가 일치하지 않습니다.' || '' });
+      form.setError('modPassword', { type: 'onChange', message: '변경 비밀번호가 일치하지 않습니다.' });
+      form.setError('reModpassword', { type: 'onChange', message: '변경 비밀번호가 일치하지 않습니다.' });
       return false;
     } else if (pass === pass2) {
       return true;

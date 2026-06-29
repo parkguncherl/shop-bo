@@ -5,8 +5,6 @@ import {
   ApiResponse,
   ApiResponseListCodeDropDown,
   ApiResponseListCodeResponseLowerSelect,
-  CodeControllerApiSelectCodePagingRequest,
-  CodeControllerApiSelectDropdownByCodeUpperRequest,
   CodeDropDown,
   CodeRequestCreate,
   CodeRequestDelete,
@@ -17,7 +15,9 @@ import {
 import { AxiosPromise } from 'axios';
 import { authApi, authDownApi } from '../libs';
 import { StateCreator } from 'zustand/esm';
-import { CODE } from '../libs/const';
+
+type CodeControllerApiSelectCodePagingRequest = any;
+type CodeControllerApiSelectDropdownByCodeUpperRequest = any;
 
 type ModalType = 'ADD' | 'MOD' | 'LOWER' | 'EXCEL';
 

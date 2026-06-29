@@ -2,11 +2,13 @@ import FormInput from './FormInput';
 import DropDownAtom from '../atom/DropDownAtom';
 import { Input } from '../Input';
 import { BaseSelectRef } from 'rc-select';
+import { Control, FieldValues } from 'react-hook-form';
 
 interface InfoInputSectionProps {
   title: string;
   type: 'compInfo' | 'gubunInfo';
   dropdownName: string;
+  control?: Control<FieldValues, any>;
   placeholder: string;
   inputValue: string;
   dropdownOptions: any[];
@@ -40,6 +42,7 @@ const InfoInputSection: React.FC<InfoInputSectionProps> = ({
   handleButtonToggle,
   handleSave,
   inputRefs,
+  control,
 }) => {
   return (
     <dl>
@@ -79,7 +82,7 @@ const InfoInputSection: React.FC<InfoInputSectionProps> = ({
           </button>
         </div>
         <div className={`formBox inpBtn ${buttonState ? 'on' : ''}`}>
-          <FormInput type="text" inputType="textarea" control={control} name={dropdownName} />
+          <FormInput type="text" inputType="textarea" control={control as any} name={dropdownName} />
           <button className="btn btnBlack" onClick={() => handleSave(type, inputValue)}>
             저장
           </button>
