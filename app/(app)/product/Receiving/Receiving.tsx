@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Search, Title, toastSuccess } from '../../../../components';
 import { CellEditingStoppedEvent, ColDef } from 'ag-grid-community';
 import { toastError } from '../../../../components';
@@ -29,6 +29,28 @@ type ListFilter = {
 };
 
 const INLINE_EDITABLE = new Set(['plusMinus', 'receivCnt', 'etcCntn']);
+
+const PlusMinusCellEditor = forwardRef((props: any, ref) => {
+  const [value, setValue] = useState<string>(props.value ?? 'P');
+  const selectRef = useRef<HTMLSelectElement>(null);
+
+  useImperativeHandle(ref, () => ({ getValue: () => value }));
+
+  useEffect(() => { selectRef.current?.focus(); }, []);
+
+  return (
+    <select
+      ref={selectRef}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      style={{ height: '100%', width: '100%', border: 'none', background: '#fff', fontSize: 13 }}
+    >
+      <option value="P">입고</option>
+      <option value="M">출고</option>
+    </select>
+  );
+});
+PlusMinusCellEditor.displayName = 'PlusMinusCellEditor';
 
 const monthStart = dayjs().startOf('month').format('YYYY-MM-DD');
 const threeMonthsLater = dayjs().add(3, 'month').format('YYYY-MM-DD');
@@ -71,8 +93,7 @@ const Receiving = () => {
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
       editable: true,
-      cellEditor: 'agSelectCellEditor',
-      cellEditorParams: { values: ['P', 'M'] },
+      cellEditor: PlusMinusCellEditor,
       cellRenderer: (p: any) => {
         const isIn = p.value === 'P';
         return (
