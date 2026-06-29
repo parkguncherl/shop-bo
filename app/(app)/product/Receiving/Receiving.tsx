@@ -64,8 +64,8 @@ const Receiving = () => {
     {
       field: 'plusMinus',
       headerName: '구분',
-      minWidth: 70,
-      maxWidth: 80,
+      minWidth: 50,
+      maxWidth: 50,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
       cellRenderer: (p: any) => {
