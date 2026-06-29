@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Search, Title, toastSuccess } from '../../../../components';
-import { ColDef } from 'ag-grid-community';
+import { CellEditingStoppedEvent, ColDef } from 'ag-grid-community';
 import { toastError } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -28,18 +28,20 @@ type ListFilter = {
   prodNm: string;
 };
 
-const today = dayjs().format('YYYY-MM-DD');
+const INLINE_EDITABLE = new Set(['plusMinus', 'receivCnt', 'etcCntn']);
+
 const monthStart = dayjs().startOf('month').format('YYYY-MM-DD');
 const threeMonthsLater = dayjs().add(3, 'month').format('YYYY-MM-DD');
 
 const Receiving = () => {
   const { onGridReady } = useAgGridApi();
   const menuNm = useCommonStore((s) => s.menuNm);
-  const [modals, openModal, closeModal, deleteReceiving] = useReceivingStore((s) => [
+  const [modals, openModal, closeModal, deleteReceiving, updateReceivingIfExist] = useReceivingStore((s) => [
     s.modals,
     s.openModal,
     s.closeModal,
     s.deleteReceiving,
+    s.updateReceivingIfExist,
   ]);
 
   const [filters, onChangeFilters, onFiltersReset] = useFilters<ListFilter>({
@@ -63,11 +65,14 @@ const Receiving = () => {
     },
     {
       field: 'plusMinus',
-      headerName: '구분',
-      minWidth: 50,
-      maxWidth: 50,
+      headerName: '구분 ✎',
+      minWidth: 80,
+      maxWidth: 90,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
+      editable: true,
+      cellEditor: 'agSelectCellEditor',
+      cellEditorParams: { values: ['P', 'M'] },
       cellRenderer: (p: any) => {
         const isIn = p.value === 'P';
         return (
@@ -105,17 +110,26 @@ const Receiving = () => {
     },
     {
       field: 'receivCnt',
-      headerName: '수량',
-      minWidth: 70,
-      maxWidth: 80,
+      headerName: '수량 ✎',
+      minWidth: 80,
+      maxWidth: 90,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
+      editable: true,
+      cellEditor: 'agNumberCellEditor',
+      cellEditorParams: { min: 1 },
     },
-    { field: 'etcCntn', headerName: '비고', minWidth: 120, suppressHeaderMenuButton: true },
-    { field: 'creUser', headerName: '처리자', minWidth: 90, maxWidth: 110, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
     {
-      field: 'creTm',
-      headerName: '등록일시',
+      field: 'etcCntn',
+      headerName: '비고 ✎',
+      minWidth: 140,
+      suppressHeaderMenuButton: true,
+      editable: true,
+    },
+    { field: 'updUser', headerName: '처리자', minWidth: 90, maxWidth: 110, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
+    {
+      field: 'updTm',
+      headerName: '수정일시',
       minWidth: 150,
       maxWidth: 165,
       cellStyle: GridSetting.CellStyle.CENTER,
@@ -158,6 +172,46 @@ const Receiving = () => {
       }
     },
   });
+
+  const { mutate: inlineMutate } = useMutation({
+    mutationFn: updateReceivingIfExist,
+    onSuccess: (e, variables) => {
+      if (e.data.resultCode === 200) {
+        toastSuccess('수정되었습니다.');
+        // 로컬 rowData 즉시 반영
+        setRowData((prev) =>
+          prev.map((row) => (row.id === variables.id ? { ...row, ...variables } : row))
+        );
+      } else {
+        toastError(e.data.resultMessage ?? '수정 중 오류가 발생했습니다.');
+        refetch();
+      }
+    },
+    onError: () => {
+      toastError('수정 중 오류가 발생했습니다.');
+      refetch();
+    },
+  });
+
+  const onCellEditingStopped = useCallback(
+    (e: CellEditingStoppedEvent<ReceivingItem>) => {
+      const field = e.column.getColId();
+      if (!INLINE_EDITABLE.has(field)) return;
+      if (e.newValue === e.oldValue) return;
+      if (e.newValue == null || e.newValue === '') return;
+
+      const id = e.data?.id;
+      if (!id) return;
+
+      const payload: Record<string, any> = { id };
+      if (field === 'plusMinus') payload.plusMinus = e.newValue;
+      else if (field === 'receivCnt') payload.receivCnt = Number(e.newValue);
+      else if (field === 'etcCntn') payload.etcCntn = e.newValue;
+
+      inlineMutate(payload);
+    },
+    [inlineMutate]
+  );
 
   const reset = () => {
     onFiltersReset();
@@ -212,7 +266,6 @@ const Receiving = () => {
       </Search>
 
       <div style={{ padding: '0 16px 16px' }}>
-        {/* 상단 버튼 영역 */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 8, justifyContent: 'flex-end' }}>
           <button className="btn btn_primary" onClick={() => openModal('RECEIVING_ADD')}>
             입고/출고 등록
@@ -241,18 +294,18 @@ const Receiving = () => {
           noRowsOverlayComponent={CustomNoRowsOverlay}
           className="default"
           domLayout="autoHeight"
+          stopEditingWhenCellsLoseFocus
           onRowClicked={(e) => setSelectedRow(e.data ?? null)}
+          onCellEditingStopped={onCellEditingStopped}
         />
       </div>
 
-      {/* 등록 팝업 */}
       <ReceivingAddPop
         open={modals.active && modals.type === 'RECEIVING_ADD'}
         onClose={() => closeModal('RECEIVING_ADD')}
         onSuccess={refetch}
       />
 
-      {/* 수정 팝업 */}
       <ReceivingModPop
         open={modals.active && modals.type === 'RECEIVING_MOD'}
         item={(modals.stored_temporary as ReceivingItem) ?? null}
@@ -260,7 +313,6 @@ const Receiving = () => {
         onSuccess={refetch}
       />
 
-      {/* 삭제 확인 */}
       <ConfirmModal
         open={modals.active && modals.type === 'RECEIVING_DEL'}
         title="해당 입고/출고 내역을 삭제하시겠습니까?"

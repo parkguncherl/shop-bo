@@ -25,6 +25,8 @@ export interface ReceivingItem {
   receivCnt: number;
   plusMinus: string;
   etcCntn?: string;
+  updUser?: string;
+  updTm?: string;
 }
 
 export interface ReceivingModFields {

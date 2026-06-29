@@ -22,6 +22,7 @@ interface ReceivingState {
 interface ReceivingApiState {
   insertReceiving: (req: any) => AxiosPromise<any>;
   updateReceiving: (req: any) => AxiosPromise<any>;
+  updateReceivingIfExist: (req: any) => AxiosPromise<any>;
   deleteReceiving: (req: any) => AxiosPromise<any>;
 }
 
@@ -44,6 +45,7 @@ const initialStateCreator: StateCreator<ReceivingStateOfAll> = (set) => ({
 
   insertReceiving: (req) => authApi.put('/receiving/insertReceiving', req),
   updateReceiving: (req) => authApi.patch('/receiving/updateReceiving', req),
+  updateReceivingIfExist: (req) => authApi.patch('/receiving/updateReceivingIfExist', req),
   deleteReceiving: (req) => authApi.delete('/receiving/deleteReceiving', { data: req }),
 });
 
