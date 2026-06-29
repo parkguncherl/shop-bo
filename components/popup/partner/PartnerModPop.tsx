@@ -12,7 +12,11 @@ import FormDropDown from '../../form/FormDropDown';
 import { Placeholder } from '../../../libs/const';
 import { PartnerRequestDelete, PartnerRequestUpdate } from '../../../generated';
 
-type PartnerRequestUpdateExtended = PartnerRequestUpdate & { reviewPointRate?: number };
+type PartnerRequestUpdateExtended = PartnerRequestUpdate & {
+  reviewPointRate?: number;
+  aiStudyText?: string;
+  aiStudyProdDetailText?: string;
+};
 
 import { authApi } from '../../../libs';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -90,6 +94,8 @@ const PartnerModPop = ({ datas }: Props) => {
         repNm: body.repNm,
         email: body.email,
         reviewPointRate: body.reviewPointRate,
+        aiStudyText: body.aiStudyText ?? '',
+        aiStudyProdDetailText: body.aiStudyProdDetailText ?? '',
         creUser: body.creUser,
         updUser: body.updUser,
       });
@@ -136,7 +142,7 @@ const PartnerModPop = ({ datas }: Props) => {
 
   const onValid: SubmitHandler<PartnerRequestUpdateExtended> = (data) => {
     data.phoneNo = (data.phoneNo || '').replace(/[^0-9]/g, '');
-    updatePartnerMutate(data as PartnerRequestUpdate);
+    updatePartnerMutate(data as unknown as PartnerRequestUpdate);
   };
 
   const deleteCodeFn = async () => {
@@ -223,6 +229,32 @@ const PartnerModPop = ({ datas }: Props) => {
               placeholder={Placeholder.Input || ''}
               required={false}
             />
+          </PopupSearchType>
+          <PopupSearchType className={'type_1'}>
+            <dl>
+              <dt>AI 기본 학습 텍스트</dt>
+              <dd>
+                <textarea
+                  {...control.register('aiStudyText')}
+                  rows={4}
+                  placeholder="AI에게 학습시킬 기본 안내 내용을 입력하세요. (예: 넌 이 쇼핑몰의 친절한 안내원이야)"
+                  style={{ width: '100%', padding: '6px 8px', border: '1px solid #d9d9d9', borderRadius: 4, fontSize: 13, resize: 'vertical' }}
+                />
+              </dd>
+            </dl>
+          </PopupSearchType>
+          <PopupSearchType className={'type_1'}>
+            <dl>
+              <dt>AI 상품 상세 학습 텍스트</dt>
+              <dd>
+                <textarea
+                  {...control.register('aiStudyProdDetailText')}
+                  rows={4}
+                  placeholder="상품 상담 시 AI가 먼저 학습해야 할 내용을 입력하세요."
+                  style={{ width: '100%', padding: '6px 8px', border: '1px solid #d9d9d9', borderRadius: 4, fontSize: 13, resize: 'vertical' }}
+                />
+              </dd>
+            </dl>
           </PopupSearchType>
         </PopupSearchBox>
       </PopupContent>
