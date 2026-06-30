@@ -52,8 +52,8 @@ const PlusMinusCellEditor = forwardRef((props: any, ref) => {
 });
 PlusMinusCellEditor.displayName = 'PlusMinusCellEditor';
 
-const monthStart = dayjs().startOf('month').format('YYYY-MM-DD');
-const threeMonthsLater = dayjs().add(3, 'month').format('YYYY-MM-DD');
+const threeMonthsAgo = dayjs().subtract(3, 'month').format('YYYY-MM-DD');
+const today = dayjs().format('YYYY-MM-DD');
 
 const Receiving = () => {
   const { onGridReady } = useAgGridApi();
@@ -67,8 +67,8 @@ const Receiving = () => {
   ]);
 
   const [filters, onChangeFilters, onFiltersReset] = useFilters<ListFilter>({
-    fromDate: monthStart,
-    toDate: threeMonthsLater,
+    fromDate: threeMonthsAgo,
+    toDate: today,
     plusMinus: '',
     prodNm: '',
   });
