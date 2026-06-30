@@ -79,7 +79,7 @@ const LoginClient = () => {
 
   const defaultValues: LoginVerificationFields = {
     //loginId: (getCookie('gguangggLocalStoriageId') as string) || '',
-    loginId: (getCookie('gguangggLocalStoriageId') as string) || '',
+    loginId: (getCookie('gguangggLocalStoriageId') as string) || 'wluckeey21@gmail.com',
     password: '1230',
     isMobileLogin: isMobileLogin,
   };
