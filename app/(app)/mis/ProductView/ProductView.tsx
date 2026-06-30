@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { ColDef, RowClickedEvent } from 'ag-grid-community';
-import { Search, Title } from '../../../../components';
+import { Search, Table, Title } from '../../../../components';
 import { useQuery } from '@tanstack/react-query';
 import { toastError } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
@@ -324,20 +324,21 @@ const ProductView = () => {
       <div style={{ display: 'flex', gap: 16, padding: '0 16px 16px', alignItems: 'flex-start' }}>
         {/* 왼쪽: ag-grid + 이미지 미리보기 */}
         <div style={{ flex: '0 0 auto', width: 680 }}>
-          <TunedGrid
-            headerHeight={35}
-            onGridReady={onGridReady}
-            loading={isLoading}
-            rowData={rowData}
-            columnDefs={columnDefs}
-            defaultColDef={defaultColDef}
-            rowSelection={{ mode: 'singleRow', enableClickSelection: true }}
-            onRowClicked={onRowClicked}
-            loadingOverlayComponent={CustomGridLoading}
-            noRowsOverlayComponent={CustomNoRowsOverlay}
-            className={'default'}
-            domLayout={'autoHeight'}
-          />
+          <Table>
+            <TunedGrid
+              headerHeight={35}
+              onGridReady={onGridReady}
+              loading={isLoading}
+              rowData={rowData}
+              columnDefs={columnDefs}
+              defaultColDef={defaultColDef}
+              rowSelection={{ mode: 'singleRow', enableClickSelection: true }}
+              onRowClicked={onRowClicked}
+              loadingOverlayComponent={CustomGridLoading}
+              noRowsOverlayComponent={CustomNoRowsOverlay}
+              className={'default'}
+            />
+          </Table>
           <ImgPreviewBox open={imgPreviewBoxOn} resized={resized} onReSizeReq={() => setResized(!resized)} fileDetList={imgPreviewFileDetList} />
         </div>
 
