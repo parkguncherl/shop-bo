@@ -403,7 +403,7 @@ const CustomerServiceList = () => {
   // ── 렌더 ─────────────────────────────────────────────────────────────────
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div>
       <Title title={menuNm ?? '고객 문의 관리'} reset={reset} search={refetch} />
 
       {/* 검색 영역 */}
@@ -459,28 +459,26 @@ const CustomerServiceList = () => {
       </Search>
 
       {/* 본문 — 좌(그리드) / 우(채팅) 분할 */}
-      <div style={{ display: 'flex', flex: 1, gap: 12, overflow: 'hidden', padding: '0 0 0' }}>
+      <div style={{ display: 'flex', gap: 12, padding: '0 0 0', alignItems: 'flex-start' }}>
         {/* 좌: 그리드 + 버튼 */}
-        <div style={{ flex: '0 0 70%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-          <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
-            <Table>
-              <TunedGrid
-                headerHeight={35}
-                onGridReady={onGridReady}
-                rowData={rowData}
-                columnDefs={columnDefs}
-                defaultColDef={defaultColDef}
-                loadingOverlayComponent={CustomGridLoading}
-                noRowsOverlayComponent={CustomNoRowsOverlay}
-                className={'wmsDefault'}
-                rowSelection={{ mode: 'singleRow', enableClickSelection: false }}
-                onRowClicked={(e) => {
-                  if (e.data) loadThread(e.data);
-                }}
-                onCellValueChanged={handleCommentChanged}
-              />
-            </Table>
-          </div>
+        <div style={{ flex: '0 0 70%' }}>
+          <Table>
+            <TunedGrid
+              headerHeight={35}
+              onGridReady={onGridReady}
+              rowData={rowData}
+              columnDefs={columnDefs}
+              defaultColDef={defaultColDef}
+              loadingOverlayComponent={CustomGridLoading}
+              noRowsOverlayComponent={CustomNoRowsOverlay}
+              className={'default'}
+              rowSelection={{ mode: 'singleRow', enableClickSelection: false }}
+              onRowClicked={(e) => {
+                if (e.data) loadThread(e.data);
+              }}
+              onCellValueChanged={handleCommentChanged}
+            />
+          </Table>
           <div className={'btnBox'}>
             <div className={'left'}>
               <button className={'btn btnGray'} onClick={() => partnerCodeOpenModal('PARTNER_CODE_OPEN')}>
@@ -492,7 +490,7 @@ const CustomerServiceList = () => {
 
         {/* 우: 채팅 패널 */}
         <div
-          style={{ flex: 1, display: 'flex', flexDirection: 'column', border: '1px solid #e0e0e0', borderRadius: 8, overflow: 'hidden', background: '#fff' }}
+          style={{ flex: 1, display: 'flex', flexDirection: 'column', height: 'calc(100vh - 338px)', minHeight: 300, border: '1px solid #e0e0e0', borderRadius: 8, overflow: 'hidden', background: '#fff' }}
         >
           {!selectedItem ? (
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaa', fontSize: 14 }}>
