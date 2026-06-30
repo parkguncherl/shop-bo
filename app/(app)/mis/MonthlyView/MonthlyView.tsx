@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { ColDef, RowClickedEvent } from 'ag-grid-community';
-import { Search, Title } from '../../../../components';
+import { Search, Table, Title } from '../../../../components';
 import { useQuery } from '@tanstack/react-query';
 import { toastError } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
@@ -359,20 +359,21 @@ const MonthlyView = () => {
             {periodLabel}별 판매 실적
             {selectedPeriod && <span style={{ marginLeft: 8, fontWeight: 400, color: '#888', fontSize: 12 }}>({selectedPeriod})</span>}
           </p>
-          <TunedGrid
-            headerHeight={35}
-            onGridReady={onTopGridReady}
-            loading={isStatLoading}
-            rowData={statData}
-            columnDefs={statColumnDefs}
-            defaultColDef={defaultColDef}
-            rowSelection={{ mode: 'singleRow', enableClickSelection: true }}
-            onRowClicked={onStatRowClicked}
-            loadingOverlayComponent={CustomGridLoading}
-            noRowsOverlayComponent={CustomNoRowsOverlay}
-            className={'default'}
-            domLayout={'autoHeight'}
-          />
+          <Table>
+            <TunedGrid
+              headerHeight={35}
+              onGridReady={onTopGridReady}
+              loading={isStatLoading}
+              rowData={statData}
+              columnDefs={statColumnDefs}
+              defaultColDef={defaultColDef}
+              rowSelection={{ mode: 'singleRow', enableClickSelection: true }}
+              onRowClicked={onStatRowClicked}
+              loadingOverlayComponent={CustomGridLoading}
+              noRowsOverlayComponent={CustomNoRowsOverlay}
+              className={'default'}
+            />
+          </Table>
         </div>
 
         {/* 2열: 상품별 상세 실적 */}
@@ -385,18 +386,19 @@ const MonthlyView = () => {
               <span style={{ fontWeight: 400, color: '#aaa', fontSize: 12, marginLeft: 6 }}>행을 클릭하세요</span>
             )}
           </p>
-          <TunedGrid
-            headerHeight={35}
-            onGridReady={onBottomGridReady}
-            loading={isDetailLoading}
-            rowData={detailData}
-            columnDefs={detailColumnDefs}
-            defaultColDef={defaultColDef}
-            loadingOverlayComponent={CustomGridLoading}
-            noRowsOverlayComponent={CustomNoRowsOverlay}
-            className={'default'}
-            domLayout={'autoHeight'}
-          />
+          <Table>
+            <TunedGrid
+              headerHeight={35}
+              onGridReady={onBottomGridReady}
+              loading={isDetailLoading}
+              rowData={detailData}
+              columnDefs={detailColumnDefs}
+              defaultColDef={defaultColDef}
+              loadingOverlayComponent={CustomGridLoading}
+              noRowsOverlayComponent={CustomNoRowsOverlay}
+              className={'default'}
+            />
+          </Table>
         </div>
 
         {/* 3열: 차트 */}

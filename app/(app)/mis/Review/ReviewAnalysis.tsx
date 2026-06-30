@@ -234,8 +234,7 @@ const ReviewAnalysis = () => {
               loading={isLoading}
               loadingOverlayComponent={CustomGridLoading}
               noRowsOverlayComponent={CustomNoRowsOverlay}
-              className={'wmsDefault'}
-              domLayout="autoHeight"
+              className={'default'}
             />
           </Table>
         </div>

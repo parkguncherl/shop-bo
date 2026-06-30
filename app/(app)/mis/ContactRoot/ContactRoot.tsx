@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { ColDef } from 'ag-grid-community';
-import { Search, Title } from '../../../../components';
+import { Search, Table, Title } from '../../../../components';
 import { useQuery } from '@tanstack/react-query';
 import { toastError } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
@@ -240,18 +240,19 @@ const ContactRoot = () => {
       <div style={{ display: 'flex', gap: 16, padding: '0 16px 16px', alignItems: 'flex-start' }}>
         {/* 왼쪽: ag-grid */}
         <div style={{ flex: '0 0 auto', width: 480 }}>
-          <TunedGrid
-            headerHeight={35}
-            onGridReady={onGridReady}
-            loading={isLoading}
-            rowData={rowData}
-            columnDefs={columnDefs}
-            defaultColDef={defaultColDef}
-            loadingOverlayComponent={CustomGridLoading}
-            noRowsOverlayComponent={CustomNoRowsOverlay}
-            className={'default'}
-            domLayout={'autoHeight'}
-          />
+          <Table>
+            <TunedGrid
+              headerHeight={35}
+              onGridReady={onGridReady}
+              loading={isLoading}
+              rowData={rowData}
+              columnDefs={columnDefs}
+              defaultColDef={defaultColDef}
+              loadingOverlayComponent={CustomGridLoading}
+              noRowsOverlayComponent={CustomNoRowsOverlay}
+              className={'default'}
+            />
+          </Table>
         </div>
 
         {/* 오른쪽: ECharts TOP 20 */}
