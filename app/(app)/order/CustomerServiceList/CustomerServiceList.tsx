@@ -17,6 +17,7 @@ import CustomNewDatePicker from '../../../../components/CustomNewDatePicker';
 import dayjs from 'dayjs';
 import { Utils } from '../../../../libs/utils';
 import { ComuResponseBoListItem, ComuResponseMessage, ComuResponseThread } from '../../../../generated';
+import { ICellRendererParams } from 'ag-grid-community';
 import { PartnerCodePop } from '../../../../components/popup/system/PartnerCodePop';
 import { PARTNER_CODE } from '../../../../libs/const';
 import { usePartnerCodeStore } from '../../../../stores/usePartnerCodeStore';
@@ -123,6 +124,23 @@ function MessageBubble({
   );
 }
 
+// ─── 특이사항 체크박스 셀 렌더러 ──────────────────────────────────────────────
+function RemarkCheckboxRenderer(props: ICellRendererParams<ComuResponseBoListItem> & { onToggle: (item: ComuResponseBoListItem) => void }) {
+  const { data, onToggle } = props;
+  if (!data) return null;
+  const checked = data.remarkYn === 'Y';
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+      <input
+        type="checkbox"
+        checked={checked}
+        style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#e53e3e' }}
+        onChange={() => onToggle(data)}
+      />
+    </div>
+  );
+}
+
 // ─── 메인 컴포넌트 ────────────────────────────────────────────────────────────
 
 // 0=일, 1=월 ... 6=토 → ISO 기준 이번 주 월요일 계산
@@ -154,6 +172,31 @@ const CustomerServiceList = () => {
   const [isSending, setIsSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const saveRemark = async (comuId: number, remarkYn: string, comment: string | null | undefined) => {
+    try {
+      await authApi.patch(`/comuMng/${comuId}/remark`, { remarkYn, comment: comment ?? null });
+    } catch {
+      toastError('저장 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleRemarkToggle = async (item: ComuResponseBoListItem) => {
+    const next = item.remarkYn === 'Y' ? 'N' : 'Y';
+    setRowData((prev) =>
+      prev.map((r) => (r.comuId === item.comuId ? { ...r, remarkYn: next } : r)),
+    );
+    await saveRemark(item.comuId!, next, item.comment);
+  };
+
+  const handleCommentChanged = async (params: import('ag-grid-community').CellValueChangedEvent<ComuResponseBoListItem>) => {
+    const item = params.data;
+    if (!item?.comuId) return;
+    setRowData((prev) =>
+      prev.map((r) => (r.comuId === item.comuId ? { ...r, comment: params.newValue } : r)),
+    );
+    await saveRemark(item.comuId, item.remarkYn ?? 'N', params.newValue);
+  };
 
   const columnDefs: ColDef<ComuResponseBoListItem>[] = [
     {
@@ -225,6 +268,27 @@ const CustomerServiceList = () => {
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
       valueFormatter: formatDateWithMinute,
+    },
+    {
+      field: 'remarkYn',
+      headerName: '특이사항',
+      minWidth: 75,
+      maxWidth: 80,
+      cellStyle: GridSetting.CellStyle.CENTER,
+      suppressHeaderMenuButton: true,
+      cellRenderer: RemarkCheckboxRenderer,
+      cellRendererParams: { onToggle: handleRemarkToggle },
+    },
+    {
+      field: 'comment',
+      headerName: '메모',
+      minWidth: 160,
+      suppressHeaderMenuButton: true,
+      editable: true,
+      cellStyle: { ...GridSetting.CellStyle.LEFT, backgroundColor: '#fffef0' },
+      valueFormatter: (p) => p.value ?? '',
+      cellEditor: 'agTextCellEditor',
+      singleClickEdit: true,
     },
   ];
 
@@ -396,6 +460,7 @@ const CustomerServiceList = () => {
                 onRowClicked={(e) => {
                   if (e.data) loadThread(e.data);
                 }}
+                onCellValueChanged={handleCommentChanged}
               />
             </Table>
           </div>
