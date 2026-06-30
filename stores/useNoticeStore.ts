@@ -3,7 +3,9 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { ApiResponse, NoticeRequestCreate, NoticeRequestUpdate, PageObject } from '../generated';
+import { ApiResponse, PageObject } from '../generated';
+type NoticeRequestCreate = any;
+type NoticeRequestUpdate = any;
 import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { authApi } from '../libs';
 import { StateCreator } from 'zustand/esm';

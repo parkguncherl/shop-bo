@@ -626,7 +626,7 @@ const CanvasByKonva = ({
 
   /** 참조를 통해 외부로 노출되는 영역을 정의함 */
   useImperativeHandle<Konva.Stage, CanvasByKonvaRef>(ref, () => {
-    return Object.assign<Konva.Stage, CanvasByKonvaCustomsRef>(stageRef.current ?? {}, {
+    return Object.assign<Konva.Stage, CanvasByKonvaCustomsRef>(stageRef.current ?? {} as any, {
       customs: {
         api: {
           addNewText: (value) => {
@@ -794,8 +794,8 @@ const CanvasByKonva = ({
     }
 
     isDrawing.current = true;
-    const pos = e.target.getStage().getPointerPosition();
-    commitLines([...lines, { tool, points: [pos.x, pos.y], color: lineConfig?.color, width: lineConfig?.width ? lineConfig?.width * 0.6 : 5 }]); // 최초 마우스 down 시점, width 값은 적절한 상수(0.6)로 별도 스케일링 처리
+    const pos = e.target.getStage()!.getPointerPosition();
+    commitLines([...lines, { tool, points: [pos!.x, pos!.y], color: lineConfig?.color, width: lineConfig?.width ? lineConfig?.width * 0.6 : 5 }]); // 최초 마우스 down 시점, width 값은 적절한 상수(0.6)로 별도 스케일링 처리
   };
 
   const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
@@ -803,11 +803,11 @@ const CanvasByKonva = ({
       return;
     }
     const stage = e.target.getStage();
-    const point = stage.getPointerPosition();
+    const point = stage!.getPointerPosition();
     let lastLine = { ...lines[lines.length - 1] };
 
     // add point
-    lastLine.points = lastLine.points.concat([point.x, point.y]); // 이동에 따른 신규 포인트 추가(concat 으로 병합)
+    lastLine.points = lastLine.points.concat([point!.x, point!.y]); // 이동에 따른 신규 포인트 추가(concat 으로 병합)
 
     // replace last
     const splicedLines = [...lines];

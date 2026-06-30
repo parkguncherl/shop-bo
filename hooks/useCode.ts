@@ -1,13 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { WebCommonControllerApi } from '../generated';
-
-const webCommonApi = new WebCommonControllerApi();
+import { authApi } from '../libs';
 
 export function useCode(codeUpper: string) {
   return useQuery({
     queryKey: ['selectLowerCodeByCodeUpper', codeUpper],
     queryFn: async () => {
-      const res = await webCommonApi.selectLowerCodeByCodeUpper({ codeUpper: codeUpper });
+      const res = await authApi.get('/code/lower/' + codeUpper);
       return res.data.body;
     },
     enabled: !!codeUpper,

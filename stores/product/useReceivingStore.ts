@@ -34,6 +34,7 @@ const initialStateCreator: StateCreator<ReceivingStateOfAll> = (set) => ({
   openModal: (type, stored_temp) =>
     set((state) => {
       state.modals = { type, active: true, stored_temporary: stored_temp };
+      return state;
     }),
 
   closeModal: (type) =>
@@ -41,6 +42,7 @@ const initialStateCreator: StateCreator<ReceivingStateOfAll> = (set) => ({
       if (state.modals.type === type) {
         state.modals = { ...state.modals, active: false, stored_temporary: undefined };
       }
+      return state;
     }),
 
   insertReceiving: (req) => authApi.put('/receiving/insertReceiving', req),

@@ -49,7 +49,7 @@ const UserAddPop = () => {
     formState: { errors, isValid },
     clearErrors,
   } = useForm<UserRequestCreateFields>({
-    resolver: yupResolver(YupSchema.AccountRequest()), // 완료
+    resolver: yupResolver(YupSchema.AccountRequest()) as any,
     defaultValues: {},
     mode: 'onSubmit',
   });
@@ -63,7 +63,7 @@ const UserAddPop = () => {
         toastSuccess('계정이 추가되었습니다.');
         // 폼 초기화
         closeModal('USER_ADD');
-        await queryClient.invalidateQueries(['/user/paging']);
+        await queryClient.invalidateQueries({ queryKey: ['/user/paging'] });
       } else {
         toastError(data.data.resultMessage);
       }
@@ -72,6 +72,8 @@ const UserAddPop = () => {
       toastError('계정 추가에 실패했습니다: ' + (error as Error).message);
     },
   });
+
+  const anyControl = control as any;
 
   /** 계정 insert */
   const onSubmit = (data: any) => {
@@ -107,25 +109,25 @@ const UserAddPop = () => {
         <PopupSearchBox>
           <PopupSearchType className={'type_2'}>
             <FormInput<UserRequestCreateFields>
-              control={control}
+              control={anyControl}
               name={'loginId'}
               label={'ID (이메일)'}
               placeholder={Placeholder.Input || ''}
               required={true}
             />
-            <FormInput<UserRequestCreateFields> control={control} name={'userNm'} label={'이름'} placeholder={Placeholder.Input || ''} required={true} />
+            <FormInput<UserRequestCreateFields> control={anyControl} name={'userNm'} label={'이름'} placeholder={Placeholder.Input || ''} required={true} />
           </PopupSearchType>
           <PopupSearchType className={'type_2'}>
-            <FormInput<UserRequestCreateFields> control={control} name={'phoneNo'} label={'전화번호'} placeholder={Placeholder.Input || ''} required={false} />
-            <FormInput<UserRequestCreateFields> control={control} name={'belongNm'} label={'소속'} placeholder={Placeholder.Input || ''} required={false} />
+            <FormInput<UserRequestCreateFields> control={anyControl} name={'phoneNo'} label={'전화번호'} placeholder={Placeholder.Input || ''} required={false} />
+            <FormInput<UserRequestCreateFields> control={anyControl} name={'belongNm'} label={'소속'} placeholder={Placeholder.Input || ''} required={false} />
           </PopupSearchType>
           <PopupSearchType className={'type_2'}>
-            <FormInput<UserRequestCreateFields> control={control} name={'deptNm'} label={'부서'} placeholder={Placeholder.Input || ''} required={false} />
-            <FormInput<UserRequestCreateFields> control={control} name={'positionNm'} label={'직책'} placeholder={Placeholder.Input || ''} required={false} />
+            <FormInput<UserRequestCreateFields> control={anyControl} name={'deptNm'} label={'부서'} placeholder={Placeholder.Input || ''} required={false} />
+            <FormInput<UserRequestCreateFields> control={anyControl} name={'positionNm'} label={'직책'} placeholder={Placeholder.Input || ''} required={false} />
           </PopupSearchType>
           <PopupSearchType className={'type_2'}>
             <FormDropDown<UserRequestCreateFields>
-              control={control}
+              control={anyControl}
               title={'권한'}
               name={'authCd'}
               defaultOptions={[...DefaultOptions.Select]}
@@ -133,7 +135,7 @@ const UserAddPop = () => {
               required={true}
             />
             <FormDropDown<UserRequestCreateFields>
-              control={control}
+              control={anyControl}
               title={'상태'}
               name={'useYn'}
               defaultOptions={[...DefaultOptions.Select]}

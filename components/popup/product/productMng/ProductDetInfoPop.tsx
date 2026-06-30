@@ -440,6 +440,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
         <PopupContent>
           <PopupSearchBox>
             <PopupSearchType className={'type_2'}>
+              <></>
               {/*<Search.Input*/}
               {/*  title={'상품명'}*/}
               {/*  name={'skuNm'}*/}

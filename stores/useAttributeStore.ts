@@ -1,7 +1,9 @@
 import { create, SetState, StateCreator } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { ApiResponse, PageObject, AuthRequestCreate, AttributeResponsePaging, AttributeRequestUpdate } from '../generated'; // Attribute api interface 생성하여 임포트할 필요
+import { ApiResponse, PageObject, AuthRequestCreate } from '../generated'; // Attribute api interface 생성하여 임포트할 필요
+type AttributeResponsePaging = any;
+type AttributeRequestUpdate = any;
 import { AxiosPromise } from 'axios';
 import { authApi, authDownApi } from '../libs';
 import { MenuPagingFilter } from './useMenuStore';

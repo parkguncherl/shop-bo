@@ -4,7 +4,7 @@ import { useCommonStore } from '../../../stores';
 import CustomNoRowsOverlay from '../../CustomNoRowsOverlay';
 import CustomGridLoading from '../../CustomGridLoading';
 import TunedGrid from '../../grid/TunedGrid';
-import { PageObject, SkuResponsePaging } from '../../../generated';
+import { PageObject } from '../../../generated';
 import useFilters from '../../../hooks/useFilters';
 import { defaultColDef, GridSetting } from '../../../libs/ag-grid';
 import { AgGridReact } from 'ag-grid-react';
@@ -19,6 +19,9 @@ import { PopupSearchBox, PopupSearchType } from '../content';
 import { Search } from '../../content';
 import { InputRef } from 'antd';
 import { CustomInput } from '../../CustomInput';
+
+// SkuResponsePaging is not yet generated; use any until the API model is available
+type SkuResponsePaging = any;
 
 interface skuSearchPopProps {
   filter?: {
@@ -41,12 +44,12 @@ interface skuSearchPopProps {
 export const SkuSearchPop = (props: skuSearchPopProps) => {
   console.log('SkuSearchPop  ===>', props);
   /** 공통 스토어 - State */
-  const [selectedRetail] = useCommonStore((s) => [s.selectedRetail]);
+  const [selectedRetail] = useCommonStore((s) => [(s as any).selectedRetail]);
 
   /** Component 참조 */
   const ProductSearchRef = useRef<InputRef>(null);
   const ProductAmtRef = useRef<InputRef>(null);
-  const RefForGrid = useRef<AgGridReact>(null);
+  const RefForGrid = useRef<any>(null);
   const focusedRowRef = useRef<number>(-1);
   const previousSelection = useRef<SkuResponsePaging[]>([]);
 
@@ -74,9 +77,9 @@ export const SkuSearchPop = (props: skuSearchPopProps) => {
     isLoading: isSkuListLoading,
     isFetched: isSkuListFetched,
     refetch: fetchSkuList,
-  } = useQuery(
-    ['/sku/paging', paging.curPage, paging.pageRowCount, props.filter?.skuNm, props.filter?.partnerId, props.filter?.mainFactoryNm, filters],
-    (): any =>
+  } = useQuery({
+    queryKey: ['/sku/paging', paging.curPage, paging.pageRowCount, props.filter?.skuNm, props.filter?.partnerId, props.filter?.mainFactoryNm, filters],
+    queryFn: (): any =>
       authApi.get('/sku/paging', {
         params: {
           curPage: paging.curPage,
@@ -88,11 +91,9 @@ export const SkuSearchPop = (props: skuSearchPopProps) => {
           sellerId: selectedRetail && selectedRetail.id ? selectedRetail.id : undefined,
         },
       }),
-    {
-      enabled: false, //props.active, // 모달이 열릴 시 활성화
-      //enabled: props.skuNm != undefined || filters.skuNm != undefined, // 속성 혹은 필터를 통하여 스큐명이 주어질 시 활성화
-    },
-  );
+    enabled: false, //props.active, // 모달이 열릴 시 활성화
+    //enabled: props.skuNm != undefined || filters.skuNm != undefined, // 속성 혹은 필터를 통하여 스큐명이 주어질 시 활성화
+  });
 
   useEffect(() => {
     if (isSkuListFetched) {
@@ -507,6 +508,8 @@ export const SkuSearchPop = (props: skuSearchPopProps) => {
       onClose={props.onClose}
       footer={
         <PopupFooter>
+          {/* intentionally empty */}
+          <></>
           {/*<div className="btnArea">*/}
           {/*  <button*/}
           {/*    className="btn"*/}

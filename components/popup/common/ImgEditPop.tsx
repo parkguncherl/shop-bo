@@ -92,7 +92,7 @@ const ImgEditPop = ({ open, onClose, imgProps, onFileIsExportedByConf }: ImgEdit
                   className="btn btnPurple"
                   disabled={!preview}
                   onClick={() => {
-                    canvasByKonvaRef.current.customs.api.exportAsFile().then((file: File | null) => {
+                    canvasByKonvaRef.current!.customs.api.exportAsFile().then((file: File | null) => {
                       if (file == null) {
                         toastError('어떠한 수정사항도 없이 저장할 수 없습니다');
                         return;
@@ -169,7 +169,7 @@ const ImgEditPop = ({ open, onClose, imgProps, onFileIsExportedByConf }: ImgEdit
                           src={icoUndo.src}
                           style={{ width: '15px', height: '15px' }}
                           onClick={() => {
-                            canvasByKonvaRef.current.customs.api.undo();
+                            canvasByKonvaRef.current!.customs.api.undo();
                           }}
                         />
                       </div>
@@ -178,7 +178,7 @@ const ImgEditPop = ({ open, onClose, imgProps, onFileIsExportedByConf }: ImgEdit
                           src={icoRedo.src}
                           style={{ width: '15px', height: '15px' }}
                           onClick={() => {
-                            canvasByKonvaRef.current.customs.api.redo();
+                            canvasByKonvaRef.current!.customs.api.redo();
                           }}
                         />
                       </div>
@@ -211,7 +211,7 @@ const ImgEditPop = ({ open, onClose, imgProps, onFileIsExportedByConf }: ImgEdit
         open={updateConfOpened}
         onClose={() => setUpdateConfOpened(false)}
         onConfirm={() => {
-          canvasByKonvaRef.current.customs.api.exportAsFile().then((file: File | null) => {
+          canvasByKonvaRef.current!.customs.api.exportAsFile().then((file: File | null) => {
             if (file == null) {
               // 기본 fallback
               console.error('파일을 저장할 수 없음');

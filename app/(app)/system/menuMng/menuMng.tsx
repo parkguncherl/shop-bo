@@ -84,7 +84,7 @@ const MenuMng = () => {
             label: d.menuNm,
           };
         }) as DropDownOption[];
-        return [{ key: 'TOP', value: 'TOP', label: '선택' || '' } as DropDownOption].concat(fetchedOptions);
+        return [{ key: 'TOP', value: 'TOP', label: '선택' } as DropDownOption].concat(fetchedOptions);
       }
       return undefined;
     },
@@ -96,7 +96,7 @@ const MenuMng = () => {
     { field: 'menuCd', headerName: '코드', minWidth: 150, suppressHeaderMenuButton: true },
     { field: 'menuNm', headerName: '이름', minWidth: 150, suppressHeaderMenuButton: true },
     { field: 'menuEngNm', headerName: '영문명', minWidth: 150, suppressHeaderMenuButton: true },
-    { field: 'menuUri', headerName: filter?.upMenuCd === 'TOP' ? 'ICO' : 'URI' || '', minWidth: 150, suppressHeaderMenuButton: true },
+    { field: 'menuUri', headerName: filter?.upMenuCd === 'TOP' ? 'ICO' : 'URI', minWidth: 150, suppressHeaderMenuButton: true },
     { field: 'menuOrder', headerName: '순서', minWidth: 60, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
     {
       field: 'auths',
@@ -197,7 +197,7 @@ const MenuMng = () => {
       </Table>
       {menuUpdYn && modalType.type === 'AUTH_MOD' && modalType.active && <MenuAuthPop data={selectedMenu || {}} />}
       {menuUpdYn && modalType.type === 'ADD' && modalType.active && (
-        <MenuAddPop data={{ upMenuCd: filter.upMenuCd, upMenuNm: dropdownOptions?.find((o) => o.key === filter.upMenuCd)?.label } || {}} />
+        <MenuAddPop data={{ upMenuCd: filter.upMenuCd, upMenuNm: dropdownOptions?.find((o) => o.key === filter.upMenuCd)?.label }} />
       )}
       {modalType.type === 'MOD' && modalType.active && <MenuModPop data={selectedMenu || {}} />}
       {menuUpdYn && modalType.type === 'EXCEL' && modalType.active && <MenuExcelUploadPop />}
