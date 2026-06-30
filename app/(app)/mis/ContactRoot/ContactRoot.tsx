@@ -21,6 +21,7 @@ type ContactFilter = {
   fromDate: string;
   toDate: string;
   deviceType: string;
+  refererUrl: string;
 };
 
 type ContactItem = {
@@ -46,6 +47,7 @@ const ContactRoot = () => {
     fromDate: monthAgo,
     toDate: today,
     deviceType: 'mobile',
+    refererUrl: '',
   });
 
   const [rowData, setRowData] = useState<ContactItem[]>([]);
@@ -215,6 +217,21 @@ const ContactRoot = () => {
                   {opt.label}
                 </button>
               ))}
+            </div>
+          </dd>
+        </dl>
+        <dl>
+          <dt>URL</dt>
+          <dd>
+            <div className="formBox">
+              <input
+                className="inputBox"
+                placeholder="유입 URL 검색"
+                value={filters.refererUrl}
+                onChange={(e) => onChangeFilters('refererUrl', e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') refetch(); }}
+                style={{ height: 32, padding: '0 8px', border: '1px solid #d9d9d9', borderRadius: 4, minWidth: 220 }}
+              />
             </div>
           </dd>
         </dl>
