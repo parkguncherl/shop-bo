@@ -45,7 +45,7 @@ const ContactRoot = () => {
   const [filters, onChangeFilters, onFiltersReset] = useFilters<ContactFilter>({
     fromDate: monthAgo,
     toDate: today,
-    deviceType: '',
+    deviceType: 'mobile',
   });
 
   const [rowData, setRowData] = useState<ContactItem[]>([]);
