@@ -26,7 +26,7 @@ import { usePartnerCodeStore } from '../../../../stores/usePartnerCodeStore';
 
 type FilterType = {
   comuType: string;
-  paymentStatus: string;
+  remarkYn: string;
   productName: string;
   fromDate: string;
   toDate: string;
@@ -156,7 +156,7 @@ const CustomerServiceList = () => {
   const [partnerCodeModals, partnerCodeOpenModal, partnerCodeCloseModal] = usePartnerCodeStore((s) => [s.modals, s.openModal, s.closeModal]);
   const [filters, onChangeFilters, onFiltersReset] = useFilters<FilterType>({
     comuType: '',
-    paymentStatus: '',
+    remarkYn: '',
     productName: '',
     fromDate: startOfWeek,
     toDate: today,
@@ -432,13 +432,30 @@ const CustomerServiceList = () => {
           value={filters.comuType}
           onChange={onChangeFilters}
         />
-        <Search.DropDown
-          title={'결제상태'}
-          name={'paymentStatus'}
-          codeUpper={'10070'}
-          value={filters.paymentStatus}
-          onChange={onChangeFilters}
-        />
+        <dl>
+          <dt>특이사항</dt>
+          <dd>
+            <div className="formBox">
+              <button
+                type="button"
+                style={{
+                  padding: '0 14px',
+                  height: 32,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  border: '1px solid #d9d9d9',
+                  borderRadius: 6,
+                  background: filters.remarkYn === 'Y' ? '#e53e3e' : '#f3f4f6',
+                  color: filters.remarkYn === 'Y' ? '#fff' : '#6b7280',
+                  cursor: 'pointer',
+                }}
+                onClick={() => onChangeFilters('remarkYn', filters.remarkYn === 'Y' ? '' : 'Y')}
+              >
+                {filters.remarkYn === 'Y' ? '특이사항 ✓' : '특이사항만'}
+              </button>
+            </div>
+          </dd>
+        </dl>
       </Search>
 
       {/* 본문 — 좌(그리드) / 우(채팅) 분할 */}
