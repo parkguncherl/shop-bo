@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 const DARK_ANT_STYLE_ID = 'dark-ant-override';
 
 const darkAntStyles = `
+  /* ── Select ── */
   .ant-select-selector {
     background: #252538 !important;
     background-color: #252538 !important;
@@ -33,6 +34,36 @@ const darkAntStyles = `
   .ant-select-item-option-selected {
     background-color: #2d1b69 !important;
     color: #a78bfa !important;
+  }
+
+  /* ── Modal ── */
+  .ant-modal-content {
+    background-color: #2a2a42 !important;
+    border: 1px solid rgba(255,255,255,0.55) !important;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.65) !important;
+    padding: 0 !important;
+  }
+  .ant-modal-header {
+    background-color: #2a2a42 !important;
+    border-bottom: 1px solid rgba(255,255,255,0.12) !important;
+    margin-bottom: 0 !important;
+  }
+  .ant-modal-body {
+    background-color: #2a2a42 !important;
+  }
+  .ant-modal-footer {
+    background-color: #2a2a42 !important;
+    border-top: 1px solid rgba(255,255,255,0.12) !important;
+    margin-top: 0 !important;
+  }
+  .ant-modal-title {
+    color: #d0d0e0 !important;
+  }
+  .ant-modal-close {
+    color: #888899 !important;
+  }
+  .ant-modal-close:hover {
+    background-color: rgba(255,255,255,0.08) !important;
   }
 `;
 
