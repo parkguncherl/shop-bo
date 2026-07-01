@@ -1,0 +1,386 @@
+// Dark Theme Override — 활성화 조건: <html data-theme="dark">
+
+[data-theme="dark"] {
+  --background-color: #141420;
+  --background-hover-color: #2a2a3e;
+  --dark-surface: #1e1e30;
+  --dark-surface-2: #252538;
+  --dark-border: #333350;
+  --dark-text: #d0d0e0;
+  --dark-text-muted: #888899;
+
+  body {
+    background-color: var(--background-color);
+    color: var(--dark-text);
+  }
+
+  a {
+    color: var(--dark-text);
+  }
+
+  // ── 헤더 ───────────────────────────────────────────────
+  .header {
+    background-color: var(--dark-surface) !important;
+  }
+
+  // ── 레이아웃 ────────────────────────────────────────────
+  .layout {
+    background-color: var(--background-color);
+  }
+
+  .appLayout {
+    & header {
+      background-color: var(--dark-surface) !important;
+    }
+
+    & .container {
+      & aside {
+        background-color: var(--dark-surface);
+
+        & > ul {
+          background-color: var(--dark-surface-2) !important;
+          border: 1px solid rgba(255, 255, 255, 0.35) !important;
+          border-radius: 5px;
+          & > li { color: var(--dark-text) !important; }
+        }
+
+        & > nav {
+          & > ul > li {
+            & > a > strong { color: var(--dark-text); }
+            &:hover > a,
+            &.on > a { background-color: var(--background-hover-color); }
+            & > ul {
+              background-color: #1a1a2c;
+              & > li > a {
+                color: var(--dark-text-muted);
+                &:hover { color: #a78bfa; }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .brief_user_info {
+    color: var(--dark-text) !important;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.15s;
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.08) !important;
+    }
+  }
+
+  .content::after {
+    background-color: var(--dark-border) !important;
+  }
+
+  // ── 히스토리 탭 ─────────────────────────────────────────
+  .historyTab {
+    & .historyBox .list > div > div {
+      & > div {
+        border-radius: 0 !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
+        border-bottom: none !important;
+
+        &.on {
+          border-radius: 0 !important;
+          border: 1px solid rgba(255, 255, 255, 0.7) !important;
+          border-bottom: none !important;
+          background-color: var(--dark-surface-2) !important;
+          color: var(--dark-text) !important;
+          height: 28px !important;
+          margin-top: 3px !important;
+          padding: 5px 7px 5px 11px !important;
+          &::before { display: none !important; }
+          & button span { background-color: var(--dark-text) !important; }
+        }
+        &.hover { background-color: rgba(255, 255, 255, 0.08) !important; }
+      }
+    }
+  }
+
+  // ── 검색/필터 영역 ──────────────────────────────────────
+  .searchBox {
+    & .searchArea {
+      background-color: var(--dark-surface) !important;
+      border: 1px solid var(--dark-border) !important;
+      border-radius: 0 !important;
+      color: var(--dark-text) !important;
+
+      & label, & span, & strong, & dt, & dd,
+      & dl dt, & dl dd, & > div > span {
+        color: var(--dark-text) !important;
+      }
+
+      & input, & select, & textarea {
+        background-color: var(--dark-surface-2) !important;
+        color: var(--dark-text) !important;
+        border-color: var(--dark-border) !important;
+        &::placeholder { color: #555570 !important; }
+      }
+
+      // Ant Design Select 내부
+      .ant-select-selector {
+        background-color: var(--dark-surface-2) !important;
+        border-color: var(--dark-border) !important;
+        color: var(--dark-text) !important;
+      }
+      .ant-select-selection-item,
+      .ant-select-selection-placeholder {
+        color: var(--dark-text) !important;
+      }
+      .ant-select-arrow { color: var(--dark-text-muted) !important; }
+    }
+  }
+
+  // ── 그리드 상단 헤더 (건수 선택, 검색 N건) ───────────────
+  .gridBoxInfo {
+    & .left ul li {
+      color: var(--dark-text) !important;
+
+      &.total strong, &.total span {
+        color: var(--dark-text) !important;
+      }
+    }
+  }
+
+  // ── Ant Design v6 CSS 변수 오버라이드 ────────────────────
+  --ant-color-bg-container: var(--dark-surface-2);
+  --ant-color-bg-elevated: var(--dark-surface-2);
+  --ant-color-text: var(--dark-text);
+  --ant-color-text-placeholder: #555570;
+  --ant-color-border: var(--dark-border);
+  --ant-color-primary: #7c3aed;
+  --ant-color-primary-hover: #6d28d9;
+  --ant-color-bg-layout: var(--background-color);
+  --ant-color-bg-spotlight: var(--dark-surface);
+  --ant-color-fill-secondary: var(--dark-surface-2);
+  --ant-color-fill-tertiary: var(--dark-surface);
+  --ant-color-split: var(--dark-border);
+  --ant-input-active-bg: var(--dark-surface-2);
+  --ant-input-hover-bg: var(--dark-surface-2);
+
+  // ── Ant Design Select ────────────────────────────────────
+  .ant-select-selector {
+    background: #252538 !important;
+    background-color: #252538 !important;
+    border-color: rgba(255,255,255,0.25) !important;
+    color: #d0d0e0 !important;
+  }
+  .ant-select-selection-item,
+  .ant-select-selection-placeholder,
+  .ant-select-selection-search-input {
+    color: #d0d0e0 !important;
+  }
+  .ant-select-arrow { color: #888899 !important; }
+
+  // titleCategoryBox (menuMng 검색조건)
+  .titleCategoryBox {
+    background-color: var(--dark-surface) !important;
+    border: 1px solid rgba(255, 255, 255, 0.45) !important;
+
+    .labelWrap { background-color: transparent !important; }
+
+    .txt {
+      background-color: var(--dark-surface-2) !important;
+      border: 1px solid rgba(255, 255, 255, 0.45) !important;
+      color: #d0d0e0 !important;
+    }
+    span { color: #d0d0e0 !important; }
+  }
+
+  // Ant Design Select 드롭다운 팝업 (body에 포탈로 마운트됨)
+  .ant-select-dropdown {
+    background-color: var(--dark-surface-2) !important;
+    border: 1px solid var(--dark-border) !important;
+
+    .ant-select-item {
+      color: var(--dark-text) !important;
+      background-color: var(--dark-surface-2) !important;
+      &:hover, &.ant-select-item-option-active {
+        background-color: var(--background-hover-color) !important;
+      }
+      &.ant-select-item-option-selected {
+        background-color: #2d1b69 !important;
+        color: #a78bfa !important;
+      }
+    }
+  }
+
+  // ── 제목 + 새로고침/즐겨찾기 버튼 ────────────────────────
+  .titleBox, .tit_box, [class*="titleBox"] {
+    color: #ffffff !important;
+    & h2, & h3, & strong, & span { color: #ffffff !important; }
+  }
+
+  .bigTitle {
+    color: var(--dark-text) !important;
+    & strong { color: var(--dark-text) !important; }
+
+    & .util {
+      & .refresh {
+        background-color: transparent !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        &:hover { border-color: rgba(255, 255, 255, 0.5) !important; }
+      }
+      & .favorite {
+        background-color: transparent !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        background-image: url(../../public/images/ico_favorite_off.svg);
+        background-repeat: no-repeat;
+        background-position: center;
+        &.on {
+          background-color: transparent !important;
+          background-image: url(../../public/images/ico_favorite.svg);
+          border-color: rgba(255, 204, 0, 0.5) !important;
+        }
+        &:hover { border-color: rgba(255, 255, 255, 0.5) !important; }
+      }
+    }
+  }
+
+  // ── 폼 인풋 ────────────────────────────────────────────
+  .formBox {
+    & input, & select, & textarea {
+      background-color: var(--dark-surface-2) !important;
+      color: var(--dark-text) !important;
+      border-color: var(--dark-border) !important;
+      &::placeholder { color: #555570 !important; }
+      &:disabled, &:read-only {
+        background-color: #1a1a28 !important;
+        color: #555570 !important;
+      }
+    }
+  }
+
+  // ── 팝업 폼 행 구분선 ─────────────────────────────────
+  .popupFormGroup {
+    & > div {
+      border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+    }
+    dl {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+      padding-bottom: 6px !important;
+      margin-bottom: 2px !important;
+    }
+    .type2 dl:last-child {
+      border-bottom: none !important;
+    }
+    & > div > div:last-child dl {
+      border-bottom: none !important;
+    }
+  }
+
+  // ── AG Grid ─────────────────────────────────────────────
+  .ag-theme-quartz {
+    --ag-background-color: var(--dark-surface);
+    --ag-odd-row-background-color: #1a1a2c;
+    --ag-row-hover-color: #252540;
+    --ag-border-color: var(--dark-border);
+    --ag-foreground-color: #d0d0e0;
+    --ag-secondary-foreground-color: #888899;
+    --ag-data-color: #d0d0e0;
+    --ag-input-focus-border-color: #7c3aed;
+    --ag-row-border-color: #2a2a3e;
+    --ag-modal-overlay-background-color: rgba(0, 0, 0, 0.6);
+  }
+
+  .ag-theme-quartz .ag-cell { color: #d0d0e0 !important; }
+  .ag-theme-quartz .ag-cell-value { color: #d0d0e0 !important; }
+
+  .ag-row::before { background-color: var(--dark-surface) !important; }
+  .ag-row-odd {
+    background-color: #1a1a2c !important;
+    &::before { background-color: #1a1a2c !important; }
+  }
+  .ag-row-hover::before { background-color: #252540 !important; }
+  .ag-row-focus::before { background-color: #252540 !important; }
+  .ag-row-selected::before { background-color: #1e3a5f !important; }
+  .ag-row-selected.ag-row-hover::before,
+  .ag-row-selected.ag-row-focus::before { background-color: #254d7a !important; }
+  .ag-row-selected .ag-cell { color: #e8f0fe !important; }
+
+  .ag-theme-quartz .ag-cell.ag-cell-focus { background-color: #2d1b69 !important; }
+  .ag-theme-quartz .ag-cell-focus:not(.ag-cell-range-selected) { background-color: #2d1b69 !important; }
+
+  .ag-theme-quartz .ag-row.ag-grid-pinned-row,
+  .ag-theme-quartz .ag-row.ag-row-pinned {
+    color: var(--dark-text-muted) !important;
+    &::before { background-color: #222235 !important; }
+  }
+
+  .ag-theme-quartz .ag-set-filter {
+    background-color: var(--dark-surface-2);
+    color: var(--dark-text);
+  }
+  .ag-theme-quartz .ag-menu-list.ag-focus-managed {
+    background-color: var(--dark-surface-2) !important;
+    color: var(--dark-text) !important;
+    border-color: var(--dark-border) !important;
+  }
+  .ag-theme-quartz .ag-wrapper.ag-input-wrapper.ag-text-field-input-wrapper {
+    background-color: var(--dark-surface-2) !important;
+  }
+  .ag-theme-quartz .ag-wrapper.ag-input-wrapper.ag-text-field-input-wrapper
+  .ag-input-field-input.ag-text-field-input {
+    background-color: var(--dark-surface-2) !important;
+    color: var(--dark-text) !important;
+    border-color: var(--dark-border) !important;
+  }
+
+  // ── 일반 텍스트 ─────────────────────────────────────────
+  strong, span, p, label, td, th, dt, dd, li { color: inherit; }
+
+  // ── select ──────────────────────────────────────────────
+  select {
+    background-color: var(--dark-surface-2);
+    color: var(--dark-text);
+    border-color: var(--dark-border);
+    option {
+      background-color: var(--dark-surface-2);
+      color: var(--dark-text);
+    }
+  }
+
+  // ── 버튼 ────────────────────────────────────────────────
+  .btn {
+    &.white,
+    &:not([class*="btnBlue"]):not([class*="btnPurple"]):not([class*="btnRed"]):not([class*="btnBlack"]):not([class*="btnGray"]) {
+      background-color: #2a2a40 !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      color: var(--dark-text) !important;
+      &:hover {
+        background-color: #383855 !important;
+        border-color: rgba(255, 255, 255, 0.4) !important;
+      }
+      &:disabled {
+        background-color: #1e1e2e !important;
+        color: #555570 !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+      }
+    }
+  }
+  .btnGray.btn {
+    background-color: #2a2a40 !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: var(--dark-text-muted) !important;
+    &:hover { background-color: #383855 !important; color: var(--dark-text) !important; }
+  }
+  .tblBtn {
+    background-color: #2a2a40 !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: var(--dark-text-muted) !important;
+    &:hover { background-color: #383855 !important; color: var(--dark-text) !important; }
+  }
+
+  // ── 구분선 ──────────────────────────────────────────────
+  hr, .divider { border-color: var(--dark-border); }
+
+  // ── 스크롤바 ────────────────────────────────────────────
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #1a1a2c; }
+  ::-webkit-scrollbar-thumb { background: #3a3a55; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #5a5a80; }
+}

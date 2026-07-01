@@ -89,17 +89,16 @@ export const authOptions: NextAuthOptions = {
     async jwt(params) {
       if (params.trigger === 'update') {
         params.token.user.partnerId = params.session.user.partnerId;
-        //params.token.user.partnerNm = params.session.user.partnerNm;
-        //params.token.user.workYmd = params.session.user.workYmd;
-        //params.token.user.workLogisId = params.session.user.workLogisId;
-        //params.token.user.workLogisNm = params.session.user.workLogisNm;
         params.token.user.isPageAuth = params.session.user.isPageAuth;
-        // params.token.user.seller1 = params.session.user.seller1;
-        // params.token.user.seller2 = params.session.user.seller2;
-        // params.token.user.factory1 = params.session.user.factory1;
-        // params.token.user.factory2 = params.session.user.factory2;
-        // params.token.user.sku1 = params.session.user.sku1;
-        // params.token.user.sku2 = params.session.user.sku2;
+
+        // 마이페이지 수정 필드 반영
+        const u = params.session.user;
+        if (u.userNm !== undefined)     params.token.user.userNm     = u.userNm;
+        if (u.phoneNo !== undefined)    params.token.user.phoneNo    = u.phoneNo;
+        if (u.belongNm !== undefined)   params.token.user.belongNm   = u.belongNm;
+        if (u.deptNm !== undefined)     params.token.user.deptNm     = u.deptNm;
+        if (u.positionNm !== undefined) params.token.user.positionNm = u.positionNm;
+        if (u.tema !== undefined)       params.token.user.tema       = u.tema;
       }
 
       const currentUser = params.user || params.token.user;

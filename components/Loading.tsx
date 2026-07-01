@@ -19,16 +19,7 @@ const Loading = () => {
 
   return (
     <div className={styles.loadingBox}>
-      <div className={styles.boxArea}>
-        <div className={styles.box}></div>
-        <div className={styles.box}></div>
-        <div className={styles.box}></div>
-      </div>
-      {/* 예전 로딩바
-      <div className={styles.loading_box}>*/}
-      {/*  <div className={styles.loading}></div>*/}
-      {/*  <div className={styles.text}>loading</div>*/}
-      {/*</div>*/}
+      <div className={styles.boxArea}></div>
     </div>
   );
 };

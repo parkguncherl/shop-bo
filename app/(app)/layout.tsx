@@ -10,6 +10,8 @@ import SignOutBtn from '../../components/layout/header/SignOutBtn';
 import HistoryBox from '../../components/layout/header/tab/HistoryBox';
 import FavoriteBox from '../../components/layout/header/tab/FavoriteBox';
 import AuthStatusChecker from '../../components/layout/header/AuthStatusChecker';
+import ThemeApplier from '../../components/layout/ThemeApplier';
+import AntdThemeProvider from '../../components/layout/AntdThemeProvider';
 
 /**
  * (server side)AppLayout
@@ -17,45 +19,48 @@ import AuthStatusChecker from '../../components/layout/header/AuthStatusChecker'
  * */
 const layout = async ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className={`appLayout ${stylesForLayout.layout}`}>
-      <header className={`${stylesForHeader.header}`}>
-        <AuthStatusChecker />
-        <div className={stylesForHeader.left}>
-          <h1>
-            <Link href={'/'}
-              style={{ display: 'flex', alignItems: 'center', color: '#fff', fontSize: '18px', fontWeight: 700, letterSpacing: '2px' }}
-            >{'GGUANGGU'}</Link>
-          </h1>
-        </div>
+    <AntdThemeProvider>
+      <div className={`appLayout ${stylesForLayout.layout}`}>
+        <ThemeApplier />
+        <header className={`${stylesForHeader.header}`}>
+          <AuthStatusChecker />
+          <div className={stylesForHeader.left}>
+            <h1>
+              <Link href={'/'} style={{ display: 'flex', alignItems: 'center', color: '#fff', fontSize: '18px', fontWeight: 700, letterSpacing: '2px' }}>
+                {'GGUANGGU'}
+              </Link>
+            </h1>
+          </div>
 
-        <div className={'historyTab'}>
-          <HistoryBox />
-        </div>
-        <div>
-          <FavoriteBox />
-        </div>
+          <div className={'historyTab'}>
+            <HistoryBox />
+          </div>
+          <div>
+            <FavoriteBox />
+          </div>
 
-        <div className={stylesForHeader.right}>
-          <SignOutBtn />
+          <div className={stylesForHeader.right}>
+            <SignOutBtn />
+          </div>
+        </header>
+        <div className={`container ${stylesForLayout.container}`}>
+          <aside>
+            <ul>
+              <li className="ico_user">
+                <BriefUserInfo />
+              </li>
+              <li className="ico_date">
+                <CurTime />
+              </li>
+            </ul>
+            <nav>
+              <NavList />
+            </nav>
+          </aside>
+          <div className={`content ${stylesForLayout.content}`}>{children}</div>
         </div>
-      </header>
-      <div className={`container ${stylesForLayout.container}`}>
-        <aside>
-          <ul>
-            <li className="ico_user">
-              <BriefUserInfo />
-            </li>
-            <li className="ico_date">
-              <CurTime />
-            </li>
-          </ul>
-          <nav>
-            <NavList />
-          </nav>
-        </aside>
-        <div className={`content ${stylesForLayout.content}`}>{children}</div>
       </div>
-    </div>
+    </AntdThemeProvider>
   );
 };
 export default layout;

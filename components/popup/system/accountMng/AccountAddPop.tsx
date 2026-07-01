@@ -28,7 +28,7 @@ export type AccountRequestCreateFields = {
   deptNm?: string;
   positionNm?: string;
   partnerId?: number;
-  workLogisId?: number;
+  tema?: string;
   orgPartnerId?: number | undefined;
   orgPartnerNm?: string | null;
 };
@@ -238,6 +238,18 @@ export const AccountAddPop = ({ open, onClose }: AccountAddPopProps) => {
                 <PopupFormType className={'type2'}>
                   <FormInput<AccountRequestCreateFields> control={control} name={'deptNm'} label={'부서'} placeholder={Placeholder.Input} />
                   <FormInput<AccountRequestCreateFields> control={control} name={'positionNm'} label={'직책'} placeholder={Placeholder.Input} />
+                </PopupFormType>
+                <PopupFormType className={'type1'}>
+                  <FormDropDown<AccountRequestCreateFields>
+                    control={control}
+                    title={'테마'}
+                    name={'tema'}
+                    options={[
+                      { key: 'white', value: 'white', label: 'White' },
+                      { key: 'dark', value: 'dark', label: 'Dark' },
+                    ]}
+                    required={false}
+                  />
                 </PopupFormType>
                 {authCd > 399 ? ( // 화주 이상만(관리자만) 보이게 처리
                   <PopupFormType className={'type1'}>

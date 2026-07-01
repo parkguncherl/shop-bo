@@ -29,7 +29,7 @@ export type AccountRequestUpdateFields = {
   deptNm?: string;
   positionNm?: string;
   partnerId?: number;
-  workLogisId?: number;
+  tema?: string;
   orgPartnerId?: number | undefined;
   orgPartnerNm?: string | null;
 };
@@ -202,6 +202,11 @@ export const AccountModPop = ({ data, open, onClose }: AccountModPopProps) => {
   // 세션
 
   /** 전달되는 data 인자에 따른 rhf 동기화 */
+  const temaOptions = [
+    { key: 'white', value: 'white', label: 'White' },
+    { key: 'dark', value: 'dark', label: 'Dark' },
+  ];
+
   useEffect(() => {
     reset({
       id: data.id,
@@ -213,6 +218,7 @@ export const AccountModPop = ({ data, open, onClose }: AccountModPopProps) => {
       belongNm: data.belongNm,
       deptNm: data.deptNm || '',
       positionNm: data.positionNm || '',
+      tema: data.tema || 'white',
     });
   }, [data]);
 
@@ -302,8 +308,9 @@ export const AccountModPop = ({ data, open, onClose }: AccountModPopProps) => {
                   />
                   <FormInput<AccountRequestUpdateFields> control={control} name={'deptNm'} label={'부서'} placeholder={Placeholder.Input || ''} />
                 </PopupFormType>
-                <PopupFormType className={'type1'}>
+                <PopupFormType className={'type2'}>
                   <FormInput<AccountRequestUpdateFields> control={control} name={'positionNm'} label={'직책'} placeholder={Placeholder.Input || ''} />
+                  <FormDropDown<AccountRequestUpdateFields> control={control} title={'테마'} name={'tema'} options={temaOptions} required={false} />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
                   <dl>

@@ -1,22 +1,21 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useSession } from 'next-auth/react';
+import { MyInfoPop } from '../../popup/mypage/MyInfoPop';
 
-const CurTime = () => {
+const BriefUserInfo = () => {
   const { data: session } = useSession();
-  //const router = useRouter();
+  const [open, setOpen] = useState(false);
 
   return (
-    <div
-      className="brief_user_info"
-      onClick={() => {
-        // todo
-      }}
-    >
-      {session?.user?.userNm || ''}
-    </div>
+    <>
+      <div className="brief_user_info" onClick={() => setOpen(true)} style={{ cursor: 'pointer' }}>
+        {session?.user?.userNm || ''}
+      </div>
+      <MyInfoPop open={open} onClose={() => setOpen(false)} />
+    </>
   );
 };
 
-export default CurTime;
+export default BriefUserInfo;

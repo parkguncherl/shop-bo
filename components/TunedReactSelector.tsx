@@ -1,4 +1,5 @@
 import React, { useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { useDarkMode } from '../contexts/ThemeContext';
 import { ActionMeta, InputActionMeta, SelectInstance } from 'react-select';
 import { DropDownOption } from '../types/DropDownOptions';
 import ClientSidedReactSelect from './clientSideOnly/ClientSidedReactSelect';
@@ -35,11 +36,24 @@ export const TunedReactSelector = ({ title, name, values, placeholder, options =
   }));
 
   const [InputValue, setInputValue] = useState<string>('');
+  const isDark = useDarkMode();
+  const dk = {
+    bg: '#252538',
+    bg2: '#1e1e30',
+    border: 'rgba(255,255,255,0.45)',
+    text: '#d0d0e0',
+    muted: '#555570',
+    hover: '#2a2a3e',
+    selected: '#2d1b69',
+    selectedText: '#a78bfa',
+  };
+
   const customStyles = {
     control: (provided: any) => ({
       ...provided,
       minHeight: '32px',
       fontSize: '13px',
+      ...(isDark && { backgroundColor: dk.bg, borderColor: dk.border, boxShadow: 'none' }),
     }),
     valueContainer: (provided: any) => ({
       ...provided,
@@ -48,15 +62,16 @@ export const TunedReactSelector = ({ title, name, values, placeholder, options =
       height: '32px',
       display: 'flex',
       alignItems: 'center',
-      overflow: 'hidden', // 반드시 유지
+      overflow: 'hidden',
     }),
     singleValue: (provided: any) => ({
       ...provided,
       fontSize: '13px',
       whiteSpace: 'nowrap',
       overflow: 'hidden',
-      textOverflow: 'ellipsis', // 길면 ... 처리
-      maxWidth: '100%', // valueContainer 안에서만 표시
+      textOverflow: 'ellipsis',
+      maxWidth: '100%',
+      ...(isDark && { color: dk.text }),
     }),
     input: (provided: any) => ({
       ...provided,
@@ -64,16 +79,24 @@ export const TunedReactSelector = ({ title, name, values, placeholder, options =
       margin: 0,
       padding: 0,
       lineHeight: '32px',
-      color: 'inherit',
+      color: isDark ? dk.text : 'inherit',
     }),
     placeholder: (provided: any) => ({
       ...provided,
       fontSize: '12px',
-      color: '#999',
+      color: isDark ? dk.muted : '#999',
       margin: 0,
       position: 'absolute',
       top: '50%',
-      transform: 'translateY(-50%)', // 세로 중앙
+      transform: 'translateY(-50%)',
+    }),
+    menu: (provided: any) => ({
+      ...provided,
+      ...(isDark && { backgroundColor: dk.bg, border: `1px solid ${dk.border}` }),
+    }),
+    menuPortal: (provided: any) => ({
+      ...provided,
+      zIndex: 9999,
     }),
     option: (provided: any, state: any) => ({
       ...provided,
@@ -83,9 +106,13 @@ export const TunedReactSelector = ({ title, name, values, placeholder, options =
       padding: '0 10px',
       margin: '0',
       alignItems: 'center',
-      fontSize: '13px', // 리스트 글자 크기
-      backgroundColor: state.isSelected ? '#0070C0' : provided.backgroundColor,
-      color: state.isSelected ? '#fff' : provided.color,
+      fontSize: '13px',
+      backgroundColor: isDark
+        ? state.isSelected ? dk.selected : state.isFocused ? dk.hover : dk.bg
+        : state.isSelected ? '#0070C0' : provided.backgroundColor,
+      color: isDark
+        ? state.isSelected ? dk.selectedText : dk.text
+        : state.isSelected ? '#fff' : provided.color,
     }),
   };
 
