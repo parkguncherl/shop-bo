@@ -375,7 +375,61 @@
     &:hover { background-color: #383855 !important; color: var(--dark-text) !important; }
   }
 
-  // ── 구분선 ──────────────────────────────────────────────
+  // ── 팝업 (Ant Design Modal) ──────────────────────────────
+  .ant-modal-content {
+    background-color: #2a2a42 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .ant-modal-header {
+    background-color: #2a2a42 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .ant-modal-footer {
+    background-color: #2a2a42 !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .ant-modal-mask {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+  }
+
+  .popupHeader h3,
+  .popupHeader h3 * {
+    color: var(--dark-text) !important;
+  }
+
+  // 팝업 내 일반 테이블 (th/td 인라인 스타일 오버라이드)
+  .popUpGroup .popBody {
+    color: var(--dark-text);
+
+    table th {
+      background-color: var(--dark-surface) !important;
+      border-color: rgba(255, 255, 255, 0.15) !important;
+      color: var(--dark-text) !important;
+    }
+
+    table td {
+      background-color: #2a2a42 !important;
+      border-color: rgba(255, 255, 255, 0.15) !important;
+      color: var(--dark-text) !important;
+    }
+
+    // 팝업 내 searchBox
+    .searchBox {
+      background-color: var(--dark-surface) !important;
+    }
+
+    // 로딩 텍스트
+    div[style*="textAlign: center"],
+    div[style*="text-align: center"] {
+      color: var(--dark-text-muted) !important;
+    }
+  }
+
+  // 구분선 ──────────────────────────────────────────────
   hr, .divider { border-color: var(--dark-border); }
 
   // ── 스크롤바 ────────────────────────────────────────────

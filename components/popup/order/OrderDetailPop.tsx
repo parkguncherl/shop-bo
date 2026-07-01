@@ -14,6 +14,7 @@ import CustomGridLoading from '../../CustomGridLoading';
 import { Table } from '../../content/Table';
 import type { OrderResponseInfo } from '../../../generated/src/model/order-response-info';
 import type { OrderResponseItem } from '../../../generated/src/model/order-response-item';
+import { useDarkMode } from '../../../contexts/ThemeContext';
 
 interface Props {
   orderId: number;
@@ -30,6 +31,22 @@ const formatWon = (params: any) => {
 
 /** BO 주문 상세 팝업 */
 export const OrderDetailPop = ({ orderId, open, onClose }: Props) => {
+  const isDark = useDarkMode();
+  const thStyle: React.CSSProperties = {
+    background: isDark ? '#1e1e30' : '#f5f5f5',
+    padding: '6px 10px',
+    border: `1px solid ${isDark ? 'rgba(255,255,255,0.15)' : '#e0e0e0'}`,
+    color: isDark ? '#d0d0e0' : undefined,
+    fontWeight: 600,
+    width: 100,
+    whiteSpace: 'nowrap',
+  };
+  const tdStyle: React.CSSProperties = {
+    padding: '6px 10px',
+    border: `1px solid ${isDark ? 'rgba(255,255,255,0.15)' : '#e0e0e0'}`,
+    background: isDark ? '#2a2a42' : undefined,
+    color: isDark ? '#d0d0e0' : undefined,
+  };
   const columnDefs: ColDef<OrderResponseItem>[] = [
     {
       field: 'productName',
@@ -198,16 +215,3 @@ export const OrderDetailPop = ({ orderId, open, onClose }: Props) => {
   );
 };
 
-const thStyle: React.CSSProperties = {
-  background: '#f5f5f5',
-  padding: '6px 10px',
-  border: '1px solid #e0e0e0',
-  fontWeight: 600,
-  width: 100,
-  whiteSpace: 'nowrap',
-};
-
-const tdStyle: React.CSSProperties = {
-  padding: '6px 10px',
-  border: '1px solid #e0e0e0',
-};
