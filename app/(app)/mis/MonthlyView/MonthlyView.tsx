@@ -16,6 +16,7 @@ import CustomNewDatePicker from '../../../../components/CustomNewDatePicker';
 import { authApi } from '../../../../libs';
 import dayjs from 'dayjs';
 import ReactECharts from 'echarts-for-react';
+import { useDarkMode } from '../../../../contexts/ThemeContext';
 
 type ViewType = 'monthly' | 'weekly';
 
@@ -54,6 +55,10 @@ const MonthlyView = () => {
   const { onGridReady: onTopGridReady } = useAgGridApi();
   const { onGridReady: onBottomGridReady } = useAgGridApi();
   const menuNm = useCommonStore((s) => s.menuNm);
+  const isDark = useDarkMode();
+  const chartTextColor = isDark ? '#d0d0e0' : '#333';
+  const chartAxisColor = isDark ? '#555570' : '#aaa';
+  const splitLineColor = isDark ? '#2a2a3e' : '#eee';
 
   const [filters, onChangeFilters, onFiltersReset] = useFilters<SalesStatFilter>({
     viewType: 'monthly',
@@ -231,9 +236,9 @@ const MonthlyView = () => {
     const periods = statData.map((d) => d.period);
     const amtData = statData.map((d) => d.totalPaymentAmt);
     const cntData = statData.map((d) => d.purchaseCnt);
-    const maxAmt = Math.max(0, ...amtData);
 
     return {
+      backgroundColor: 'transparent',
       tooltip: {
         trigger: 'axis',
         axisPointer: { type: 'cross' },
@@ -249,60 +254,19 @@ const MonthlyView = () => {
             .replace(/^/, `<b>${period}</b><br/>`);
         },
       },
-      legend: {
-        bottom: 0,
-        data: ['총구매금액', '구매건수'],
-      },
+      legend: { bottom: 0, data: ['총구매금액', '구매건수'], textStyle: { color: chartTextColor } },
       grid: { left: 16, right: 60, top: 50, bottom: 50, containLabel: true },
-      xAxis: {
-        type: 'category',
-        data: periods,
-        axisLabel: { rotate: periods.length > 8 ? 30 : 0, fontSize: 11 },
-      },
+      xAxis: { type: 'category', data: periods, axisLabel: { rotate: periods.length > 8 ? 30 : 0, fontSize: 11, color: chartTextColor }, axisLine: { lineStyle: { color: chartAxisColor } } },
       yAxis: [
-        {
-          type: 'value',
-          name: '구매건수',
-          nameTextStyle: { fontSize: 11 },
-          splitLine: { show: false },
-        },
-        {
-          type: 'value',
-          name: '총구매금액',
-          nameTextStyle: { fontSize: 11 },
-          axisLabel: {
-            formatter: (v: number) => (v >= 10000 ? Math.floor(v / 10000) + '만' : v.toLocaleString()),
-          },
-        },
+        { type: 'value', name: '구매건수', nameTextStyle: { fontSize: 11, color: chartTextColor }, axisLabel: { color: chartTextColor }, splitLine: { show: false } },
+        { type: 'value', name: '총구매금액', nameTextStyle: { fontSize: 11, color: chartTextColor }, axisLabel: { color: chartTextColor, formatter: (v: number) => (v >= 10000 ? Math.floor(v / 10000) + '만' : v.toLocaleString()) }, splitLine: { lineStyle: { color: splitLineColor } } },
       ],
       series: [
-        {
-          name: '총구매금액',
-          type: 'bar',
-          yAxisIndex: 1,
-          data: amtData,
-          itemStyle: { color: '#5b8ff9' },
-          label: {
-            show: true,
-            position: 'top',
-            fontSize: 10,
-            formatter: (p: any) => (p.value >= 10000 ? Math.floor(p.value / 10000) + '만' : p.value.toLocaleString()),
-          },
-        },
-        {
-          name: '구매건수',
-          type: 'line',
-          yAxisIndex: 0,
-          data: cntData,
-          itemStyle: { color: '#e86452' },
-          lineStyle: { width: 2 },
-          symbol: 'circle',
-          symbolSize: 6,
-          label: { show: true, position: 'top', fontSize: 10, formatter: '{c}건' },
-        },
+        { name: '총구매금액', type: 'bar', yAxisIndex: 1, data: amtData, itemStyle: { color: '#5b8ff9' }, label: { show: true, position: 'top', fontSize: 10, color: chartTextColor, formatter: (p: any) => (p.value >= 10000 ? Math.floor(p.value / 10000) + '만' : p.value.toLocaleString()) } },
+        { name: '구매건수', type: 'line', yAxisIndex: 0, data: cntData, itemStyle: { color: '#e86452' }, lineStyle: { width: 2 }, symbol: 'circle', symbolSize: 6, label: { show: true, position: 'top', fontSize: 10, color: chartTextColor, formatter: '{c}건' } },
       ],
     };
-  }, [statData]);
+  }, [statData, chartTextColor, chartAxisColor, splitLineColor]);
 
   const periodLabel = filters.viewType === 'monthly' ? '월' : '주차';
 
@@ -355,7 +319,7 @@ const MonthlyView = () => {
       <div className="layoutBox">
         {/* 1열: 기간별 실적 요약 */}
         <div className="layout20">
-          <p style={{ margin: '0 0 6px 2px', fontSize: 13, fontWeight: 600, color: '#333' }}>
+          <p style={{ margin: '0 0 6px 2px', fontSize: 13, fontWeight: 600, color: chartTextColor }}>
             {periodLabel}별 판매 실적
             {selectedPeriod && <span style={{ marginLeft: 8, fontWeight: 400, color: '#888', fontSize: 12 }}>({selectedPeriod})</span>}
           </p>
@@ -378,7 +342,7 @@ const MonthlyView = () => {
 
         {/* 2열: 상품별 상세 실적 */}
         <div className="layout40">
-          <p style={{ margin: '0 0 6px 2px', fontSize: 13, fontWeight: 600, color: '#333' }}>
+          <p style={{ margin: '0 0 6px 2px', fontSize: 13, fontWeight: 600, color: chartTextColor }}>
             상품별 상세 실적
             {selectedPeriod ? (
               <span style={{ marginLeft: 6, fontWeight: 400, color: '#555', fontSize: 12 }}> {selectedPeriod}</span>
@@ -403,12 +367,12 @@ const MonthlyView = () => {
 
         {/* 3열: 차트 */}
         <div className="layout40">
-          <p style={{ margin: '0 0 6px 2px', fontSize: 13, fontWeight: 600, color: '#333' }}>{periodLabel}별 판매 실적 차트</p>
-          <div style={{ border: '1px solid #e8e8e8', borderRadius: 4, background: '#fff', padding: '8px' }}>
+          <p style={{ margin: '0 0 6px 2px', fontSize: 13, fontWeight: 600, color: chartTextColor }}>{periodLabel}별 판매 실적 차트</p>
+          <div style={{ border: `1px solid ${isDark ? '#333350' : '#e8e8e8'}`, borderRadius: 4, background: isDark ? '#1e1e30' : '#fff', padding: '8px' }}>
             {statData.length > 0 ? (
               <ReactECharts option={chartOption} style={{ height: 460 }} />
             ) : (
-              <div style={{ height: 460, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaa', fontSize: 13 }}>
+              <div style={{ height: 460, display: 'flex', alignItems: 'center', justifyContent: 'center', color: isDark ? '#555570' : '#aaa', fontSize: 13 }}>
                 데이터가 없습니다.
               </div>
             )}

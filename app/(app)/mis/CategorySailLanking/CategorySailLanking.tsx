@@ -15,6 +15,7 @@ import TunedGrid from '../../../../components/grid/TunedGrid';
 import { authApi } from '../../../../libs';
 import dayjs from 'dayjs';
 import ReactECharts from 'echarts-for-react';
+import { useDarkMode } from '../../../../contexts/ThemeContext';
 import CustomDatePickerAsPartiallyStateFulFn from '../../../../components/CustomDatePickerAsPartiallyStateFulFn';
 
 type CategoryViewFilter = {
@@ -38,6 +39,10 @@ const yearStart = dayjs().startOf('year').format('YYYY-MM-DD');
 const CategorySailLanking = () => {
   const { onGridReady } = useAgGridApi();
   const menuNm = useCommonStore((s) => s.menuNm);
+  const isDark = useDarkMode();
+  const chartTextColor = isDark ? '#d0d0e0' : '#333';
+  const chartAxisColor = isDark ? '#555570' : '#aaa';
+  const splitLineColor = isDark ? '#2a2a3e' : '#eee';
 
   const [filters, onChangeFilters, onFiltersReset] = useFilters<CategoryViewFilter>({
     fromDate: yearStart,
@@ -56,70 +61,23 @@ const CategorySailLanking = () => {
     const rightAxisInterval = useRightAxis ? 1000 : undefined;
 
     return {
-      tooltip: {
-        trigger: 'axis',
-        axisPointer: { type: 'shadow' },
-      },
-      legend: {
-        bottom: 0,
-        data: ['구매건수', '장바구니건수', '페이지뷰', '총점'],
-      },
+      backgroundColor: 'transparent',
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+      legend: { bottom: 0, data: ['구매건수', '장바구니건수', '페이지뷰', '총점'], textStyle: { color: chartTextColor } },
       grid: { left: 16, right: 60, top: 50, bottom: 50, containLabel: true },
-      xAxis: {
-        type: 'category',
-        data: names,
-        axisLabel: { rotate: 30, fontSize: 11 },
-      },
+      xAxis: { type: 'category', data: names, axisLabel: { rotate: 30, fontSize: 11, color: chartTextColor }, axisLine: { lineStyle: { color: chartAxisColor } } },
       yAxis: [
-        {
-          type: 'value',
-          name: '건수',
-          nameTextStyle: { fontSize: 11 },
-        },
-        {
-          type: 'value',
-          name: '페이지뷰',
-          nameTextStyle: { fontSize: 11 },
-          ...(useRightAxis ? { max: rightAxisMax, interval: rightAxisInterval } : {}),
-          splitLine: { show: false },
-        },
+        { type: 'value', name: '건수', nameTextStyle: { fontSize: 11, color: chartTextColor }, axisLabel: { color: chartTextColor }, splitLine: { lineStyle: { color: splitLineColor } } },
+        { type: 'value', name: '페이지뷰', nameTextStyle: { fontSize: 11, color: chartTextColor }, axisLabel: { color: chartTextColor }, ...(useRightAxis ? { max: rightAxisMax, interval: rightAxisInterval } : {}), splitLine: { show: false } },
       ],
       series: [
-        {
-          name: '구매건수',
-          type: 'bar',
-          yAxisIndex: 0,
-          data: top10.map((d) => d.purchaseCnt),
-          itemStyle: { color: '#5b8ff9' },
-          label: { show: true, position: 'top', fontSize: 10, formatter: '{c}' },
-        },
-        {
-          name: '장바구니건수',
-          type: 'bar',
-          yAxisIndex: 0,
-          data: top10.map((d) => d.cartCnt),
-          itemStyle: { color: '#61ddaa' },
-          label: { show: true, position: 'top', formatter: '{c}', fontSize: 10 },
-        },
-        {
-          name: '페이지뷰',
-          type: 'bar',
-          yAxisIndex: 1,
-          data: top10.map((d) => d.pageViewCnt),
-          itemStyle: { color: '#f6bd16' },
-          label: { show: true, position: 'top', fontSize: 10, formatter: '{c}' },
-        },
-        {
-          name: '총점',
-          type: 'bar',
-          yAxisIndex: 0,
-          data: top10.map((d) => d.totalScore),
-          itemStyle: { color: '#e86452' },
-          label: { show: true, position: 'top', fontSize: 10, formatter: '{c}' },
-        },
+        { name: '구매건수', type: 'bar', yAxisIndex: 0, data: top10.map((d) => d.purchaseCnt), itemStyle: { color: '#5b8ff9' }, label: { show: true, position: 'top', fontSize: 10, formatter: '{c}', color: chartTextColor } },
+        { name: '장바구니건수', type: 'bar', yAxisIndex: 0, data: top10.map((d) => d.cartCnt), itemStyle: { color: '#61ddaa' }, label: { show: true, position: 'top', fontSize: 10, formatter: '{c}', color: chartTextColor } },
+        { name: '페이지뷰', type: 'bar', yAxisIndex: 1, data: top10.map((d) => d.pageViewCnt), itemStyle: { color: '#f6bd16' }, label: { show: true, position: 'top', fontSize: 10, formatter: '{c}', color: chartTextColor } },
+        { name: '총점', type: 'bar', yAxisIndex: 0, data: top10.map((d) => d.totalScore), itemStyle: { color: '#e86452' }, label: { show: true, position: 'top', fontSize: 10, formatter: '{c}', color: chartTextColor } },
       ],
     };
-  }, [top10]);
+  }, [top10, chartTextColor, chartAxisColor, splitLineColor]);
 
   const columnDefs: ColDef<CategoryViewItem>[] = [
     {
@@ -278,12 +236,12 @@ const CategorySailLanking = () => {
         </div>
 
         {/* 오른쪽: ECharts 상위 10개 */}
-        <div style={{ flex: 1, minWidth: 0, border: '1px solid #e8e8e8', borderRadius: 4, background: '#fff', padding: '12px 8px' }}>
-          <p style={{ margin: '0 0 8px 8px', fontSize: 13, fontWeight: 600, color: '#333' }}>카테고리별 판매 TOP 10 (총점 기준)</p>
+        <div style={{ flex: 1, minWidth: 0, border: `1px solid ${isDark ? '#333350' : '#e8e8e8'}`, borderRadius: 4, background: isDark ? '#1e1e30' : '#fff', padding: '12px 8px' }}>
+          <p style={{ margin: '0 0 8px 8px', fontSize: 13, fontWeight: 600, color: chartTextColor }}>카테고리별 판매 TOP 10 (총점 기준)</p>
           {top10.length > 0 ? (
             <ReactECharts option={chartOption} style={{ height: 400 }} />
           ) : (
-            <div style={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaa', fontSize: 13 }}>데이터가 없습니다.</div>
+            <div style={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', color: isDark ? '#555570' : '#aaa', fontSize: 13 }}>데이터가 없습니다.</div>
           )}
         </div>
       </div>

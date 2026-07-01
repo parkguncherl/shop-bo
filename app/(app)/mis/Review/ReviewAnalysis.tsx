@@ -16,6 +16,7 @@ import { authApi } from '../../../../libs';
 import ReactECharts from 'echarts-for-react';
 import dayjs from 'dayjs';
 import { PartnerCodeControllerApi } from '../../../../generated';
+import { useDarkMode } from '../../../../contexts/ThemeContext';
 
 // ─── 상수 ─────────────────────────────────────────────────────────────────────
 
@@ -62,6 +63,10 @@ type GridRow = {
 const ReviewAnalysis = () => {
   const { onGridReady } = useAgGridApi();
   const menuNm = useCommonStore((s) => s.menuNm);
+  const isDark = useDarkMode();
+  const chartTextColor = isDark ? '#d0d0e0' : '#333';
+  const chartAxisColor = isDark ? '#555570' : '#aaa';
+  const splitLineColor = isDark ? '#2a2a3e' : '#eee';
   const [filters, onChangeFilters] = useFilters<FilterType>({ fromDate: oneMonthAgo, toDate: today, categoryId: '' });
   const { data: categoryData } = useQuery({
     queryKey: ['partnerCode', 'P0001'],
@@ -148,6 +153,7 @@ const ReviewAnalysis = () => {
     }));
 
     return {
+      backgroundColor: 'transparent',
       tooltip: {
         trigger: 'axis',
         axisPointer: { type: 'shadow' },
@@ -163,18 +169,13 @@ const ReviewAnalysis = () => {
           return `<b>${params[0]?.axisValue}</b> 합계 ${total.toLocaleString()}건<br/>${lines}`;
         },
       },
-      legend: { type: 'scroll', bottom: 0, textStyle: { fontSize: 11 } },
+      legend: { type: 'scroll', bottom: 0, textStyle: { fontSize: 11, color: chartTextColor } },
       grid: { left: 80, right: 24, top: 16, bottom: 60 },
-      xAxis: { type: 'value', axisLabel: { formatter: (v: number) => v.toLocaleString(), fontSize: 11 } },
-      yAxis: {
-        type: 'category',
-        data: fitGroups,
-        axisLabel: { fontSize: 12, fontWeight: 'bold' },
-        axisTick: { show: false },
-      },
+      xAxis: { type: 'value', axisLabel: { formatter: (v: number) => v.toLocaleString(), fontSize: 11, color: chartTextColor }, splitLine: { lineStyle: { color: splitLineColor } } },
+      yAxis: { type: 'category', data: fitGroups, axisLabel: { fontSize: 12, fontWeight: 'bold', color: chartTextColor }, axisLine: { lineStyle: { color: chartAxisColor } }, axisTick: { show: false } },
       series,
     };
-  }, [items, fitGroups]);
+  }, [items, fitGroups, chartTextColor, chartAxisColor, splitLineColor]);
 
   // ── 기간 프리셋 ────────────────────────────────────────────────────────────
   const applyPreset = (preset: (typeof PERIOD_PRESETS)[number]) => {
@@ -216,7 +217,7 @@ const ReviewAnalysis = () => {
       </Search>
 
       {!isLoading && grandTotal > 0 && (
-        <div style={{ fontSize: 13, color: '#555', marginBottom: 8 }}>
+        <div style={{ fontSize: 13, color: isDark ? '#888899' : '#555', marginBottom: 8 }}>
           검색 <b>{grandTotal.toLocaleString()}건</b>
         </div>
       )}
@@ -241,20 +242,13 @@ const ReviewAnalysis = () => {
 
         {/* 우: 가로 스택 바 차트 */}
         <div style={{ flex: 1 }}>
-          <div style={chartCard}>
+          <div style={{ background: isDark ? '#1e1e30' : '#fff', border: `1px solid ${isDark ? '#333350' : '#e8e8e8'}`, borderRadius: 8, padding: '16px 12px 12px' }}>
             <ReactECharts option={stackBarOption} style={{ height: 480 }} />
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-const chartCard: React.CSSProperties = {
-  background: '#fff',
-  border: '1px solid #e8e8e8',
-  borderRadius: 8,
-  padding: '16px 12px 12px',
 };
 
 export default ReviewAnalysis;

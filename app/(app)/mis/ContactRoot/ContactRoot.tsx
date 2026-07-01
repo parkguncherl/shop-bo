@@ -16,6 +16,7 @@ import CustomDatePickerAsPartiallyStateFulFn from '../../../../components/Custom
 import { authApi } from '../../../../libs';
 import dayjs from 'dayjs';
 import ReactECharts from 'echarts-for-react';
+import { useDarkMode } from '../../../../contexts/ThemeContext';
 
 type ContactFilter = {
   fromDate: string;
@@ -42,6 +43,10 @@ const DEVICE_OPTIONS = [
 const ContactRoot = () => {
   const { onGridReady } = useAgGridApi();
   const menuNm = useCommonStore((s) => s.menuNm);
+  const isDark = useDarkMode();
+  const chartTextColor = isDark ? '#d0d0e0' : '#333';
+  const chartAxisColor = isDark ? '#555570' : '#aaa';
+  const splitLineColor = isDark ? '#2a2a3e' : '#eee';
 
   const [filters, onChangeFilters, onFiltersReset] = useFilters<ContactFilter>({
     fromDate: monthAgo,
@@ -66,58 +71,25 @@ const ContactRoot = () => {
     const showByDevice = filters.deviceType === '';
 
     return {
-      tooltip: {
-        trigger: 'axis',
-        axisPointer: { type: 'shadow' },
-      },
+      backgroundColor: 'transparent',
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
       legend: showByDevice
-        ? { bottom: 0, data: ['Mobile', 'Desktop', '기타'] }
+        ? { bottom: 0, data: ['Mobile', 'Desktop', '기타'], textStyle: { color: chartTextColor } }
         : { show: false },
       grid: { left: 16, right: 16, top: 50, bottom: showByDevice ? 50 : 30, containLabel: true },
-      xAxis: {
-        type: 'category',
-        data: labels,
-        axisLabel: { rotate: 35, fontSize: 10, interval: 0 },
-      },
-      yAxis: { type: 'value', name: '건수' },
+      xAxis: { type: 'category', data: labels, axisLabel: { rotate: 35, fontSize: 10, interval: 0, color: chartTextColor }, axisLine: { lineStyle: { color: chartAxisColor } } },
+      yAxis: { type: 'value', name: '건수', nameTextStyle: { color: chartTextColor }, axisLabel: { color: chartTextColor }, splitLine: { lineStyle: { color: splitLineColor } } },
       series: showByDevice
         ? [
-            {
-              name: 'Mobile',
-              type: 'bar',
-              stack: 'total',
-              data: mobileData,
-              itemStyle: { color: '#5b8ff9' },
-              label: { show: false },
-            },
-            {
-              name: 'Desktop',
-              type: 'bar',
-              stack: 'total',
-              data: desktopData,
-              itemStyle: { color: '#61ddaa' },
-              label: { show: false },
-            },
-            {
-              name: '기타',
-              type: 'bar',
-              stack: 'total',
-              data: otherData,
-              itemStyle: { color: '#f6bd16' },
-              label: { show: false },
-            },
+            { name: 'Mobile', type: 'bar', stack: 'total', data: mobileData, itemStyle: { color: '#5b8ff9' }, label: { show: false } },
+            { name: 'Desktop', type: 'bar', stack: 'total', data: desktopData, itemStyle: { color: '#61ddaa' }, label: { show: false } },
+            { name: '기타', type: 'bar', stack: 'total', data: otherData, itemStyle: { color: '#f6bd16' }, label: { show: false } },
           ]
         : [
-            {
-              name: '건수',
-              type: 'bar',
-              data: top20.map((d) => d.cnt),
-              itemStyle: { color: filters.deviceType === 'mobile' ? '#5b8ff9' : '#61ddaa' },
-              label: { show: true, position: 'top', fontSize: 10, formatter: '{c}' },
-            },
+            { name: '건수', type: 'bar', data: top20.map((d) => d.cnt), itemStyle: { color: filters.deviceType === 'mobile' ? '#5b8ff9' : '#61ddaa' }, label: { show: true, position: 'top', fontSize: 10, formatter: '{c}', color: chartTextColor } },
           ],
     };
-  }, [top20, filters.deviceType]);
+  }, [top20, filters.deviceType, chartTextColor, chartAxisColor, splitLineColor]);
 
   const columnDefs: ColDef<ContactItem>[] = [
     {
@@ -256,14 +228,14 @@ const ContactRoot = () => {
         </div>
 
         {/* 오른쪽: ECharts TOP 20 */}
-        <div style={{ flex: 1, minWidth: 0, border: '1px solid #e8e8e8', borderRadius: 4, background: '#fff', padding: '12px 8px' }}>
-          <p style={{ margin: '0 0 8px 8px', fontSize: 13, fontWeight: 600, color: '#333' }}>
+        <div style={{ flex: 1, minWidth: 0, border: `1px solid ${isDark ? '#333350' : '#e8e8e8'}`, borderRadius: 4, background: isDark ? '#1e1e30' : '#fff', padding: '12px 8px' }}>
+          <p style={{ margin: '0 0 8px 8px', fontSize: 13, fontWeight: 600, color: chartTextColor }}>
             유입 URL TOP 20 (건수 기준)
           </p>
           {top20.length > 0 ? (
             <ReactECharts option={chartOption} style={{ height: 420 }} />
           ) : (
-            <div style={{ height: 420, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaa', fontSize: 13 }}>
+            <div style={{ height: 420, display: 'flex', alignItems: 'center', justifyContent: 'center', color: isDark ? '#555570' : '#aaa', fontSize: 13 }}>
               데이터가 없습니다.
             </div>
           )}
