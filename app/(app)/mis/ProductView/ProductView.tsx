@@ -76,16 +76,62 @@ const ProductView = () => {
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
       legend: { bottom: 0, data: ['구매건수', '장바구니건수', '페이지뷰', '총점'], textStyle: { color: chartTextColor } },
       grid: { left: 16, right: 60, top: 50, bottom: 50, containLabel: true },
-      xAxis: { type: 'category', data: names, axisLabel: { rotate: 30, fontSize: 11, color: chartTextColor }, axisLine: { lineStyle: { color: chartAxisColor } } },
+      xAxis: {
+        type: 'category',
+        data: names,
+        axisLabel: { rotate: 30, fontSize: 11, color: chartTextColor },
+        axisLine: { lineStyle: { color: chartAxisColor } },
+      },
       yAxis: [
-        { type: 'value', name: '건수', nameTextStyle: { fontSize: 11, color: chartTextColor }, axisLabel: { color: chartTextColor }, splitLine: { lineStyle: { color: splitLineColor } } },
-        { type: 'value', name: '페이지뷰', nameTextStyle: { fontSize: 11, color: chartTextColor }, axisLabel: { color: chartTextColor }, ...(useRightAxis ? { max: rightAxisMax, interval: rightAxisInterval } : {}), splitLine: { show: false } },
+        {
+          type: 'value',
+          name: '건수',
+          nameTextStyle: { fontSize: 11, color: chartTextColor },
+          axisLabel: { color: chartTextColor },
+          splitLine: { lineStyle: { color: splitLineColor } },
+        },
+        {
+          type: 'value',
+          name: '페이지뷰',
+          nameTextStyle: { fontSize: 11, color: chartTextColor },
+          axisLabel: { color: chartTextColor },
+          ...(useRightAxis ? { max: rightAxisMax, interval: rightAxisInterval } : {}),
+          splitLine: { show: false },
+        },
       ],
       series: [
-        { name: '구매건수', type: 'bar', yAxisIndex: 0, data: top10.map((d) => d.purchaseCnt), itemStyle: { color: '#5b8ff9' }, label: { show: true, position: 'top', fontSize: 10, formatter: '{c}', color: chartTextColor } },
-        { name: '장바구니건수', type: 'bar', yAxisIndex: 0, data: top10.map((d) => d.cartCnt), itemStyle: { color: '#61ddaa' }, label: { show: true, position: 'top', fontSize: 10, formatter: '{c}', color: chartTextColor } },
-        { name: '페이지뷰', type: 'bar', yAxisIndex: 1, data: top10.map((d) => d.pageViewCnt), itemStyle: { color: '#f6bd16' }, label: { show: true, position: 'top', fontSize: 10, formatter: '{c}', color: chartTextColor } },
-        { name: '총점', type: 'bar', yAxisIndex: 0, data: top10.map((d) => d.totalScore), itemStyle: { color: '#e86452' }, label: { show: true, position: 'top', fontSize: 10, formatter: '{c}', color: chartTextColor } },
+        {
+          name: '구매건수',
+          type: 'bar',
+          yAxisIndex: 0,
+          data: top10.map((d) => d.purchaseCnt),
+          itemStyle: { color: '#5b8ff9' },
+          label: { show: true, position: 'top', fontSize: 10, formatter: '{c}', color: chartTextColor },
+        },
+        {
+          name: '장바구니건수',
+          type: 'bar',
+          yAxisIndex: 0,
+          data: top10.map((d) => d.cartCnt),
+          itemStyle: { color: '#61ddaa' },
+          label: { show: true, position: 'top', fontSize: 10, formatter: '{c}', color: chartTextColor },
+        },
+        {
+          name: '페이지뷰',
+          type: 'bar',
+          yAxisIndex: 1,
+          data: top10.map((d) => d.pageViewCnt),
+          itemStyle: { color: '#f6bd16' },
+          label: { show: true, position: 'top', fontSize: 10, formatter: '{c}', color: chartTextColor },
+        },
+        {
+          name: '총점',
+          type: 'bar',
+          yAxisIndex: 0,
+          data: top10.map((d) => d.totalScore),
+          itemStyle: { color: '#e86452' },
+          label: { show: true, position: 'top', fontSize: 10, formatter: '{c}', color: chartTextColor },
+        },
       ],
     };
   }, [top10, chartTextColor, chartAxisColor, splitLineColor]);
@@ -214,12 +260,35 @@ const ProductView = () => {
                 <input type="date" value={filters.toDate} onChange={(e) => onChangeFilters('toDate', e.target.value)} className="dateInput" />
               </div>
               <div style={{ display: 'flex', gap: 4 }}>
-                {([
-                  { label: '당일', fn: () => { const d = dayjs().format('YYYY-MM-DD'); onChangeFilters('fromDate', d); onChangeFilters('toDate', d); } },
-                  { label: '1주일', fn: () => { onChangeFilters('fromDate', dayjs().subtract(6, 'day').format('YYYY-MM-DD')); onChangeFilters('toDate', dayjs().format('YYYY-MM-DD')); } },
-                  { label: '1개월', fn: () => { onChangeFilters('fromDate', dayjs().subtract(1, 'month').format('YYYY-MM-DD')); onChangeFilters('toDate', dayjs().format('YYYY-MM-DD')); } },
-                ] as { label: string; fn: () => void }[]).map(({ label, fn }) => (
-                  <button key={label} className="btn" onClick={fn} style={{ height: 28, padding: '0 10px', fontSize: 12, whiteSpace: 'nowrap' }}>{label}</button>
+                {(
+                  [
+                    {
+                      label: '당일',
+                      fn: () => {
+                        const d = dayjs().format('YYYY-MM-DD');
+                        onChangeFilters('fromDate', d);
+                        onChangeFilters('toDate', d);
+                      },
+                    },
+                    {
+                      label: '1주일',
+                      fn: () => {
+                        onChangeFilters('fromDate', dayjs().subtract(6, 'day').format('YYYY-MM-DD'));
+                        onChangeFilters('toDate', dayjs().format('YYYY-MM-DD'));
+                      },
+                    },
+                    {
+                      label: '1개월',
+                      fn: () => {
+                        onChangeFilters('fromDate', dayjs().subtract(1, 'month').format('YYYY-MM-DD'));
+                        onChangeFilters('toDate', dayjs().format('YYYY-MM-DD'));
+                      },
+                    },
+                  ] as { label: string; fn: () => void }[]
+                ).map(({ label, fn }) => (
+                  <button key={label} className="btn" onClick={fn} style={{ height: 28, padding: '0 10px', fontSize: 12, whiteSpace: 'nowrap' }}>
+                    {label}
+                  </button>
                 ))}
               </div>
             </div>
@@ -265,12 +334,23 @@ const ProductView = () => {
         </div>
 
         {/* 오른쪽: ECharts 상위 10개 */}
-        <div style={{ flex: 1, minWidth: 0, border: `1px solid ${isDark ? '#333350' : '#e8e8e8'}`, borderRadius: 4, background: isDark ? '#1e1e30' : '#fff', padding: '12px 8px' }}>
+        <div
+          style={{
+            flex: 1,
+            minWidth: 0,
+            border: `1px solid ${isDark ? '#333350' : '#e8e8e8'}`,
+            borderRadius: 4,
+            background: isDark ? '#1e1e30' : '#fff',
+            padding: '12px 8px',
+          }}
+        >
           <p style={{ margin: '0 0 8px 8px', fontSize: 13, fontWeight: 600, color: chartTextColor }}>잘 팔리는 상품 TOP 10 (총점 기준)</p>
           {top10.length > 0 ? (
             <ReactECharts option={chartOption} style={{ height: 400 }} />
           ) : (
-            <div style={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', color: isDark ? '#555570' : '#aaa', fontSize: 13 }}>데이터가 없습니다.</div>
+            <div style={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', color: isDark ? '#555570' : '#aaa', fontSize: 13 }}>
+              데이터가 없습니다.
+            </div>
           )}
         </div>
       </div>
