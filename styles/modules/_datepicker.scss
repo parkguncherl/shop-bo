@@ -1028,6 +1028,108 @@
   }
 }
 
+// Ant Design 기본 primary(파란색) → 퍼플 변수 오버라이드
+.ant-picker-dropdown,
+.ant-picker-panel-container {
+  --ant-color-primary: #5b21b6;
+  --ant-color-primary-hover: #7c3aed;
+  --ant-color-primary-active: #4c1d95;
+  --ant-color-primary-bg: rgba(91, 33, 182, 0.12);
+  --ant-color-primary-bg-hover: rgba(91, 33, 182, 0.2);
+  --ant-color-primary-border: #7c3aed;
+  --ant-color-link: #7c3aed;
+  --ant-color-link-hover: #a78bfa;
+  --ant-color-info: #5b21b6;
+  --ant-color-info-bg: rgba(91, 33, 182, 0.12);
+  --ant-color-info-border: #7c3aed;
+  --ant-picker-cell-active-bg: rgba(91, 33, 182, 0.2);
+}
+
+// 날짜 hover 툴팁 완전 제거
+.ant-picker-dropdown .ant-tooltip,
+.ant-picker-dropdown [class*="tooltip"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+// ── 데이트피커 파란색 → 퍼플 오버라이드 (라이트/다크 공통) ──────────
+$purple: #5b21b6;
+$purple-light: rgba(91, 33, 182, 0.12);
+$purple-hover: #7c3aed;
+$purple-muted: #a78bfa;
+
+// 선택된 날짜 (start / end / single)
+.ant-picker-panel-layout {
+  .ant-picker-cell-inner.start-date span,
+  .ant-picker-cell-inner.end-date span {
+    background-color: $purple !important;
+  }
+  .ant-picker-cell-inner.in-range-date {
+    background-color: $purple-light !important;
+    &::before { background-color: $purple-light !important; }
+  }
+  .ant-picker-cell-inner.start-date::before,
+  .ant-picker-cell-inner.end-date::before {
+    background-color: $purple-light !important;
+  }
+  // 월/연/연대 패널 선택 셀
+  .ant-picker-month-panel,
+  .ant-picker-year-panel,
+  .ant-picker-decade-panel {
+    .ant-picker-cell-selected .ant-picker-cell-inner {
+      background-color: $purple !important;
+    }
+  }
+  // 주간 선택 row
+  .ant-picker-week-panel-row-selected td {
+    background-color: $purple-light !important;
+    &:hover { background-color: $purple-light !important; }
+  }
+  .ant-picker-week-panel-row-selected td.ant-picker-cell-selected .ant-picker-cell-inner {
+    background-color: $purple !important;
+  }
+  // Ant Design 기본 range 셀 (::before 바)
+  .ant-picker-cell-in-range::before,
+  .ant-picker-cell-range-start:not(.ant-picker-cell-range-start-single)::before,
+  .ant-picker-cell-range-end:not(.ant-picker-cell-range-end-single)::before {
+    background: $purple-light !important;
+  }
+  // Ant Design 기본 selected 셀
+  .ant-picker-cell-selected .ant-picker-cell-inner,
+  .ant-picker-cell-range-start .ant-picker-cell-inner,
+  .ant-picker-cell-range-end .ant-picker-cell-inner {
+    background-color: $purple !important;
+    color: #fff !important;
+  }
+  // hover
+  .ant-picker-cell:hover .ant-picker-cell-inner {
+    background-color: rgba(91, 33, 182, 0.15) !important;
+  }
+  // 오늘 dot
+  .ant-picker-cell-today .ant-picker-cell-inner::before {
+    background-color: $purple !important;
+    border-color: $purple !important;
+  }
+}
+
+// ok 버튼
+.ant-picker-dropdown .ant-picker-ok button.ant-btn,
+.ant-picker-footer .ant-picker-ok button.ant-btn {
+  background-color: $purple !important;
+  border-color: $purple !important;
+  color: #fff !important;
+  &:hover { background-color: $purple-hover !important; }
+  &:disabled { background-color: $purple-muted !important; }
+}
+
+// active bar (range 선택 중 밑줄)
+.ant-picker-active-bar { background: $purple !important; }
+
+// focus / hover border
+.ant-picker-focused,
+.ant-picker:hover { border-color: $purple-muted !important; }
+
 // wms 데이트피커
 .wms {
   & .ant-picker-cell {

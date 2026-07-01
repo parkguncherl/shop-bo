@@ -314,7 +314,7 @@ const Dashboard = () => {
       {/* ── 현황 카드 ── */}
       <div style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', gap: 12 }}>
-          <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderLeft: '3px solid #5b8ff9', borderRadius: 8, padding: '10px 18px', minWidth: 200 }}>
+          <div style={{ background: cardBg, borderTop: `1px solid ${cardBorder}`, borderRight: `1px solid ${cardBorder}`, borderBottom: `1px solid ${cardBorder}`, borderLeft: '3px solid #5b8ff9', borderRadius: 8, padding: '10px 18px', minWidth: 200 }}>
             <div style={{ fontSize: 12, color: textMuted, marginBottom: 6 }}>오늘 판매 / 금액</div>
             <div style={{ fontSize: 18, fontWeight: 700, display: 'flex', alignItems: 'baseline', gap: 2 }}>
               <span style={{ color: '#5b8ff9' }}>{daily.todayPurchaseCnt.toLocaleString()}</span>
@@ -334,7 +334,7 @@ const Dashboard = () => {
               <span style={{ fontSize: 12, color: textMuted, marginLeft: 1 }}>원</span>
             </div>
           </div>
-          <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderLeft: '3px solid #f56c6c', borderRadius: 8, padding: '10px 18px', minWidth: 200 }}>
+          <div style={{ background: cardBg, borderTop: `1px solid ${cardBorder}`, borderRight: `1px solid ${cardBorder}`, borderBottom: `1px solid ${cardBorder}`, borderLeft: '3px solid #f56c6c', borderRadius: 8, padding: '10px 18px', minWidth: 200 }}>
             <div style={{ fontSize: 12, color: textMuted, marginBottom: 6 }}>금일 취소 / 금액</div>
             <div style={{ fontSize: 18, fontWeight: 700, display: 'flex', alignItems: 'baseline', gap: 2 }}>
               <span style={{ color: '#f56c6c' }}>{daily.todayCancelCnt.toLocaleString()}</span>
@@ -344,7 +344,7 @@ const Dashboard = () => {
               <span style={{ fontSize: 12, color: textMuted, marginLeft: 1 }}>원</span>
             </div>
           </div>
-          <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderLeft: '3px solid #f0a0a0', borderRadius: 8, padding: '10px 18px', minWidth: 200 }}>
+          <div style={{ background: cardBg, borderTop: `1px solid ${cardBorder}`, borderRight: `1px solid ${cardBorder}`, borderBottom: `1px solid ${cardBorder}`, borderLeft: '3px solid #f0a0a0', borderRadius: 8, padding: '10px 18px', minWidth: 200 }}>
             <div style={{ fontSize: 12, color: textMuted, marginBottom: 6 }}>어제 취소 / 금액</div>
             <div style={{ fontSize: 18, fontWeight: 700, display: 'flex', alignItems: 'baseline', gap: 2 }}>
               <span style={{ color: '#f56c6c' }}>{daily.yesterdayCancelCnt.toLocaleString()}</span>

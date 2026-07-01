@@ -14,7 +14,6 @@ import CustomGridLoading from '../../../../components/CustomGridLoading';
 import TunedGrid from '../../../../components/grid/TunedGrid';
 import { authApi } from '../../../../libs';
 import dayjs from 'dayjs';
-import CustomDatePickerAsPartiallyStateFulFn from '../../../../components/CustomDatePickerAsPartiallyStateFulFn';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import { useReceivingStore } from '../../../../stores/product/useReceivingStore';
 import ReceivingAddPop from '../../../../components/popup/product/receiving/ReceivingAddPop';
@@ -245,14 +244,27 @@ const Receiving = () => {
       <Title title={menuNm ?? '입고/출고 관리'} reset={reset} search={refetch} />
 
       <Search className="type_1">
-        <CustomDatePickerAsPartiallyStateFulFn
-          title="입출고일"
-          type="range"
-          startName="fromDate"
-          endName="toDate"
-          onChange={onChangeFilters}
-          value={[filters.fromDate, filters.toDate]}
-        />
+        <dl>
+          <dt>입출고일</dt>
+          <dd>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div className="formBox" style={{ gap: 4 }}>
+                <input type="date" value={filters.fromDate} onChange={(e) => onChangeFilters('fromDate', e.target.value)} className="dateInput" />
+                <span style={{ padding: '0 2px' }}>~</span>
+                <input type="date" value={filters.toDate} onChange={(e) => onChangeFilters('toDate', e.target.value)} className="dateInput" />
+              </div>
+              <div style={{ display: 'flex', gap: 4 }}>
+                {([
+                  { label: '당일', fn: () => { const d = dayjs().format('YYYY-MM-DD'); onChangeFilters('fromDate', d); onChangeFilters('toDate', d); } },
+                  { label: '1주일', fn: () => { onChangeFilters('fromDate', dayjs().subtract(6, 'day').format('YYYY-MM-DD')); onChangeFilters('toDate', dayjs().format('YYYY-MM-DD')); } },
+                  { label: '1개월', fn: () => { onChangeFilters('fromDate', dayjs().subtract(1, 'month').format('YYYY-MM-DD')); onChangeFilters('toDate', dayjs().format('YYYY-MM-DD')); } },
+                ] as { label: string; fn: () => void }[]).map(({ label, fn }) => (
+                  <button key={label} className="btn" onClick={fn} style={{ height: 28, padding: '0 10px', fontSize: 12 }}>{label}</button>
+                ))}
+              </div>
+            </div>
+          </dd>
+        </dl>
         <dl>
           <dt>구분</dt>
           <dd>

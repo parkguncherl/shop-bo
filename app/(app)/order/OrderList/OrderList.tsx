@@ -14,7 +14,6 @@ import CustomGridLoading from '../../../../components/CustomGridLoading';
 import TunedGrid from '../../../../components/grid/TunedGrid';
 import { OrderDetailPop } from '../../../../components/popup/order/OrderDetailPop';
 import dayjs from 'dayjs';
-import CustomNewDatePicker from '../../../../components/CustomNewDatePicker';
 import { ApiResponse, OrderMngResponseBoListItem } from '../../../../generated';
 import { AxiosResponse } from 'axios';
 
@@ -177,15 +176,39 @@ const OrderList = () => {
     <div>
       <Title title={menuNm ?? '주문 목록'} reset={reset} search={orderListDataRefetch} />
       <Search className={'type_1'}>
-        <CustomNewDatePicker
-          title={'조회기간'}
-          type={'range'}
-          defaultType={'week'}
-          startName={'fromDate'}
-          endName={'toDate'}
-          onChange={onChangeFilters}
-          value={[filters.fromDate, filters.toDate]}
-        />
+        <dl>
+          <dt>조회기간</dt>
+          <dd>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div className="formBox" style={{ gap: 4 }}>
+                <input
+                  type="date"
+                  value={filters.fromDate}
+                  onChange={(e) => onChangeFilters('fromDate', e.target.value)}
+                  className="dateInput"
+                />
+                <span style={{ padding: '0 2px' }}>~</span>
+                <input
+                  type="date"
+                  value={filters.toDate}
+                  onChange={(e) => onChangeFilters('toDate', e.target.value)}
+                  className="dateInput"
+                />
+              </div>
+              <div style={{ display: 'flex', gap: 4 }}>
+                {([
+                  { label: '당일', fn: () => { const d = dayjs().format('YYYY-MM-DD'); onChangeFilters('fromDate', d); onChangeFilters('toDate', d); } },
+                  { label: '1주일', fn: () => { onChangeFilters('fromDate', dayjs().subtract(6, 'day').format('YYYY-MM-DD')); onChangeFilters('toDate', dayjs().format('YYYY-MM-DD')); } },
+                  { label: '1개월', fn: () => { onChangeFilters('fromDate', dayjs().subtract(1, 'month').format('YYYY-MM-DD')); onChangeFilters('toDate', dayjs().format('YYYY-MM-DD')); } },
+                ] as { label: string; fn: () => void }[]).map(({ label, fn }) => (
+                  <button key={label} className="btn" onClick={fn} style={{ height: 28, padding: '0 10px', fontSize: 12 }}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </dd>
+        </dl>
       </Search>
       <Table>
         <TunedGrid<OrderMngResponseBoListItem>

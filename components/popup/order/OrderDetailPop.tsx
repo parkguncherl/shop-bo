@@ -44,7 +44,7 @@ export const OrderDetailPop = ({ orderId, open, onClose }: Props) => {
   const tdStyle: React.CSSProperties = {
     padding: '6px 10px',
     border: `1px solid ${isDark ? 'rgba(255,255,255,0.15)' : '#e0e0e0'}`,
-    background: isDark ? '#2a2a42' : undefined,
+    background: isDark ? '#1e1e30' : undefined,
     color: isDark ? '#d0d0e0' : undefined,
   };
   const columnDefs: ColDef<OrderResponseItem>[] = [

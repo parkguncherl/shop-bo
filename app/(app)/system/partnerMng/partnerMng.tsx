@@ -18,7 +18,7 @@ import { CellClickedEvent, ColDef } from 'ag-grid-community';
 import PartnerAddPop from '../../../../components/popup/partner/PartnerAddPop';
 import PartnerModPop from '../../../../components/popup/partner/PartnerModPop';
 import TunedGrid from '../../../../components/grid/TunedGrid';
-import CustomNewDatePicker from '../../../../components/CustomNewDatePicker';
+import dayjs from 'dayjs';
 
 const PartnerMng = () => {
   /** Grid Api */
@@ -151,16 +151,27 @@ const PartnerMng = () => {
           onChange={onChangeFilters}
           filters={filters}
         />
-        <CustomNewDatePicker
-          title={'기간'}
-          type={'range'}
-          defaultType={'today'}
-          startName={'startDate'}
-          endName={'endDate'}
-          value={[filters.startDate, filters.endDate]}
-          onEnter={search}
-          onChange={onChangeFilters}
-        />
+        <dl>
+          <dt>기간</dt>
+          <dd>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div className="formBox" style={{ gap: 4 }}>
+                <input type="date" value={filters.startDate} onChange={(e) => onChangeFilters('startDate', e.target.value)} className="dateInput" />
+                <span style={{ padding: '0 2px' }}>~</span>
+                <input type="date" value={filters.endDate} onChange={(e) => onChangeFilters('endDate', e.target.value)} className="dateInput" />
+              </div>
+              <div style={{ display: 'flex', gap: 4 }}>
+                {([
+                  { label: '당일', fn: () => { const d = dayjs().format('YYYY-MM-DD'); onChangeFilters('startDate', d); onChangeFilters('endDate', d); } },
+                  { label: '1주일', fn: () => { onChangeFilters('startDate', dayjs().subtract(6, 'day').format('YYYY-MM-DD')); onChangeFilters('endDate', dayjs().format('YYYY-MM-DD')); } },
+                  { label: '1개월', fn: () => { onChangeFilters('startDate', dayjs().subtract(1, 'month').format('YYYY-MM-DD')); onChangeFilters('endDate', dayjs().format('YYYY-MM-DD')); } },
+                ] as { label: string; fn: () => void }[]).map(({ label, fn }) => (
+                  <button key={label} className="btn" onClick={fn} style={{ height: 28, padding: '0 10px', fontSize: 12 }}>{label}</button>
+                ))}
+              </div>
+            </div>
+          </dd>
+        </dl>
         <Search.DropDown
           title={'구분'}
           name={'upperPartnerId'}
