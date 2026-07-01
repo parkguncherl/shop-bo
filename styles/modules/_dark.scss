@@ -127,6 +127,17 @@
         &::placeholder { color: #555570 !important; }
       }
 
+      & .formBox button {
+        background-color: var(--dark-surface-2) !important;
+        color: var(--dark-text) !important;
+        border-color: var(--dark-border) !important;
+        &.segBtn--active {
+          background-color: #5b21b6 !important;
+          color: #fff !important;
+          border-color: #5b21b6 !important;
+        }
+      }
+
       // Ant Design Select 내부
       .ant-select-selector {
         background-color: var(--dark-surface-2) !important;

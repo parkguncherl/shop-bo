@@ -169,7 +169,7 @@ const ContactRoot = () => {
                   { label: '1주일', fn: () => { onChangeFilters('fromDate', dayjs().subtract(6, 'day').format('YYYY-MM-DD')); onChangeFilters('toDate', dayjs().format('YYYY-MM-DD')); } },
                   { label: '1개월', fn: () => { onChangeFilters('fromDate', dayjs().subtract(1, 'month').format('YYYY-MM-DD')); onChangeFilters('toDate', dayjs().format('YYYY-MM-DD')); } },
                 ] as { label: string; fn: () => void }[]).map(({ label, fn }) => (
-                  <button key={label} className="btn" onClick={fn} style={{ height: 28, padding: '0 10px', fontSize: 12 }}>{label}</button>
+                  <button key={label} className="btn" onClick={fn} style={{ height: 28, padding: '0 10px', fontSize: 12, whiteSpace: 'nowrap' }}>{label}</button>
                 ))}
               </div>
             </div>
@@ -183,14 +183,15 @@ const ContactRoot = () => {
                 <button
                   key={opt.value}
                   type="button"
+                  className={filters.deviceType === opt.value ? 'segBtn segBtn--active' : 'segBtn'}
                   style={{
                     padding: '0 14px',
                     height: 32,
                     fontSize: 13,
                     fontWeight: 500,
-                    border: `1px solid ${isDark ? '#333350' : '#d9d9d9'}`,
-                    background: filters.deviceType === opt.value ? '#5b21b6' : isDark ? '#252538' : '#f3f4f6',
-                    color: filters.deviceType === opt.value ? '#fff' : isDark ? '#d0d0e0' : '#6b7280',
+                    border: '1px solid #d9d9d9',
+                    background: filters.deviceType === opt.value ? '#5b21b6' : '#f3f4f6',
+                    color: filters.deviceType === opt.value ? '#fff' : '#6b7280',
                     cursor: 'pointer',
                     marginLeft: -1,
                     position: 'relative',

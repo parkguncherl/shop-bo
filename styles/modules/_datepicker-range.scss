@@ -108,11 +108,14 @@
       & dl {
         display: flex;
         align-items: center;
+        flex-shrink: 0;
         & dt {
           display: flex;
           align-items: center;
           padding-right: 8px;
           box-sizing: border-box;
+          white-space: nowrap;
+          flex-shrink: 0;
           & label {
             font-size: var(--s-size);
             font-weight: 500;
