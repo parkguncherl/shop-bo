@@ -210,13 +210,6 @@ const ReviewAnalysis = () => {
             </div>
           </dd>
         </dl>
-        <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginLeft: 8 }}>
-          {PERIOD_PRESETS.map((p) => (
-            <button key={p.label} className={'btn btnGray'} style={{ height: 32, padding: '0 12px', fontSize: 12 }} onClick={() => applyPreset(p)}>
-              {p.label}
-            </button>
-          ))}
-        </div>
         <Search.DropDown
           title={'카테고리'}
           name={'categoryId'}

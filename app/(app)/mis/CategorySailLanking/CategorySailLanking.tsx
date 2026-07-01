@@ -187,45 +187,6 @@ const CategorySailLanking = () => {
             </div>
           </dd>
         </dl>
-        <dl>
-          <dd>
-            <div className="formBox">
-              {(
-                [
-                  { label: '1주일', days: 7 },
-                  { label: '2주일', days: 14 },
-                  { label: '1개월', days: 30 },
-                ] as const
-              ).map((item, i, arr) => (
-                <button
-                  key={item.label}
-                  type="button"
-                  style={{
-                    padding: '0 12px',
-                    height: 32,
-                    fontSize: 13,
-                    fontWeight: 500,
-                    border: '1px solid #d9d9d9',
-                    background: '#f3f4f6',
-                    color: '#6b7280',
-                    cursor: 'pointer',
-                    marginLeft: -1,
-                    position: 'relative',
-                    borderRadius: i === 0 ? '6px 0 0 6px' : i === arr.length - 1 ? '0 6px 6px 0' : 0,
-                  }}
-                  onClick={() => {
-                    const from = dayjs().subtract(item.days, 'day').format('YYYY-MM-DD');
-                    onChangeFilters('fromDate', from);
-                    onChangeFilters('toDate', today);
-                    refetch();
-                  }}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </dd>
-        </dl>
       </Search>
 
       <div style={{ display: 'flex', gap: 16, padding: '0 16px 16px', alignItems: 'flex-start' }}>
