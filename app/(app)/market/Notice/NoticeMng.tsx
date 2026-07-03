@@ -156,17 +156,15 @@ const NoticeMng = () => {
   return (
     <div>
       <Title title={menuNm ?? '공지사항 관리'} reset={reset} search={refetch} />
-      <Search className="type_1">
-        <div className="searchBox">
-          <label className="searchLabel">제목</label>
-          <input
-            className="inputBox"
-            value={filters.title}
-            onChange={(e) => onChangeFilters('title', e.target.value)}
-            placeholder="제목 검색"
-            onKeyDown={(e) => e.key === 'Enter' && refetch()}
-          />
-        </div>
+      <Search className="type_2">
+        <Search.Input
+          title="제목"
+          name="title"
+          placeholder="제목을 입력하세요"
+          value={filters.title}
+          onChange={(name, value) => onChangeFilters(name as keyof NoticeFilter, value as string)}
+          onEnter={() => refetch()}
+        />
       </Search>
       <Table>
         <TunedGrid

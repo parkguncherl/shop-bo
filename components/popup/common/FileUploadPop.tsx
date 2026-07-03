@@ -120,10 +120,6 @@ export const FileUploadPop = ({ open, onClose, onSuccess, onlyImg = false, fileI
   // 4. 서버 전송
   const handleUpload = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (!fileId) {
-      toastError('파일 영역 식별자를 찾을 수 없습니다.');
-      return;
-    }
 
     if (files.length === 0) {
       toastError('선택된 파일이 없습니다.');
@@ -136,7 +132,10 @@ export const FileUploadPop = ({ open, onClose, onSuccess, onlyImg = false, fileI
       formData.append('uploadFiles', f.file);
     });
 
-    formData.append('fileId', fileId.toString());
+    // fileId 가 있으면 기존 그룹에 추가, 없으면 신규 그룹 생성(서버에서 fileId 발급)
+    if (fileId) {
+      formData.append('fileId', fileId.toString());
+    }
 
     // if (imageFileWidth && imageFileHeight) {
     //   formData.append('imageFileWidth', imageFileWidth.toString());
@@ -149,7 +148,10 @@ export const FileUploadPop = ({ open, onClose, onSuccess, onlyImg = false, fileI
       })
       .then((response) => {
         if (response.data.resultCode === 200) {
-          if (onSuccess) onSuccess(response.data.body);
+          // body 는 업로드된 파일 목록(List). 단일 이미지 사용처를 위해 첫 번째 항목을 전달
+          const body = response.data.body;
+          const first = Array.isArray(body) ? body[0] : body;
+          if (onSuccess) onSuccess(first);
           toastSuccess('성공적으로 업로드되었습니다.');
           onCloseCommonHandler();
         } else {

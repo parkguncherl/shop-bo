@@ -92,7 +92,7 @@ const NoticeMngAddPop = ({ open, onClose, onSuccess }: Props) => {
               <PopupFormType className="type1">
                 <FormInput<FormFields> control={control} name="moveUri" label="이동 URL" placeholder="이미지 클릭 시 이동할 URL (선택)" />
               </PopupFormType>
-              <PopupFormType className="type2">
+              <PopupFormType className="type1">
                 <FormDropDown<FormFields>
                   control={control}
                   name="gesiYn"
@@ -102,21 +102,31 @@ const NoticeMngAddPop = ({ open, onClose, onSuccess }: Props) => {
                     { key: 1, value: 'N', label: '미게시' },
                   ]}
                 />
-                <div className="inputWrap">
-                  <dl>
-                    <dt>이미지</dt>
-                    <dd>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        {imgPreviewUrl && (
-                          <img src={imgPreviewUrl} alt="미리보기" style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 4, border: '1px solid #e0e0e0' }} />
-                        )}
-                        <button className="btn btnGray" type="button" onClick={() => setFilePopOpen(true)}>
-                          {fileId ? '이미지 변경' : '이미지 등록'}
+              </PopupFormType>
+              <PopupFormType className="type1">
+                <dl>
+                  <dt><label>이미지</label></dt>
+                  <dd>
+                    <div className="formBox" style={{ display: 'flex', alignItems: 'center' }}>
+                      <button className="btn" type="button" style={{ whiteSpace: 'nowrap' }} onClick={() => setFilePopOpen(true)}>
+                        {fileId ? '이미지 변경' : '이미지 등록'}
+                      </button>
+                    </div>
+                    {imgPreviewUrl && (
+                      <div style={{ position: 'relative', width: 120, marginTop: 8 }}>
+                        <img src={imgPreviewUrl} alt="미리보기" style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 4, border: '1px solid #e0e0e0', display: 'block' }} />
+                        <button
+                          type="button"
+                          onClick={() => { setFileId(undefined); setImgPreviewUrl(''); }}
+                          style={{ position: 'absolute', top: 4, right: 4, width: 20, height: 20, borderRadius: '50%', border: 'none', background: 'rgba(0,0,0,0.55)', color: '#fff', cursor: 'pointer', lineHeight: '20px', textAlign: 'center', padding: 0 }}
+                          aria-label="이미지 삭제"
+                        >
+                          ×
                         </button>
                       </div>
-                    </dd>
-                  </dl>
-                </div>
+                    )}
+                  </dd>
+                </dl>
               </PopupFormType>
             </PopupFormGroup>
           </PopupFormBox>
