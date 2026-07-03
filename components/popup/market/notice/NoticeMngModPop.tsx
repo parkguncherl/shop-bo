@@ -6,6 +6,8 @@ import { PopupContent } from '../../PopupContent';
 import { PopupFooter } from '../../PopupFooter';
 import { authApi } from '../../../../libs';
 import { toastError, toastSuccess } from '../../../ToastMessage';
+import { FileUploadPop } from '../../common/FileUploadPop';
+import { useCommonStore } from '../../../../stores';
 import type { NoticeItem } from '../../../../app/(app)/market/Notice/NoticeMng';
 
 interface Props {
@@ -16,11 +18,26 @@ interface Props {
 }
 
 const NoticeMngModPop = ({ open, item, onClose, onSuccess }: Props) => {
+  const getFileUrl = useCommonStore((s) => s.getFileUrl);
   const [title, setTitle] = useState('');
+  const [fileId, setFileId] = useState<number | undefined>();
+  const [imgPreviewUrl, setImgPreviewUrl] = useState('');
+  const [filePopOpen, setFilePopOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
     setTitle(item.title ?? '');
+    setFileId(item.fileId);
+    setImgPreviewUrl('');
+
+    if (item.fileId) {
+      authApi.get(`/common/file/${item.fileId}`).then(({ data }) => {
+        const fileList = data?.body ?? [];
+        if (fileList.length > 0 && fileList[0].sysFileNm) {
+          getFileUrl(fileList[0].sysFileNm).then((url: string) => setImgPreviewUrl(url));
+        }
+      }).catch(() => {});
+    }
   }, [open, item]);
 
   const handleClose = () => onClose();
@@ -30,6 +47,7 @@ const NoticeMngModPop = ({ open, item, onClose, onSuccess }: Props) => {
     const { data } = await authApi.put('/noticeMng/update', {
       id: item.id,
       title,
+      fileId: fileId ?? null,
     });
     if (data?.resultCode === 200) {
       toastSuccess('수정되었습니다.');
@@ -40,39 +58,68 @@ const NoticeMngModPop = ({ open, item, onClose, onSuccess }: Props) => {
   };
 
   return (
-    <PopupLayout
-      width={600}
-      open={open}
-      title="공지사항 수정"
-      onClose={handleClose}
-      footer={
-        <PopupFooter>
-          <div className="btnArea">
-            <button className="btn btnPurple" onClick={handleSave}>저장</button>
-            <button className="btn" onClick={handleClose}>닫기</button>
-          </div>
-        </PopupFooter>
-      }
-    >
-      <PopupContent>
-        <table className="formTable">
-          <tbody>
-            <tr>
-              <th>제목 *</th>
-              <td>
-                <input
-                  className="inputBox"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="제목을 입력하세요"
-                  style={{ width: '100%' }}
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </PopupContent>
-    </PopupLayout>
+    <>
+      <PopupLayout
+        width={600}
+        open={open}
+        title="공지사항 수정"
+        onClose={handleClose}
+        footer={
+          <PopupFooter>
+            <div className="btnArea">
+              <button className="btn btnPurple" onClick={handleSave}>저장</button>
+              <button className="btn" onClick={handleClose}>닫기</button>
+            </div>
+          </PopupFooter>
+        }
+      >
+        <PopupContent>
+          <table className="formTable">
+            <tbody>
+              <tr>
+                <th>제목 *</th>
+                <td>
+                  <input
+                    className="inputBox"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="제목을 입력하세요"
+                    style={{ width: '100%' }}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <th>이미지</th>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {imgPreviewUrl && (
+                      <img src={imgPreviewUrl} alt="미리보기" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 4, border: '1px solid #e0e0e0' }} />
+                    )}
+                    <button className="btn btnGray" onClick={() => setFilePopOpen(true)}>
+                      {fileId ? '이미지 변경' : '이미지 등록'}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </PopupContent>
+      </PopupLayout>
+
+      <FileUploadPop
+        open={filePopOpen}
+        onlyImg={true}
+        onClose={() => setFilePopOpen(false)}
+        onSuccess={async (fileInfo) => {
+          if (fileInfo?.fileId) setFileId(fileInfo.fileId as unknown as number);
+          if (fileInfo?.sysFileNm) {
+            const url = await getFileUrl(fileInfo.sysFileNm as unknown as string);
+            setImgPreviewUrl(url);
+          }
+          setFilePopOpen(false);
+        }}
+      />
+    </>
   );
 };
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { ColDef } from 'ag-grid-community';
+import { ColDef, ICellRendererParams } from 'ag-grid-community';
 import { Search, Table, Title } from '../../../../components';
 import { toastError, toastSuccess } from '../../../../components/ToastMessage';
 import { useCommonStore } from '../../../../stores';
@@ -22,6 +22,7 @@ export type NoticeItem = {
   id: number;
   noticeCd?: string;
   title: string;
+  fileId?: number;
   moveUri?: string;
   gesiYn?: string;
   creUser?: string;
@@ -37,8 +38,10 @@ type NoticeFilter = {
 const NoticeMng = () => {
   const { onGridReady } = useAgGridApi();
   const menuNm = useCommonStore((s) => s.menuNm);
+  const getFileUrl = useCommonStore((s) => s.getFileUrl);
 
   const [rowData, setRowData] = useState<NoticeItem[]>([]);
+  const [imgUrls, setImgUrls] = useState<Record<number, string>>({});
   const [selectedRow, setSelectedRow] = useState<NoticeItem | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [modOpen, setModOpen] = useState(false);
@@ -64,6 +67,20 @@ const NoticeMng = () => {
       toastError(resultMessage ?? '조회 중 오류가 발생했습니다.');
     }
   }, [listData, isSuccess]);
+
+  useEffect(() => {
+    rowData.forEach(async (row) => {
+      if (!row.fileId || imgUrls[row.fileId]) return;
+      try {
+        const { data } = await authApi.get(`/common/file/${row.fileId}`);
+        const fileList = data?.body ?? [];
+        if (fileList.length > 0 && fileList[0].sysFileNm) {
+          const url = await getFileUrl(fileList[0].sysFileNm);
+          setImgUrls((prev) => ({ ...prev, [row.fileId!]: url }));
+        }
+      } catch { /* ignore */ }
+    });
+  }, [rowData]);
 
   const { mutate: deleteMutate } = useMutation({
     mutationFn: (id: number) => authApi.delete(`/noticeMng/${id}`),
@@ -92,6 +109,18 @@ const NoticeMng = () => {
       headerName: '제목',
       minWidth: 250,
       suppressHeaderMenuButton: true,
+    },
+    {
+      field: 'fileId',
+      headerName: '이미지',
+      minWidth: 80, maxWidth: 90,
+      cellStyle: GridSetting.CellStyle.CENTER,
+      suppressHeaderMenuButton: true,
+      cellRenderer: (p: ICellRendererParams<NoticeItem>) => {
+        const url = p.data?.fileId ? imgUrls[p.data.fileId] : undefined;
+        if (!url) return p.value ? '있음' : '-';
+        return <img src={url} alt="이미지" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4, margin: '2px 0' }} />;
+      },
     },
     {
       field: 'creUser',
