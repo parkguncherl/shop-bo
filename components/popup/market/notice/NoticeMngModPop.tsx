@@ -22,12 +22,14 @@ const NoticeMngModPop = ({ open, item, onClose, onSuccess }: Props) => {
   const [title, setTitle] = useState('');
   const [fileId, setFileId] = useState<number | undefined>();
   const [imgPreviewUrl, setImgPreviewUrl] = useState('');
+  const [moveUri, setMoveUri] = useState('');
   const [filePopOpen, setFilePopOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
     setTitle(item.title ?? '');
     setFileId(item.fileId);
+    setMoveUri(item.moveUri ?? '');
     setImgPreviewUrl('');
 
     if (item.fileId) {
@@ -48,6 +50,7 @@ const NoticeMngModPop = ({ open, item, onClose, onSuccess }: Props) => {
       id: item.id,
       title,
       fileId: fileId ?? null,
+      moveUri: moveUri || null,
     });
     if (data?.resultCode === 200) {
       toastSuccess('수정되었습니다.');
@@ -84,6 +87,18 @@ const NoticeMngModPop = ({ open, item, onClose, onSuccess }: Props) => {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="제목을 입력하세요"
+                    style={{ width: '100%' }}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <th>이동 URL</th>
+                <td>
+                  <input
+                    className="inputBox"
+                    value={moveUri}
+                    onChange={(e) => setMoveUri(e.target.value)}
+                    placeholder="이미지 클릭 시 이동할 URL (선택)"
                     style={{ width: '100%' }}
                   />
                 </td>
