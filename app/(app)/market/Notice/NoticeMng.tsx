@@ -22,10 +22,8 @@ export type NoticeItem = {
   id: number;
   noticeCd?: string;
   title: string;
-  noticeCntn?: string;
   moveUri?: string;
-  authCds?: string;
-  readCnt?: string;
+  gesiYn?: string;
   creUser?: string;
   creTm?: string;
   updUser?: string;
@@ -94,14 +92,6 @@ const NoticeMng = () => {
       headerName: '제목',
       minWidth: 250,
       suppressHeaderMenuButton: true,
-    },
-    {
-      field: 'readCnt',
-      headerName: '조회수',
-      minWidth: 80, maxWidth: 90,
-      cellStyle: GridSetting.CellStyle.CENTER,
-      suppressHeaderMenuButton: true,
-      valueFormatter: (p) => p.value ?? '0',
     },
     {
       field: 'creUser',

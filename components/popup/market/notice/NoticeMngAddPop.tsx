@@ -15,11 +15,9 @@ interface Props {
 
 const NoticeMngAddPop = ({ open, onClose, onSuccess }: Props) => {
   const [title, setTitle] = useState('');
-  const [noticeCntn, setNoticeCntn] = useState('');
 
   const handleClose = () => {
     setTitle('');
-    setNoticeCntn('');
     onClose();
   };
 
@@ -28,7 +26,6 @@ const NoticeMngAddPop = ({ open, onClose, onSuccess }: Props) => {
     const { data } = await authApi.post('/noticeMng/create', {
       noticeCd: '2',
       title,
-      noticeCntn: noticeCntn || null,
     });
     if (data?.resultCode === 200) {
       toastSuccess('등록되었습니다.');
@@ -65,19 +62,6 @@ const NoticeMngAddPop = ({ open, onClose, onSuccess }: Props) => {
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="제목을 입력하세요"
                   style={{ width: '100%' }}
-                />
-              </td>
-            </tr>
-            <tr>
-              <th>내용</th>
-              <td>
-                <textarea
-                  className="inputBox"
-                  value={noticeCntn}
-                  onChange={(e) => setNoticeCntn(e.target.value)}
-                  placeholder="내용을 입력하세요"
-                  rows={8}
-                  style={{ width: '100%', resize: 'vertical' }}
                 />
               </td>
             </tr>

@@ -17,12 +17,10 @@ interface Props {
 
 const NoticeMngModPop = ({ open, item, onClose, onSuccess }: Props) => {
   const [title, setTitle] = useState('');
-  const [noticeCntn, setNoticeCntn] = useState('');
 
   useEffect(() => {
     if (!open) return;
     setTitle(item.title ?? '');
-    setNoticeCntn(item.noticeCntn ?? '');
   }, [open, item]);
 
   const handleClose = () => onClose();
@@ -31,9 +29,7 @@ const NoticeMngModPop = ({ open, item, onClose, onSuccess }: Props) => {
     if (!title.trim()) { toastError('제목을 입력해주세요.'); return; }
     const { data } = await authApi.put('/noticeMng/update', {
       id: item.id,
-      noticeCd: item.noticeCd ?? '2',
       title,
-      noticeCntn: noticeCntn || null,
     });
     if (data?.resultCode === 200) {
       toastSuccess('수정되었습니다.');
@@ -70,19 +66,6 @@ const NoticeMngModPop = ({ open, item, onClose, onSuccess }: Props) => {
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="제목을 입력하세요"
                   style={{ width: '100%' }}
-                />
-              </td>
-            </tr>
-            <tr>
-              <th>내용</th>
-              <td>
-                <textarea
-                  className="inputBox"
-                  value={noticeCntn}
-                  onChange={(e) => setNoticeCntn(e.target.value)}
-                  placeholder="내용을 입력하세요"
-                  rows={8}
-                  style={{ width: '100%', resize: 'vertical' }}
                 />
               </td>
             </tr>
