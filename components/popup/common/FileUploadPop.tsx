@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { PopupContent } from '../PopupContent';
 import { PopupFooter } from '../PopupFooter';
 import { authApi } from '../../../libs';
@@ -79,7 +79,31 @@ export const FileUploadPop = ({ open, onClose, onSuccess, onlyImg = false, fileI
     e.target.value = '';
   };
 
-  // 2. 드래그 앤 드롭 핸들러
+  // 2. 클립보드 붙여넣기 (Ctrl+V)
+  const handlePaste = useCallback((e: ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    const imageFiles: File[] = [];
+    for (const item of Array.from(items)) {
+      if (item.type.startsWith('image/')) {
+        const blob = item.getAsFile();
+        if (blob) {
+          const ext = item.type.split('/')[1] || 'png';
+          const fileName = `clipboard_${Date.now()}.${ext === 'png' ? 'png' : 'png'}`;
+          imageFiles.push(new File([blob], fileName, { type: 'image/png' }));
+        }
+      }
+    }
+    if (imageFiles.length > 0) processFiles(imageFiles);
+  }, [processFiles]);
+
+  useEffect(() => {
+    if (!open) return;
+    window.addEventListener('paste', handlePaste);
+    return () => window.removeEventListener('paste', handlePaste);
+  }, [open, handlePaste]);
+
+  // 3. 드래그 앤 드롭 핸들러
   const onDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -203,7 +227,7 @@ export const FileUploadPop = ({ open, onClose, onSuccess, onlyImg = false, fileI
 
           <div className="uploadPrompt">
             <span className="ico_upload"></span>
-            <p>{onlyImg ? '이미지들을 드래그 하거나 클릭해주세요' : '파일들을 드래그 하거나 클릭해주세요'}</p>
+            <p>{onlyImg ? '이미지 드래그, 클릭, 또는 Ctrl+V로 붙여넣기' : '파일 드래그, 클릭, 또는 Ctrl+V로 붙여넣기'}</p>
             <label htmlFor={uniqueId} className="btn_upload_label">
               {onlyImg ? '이미지 선택' : '파일 선택'}
             </label>

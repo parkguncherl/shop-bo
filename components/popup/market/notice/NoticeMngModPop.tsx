@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { ImageSwiper } from '../../../ImageSwiper';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { PopupLayout } from '../../PopupLayout';
 import { PopupContent } from '../../PopupContent';
@@ -29,15 +30,29 @@ interface FormFields {
   gesiYn: string;
 }
 
+interface FileDet {
+  id: number;
+  sysFileNm: string;
+}
+
 const NoticeMngModPop = ({ open, item, onClose, onSuccess }: Props) => {
   const getFileUrl = useCommonStore((s) => s.getFileUrl);
   const [fileId, setFileId] = useState<number | undefined>();
-  const [imgPreviewUrl, setImgPreviewUrl] = useState('');
+  const [fileDets, setFileDets] = useState<FileDet[]>([]);
+  const [imgUrls, setImgUrls] = useState<string[]>([]);
   const [filePopOpen, setFilePopOpen] = useState(false);
 
   const { control, handleSubmit, reset } = useForm<FormFields>({
     defaultValues: { title: '', moveUri: '', gesiYn: 'N' },
   });
+
+  const loadImages = async (fid: number) => {
+    const { data } = await authApi.get(`/common/file/${fid}`);
+    const list: FileDet[] = (data?.body ?? []).filter((f: FileDet) => f.id && f.sysFileNm);
+    const urls = await Promise.all(list.map((f) => getFileUrl(f.sysFileNm)));
+    setFileDets(list);
+    setImgUrls(urls.filter(Boolean));
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -47,17 +62,28 @@ const NoticeMngModPop = ({ open, item, onClose, onSuccess }: Props) => {
       gesiYn: item.gesiYn ?? 'N',
     });
     setFileId(item.fileId);
-    setImgPreviewUrl('');
+    setFileDets([]);
+    setImgUrls([]);
 
     if (item.fileId) {
-      authApi.get(`/common/file/${item.fileId}`).then(({ data }) => {
-        const fileList = data?.body ?? [];
-        if (fileList.length > 0 && fileList[0].sysFileNm) {
-          getFileUrl(fileList[0].sysFileNm).then((url: string) => setImgPreviewUrl(url));
-        }
-      }).catch(() => {});
+      loadImages(item.fileId).catch(() => {});
     }
   }, [open, item]);
+
+  const handleDeleteImage = async (index: number) => {
+    const det = fileDets[index];
+    if (!det) return;
+    try {
+      await authApi.delete(`/common/fileDeleteByKey/${det.id}`);
+      const newDets = fileDets.filter((_, i) => i !== index);
+      const newUrls = imgUrls.filter((_, i) => i !== index);
+      setFileDets(newDets);
+      setImgUrls(newUrls);
+      if (newDets.length === 0) setFileId(undefined);
+    } catch {
+      toastError('이미지 삭제 중 오류가 발생했습니다.');
+    }
+  };
 
   const handleClose = () => onClose();
 
@@ -123,22 +149,10 @@ const NoticeMngModPop = ({ open, item, onClose, onSuccess }: Props) => {
                   <dd>
                     <div className="formBox" style={{ display: 'flex', alignItems: 'center' }}>
                       <button className="btn" type="button" style={{ whiteSpace: 'nowrap' }} onClick={() => setFilePopOpen(true)}>
-                        {fileId ? '이미지 변경' : '이미지 등록'}
+                        {fileId ? '이미지 추가' : '이미지 등록'}
                       </button>
                     </div>
-                    {imgPreviewUrl && (
-                      <div style={{ position: 'relative', width: 120, marginTop: 8 }}>
-                        <img src={imgPreviewUrl} alt="미리보기" style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 4, border: '1px solid #e0e0e0', display: 'block' }} />
-                        <button
-                          type="button"
-                          onClick={() => { setFileId(undefined); setImgPreviewUrl(''); }}
-                          style={{ position: 'absolute', top: 4, right: 4, width: 20, height: 20, borderRadius: '50%', border: 'none', background: 'rgba(0,0,0,0.55)', color: '#fff', cursor: 'pointer', lineHeight: '20px', textAlign: 'center', padding: 0 }}
-                          aria-label="이미지 삭제"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    )}
+                    <ImageSwiper images={imgUrls} width={140} height={140} onDelete={handleDeleteImage} />
                   </dd>
                 </dl>
               </PopupFormType>
@@ -150,12 +164,13 @@ const NoticeMngModPop = ({ open, item, onClose, onSuccess }: Props) => {
       <FileUploadPop
         open={filePopOpen}
         onlyImg={true}
+        fileId={fileId}
         onClose={() => setFilePopOpen(false)}
         onSuccess={async (fileInfo) => {
-          if (fileInfo?.fileId) setFileId(fileInfo.fileId as unknown as number);
-          if (fileInfo?.sysFileNm) {
-            const url = await getFileUrl(fileInfo.sysFileNm as unknown as string);
-            setImgPreviewUrl(url);
+          const resultFileId = (fileInfo?.fileId as unknown as number) ?? fileId;
+          if (resultFileId) {
+            setFileId(resultFileId);
+            await loadImages(resultFileId);
           }
           setFilePopOpen(false);
         }}

@@ -1,5 +1,6 @@
 export * from './content';
 export * from './BtnCellRenderer';
+export * from './ImageSwiper';
 export * from './Button';
 export * from './CustomChart';
 export * from './CustomDatePicker';
