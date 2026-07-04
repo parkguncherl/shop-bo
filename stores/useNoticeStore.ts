@@ -27,14 +27,12 @@ export interface NoticeDetail {
   id: number;
   noticeCd: string;
   title: string;
-  noticeCntn: string;
   moveUri: string;
   authCds: string;
   creUser: string;
   creTm: string;
   updUser: string;
   updTm: string;
-  deleteYn: string;
   readCnt: number;
 }
 

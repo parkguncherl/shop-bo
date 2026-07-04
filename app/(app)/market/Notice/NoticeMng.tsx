@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { ColDef, ICellRendererParams } from 'ag-grid-community';
 import { Search, Table, Title } from '../../../../components';
-import { toastError, toastSuccess } from '../../../../components/ToastMessage';
+import { toastError, toastSuccess } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
 import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
 import { useAgGridApi } from '../../../../hooks';
@@ -23,6 +23,7 @@ export type NoticeItem = {
   noticeCd?: string;
   title: string;
   fileId?: number;
+  fileCnt?: number;
   moveUri?: string;
   gesiYn?: string;
   creUser?: string;
@@ -33,6 +34,7 @@ export type NoticeItem = {
 
 type NoticeFilter = {
   title: string;
+  noticeCd: string;
 };
 
 const NoticeMng = () => {
@@ -49,20 +51,31 @@ const NoticeMng = () => {
 
   const queryClient = useQueryClient();
 
-  const [filters, onChangeFilters, onFiltersReset] = useFilters<NoticeFilter>({ title: '' });
+  const [filters, onChangeFilters, onFiltersReset] = useFilters<NoticeFilter>({ title: '', noticeCd: '' });
 
-  const { isLoading, isSuccess, data: listData, refetch } = useQuery({
-    queryKey: ['/noticeMng/list', filters.title],
-    queryFn: () => authApi.get('/noticeMng/list', {
-      params: { pageRowCount: 1000, curPage: 1, 'filter.title': filters.title || undefined },
-    }),
+  const {
+    isLoading,
+    isSuccess,
+    data: listData,
+    refetch,
+  } = useQuery({
+    queryKey: ['/noticeMng/list', filters.title, filters.noticeCd],
+    queryFn: () =>
+      authApi.get('/noticeMng/list', {
+        params: {
+          pageRowCount: 1000,
+          curPage: 1,
+          'filter.title': filters.title || undefined,
+          'filter.noticeCd': filters.noticeCd || undefined,
+        },
+      }),
   });
 
   useEffect(() => {
     if (!isSuccess) return;
     const { resultCode, body, resultMessage } = listData.data;
     if (resultCode === 200) {
-      setRowData(body?.list ?? []);
+      setRowData(body?.rows ?? []);
     } else {
       toastError(resultMessage ?? '조회 중 오류가 발생했습니다.');
     }
@@ -78,7 +91,9 @@ const NoticeMng = () => {
           const url = await getFileUrl(fileList[0].sysFileNm);
           setImgUrls((prev) => ({ ...prev, [row.fileId!]: url }));
         }
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     });
   }, [rowData]);
 
@@ -99,7 +114,8 @@ const NoticeMng = () => {
   const columnDefs: ColDef<NoticeItem>[] = [
     {
       headerName: 'No',
-      minWidth: 55, maxWidth: 55,
+      minWidth: 55,
+      maxWidth: 55,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
       valueGetter: (p) => (p.node?.rowIndex != null ? p.node.rowIndex + 1 : ''),
@@ -111,39 +127,52 @@ const NoticeMng = () => {
       suppressHeaderMenuButton: true,
     },
     {
-      field: 'fileId',
-      headerName: '이미지',
-      minWidth: 80, maxWidth: 90,
+      field: 'moveUri',
+      headerName: '링크 URL',
+      minWidth: 250,
+      suppressHeaderMenuButton: true,
+    },
+    {
+      field: 'fileCnt',
+      headerName: '첨부',
+      minWidth: 55,
+      maxWidth: 55,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
-      cellRenderer: (p: ICellRendererParams<NoticeItem>) => {
-        const url = p.data?.fileId ? imgUrls[p.data.fileId] : undefined;
-        if (!url) return p.value ? '있음' : '-';
-        return <img src={url} alt="이미지" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4, margin: '2px 0' }} />;
-      },
+    },
+    {
+      field: 'gesiYn',
+      headerName: '게시여부',
+      minWidth: 60,
+      maxWidth: 60,
+      suppressHeaderMenuButton: true,
+      cellStyle: GridSetting.CellStyle.CENTER,
     },
     {
       field: 'creUser',
       headerName: '등록자',
-      minWidth: 100, maxWidth: 120,
+      minWidth: 100,
+      maxWidth: 120,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
     },
     {
-      field: 'creTm',
+      field: 'updTm',
       headerName: '등록일',
-      minWidth: 110, maxWidth: 120,
+      minWidth: 110,
+      maxWidth: 120,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
-      valueFormatter: (p) => p.value ? dayjs(p.value).format('YYYY-MM-DD') : '',
+      cellRenderer: 'DATE',
     },
     {
       field: 'updTm',
       headerName: '수정일',
-      minWidth: 110, maxWidth: 120,
+      minWidth: 110,
+      maxWidth: 120,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
-      valueFormatter: (p) => p.value ? dayjs(p.value).format('YYYY-MM-DD') : '',
+      cellRenderer: 'DATE',
     },
   ];
 
@@ -157,6 +186,17 @@ const NoticeMng = () => {
     <div>
       <Title title={menuNm ?? '공지사항 관리'} reset={reset} search={refetch} />
       <Search className="type_2">
+        <Search.DropDown
+          title="구분"
+          name="noticeCd"
+          value={filters.noticeCd}
+          onChange={(name, value) => onChangeFilters(name as keyof NoticeFilter, value as string)}
+          defaultOptions={[
+            { label: '화면공지', value: '1' },
+            { label: '기타', value: '2' },
+          ]}
+          showAll={true}
+        />
         <Search.Input
           title="제목"
           name="title"
@@ -181,15 +221,17 @@ const NoticeMng = () => {
           onRowClicked={(e) => setSelectedRow(e.data ?? null)}
         />
       </Table>
-      <div className="btnBox">
+      <div className="btnArea between">
         <div className="right">
-          <button className="btn btn_primary" onClick={() => setAddOpen(true)}>등록</button>
-          {selectedRow && (
-            <>
-              <button className="btn btn_default" onClick={() => setModOpen(true)}>수정</button>
-              <button className="btn btn_danger" onClick={() => setDelOpen(true)}>삭제</button>
-            </>
-          )}
+          <button className="btn btn_primary" onClick={() => setAddOpen(true)}>
+            등록
+          </button>
+          <button className="btn btn_default" onClick={() => setModOpen(true)} disabled={!selectedRow}>
+            수정
+          </button>
+          <button className="btn btn_danger" onClick={() => setDelOpen(true)} disabled={!selectedRow}>
+            삭제
+          </button>
         </div>
       </div>
 
@@ -218,7 +260,9 @@ const NoticeMng = () => {
         open={delOpen}
         title="해당 공지사항을 삭제하시겠습니까?"
         warningMessage="삭제 후 복구할 수 없습니다."
-        onConfirm={() => { if (selectedRow) deleteMutate(selectedRow.id); }}
+        onConfirm={() => {
+          if (selectedRow) deleteMutate(selectedRow.id);
+        }}
         onClose={(_r) => setDelOpen(false)}
       />
     </div>

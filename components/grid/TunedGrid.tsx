@@ -134,6 +134,8 @@ const TunedGrid = <P, PO extends DefaultPagingOptions = DefaultPagingOptions>({ 
     ...props.components,
     NUMBER_COMMA: GridSetting.CellRenderer.NUMBER_COMMA,
     PERCENTAGE: GridSetting.CellRenderer.PERCENTAGE,
+    DATE: GridSetting.CellRenderer.DATE,
+    DATETIME: GridSetting.CellRenderer.DATETIME,
   };
 
   /** 참조 및 외부 노출 ref 속성 실 구현 */

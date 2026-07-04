@@ -3,6 +3,7 @@
 import { ColDef, SuppressKeyboardEventParams } from 'ag-grid-community';
 import CustomTooltip from '../components/CustomTooltip';
 import { Utils } from './utils';
+import dayjs from 'dayjs';
 
 export const defaultColDef: ColDef = {
   flex: 1,
@@ -79,6 +80,29 @@ export const GridSetting = {
       if (params.value == null || params.value === '') return '';
       if (isNaN(params.value)) return params.value;
       return `${params.value} %`;
+    },
+    DATE: (params: any) => {
+      if (params.value == null || params.value === '') return '';
+
+      const date = dayjs(params.value);
+
+      if (!date.isValid()) {
+        return params.value;
+      }
+
+      return date.format('YYYY-MM-DD');
+    },
+
+    DATETIME: (params: any) => {
+      if (params.value == null || params.value === '') return '';
+
+      const date = dayjs(params.value);
+
+      if (!date.isValid()) {
+        return params.value;
+      }
+
+      return date.format('YYYY-MM-DD HH:mm:ss');
     },
   },
 };
