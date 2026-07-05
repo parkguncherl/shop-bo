@@ -31,7 +31,7 @@ import {
 type ContentProductInfoWithImg = ProductContentListResponseContentProductInfo & { imgUrl?: string };
 
 /** 상품관리 - 상품컨텐츠 목록 페이지 */
-const ContentList = () => {
+const ProdGroupMng = () => {
   /** Grid Api */
   const { onGridReady } = useAgGridApi();
 
@@ -64,20 +64,19 @@ const ContentList = () => {
       suppressHeaderMenuButton: true,
     },
     { field: 'newsTitle', headerName: '제목', minWidth: 200, maxWidth: 250, suppressHeaderMenuButton: true },
-    { field: 'newsSubTitle', headerName: '하위 제목', minWidth: 100, maxWidth: 200, suppressHeaderMenuButton: true },
     {
       field: 'imageCnt',
-      headerName: '이미지 건수',
-      minWidth: 80,
-      maxWidth: 80,
+      headerName: '이미지',
+      minWidth: 50,
+      maxWidth: 50,
       suppressHeaderMenuButton: true,
       cellStyle: GridSetting.CellStyle.CENTER,
     },
     {
       field: 'productCnt',
       headerName: '연결상품',
-      minWidth: 80,
-      maxWidth: 80,
+      minWidth: 60,
+      maxWidth: 60,
       suppressHeaderMenuButton: true,
       cellStyle: GridSetting.CellStyle.CENTER,
     },
@@ -93,6 +92,16 @@ const ContentList = () => {
       valueGetter: (params) => (params.node ? (params.node.rowIndex ?? 0) + 1 : ''),
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
+    },
+    {
+      field: 'imgUrl' as keyof ContentProductInfoWithImg,
+      headerName: '이미지',
+      minWidth: 56,
+      maxWidth: 56,
+      suppressHeaderMenuButton: true,
+      cellStyle: { padding: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+      cellRenderer: (params: { value?: string }) =>
+        params.value ? <img src={params.value} style={{ height: '46px', width: '46px', objectFit: 'cover', borderRadius: '4px' }} /> : null,
     },
     { field: 'prodNm', headerName: '상품명', minWidth: 130, maxWidth: 200, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.LEFT },
     {
@@ -135,18 +144,6 @@ const ContentList = () => {
       suppressHeaderMenuButton: true,
       cellStyle: GridSetting.CellStyle.CENTER,
       cellRenderer: 'NUMBER_COMMA',
-    },
-    {
-      field: 'imgUrl' as keyof ContentProductInfoWithImg,
-      headerName: '이미지',
-      minWidth: 56,
-      maxWidth: 56,
-      suppressHeaderMenuButton: true,
-      cellStyle: { padding: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center' },
-      cellRenderer: (params: { value?: string }) =>
-        params.value ? (
-          <img src={params.value} style={{ height: '46px', width: '46px', objectFit: 'cover', borderRadius: '4px' }} />
-        ) : null,
     },
     {
       field: 'discountRate',
@@ -276,7 +273,7 @@ const ContentList = () => {
     isLoading: isProductContentListResponseLoading,
     refetch: productContentListResponseRefetch,
   } = useQuery({
-    queryKey: ['/productContentList/productContentListPaging', filters, debouncedCurPage],
+    queryKey: ['/productContentList/productContentListPaging', debouncedCurPage],
     queryFn: () =>
       authApi.get('/productContentList/productContentListPaging', {
         params: {
@@ -349,10 +346,19 @@ const ContentList = () => {
   return (
     <div>
       <div className="layoutBox">
-        <div className={'layout40'}>
+        <div className={'layout30'}>
           <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} />
           <Search className="type_2">
-            <Search.Input title={'컨텐츠 제목'} name={'newsTitle'} placeholder={Placeholder.Input} value={filters.newsTitle} onChange={onChangeFilters} />
+            <Search.Input
+              title={'컨텐츠 제목'}
+              name={'newsTitle'}
+              placeholder={Placeholder.Input}
+              value={filters.newsTitle}
+              onChange={onChangeFilters}
+              onEnter={() => {
+                productContentListResponseRefetch();
+              }}
+            />
           </Search>
           <Table>
             <TableHeader count={((paging.curPage || 1) - 1) * (paging.pageRowCount || 0) + productContentList.length} search={search}></TableHeader>
@@ -430,7 +436,7 @@ const ContentList = () => {
             </div>
           </Table>
         </div>
-        <div className={'layout60'}>
+        <div className={'layout70'}>
           <Title title={'연결품목목록'} detail={true} />
           <Search className="type_2">
             <CustomSwitch
@@ -528,4 +534,4 @@ const ContentList = () => {
   );
 };
 
-export default ContentList;
+export default ProdGroupMng;

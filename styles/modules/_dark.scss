@@ -523,6 +523,9 @@
   .ag-row-selected.ag-row-hover::before,
   .ag-row-selected.ag-row-focus::before { background-color: #254d7a !important; }
   .ag-row-selected .ag-cell { color: #e8f0fe !important; }
+  .check .ag-row-selected .ag-cell-value.ag-column-first::after {
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='9' viewBox='0 0 12 9' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.5 3.5L4.57143 7L11 1' stroke='%23ffffff' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+  }
 
   .ag-theme-quartz .ag-cell.ag-cell-focus { background-color: #2d1b69 !important; }
   .ag-theme-quartz .ag-cell-focus:not(.ag-cell-range-selected) { background-color: #2d1b69 !important; }
