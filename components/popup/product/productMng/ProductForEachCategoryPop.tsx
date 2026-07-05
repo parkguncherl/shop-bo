@@ -241,6 +241,10 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
     }
   }, [categories, isCategoriesSuccess]);
 
+  useEffect(() => {
+    console.log('lowerPartnerCodeList ==>', lowerPartnerCodeList);
+  }, [lowerPartnerCodeList]);
+
   /** 카테고리 연결상품정보 목록 조회 */
   const {
     data: productInfosByCategory,
@@ -360,6 +364,14 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
     }
   };
 
+  const categoryOptions = useMemo(() => {
+    return lowerPartnerCodeList.map((lowerPartnerCode) => ({
+      key: String(lowerPartnerCode.id),
+      label: lowerPartnerCode.codeNm,
+      value: lowerPartnerCode.id,
+    }));
+  }, [lowerPartnerCodeList]);
+
   return (
     <div className="imgPopBox">
       <PopupLayout
@@ -374,7 +386,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
               <div className="left">
                 <button
                   className={`btn ${selectedProductInfoByCategory != undefined && filtersForProdInfoByCategory.categoryId && 'btnPurple'}`}
-                  disabled={selectedProductInfoByCategory == undefined || !filtersForProdInfoByCategory.categoryId}
+                  disabled={selectedProductInfoByCategory === undefined}
                   onClick={() => {
                     setModalsStatus({
                       type: 'DEL_FROM_CATEGORY',
@@ -449,13 +461,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
               <Search.DropDown
                 title={'카테고리'}
                 name={'categoryId'}
-                defaultOptions={lowerPartnerCodeList.map((lowerPartnerCode, index) => {
-                  return {
-                    key: index,
-                    label: lowerPartnerCode.codeNm,
-                    value: lowerPartnerCode.id, // 카테고리 연결상품 조회에서는 categoryId 를 사용하므로 이와 같이 할당한다.
-                  };
-                })}
+                defaultOptions={categoryOptions}
                 value={filtersForProdInfoByCategory.categoryId}
                 onChange={onChangeFiltersForProdInfoByCategory}
                 dropDownStyle={{ width: '280px' }}
