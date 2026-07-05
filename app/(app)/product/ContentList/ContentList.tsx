@@ -28,6 +28,8 @@ import {
   ProductContentListResponseProductContent,
 } from '../../../../generated';
 
+type ContentProductInfoWithImg = ProductContentListResponseContentProductInfo & { imgUrl?: string };
+
 /** 상품관리 - 상품컨텐츠 목록 페이지 */
 const ContentList = () => {
   /** Grid Api */
@@ -82,7 +84,7 @@ const ContentList = () => {
   ]);
 
   /** 컬럼 설정 - 권한 컬럼 포함 */
-  const [rightColumnDefs] = useState<ColDef<ProductContentListResponseContentProductInfo | { no: number }>[]>([
+  const [rightColumnDefs] = useState<ColDef<ContentProductInfoWithImg | { no: number }>[]>([
     {
       field: 'no',
       headerName: 'NO',
@@ -135,6 +137,18 @@ const ContentList = () => {
       cellRenderer: 'NUMBER_COMMA',
     },
     {
+      field: 'imgUrl' as keyof ContentProductInfoWithImg,
+      headerName: '이미지',
+      minWidth: 56,
+      maxWidth: 56,
+      suppressHeaderMenuButton: true,
+      cellStyle: { padding: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+      cellRenderer: (params: { value?: string }) =>
+        params.value ? (
+          <img src={params.value} style={{ height: '46px', width: '46px', objectFit: 'cover', borderRadius: '4px' }} />
+        ) : null,
+    },
+    {
       field: 'discountRate',
       headerName: '할인율',
       minWidth: 80,
@@ -147,7 +161,7 @@ const ContentList = () => {
   const [productContentList, setProductContentList] = useState<ProductContentListResponseProductContent[]>([]);
   const [lastProductContent, setLastProductContent] = useState<ProductContentListResponseProductContent | undefined>(undefined); // 다음 페이징 동작에서 사용할 마지막 행의 정보(last row's info)
 
-  const [contentsProductInfoList, setContentsProductInfoList] = useState<ProductContentListResponseContentProductInfo[]>([]);
+  const [contentsProductInfoList, setContentsProductInfoList] = useState<ContentProductInfoWithImg[]>([]);
 
   const [selectedRowsData, setSelectedRowsData] = useState<ProductContentListResponseProductContent | undefined>(undefined);
 
@@ -312,7 +326,20 @@ const ContentList = () => {
     if (isContentsProductInfoListResponseSuccess) {
       const { resultCode, body, resultMessage } = contentsProductInfoListResponse.data;
       if (resultCode === 200) {
-        setContentsProductInfoList(body || []);
+        const rows: ProductContentListResponseContentProductInfo[] = body || [];
+        Promise.all(
+          rows.map(async (row) => {
+            if (!row.repFileId) return { ...row };
+            try {
+              const { data } = await authApi.get(`/common/file/${row.repFileId}`);
+              const first = (data?.body as { sysFileNm?: string }[] | undefined)?.[0];
+              const imgUrl = first?.sysFileNm ? await getFileUrl(first.sysFileNm) : undefined;
+              return { ...row, imgUrl };
+            } catch {
+              return { ...row };
+            }
+          }),
+        ).then(setContentsProductInfoList);
       } else {
         toastError(resultMessage);
       }
@@ -418,8 +445,9 @@ const ContentList = () => {
           </Search>
           <Table>
             <TableHeader count={contentsProductInfoList.length} search={search}></TableHeader>
-            <TunedGrid<ProductContentListResponseContentProductInfo>
+            <TunedGrid<ContentProductInfoWithImg>
               headerHeight={35}
+              rowHeight={50}
               ref={rightGridRef}
               onGridReady={onGridReady}
               rowData={contentsProductInfoList}

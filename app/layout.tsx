@@ -16,7 +16,7 @@ import { AntdRegistry } from '@ant-design/nextjs-registry';
  * 해당 애플리케이션의 DOM 중 최상위 영역, 해당 영역에서 전역 provider 제공
  * */
 export const metadata: Metadata = {
-  title: 'GGUANGGU',
+  title: '맵시꾼',
   icons: { icon: '/favicon_logo.svg' },
 };
 const layout = ({ children }: { children: React.ReactNode }) => {

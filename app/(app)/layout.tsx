@@ -27,7 +27,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
           <div className={stylesForHeader.left}>
             <h1>
               <Link href={'/'} style={{ display: 'flex', alignItems: 'center', color: '#fff', fontSize: '18px', fontWeight: 700, letterSpacing: '2px' }}>
-                {'GGUANGGU'}
+                {'맵시꾼'}
               </Link>
             </h1>
           </div>

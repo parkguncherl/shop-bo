@@ -232,9 +232,7 @@ const LoginClient = () => {
       <div className={styles.login_box}>
         <form>
           <div className={styles.content}>
-            <div className={styles.logo}>
-              GGUANGGU
-            </div>
+            <div className={styles.logo}>맵시꾼</div>
             <div className={`${styles.login_inp} ${validAccount ? styles.id_pw_close : styles.id_pw_open}`}>
               <div className={styles.inp_id}>
                 <FormInput<LoginVerificationFields>
