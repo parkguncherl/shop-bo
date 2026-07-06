@@ -4,8 +4,8 @@
  /wms/system/partnerMng
  */
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useAgGridApi, useDidMountEffect } from '../../../../hooks';
+import React, { useEffect, useMemo } from 'react';
+import { useAgGridApi } from '../../../../hooks';
 import { useCommonStore } from '../../../../stores';
 import useFilters from '../../../../hooks/useFilters';
 import { useQuery } from '@tanstack/react-query';
@@ -24,7 +24,7 @@ const PartnerMng = () => {
   /** Grid Api */
   const { onGridReady } = useAgGridApi();
   /** 공통 스토어 - State */
-  const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
+  const [menuNm] = useCommonStore((s) => [s.menuNm]);
   /** 스토어 */
   const [paging, setPaging, selectedPartner, setSelectedPartner, modalType, openModal] = usePartnerStore((s) => [
     s.paging,
@@ -35,7 +35,7 @@ const PartnerMng = () => {
     s.openModal,
   ]);
   /** 필터 */
-  const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<PartnerPagingFilter>({
+  const [filters, onChangeFilters] = useFilters<PartnerPagingFilter>({
     startDate: '2026-01-01',
     endDate: new Date().toISOString().slice(0, 10),
   });
@@ -61,7 +61,15 @@ const PartnerMng = () => {
       },
       { field: 'repNm', headerName: '대표자명', minWidth: 120, maxWidth: 120, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
       { field: 'email', headerName: '회사이메일', minWidth: 150, maxWidth: 150, cellStyle: GridSetting.CellStyle.LEFT, suppressHeaderMenuButton: true },
-      { field: 'reviewPointRate', headerName: '리뷰포인트율', minWidth: 100, maxWidth: 100, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true, valueFormatter: (p) => p.value != null ? `${p.value}%` : '' },
+      {
+        field: 'reviewPointRate',
+        headerName: '리뷰포인트율',
+        minWidth: 100,
+        maxWidth: 100,
+        cellStyle: GridSetting.CellStyle.CENTER,
+        suppressHeaderMenuButton: true,
+        valueFormatter: (p) => (p.value != null ? `${p.value}%` : ''),
+      },
     ],
     [],
   );
@@ -107,25 +115,25 @@ const PartnerMng = () => {
   const search = async () => {
     await onSearch();
   };
-  useEffect(() => {
-    // 검색 조건 또는 페이지가 변경될 때마다 검색 수행
-    onSearch();
-  }, []);
+  // useEffect(() => {
+  //   // 검색 조건 또는 페이지가 변경될 때마다 검색 수행
+  //   onSearch();
+  // }, []);
 
-  /** 드롭다운 옵션 */
-  const dropdownOptions = [
-    { key: 'SL', value: 'select', label: '선택' },
-    { key: 'HW', value: '0', label: '화주' },
-    { key: 'DM', value: 'any', label: '도매' },
-  ];
-  /** 드롭다운 변경 시 */
-  const onChangeOptions = useCallback(async (name: string, value: string | number) => {
-    dispatch({ name: name, value: value });
-  }, []);
-  useDidMountEffect(() => {
-    // 드롭다운 변경시
-    onSearch();
-  }, [filters.upperPartnerId]);
+  // /** 드롭다운 옵션 */
+  // const dropdownOptions = [
+  //   { key: 'SL', value: 'select', label: '선택' },
+  //   { key: 'HW', value: '0', label: '화주' },
+  //   { key: 'DM', value: 'any', label: '도매' },
+  // ];
+  // /** 드롭다운 변경 시 */
+  // const onChangeOptions = useCallback(async (name: string, value: string | number) => {
+  //   dispatch({ name: name, value: value });
+  // }, []);
+  // useDidMountEffect(() => {
+  //   // 드롭다운 변경시
+  //   onSearch();
+  // }, [filters.upperPartnerId]);
 
   /** 셀 클릭 이벤트 */
   const onCellClicked = async (cellClickedEvent: CellClickedEvent) => {
@@ -140,7 +148,6 @@ const PartnerMng = () => {
   return (
     <div>
       <Title title={menuNm ? `${menuNm}` : ''} filters={filters} search={search} />
-
       <Search className="type_2 full">
         <Search.Input
           title={'검색'}
@@ -161,25 +168,48 @@ const PartnerMng = () => {
                 <input type="date" value={filters.endDate} onChange={(e) => onChangeFilters('endDate', e.target.value)} className="dateInput" />
               </div>
               <div style={{ display: 'flex', gap: 4 }}>
-                {([
-                  { label: '당일', fn: () => { const d = dayjs().format('YYYY-MM-DD'); onChangeFilters('startDate', d); onChangeFilters('endDate', d); } },
-                  { label: '1주일', fn: () => { onChangeFilters('startDate', dayjs().subtract(6, 'day').format('YYYY-MM-DD')); onChangeFilters('endDate', dayjs().format('YYYY-MM-DD')); } },
-                  { label: '1개월', fn: () => { onChangeFilters('startDate', dayjs().subtract(1, 'month').format('YYYY-MM-DD')); onChangeFilters('endDate', dayjs().format('YYYY-MM-DD')); } },
-                ] as { label: string; fn: () => void }[]).map(({ label, fn }) => (
-                  <button key={label} className="btn" onClick={fn} style={{ height: 28, padding: '0 10px', fontSize: 12, whiteSpace: 'nowrap' }}>{label}</button>
+                {(
+                  [
+                    {
+                      label: '당일',
+                      fn: () => {
+                        const d = dayjs().format('YYYY-MM-DD');
+                        onChangeFilters('startDate', d);
+                        onChangeFilters('endDate', d);
+                      },
+                    },
+                    {
+                      label: '1주일',
+                      fn: () => {
+                        onChangeFilters('startDate', dayjs().subtract(6, 'day').format('YYYY-MM-DD'));
+                        onChangeFilters('endDate', dayjs().format('YYYY-MM-DD'));
+                      },
+                    },
+                    {
+                      label: '1개월',
+                      fn: () => {
+                        onChangeFilters('startDate', dayjs().subtract(1, 'month').format('YYYY-MM-DD'));
+                        onChangeFilters('endDate', dayjs().format('YYYY-MM-DD'));
+                      },
+                    },
+                  ] as { label: string; fn: () => void }[]
+                ).map(({ label, fn }) => (
+                  <button key={label} className="btn" onClick={fn} style={{ height: 28, padding: '0 10px', fontSize: 12, whiteSpace: 'nowrap' }}>
+                    {label}
+                  </button>
                 ))}
               </div>
             </div>
           </dd>
         </dl>
-        <Search.DropDown
-          title={'구분'}
-          name={'upperPartnerId'}
-          defaultOptions={dropdownOptions}
-          placeholder={'파트너 구분'}
-          onChange={onChangeOptions}
-          // onEnter={onEnter}
-        />
+        {/*<Search.DropDown*/}
+        {/*  title={'구분'}*/}
+        {/*  name={'upperPartnerId'}*/}
+        {/*  defaultOptions={dropdownOptions}*/}
+        {/*  placeholder={'파트너 구분'}*/}
+        {/*  onChange={onChangeOptions}*/}
+        {/*  // onEnter={onEnter}*/}
+        {/*/>*/}
       </Search>
 
       <Table>

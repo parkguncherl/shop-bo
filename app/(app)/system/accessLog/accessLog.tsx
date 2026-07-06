@@ -181,15 +181,15 @@ const AccessLog = () => {
           onEnter={onEnter}
           filters={filters}
         />
-        <Search.DropDown
-          title={'종류'}
-          name={'tranType'}
-          //defaultOptions={[...DefaultOptions.Select]}
-          // codeUpper={'50050'} // todo 백앤드 페이징 조회 영역에서는 분명히 50050 으로 명시되어 있으나 code 테이블 조회에서는 조회되지 아니함, 추후 적절한 상위코드 할당 후 역시 정의할 시 수정할 것
-          enumName={'TranType'}
-          value={filters.tranType || ''}
-          onChange={onChangeFilters}
-        />
+        {/*<Search.DropDown*/}
+        {/*  title={'종류'}*/}
+        {/*  name={'tranType'}*/}
+        {/*  //defaultOptions={[...DefaultOptions.Select]}*/}
+        {/*  // codeUpper={'50050'} // todo 백앤드 페이징 조회 영역에서는 분명히 50050 으로 명시되어 있으나 code 테이블 조회에서는 조회되지 아니함, 추후 적절한 상위코드 할당 후 역시 정의할 시 수정할 것*/}
+        {/*  enumName={'TranType'}*/}
+        {/*  value={filters.tranType || ''}*/}
+        {/*  onChange={onChangeFilters}*/}
+        {/*/>*/}
         <Search.Input
           title={'내용'}
           name={'uriNm'}

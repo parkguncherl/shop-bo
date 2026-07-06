@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { ColDef, ICellRendererParams } from 'ag-grid-community';
+import { ColDef } from 'ag-grid-community';
 import { Search, Table, Title } from '../../../../components';
 import { toastError, toastSuccess } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
@@ -15,7 +15,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import NoticeMngAddPop from '../../../../components/popup/market/notice/NoticeMngAddPop';
 import NoticeMngModPop from '../../../../components/popup/market/notice/NoticeMngModPop';
-import dayjs from 'dayjs';
 import useFilters from '../../../../hooks/useFilters';
 
 export type NoticeItem = {
@@ -186,17 +185,17 @@ const NoticeMng = () => {
     <div>
       <Title title={menuNm ?? '공지사항 관리'} reset={reset} search={refetch} />
       <Search className="type_2">
-        <Search.DropDown
-          title="구분"
-          name="noticeCd"
-          value={filters.noticeCd}
-          onChange={(name, value) => onChangeFilters(name as keyof NoticeFilter, value as string)}
-          defaultOptions={[
-            { label: '화면공지', value: '1' },
-            { label: '기타', value: '2' },
-          ]}
-          showAll={true}
-        />
+        {/*<Search.DropDown*/}
+        {/*  title="구분"*/}
+        {/*  name="noticeCd"*/}
+        {/*  value={filters.noticeCd}*/}
+        {/*  onChange={(name, value) => onChangeFilters(name as keyof NoticeFilter, value as string)}*/}
+        {/*  defaultOptions={[*/}
+        {/*    { label: '화면공지', value: '1' },*/}
+        {/*    { label: '기타', value: '2' },*/}
+        {/*  ]}*/}
+        {/*  showAll={true}*/}
+        {/*/>*/}
         <Search.Input
           title="제목"
           name="title"

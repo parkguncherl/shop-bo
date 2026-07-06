@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ColDef } from 'ag-grid-community';
 import { Search, Table, Title } from '../../../../components';
@@ -14,7 +14,6 @@ import useFilters from '../../../../hooks/useFilters';
 import { authApi } from '../../../../libs';
 import ReactECharts from 'echarts-for-react';
 import dayjs from 'dayjs';
-import { PartnerCodeControllerApi } from '../../../../generated';
 import { useDarkMode } from '../../../../contexts/ThemeContext';
 
 // ─── 상수 ─────────────────────────────────────────────────────────────────────
@@ -67,14 +66,14 @@ const ReviewAnalysis = () => {
   const chartAxisColor = isDark ? '#555570' : '#aaa';
   const splitLineColor = isDark ? '#2a2a3e' : '#eee';
   const [filters, onChangeFilters] = useFilters<FilterType>({ fromDate: oneMonthAgo, toDate: today, categoryId: '' });
-  const { data: categoryData } = useQuery({
-    queryKey: ['partnerCode', 'P0001'],
-    queryFn: async () => {
-      const api = new PartnerCodeControllerApi();
-      const res = await api.selectDropdownByPartnerCodeUpper(undefined, 'P0001');
-      return (res.data.body ?? []).map((c) => ({ key: String(c.id), value: String(c.id), label: c.codeNm ?? '' }));
-    },
-  });
+  // const { data: categoryData } = useQuery({
+  //   queryKey: ['partnerCode', 'P0001'],
+  //   queryFn: async () => {
+  //     const api = new PartnerCodeControllerApi();
+  //     const res = await api.selectDropdownByPartnerCodeUpper(undefined, 'P0001');
+  //     return (res.data.body ?? []).map((c) => ({ key: String(c.id), value: String(c.id), label: c.codeNm ?? '' }));
+  //   },
+  // });
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['/mis/reviewFitAnalysis', filters],
@@ -95,7 +94,9 @@ const ReviewAnalysis = () => {
 
   const groupTotals = useMemo(() => {
     const m: Record<string, number> = {};
-    items.forEach((r) => { m[r.fitGroup] = (m[r.fitGroup] ?? 0) + r.cnt; });
+    items.forEach((r) => {
+      m[r.fitGroup] = (m[r.fitGroup] ?? 0) + r.cnt;
+    });
     return m;
   }, [items]);
 
@@ -122,14 +123,26 @@ const ReviewAnalysis = () => {
   const stackBarOption = useMemo(() => {
     // 키/몸무게 조합 목록 (cnt 내림차순 정렬)
     const comboMap = new Map<string, number>();
-    items.forEach((r) => { comboMap.set(r.myHeightWeightNm, (comboMap.get(r.myHeightWeightNm) ?? 0) + r.cnt); });
+    items.forEach((r) => {
+      comboMap.set(r.myHeightWeightNm, (comboMap.get(r.myHeightWeightNm) ?? 0) + r.cnt);
+    });
     const combos = [...comboMap.entries()].sort((a, b) => b[1] - a[1]).map(([k]) => k);
 
     const COLORS = [
-      '#7c3aed', '#a78bfa', '#c4b5fd', '#ddd6fe',
-      '#0f766e', '#14b8a6', '#5eead4', '#99f6e4',
-      '#b45309', '#fbbf24', '#fde68a',
-      '#be123c', '#fb7185', '#fecdd3',
+      '#7c3aed',
+      '#a78bfa',
+      '#c4b5fd',
+      '#ddd6fe',
+      '#0f766e',
+      '#14b8a6',
+      '#5eead4',
+      '#99f6e4',
+      '#b45309',
+      '#fbbf24',
+      '#fde68a',
+      '#be123c',
+      '#fb7185',
+      '#fecdd3',
     ];
 
     const series = combos.map((combo, i) => ({
@@ -138,17 +151,14 @@ const ReviewAnalysis = () => {
       stack: 'total',
       label: {
         show: true,
-        formatter: (p: any) => p.value > 0 ? combo : '',
+        formatter: (p: any) => (p.value > 0 ? combo : ''),
         fontSize: 11,
         color: '#fff',
         fontWeight: 600,
       },
       emphasis: { focus: 'series' },
       itemStyle: { color: COLORS[i % COLORS.length] },
-      data: fitGroups.map((grp) =>
-        items.filter((r) => r.fitGroup === grp && r.myHeightWeightNm === combo)
-             .reduce((s, r) => s + r.cnt, 0)
-      ),
+      data: fitGroups.map((grp) => items.filter((r) => r.fitGroup === grp && r.myHeightWeightNm === combo).reduce((s, r) => s + r.cnt, 0)),
     }));
 
     return {
@@ -170,8 +180,18 @@ const ReviewAnalysis = () => {
       },
       legend: { type: 'scroll', bottom: 0, textStyle: { fontSize: 11, color: chartTextColor } },
       grid: { left: 80, right: 24, top: 16, bottom: 60 },
-      xAxis: { type: 'value', axisLabel: { formatter: (v: number) => v.toLocaleString(), fontSize: 11, color: chartTextColor }, splitLine: { lineStyle: { color: splitLineColor } } },
-      yAxis: { type: 'category', data: fitGroups, axisLabel: { fontSize: 12, fontWeight: 'bold', color: chartTextColor }, axisLine: { lineStyle: { color: chartAxisColor } }, axisTick: { show: false } },
+      xAxis: {
+        type: 'value',
+        axisLabel: { formatter: (v: number) => v.toLocaleString(), fontSize: 11, color: chartTextColor },
+        splitLine: { lineStyle: { color: splitLineColor } },
+      },
+      yAxis: {
+        type: 'category',
+        data: fitGroups,
+        axisLabel: { fontSize: 12, fontWeight: 'bold', color: chartTextColor },
+        axisLine: { lineStyle: { color: chartAxisColor } },
+        axisTick: { show: false },
+      },
       series,
     };
   }, [items, fitGroups, chartTextColor, chartAxisColor, splitLineColor]);
@@ -186,7 +206,14 @@ const ReviewAnalysis = () => {
 
   return (
     <div>
-      <Title title={menuNm ?? '리뷰 분석'} reset={() => { onChangeFilters('fromDate', oneMonthAgo); onChangeFilters('toDate', today); }} search={refetch} />
+      <Title
+        title={menuNm ?? '리뷰 분석'}
+        reset={() => {
+          onChangeFilters('fromDate', oneMonthAgo);
+          onChangeFilters('toDate', today);
+        }}
+        search={refetch}
+      />
 
       <Search className={'type_1'}>
         <dl>
@@ -199,25 +226,48 @@ const ReviewAnalysis = () => {
                 <input type="date" value={filters.toDate} onChange={(e) => onChangeFilters('toDate', e.target.value)} className="dateInput" />
               </div>
               <div style={{ display: 'flex', gap: 4 }}>
-                {([
-                  { label: '당일', fn: () => { const d = dayjs().format('YYYY-MM-DD'); onChangeFilters('fromDate', d); onChangeFilters('toDate', d); } },
-                  { label: '1주일', fn: () => { onChangeFilters('fromDate', dayjs().subtract(6, 'day').format('YYYY-MM-DD')); onChangeFilters('toDate', dayjs().format('YYYY-MM-DD')); } },
-                  { label: '1개월', fn: () => { onChangeFilters('fromDate', dayjs().subtract(1, 'month').format('YYYY-MM-DD')); onChangeFilters('toDate', dayjs().format('YYYY-MM-DD')); } },
-                ] as { label: string; fn: () => void }[]).map(({ label, fn }) => (
-                  <button key={label} className="btn" onClick={fn} style={{ height: 28, padding: '0 10px', fontSize: 12, whiteSpace: 'nowrap' }}>{label}</button>
+                {(
+                  [
+                    {
+                      label: '당일',
+                      fn: () => {
+                        const d = dayjs().format('YYYY-MM-DD');
+                        onChangeFilters('fromDate', d);
+                        onChangeFilters('toDate', d);
+                      },
+                    },
+                    {
+                      label: '1주일',
+                      fn: () => {
+                        onChangeFilters('fromDate', dayjs().subtract(6, 'day').format('YYYY-MM-DD'));
+                        onChangeFilters('toDate', dayjs().format('YYYY-MM-DD'));
+                      },
+                    },
+                    {
+                      label: '1개월',
+                      fn: () => {
+                        onChangeFilters('fromDate', dayjs().subtract(1, 'month').format('YYYY-MM-DD'));
+                        onChangeFilters('toDate', dayjs().format('YYYY-MM-DD'));
+                      },
+                    },
+                  ] as { label: string; fn: () => void }[]
+                ).map(({ label, fn }) => (
+                  <button key={label} className="btn" onClick={fn} style={{ height: 28, padding: '0 10px', fontSize: 12, whiteSpace: 'nowrap' }}>
+                    {label}
+                  </button>
                 ))}
               </div>
             </div>
           </dd>
         </dl>
-        <Search.DropDown
-          title={'카테고리'}
-          name={'categoryId'}
-          value={filters.categoryId}
-          onChange={onChangeFilters}
-          defaultOptions={categoryData ?? []}
-          showAll={true}
-        />
+        {/*<Search.DropDown*/}
+        {/*  title={'카테고리'}*/}
+        {/*  name={'categoryId'}*/}
+        {/*  value={filters.categoryId}*/}
+        {/*  onChange={onChangeFilters}*/}
+        {/*  defaultOptions={categoryData ?? []}*/}
+        {/*  showAll={true}*/}
+        {/*/>*/}
       </Search>
 
       {!isLoading && grandTotal > 0 && (
@@ -246,7 +296,14 @@ const ReviewAnalysis = () => {
 
         {/* 우: 가로 스택 바 차트 */}
         <div style={{ flex: 1 }}>
-          <div style={{ background: isDark ? '#1e1e30' : '#fff', border: `1px solid ${isDark ? '#333350' : '#e8e8e8'}`, borderRadius: 8, padding: '16px 12px 12px' }}>
+          <div
+            style={{
+              background: isDark ? '#1e1e30' : '#fff',
+              border: `1px solid ${isDark ? '#333350' : '#e8e8e8'}`,
+              borderRadius: 8,
+              padding: '16px 12px 12px',
+            }}
+          >
             <ReactECharts option={stackBarOption} style={{ height: 480 }} />
           </div>
         </div>

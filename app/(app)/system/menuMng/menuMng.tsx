@@ -18,13 +18,13 @@ import TunedGrid from '../../../../components/grid/TunedGrid';
 /** 시스템 - 메뉴접근 권한관리 페이지 */
 const MenuMng = () => {
   /** Grid Api */
-  const { gridApi, gridColumnApi, onGridReady } = useAgGridApi();
+  const { gridApi, onGridReady } = useAgGridApi();
 
   /** 공통 스토어 - State */
   const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
 
   /** 공통 스토어 - State */
-  const [menuUpdYn, menuExcelYn] = useCommonStore((s) => [s.menuUpdYn, s.menuExcelYn]);
+  const [menuUpdYn] = useCommonStore((s) => [s.menuUpdYn]);
 
   /** 코드관리 스토어 - State */
   const [modalType, openModal, paging, filter, selectedMenu, setSelectedMenu, setPaging, setFilter, excelDown, onClear] = useMenuStore((s) => [
