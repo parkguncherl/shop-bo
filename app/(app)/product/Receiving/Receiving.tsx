@@ -33,15 +33,20 @@ const PlusMinusCellEditor = forwardRef((props: any, ref) => {
   const [value, setValue] = useState<string>(props.value ?? 'P');
   const selectRef = useRef<HTMLSelectElement>(null);
 
-  useImperativeHandle(ref, () => ({ getValue: () => value }));
+  //useImperativeHandle(ref, () => ({ getValue: () => value }));
 
-  useEffect(() => { selectRef.current?.focus(); }, []);
+  // useEffect(() => {
+  //   selectRef.current?.focus();
+  // }, []);
 
   return (
     <select
       ref={selectRef}
       value={value}
-      onChange={(e) => setValue(e.target.value)}
+      onChange={(e) => {
+        props.onValueChange?.(e.target.value, props); // 내부 onChange를 밖으로 전달
+        setValue(e.target.value);
+      }}
       style={{ height: '100%', width: '100%', border: 'none', background: '#fff', fontSize: 13 }}
     >
       <option value="P">입고</option>
@@ -95,12 +100,13 @@ const Receiving = () => {
       cellEditor: PlusMinusCellEditor,
       cellRenderer: (p: any) => {
         const isIn = p.value === 'P';
-        return (
-          <span style={{ color: isIn ? '#1677ff' : '#f56c6c', fontWeight: 600 }}>
-            {isIn ? '입고' : '출고'}
-          </span>
-        );
+        return <span style={{ color: isIn ? '#1677ff' : '#f56c6c', fontWeight: 600 }}>{isIn ? '입고' : '출고'}</span>;
       },
+      // cellEditorParams: {
+      // onValueChange: (newValue: any, params: any) => {
+      //   console.log('newValue: ', newValue);
+      // },
+      // },
     },
     {
       field: 'receivDate',
@@ -199,9 +205,7 @@ const Receiving = () => {
       if (e.data.resultCode === 200) {
         toastSuccess('수정되었습니다.');
         // 로컬 rowData 즉시 반영
-        setRowData((prev) =>
-          prev.map((row) => (row.id === variables.id ? { ...row, ...variables } : row))
-        );
+        setRowData((prev) => prev.map((row) => (row.id === variables.id ? { ...row, ...variables } : row)));
       } else {
         toastError(e.data.resultMessage ?? '수정 중 오류가 발생했습니다.');
         refetch();
@@ -230,7 +234,7 @@ const Receiving = () => {
 
       inlineMutate(payload);
     },
-    [inlineMutate]
+    [inlineMutate],
   );
 
   const reset = () => {
@@ -254,12 +258,35 @@ const Receiving = () => {
                 <input type="date" value={filters.toDate} onChange={(e) => onChangeFilters('toDate', e.target.value)} className="dateInput" />
               </div>
               <div style={{ display: 'flex', gap: 4 }}>
-                {([
-                  { label: '당일', fn: () => { const d = dayjs().format('YYYY-MM-DD'); onChangeFilters('fromDate', d); onChangeFilters('toDate', d); } },
-                  { label: '1주일', fn: () => { onChangeFilters('fromDate', dayjs().subtract(6, 'day').format('YYYY-MM-DD')); onChangeFilters('toDate', dayjs().format('YYYY-MM-DD')); } },
-                  { label: '1개월', fn: () => { onChangeFilters('fromDate', dayjs().subtract(1, 'month').format('YYYY-MM-DD')); onChangeFilters('toDate', dayjs().format('YYYY-MM-DD')); } },
-                ] as { label: string; fn: () => void }[]).map(({ label, fn }) => (
-                  <button key={label} className="btn" onClick={fn} style={{ height: 28, padding: '0 10px', fontSize: 12, whiteSpace: 'nowrap' }}>{label}</button>
+                {(
+                  [
+                    {
+                      label: '당일',
+                      fn: () => {
+                        const d = dayjs().format('YYYY-MM-DD');
+                        onChangeFilters('fromDate', d);
+                        onChangeFilters('toDate', d);
+                      },
+                    },
+                    {
+                      label: '1주일',
+                      fn: () => {
+                        onChangeFilters('fromDate', dayjs().subtract(6, 'day').format('YYYY-MM-DD'));
+                        onChangeFilters('toDate', dayjs().format('YYYY-MM-DD'));
+                      },
+                    },
+                    {
+                      label: '1개월',
+                      fn: () => {
+                        onChangeFilters('fromDate', dayjs().subtract(1, 'month').format('YYYY-MM-DD'));
+                        onChangeFilters('toDate', dayjs().format('YYYY-MM-DD'));
+                      },
+                    },
+                  ] as { label: string; fn: () => void }[]
+                ).map(({ label, fn }) => (
+                  <button key={label} className="btn" onClick={fn} style={{ height: 28, padding: '0 10px', fontSize: 12, whiteSpace: 'nowrap' }}>
+                    {label}
+                  </button>
                 ))}
               </div>
             </div>
@@ -290,7 +317,9 @@ const Receiving = () => {
                 placeholder="상품명 검색"
                 value={filters.prodNm}
                 onChange={(e) => onChangeFilters('prodNm', e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') refetch(); }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') refetch();
+                }}
                 style={{ height: 32, padding: '0 8px', border: '1px solid #d9d9d9', borderRadius: 4, minWidth: 160 }}
               />
             </div>
@@ -333,11 +362,7 @@ const Receiving = () => {
         />
       </div>
 
-      <ReceivingAddPop
-        open={modals.active && modals.type === 'RECEIVING_ADD'}
-        onClose={() => closeModal('RECEIVING_ADD')}
-        onSuccess={refetch}
-      />
+      <ReceivingAddPop open={modals.active && modals.type === 'RECEIVING_ADD'} onClose={() => closeModal('RECEIVING_ADD')} onSuccess={refetch} />
 
       <ReceivingModPop
         open={modals.active && modals.type === 'RECEIVING_MOD'}
