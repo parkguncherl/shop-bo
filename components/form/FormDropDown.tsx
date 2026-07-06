@@ -1,11 +1,13 @@
-import { useController, FieldValues } from 'react-hook-form';
+import { useController, FieldValues, Path, PathValue } from 'react-hook-form';
 import { DropDownOption } from '../../types/DropDownOptions';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import DropDownAtom from '../atom/DropDownAtom';
 import { authApi } from '../../libs';
 import { ApiResponseListCodeDropDown } from '../../generated';
 import { TControl } from '../../types/Control';
 import { Input } from 'antd';
+import { useQuery } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
 
 type TProps<T extends FieldValues> = TControl<T> & {
   title?: string;
@@ -31,6 +33,20 @@ type TProps<T extends FieldValues> = TControl<T> & {
   startWith?: string;
 };
 
+/** 불필요한 리 랜더링 방지 차원에서 컴포넌트 외부에 정의 */
+const newDropDownData = (res: AxiosResponse<ApiResponseListCodeDropDown> | undefined) =>
+  (res?.data.body || []).map(
+    (v) =>
+      ({
+        key: v.codeCd,
+        value: v.codeCd,
+        label: v.codeNm,
+      } as DropDownOption),
+  );
+const valuesAsPureFn = <T extends FieldValues>(value: PathValue<T, Path<T> & string>, multiple?: boolean | undefined) => {
+  return multiple ? (Array.isArray(value) ? value : []) : value;
+};
+
 const FormDropDown = <T extends FieldValues>({ ...props }: TProps<T>) => {
   const {
     field: { name, onChange: controlChange, value },
@@ -41,39 +57,55 @@ const FormDropDown = <T extends FieldValues>({ ...props }: TProps<T>) => {
     control: props.control,
   });
   const el = useRef<HTMLDListElement | null>(null);
-  const [dropDownData, setDropDownData] = useState<DropDownOption[]>(props.defaultOptions || []);
-  const params = { codeUpper: props.codeUpper };
+  //const [dropDownData, setDropDownData] = useState<DropDownOption[]>(props.defaultOptions || []);
+  //const params = { codeUpper: props.codeUpper };
   const [gbVal, setGbVal] = useState(props.title);
 
-  const getDropDownData = async () => {
-    try {
+  // const getDropDownData = async () => {
+  //   try {
+  //     const apiUrl = props.isPartnerCode ? '/partnerCode/dropdown' : '/code/dropdown';
+  //     const res = await authApi.get<ApiResponseListCodeDropDown>(apiUrl, {
+  //       params: {
+  //         ...params,
+  //       },
+  //     });
+  //     const newDropDownData = (res.data.body || []).map(
+  //       (v) =>
+  //         ({
+  //           key: v.codeCd,
+  //           value: v.codeCd,
+  //           label: v.codeNm,
+  //         } as DropDownOption),
+  //     );
+  //     setDropDownData(newDropDownData);
+  //   } catch (err) {
+  //     console.log('실패');
+  //   }
+  // };
+  //
+  // useEffect(() => {
+  //   if (props.codeUpper) {
+  //     getDropDownData();
+  //   }
+  // }, [props.codeUpper]);
+
+  const {
+    data: dropDownDataRes,
+    // isSuccess: isDropDownDataResSuccess,
+    // isLoading: isDropDownDataResLoading,
+    // refetch: dropDownDataResRefetch,
+  } = useQuery({
+    queryKey: ['dropDownData', props.isPartnerCode, props.codeUpper],
+    queryFn: () => {
       const apiUrl = props.isPartnerCode ? '/partnerCode/dropdown' : '/code/dropdown';
-      const res = await authApi.get<ApiResponseListCodeDropDown>(apiUrl, {
-        params: {
-          ...params,
-        },
+      return authApi.get<ApiResponseListCodeDropDown>(apiUrl, {
+        params: { codeUpper: props.codeUpper },
       });
-      const newDropDownData = (res.data.body || []).map(
-        (v) =>
-          ({
-            key: v.codeCd,
-            value: v.codeCd,
-            label: v.codeNm,
-          } as DropDownOption),
-      );
-      setDropDownData(newDropDownData);
-    } catch (err) {
-      console.log('실패');
-    }
-  };
+    },
+    refetchOnMount: 'always',
+  });
 
-  useEffect(() => {
-    if (props.codeUpper) {
-      getDropDownData();
-    }
-  }, [props.codeUpper]);
-
-  const values = props.multiple ? (Array.isArray(value) ? value : []) : value;
+  //const values = props.multiple ? (Array.isArray(value) ? value : []) : value;
 
   const [focusStates, setFocusStates] = useState<{ [key: string]: boolean }>({});
   const handleFocus = (name: string) => {
@@ -95,8 +127,9 @@ const FormDropDown = <T extends FieldValues>({ ...props }: TProps<T>) => {
             <div className={`formBox ${props.disabled ? 'disabled' : ''} ${focusStates[name] ? 'focus' : ''} border`}>
               <DropDownAtom
                 name={name}
-                values={values}
-                options={(props.codeUpper ? dropDownData : props.options || []).filter(
+                //values={values}
+                values={valuesAsPureFn(value, props.multiple)}
+                options={(props.codeUpper ? newDropDownData(dropDownDataRes) : props.options || []).filter(
                   (f) => !props.startWith || String(f.value).startsWith(String(props.startWith)),
                 )}
                 onChangeOptions={props.onChange}
@@ -135,7 +168,10 @@ const FormDropDown = <T extends FieldValues>({ ...props }: TProps<T>) => {
                   <DropDownAtom
                     name={name}
                     value={value || ''}
-                    options={(props.codeUpper ? dropDownData : props.options || []).filter(
+                    // options={(props.codeUpper ? dropDownData : props.options || []).filter(
+                    //   (f) => !props.startWith || String(f.value).startsWith(String(props.startWith)),
+                    // )}
+                    options={(props.codeUpper ? newDropDownData(dropDownDataRes) : props.options || []).filter(
                       (f) => !props.startWith || String(f.value).startsWith(String(props.startWith)),
                     )}
                     onChangeOptions={props.onChange}
@@ -166,7 +202,10 @@ const FormDropDown = <T extends FieldValues>({ ...props }: TProps<T>) => {
               <DropDownAtom
                 name={name}
                 value={value}
-                options={(props.codeUpper ? dropDownData : props.options || []).filter(
+                // options={(props.codeUpper ? dropDownData : props.options || []).filter(
+                //   (f) => !props.startWith || String(f.value).startsWith(String(props.startWith)),
+                // )}
+                options={(props.codeUpper ? newDropDownData(dropDownDataRes) : props.options || []).filter(
                   (f) => !props.startWith || String(f.value).startsWith(String(props.startWith)),
                 )}
                 onChangeOptions={props.onChange}
@@ -192,7 +231,8 @@ const FormDropDown = <T extends FieldValues>({ ...props }: TProps<T>) => {
               <DropDownAtom
                 name={name}
                 value={value}
-                options={props.codeUpper ? dropDownData : props.options || []}
+                // options={props.codeUpper ? dropDownData : props.options || []}
+                options={props.codeUpper ? newDropDownData(dropDownDataRes) : props.options || []}
                 onChangeOptions={props.onChange}
                 onChangeControl={controlChange}
                 readonly={props.readonly}
