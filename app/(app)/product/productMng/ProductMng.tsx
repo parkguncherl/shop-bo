@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Search, Table, Title, toastSuccess } from '../../../../components';
 import {
   ProductMngRequestProductDetInfoFilter,
@@ -8,7 +8,7 @@ import {
   ProductMngResponseProductDetInfo,
   ProductMngResponseProductInfo,
 } from '../../../../generated';
-import { CellClickedEvent, ColDef, ICellEditorParams } from 'ag-grid-community';
+import { CellClickedEvent, ColDef, ICellEditorParams, RowClassParams } from 'ag-grid-community';
 import { TableHeader, toastError } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -341,6 +341,17 @@ const ProductMng = () => {
         suppressHeaderMenuButton: true,
       },
       { field: 'makeYmd', headerName: '출시일', minWidth: 100, maxWidth: 100, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
+      {
+        field: 'relCount',
+        headerName: '연계',
+        minWidth: 50,
+        maxWidth: 50,
+        suppressHeaderMenuButton: true,
+        cellStyle: (params) => ({
+          ...GridSetting.CellStyle.CENTER,
+          ...(params.value != null && params.value < 1 ? { color: '#ff6b6b', fontWeight: 700, background: 'rgba(255, 80, 80, 0.12)' } : {}),
+        }),
+      },
       {
         field: 'orgAmt',
         headerName: '원가',

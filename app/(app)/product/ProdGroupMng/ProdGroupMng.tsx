@@ -1,8 +1,8 @@
 ﻿'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Search, Table, Title, toastSuccess } from '../../../../components';
-import { ColDef, RowDragEndEvent, SelectionChangedEvent } from 'ag-grid-community';
+import { CellValueChangedEvent, ColDef, RowDragEndEvent, SelectionChangedEvent } from 'ag-grid-community';
 import { TableHeader, toastError } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -53,7 +53,7 @@ const ProdGroupMng = () => {
   const rightGridRef = useRef<TunedGridRef<ProductContentListResponseProductContent>>(null);
 
   /** 컬럼 설정 - 권한 컬럼 포함 */
-  const [columnDefs] = useState<ColDef<ProductContentListResponseProductContent | { no: number }>[]>([
+  const columnDefs = useMemo<ColDef<ProductContentListResponseProductContent | { no: number }>[]>(() => [
     {
       field: 'no',
       headerName: 'NO',
@@ -63,7 +63,15 @@ const ProdGroupMng = () => {
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
     },
-    { field: 'newsTitle', headerName: '제목', minWidth: 200, maxWidth: 250, suppressHeaderMenuButton: true },
+    {
+      field: 'newsTitle',
+      headerName: '제목',
+      minWidth: 200,
+      maxWidth: 250,
+      suppressHeaderMenuButton: true,
+      editable: true,
+      cellStyle: { cursor: 'text' },
+    },
     {
       field: 'imageCnt',
       headerName: '이미지',
@@ -80,7 +88,7 @@ const ProdGroupMng = () => {
       suppressHeaderMenuButton: true,
       cellStyle: GridSetting.CellStyle.CENTER,
     },
-  ]);
+  ], []);
 
   /** 컬럼 설정 - 권한 컬럼 포함 */
   const [rightColumnDefs] = useState<ColDef<ContentProductInfoWithImg | { no: number }>[]>([
@@ -180,6 +188,25 @@ const ProdGroupMng = () => {
   // lastInfos, paging.curPage 디바운스 처리하여 그리드 내부 페이징 상태 초기화 시 실행 순서를 보장토록 함
   const debouncedCurPage = useDebounce(paging.curPage?.toString() || '', 500); // 0.5초 대기 todo 디바운싱 상태가 원하는 경우에 업데이트되는지 확인하며 페이징 동작 손보기
   //  // const debouncedFilters = useDebounce(filters.newsTitle + '☆' + paging.curPage, 500); // 0.5초 대기
+
+  /** 제목 인라인 편집 저장 */
+  const handleTitleCellValueChanged = async (e: CellValueChangedEvent<ProductContentListResponseProductContent>) => {
+    if (e.column.getColId() !== 'newsTitle' || e.newValue === e.oldValue) return;
+    const formData = new FormData();
+    formData.append('main', new Blob([JSON.stringify({ id: e.data.id, newsTitle: e.newValue })], { type: 'application/json' }));
+    try {
+      const { data } = await authApi.put('/productContentList/updateProductContents', formData);
+      if (data?.resultCode === 200) {
+        toastSuccess('제목이 수정되었습니다.');
+      } else {
+        toastError(data?.resultMessage ?? '수정 중 오류가 발생했습니다.');
+        e.node.setDataValue('newsTitle', e.oldValue);
+      }
+    } catch {
+      toastError('수정 중 오류가 발생했습니다.');
+      e.node.setDataValue('newsTitle', e.oldValue);
+    }
+  };
 
   /** 검색 버튼 클릭 시 */
   const search = async () => {
@@ -371,6 +398,8 @@ const ProdGroupMng = () => {
               columnDefs={columnDefs}
               defaultColDef={defaultColDef}
               onRowDoubleClicked={(e) => openModal('SHOW', e.data)}
+              onCellValueChanged={handleTitleCellValueChanged}
+              stopEditingWhenCellsLoseFocus={true}
               onSelectionChanged={(event) => {
                 const selectedRows = event.api.getSelectedRows();
                 setSelectedRowsData(selectedRows.length > 0 ? selectedRows[0] : undefined);

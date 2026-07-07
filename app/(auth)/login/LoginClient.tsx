@@ -13,7 +13,6 @@ import FormInput from '../../../components/form/FormInput';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Timer, YupSchema } from '../../../libs';
 import { LoginRequest, LoginResponse } from '../../../generated';
-import { SubmitErrorHandler } from 'react-hook-form/dist/types/form';
 import { deleteCookie, getCookie, setCookie } from 'cookies-next';
 import { CheckBox } from '../../../components/CheckBox';
 import { LOCAL_STORAGE_WMS_HISTORY, Otp } from '../../../libs/const';
@@ -208,18 +207,13 @@ const LoginClient = () => {
     verificationMutate({ loginId, password, isMobileLogin });
   };
 
-  // 아이디, 비밀번호 비정상 입력시
-  const onInvalid: SubmitErrorHandler<LoginRequest> = (data) => {
-    // console.log('===> onInvalid data : ', data);
-  };
-
   /** 엔터키 이벤트 */
   const onKeyDownEnter = async (e: KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       // 1단계
       if (!validAccount) {
-        await handleSubmit(onValid, onInvalid)();
+        await handleSubmit(onValid)();
       } else {
         // 2단계
         await handleLogin();
@@ -232,7 +226,7 @@ const LoginClient = () => {
       <div className={styles.login_box}>
         <form>
           <div className={styles.content}>
-            <div className={styles.logo}>맵시꾼</div>
+            <div className={styles.logo}>MAPSIGGUN</div>
             <div className={`${styles.login_inp} ${validAccount ? styles.id_pw_close : styles.id_pw_open}`}>
               <div className={styles.inp_id}>
                 <FormInput<LoginVerificationFields>
@@ -317,7 +311,7 @@ const LoginClient = () => {
                   </span>
                 </div>
               )}
-              <button className={styles.clickbtn} onClick={validAccount ? handleLogin : handleSubmit(onValid, onInvalid)} disabled={verificationIsLoading}>
+              <button className={styles.clickbtn} onClick={validAccount ? handleLogin : handleSubmit(onValid)} disabled={verificationIsLoading}>
                 {'로그인'}
               </button>
               {!validAccount && (
