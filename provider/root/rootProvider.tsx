@@ -13,7 +13,6 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
-import 'react-datepicker/dist/react-datepicker.css';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AxiosResponse } from 'axios';
 import { ApiResponse } from '../../generated';
