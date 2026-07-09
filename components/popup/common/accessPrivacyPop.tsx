@@ -4,11 +4,58 @@ import { PopupContent } from '../PopupContent';
 import Loading from '../../Loading';
 import { PopupLayout } from '../PopupLayout';
 import { useCommonStore } from '../../../stores';
-import { Tabs, Typography } from 'antd';
 import styled from 'styled-components';
 
-const { Title, Paragraph, Text } = Typography;
-const { TabPane } = Tabs;
+/**
+ * antd Typography/Tabs 제거 → 동일 클래스명(.ant-typography / .ant-tabs-*)을 렌더하는
+ * 경량 로컬 컴포넌트. 기존 styled() 래퍼 및 scss 오버라이드가 그대로 적용됨.
+ */
+type TypoProps = { level?: number; strong?: boolean; className?: string; style?: React.CSSProperties; children?: React.ReactNode };
+
+const Title = ({ level = 1, className, style, children }: TypoProps) => {
+  const Tag = `h${level}` as keyof React.JSX.IntrinsicElements;
+  return (
+    <Tag className={`ant-typography ${className ?? ''}`} style={style}>
+      {children}
+    </Tag>
+  );
+};
+const Paragraph = ({ className, style, children }: TypoProps) => (
+  <p className={`ant-typography ${className ?? ''}`} style={style}>
+    {children}
+  </p>
+);
+const Text = ({ strong, className, style, children }: TypoProps) => (
+  <span className={`ant-typography ${className ?? ''}`} style={{ fontWeight: strong ? 600 : undefined, ...style }}>
+    {children}
+  </span>
+);
+
+type TabsProps = { activeKey?: string; onChange?: (key: string) => void; className?: string; children?: React.ReactNode };
+const Tabs = ({ activeKey, onChange, className, children }: TabsProps) => {
+  const items = React.Children.toArray(children).filter(Boolean) as React.ReactElement<{ tab?: React.ReactNode; children?: React.ReactNode }>[];
+  const active = activeKey || '1';
+  return (
+    <div className={`ant-tabs ${className ?? ''}`}>
+      <div className="ant-tabs-nav">
+        <div className="ant-tabs-nav-wrap">
+          {items.map((child, i) => {
+            const k = String(i + 1);
+            return (
+              <div key={k} className={`ant-tabs-tab ${active === k ? 'ant-tabs-tab-active' : ''}`} onClick={() => onChange?.(k)}>
+                <div className="ant-tabs-tab-btn">{child.props.tab}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className="ant-tabs-content">
+        {items.map((child, i) => (String(i + 1) === active ? <div key={i}>{child.props.children}</div> : null))}
+      </div>
+    </div>
+  );
+};
+const TabPane = ({ children }: { tab?: React.ReactNode; children?: React.ReactNode }) => <>{children}</>;
 
 // 스타일드 컴포넌트 정의
 const StyledContainer = styled.div`

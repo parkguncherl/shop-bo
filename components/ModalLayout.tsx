@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, useEffect, useRef, useState } from 'react';
 import Draggable from 'react-draggable';
-import { Modal } from 'antd';
+import { Modal } from './modal/Modal';
 import Image from 'next/image';
 import CloseIcon from '../public/ico/ico_close.svg';
 

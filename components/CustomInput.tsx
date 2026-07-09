@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Utils } from '../libs/utils';
 import { toastError } from './ToastMessage';
 import { AlertMessage } from '../libs/const';
-import { Input, InputRef } from 'antd';
 
 interface Props {
   title?: string;
@@ -17,7 +16,7 @@ interface Props {
   required?: boolean;
   filters?: object;
   wrapperClassNames?: string;
-  reference?: React.RefObject<InputRef>;
+  reference?: React.RefObject<HTMLInputElement>;
   list?: string; // datalist 사용을 위한 속성
   keyDownEvent?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
@@ -73,12 +72,12 @@ export const CustomInput = ({
           </dt>
           <dd>
             <div className={`formBox border ${focusStates[name] ? 'focus' : ''}`}>
-              <Input
+              <input
                 style={styles}
                 placeholder={placeholder}
                 disabled={disable}
                 type={type}
-                value={value}
+                value={value ?? ''}
                 name={name}
                 ref={reference}
                 autoComplete={'off'}
@@ -95,18 +94,17 @@ export const CustomInput = ({
                 onBlur={() => {
                   handleBlur(name);
                 }}
-                allowClear
               />
             </div>
           </dd>
         </dl>
       ) : (
-        <Input
+        <input
           style={styles}
           placeholder={placeholder}
           disabled={disable}
           type={type}
-          value={value}
+          value={value ?? ''}
           name={name}
           autoComplete={'off'}
           ref={reference}
@@ -122,7 +120,6 @@ export const CustomInput = ({
           onBlur={() => {
             handleBlur(name);
           }}
-          allowClear
         />
       )}
     </>

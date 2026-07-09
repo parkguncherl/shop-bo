@@ -47,7 +47,18 @@ const PlusMinusCellEditor = forwardRef((props: any, ref) => {
         props.onValueChange?.(e.target.value, props); // 내부 onChange를 밖으로 전달
         setValue(e.target.value);
       }}
-      style={{ height: '100%', width: '100%', border: 'none', background: '#fff', fontSize: 13 }}
+      style={{
+        height: '100%',
+        width: '100%',
+        border: 'none',
+        fontSize: 13,
+        lineHeight: 'normal',
+        padding: '0 6px',
+        margin: 0,
+        boxSizing: 'border-box',
+        verticalAlign: 'middle',
+        appearance: 'auto',
+      }}
     >
       <option value="P">입고</option>
       <option value="M">출고</option>

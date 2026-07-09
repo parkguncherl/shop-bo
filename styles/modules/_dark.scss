@@ -258,6 +258,21 @@
     }
   }
 
+  // ── native select 다크모드 (.formBox 밖 · ag-grid 셀 드롭다운 등) ──
+  select {
+    background-color: var(--dark-surface-2) !important;
+    color: var(--dark-text) !important;
+    border-color: var(--dark-border) !important;
+    &:disabled { background-color: #1a1a28 !important; color: #555570 !important; }
+    & option {
+      background-color: var(--dark-surface-2) !important;
+      color: var(--dark-text) !important;
+    }
+  }
+  input[type="date"] {
+    color-scheme: dark;
+  }
+
   // ── 폼 인풋 ────────────────────────────────────────────
   .formBox {
     & input, & select, & textarea {

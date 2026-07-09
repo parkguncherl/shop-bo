@@ -1,8 +1,6 @@
 import React, { useRef, useState } from 'react';
-import { Input, InputRef } from 'antd';
 import DropDownAtom from './atom/DropDownAtom';
 import { DataListOption } from '../types/DataListOptions';
-import { BaseSelectRef } from 'rc-select';
 
 interface Props {
   options?: DataListOption[];
@@ -17,8 +15,8 @@ interface Props {
   placeholder?: string;
   required?: boolean;
   wrapperClassNames?: string;
-  refOfInput?: React.RefObject<InputRef>;
-  refOfSelect?: React.RefObject<BaseSelectRef>;
+  refOfInput?: React.RefObject<HTMLInputElement>;
+  refOfSelect?: React.RefObject<HTMLSelectElement>;
   selectorShowAction?: ('focus' | 'click')[] | undefined;
   list?: string; // datalist 사용을 위한 속성
   value?: string;
@@ -50,7 +48,7 @@ export const DataList = ({
   value,
 }: Props) => {
   /** 인자로 받는 참조가 존재하지 않을 경우 사용되는 참조 (본 참조를 통해 구현되는 동작은 인자로 받는 참조에도 적용되어야) */
-  const inputRef = useRef<InputRef>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const [focusOn, setFocusOn] = useState<boolean>(false);
   const handleOnFocus = () => {
@@ -72,7 +70,7 @@ export const DataList = ({
             </dt>
             <dd>
               <div className={`searchInputBox ${focusOn ? 'focus' : ''}`}>
-                <Input
+                <input
                   placeholder={placeholder}
                   disabled={disable}
                   type={type}
@@ -86,13 +84,9 @@ export const DataList = ({
                   autoComplete={'off'}
                   list={list}
                   onKeyDown={onKeyDownAtInput}
-                  value={value}
+                  value={value ?? ''}
                   onFocus={handleOnFocus}
                   onBlur={handleOnBlur}
-                  onEmptied={(e) => {
-                    console.log(e);
-                  }}
-                  allowClear={true}
                 />
                 <DropDownAtom
                   name={name}
@@ -109,7 +103,7 @@ export const DataList = ({
         </>
       ) : (
         <div className={`searchInputBox ${focusOn ? 'focus' : ''}`}>
-          <Input
+          <input
             placeholder={placeholder}
             disabled={disable}
             type={type}
@@ -123,13 +117,9 @@ export const DataList = ({
             autoComplete={'off'}
             list={list}
             onKeyDown={onKeyDownAtInput}
-            value={value}
+            value={value ?? ''}
             onFocus={handleOnFocus}
             onBlur={handleOnBlur}
-            onEmptied={(e) => {
-              console.log(e);
-            }}
-            allowClear={true}
           />
           <DropDownAtom
             name={name}

@@ -3,7 +3,6 @@ import { DropDownOption } from '../../types/DropDownOptions';
 import React from 'react';
 import { TControl } from '../../types/Control';
 import DatePickerAtom from '../atom/DatePickerAtom';
-import { DatePicker } from 'antd';
 import dayjs from 'dayjs';
 
 type TProps<T extends FieldValues> = TControl<T> & {
@@ -21,11 +20,10 @@ type TProps<T extends FieldValues> = TControl<T> & {
   disabled?: boolean;
   format?: string;
   className?: string;
-  ref?: React.Ref<React.ComponentRef<typeof DatePicker>>;
+  ref?: React.Ref<HTMLInputElement>;
 };
 
 function FormDatePicker<T extends FieldValues>({ ref, ...props }: TProps<T>) {
-  //const el = useRef<HTMLDListElement | null>(null);
   const {
     field: { name, onChange: controlChange, value },
     fieldState: { error },
@@ -36,10 +34,8 @@ function FormDatePicker<T extends FieldValues>({ ref, ...props }: TProps<T>) {
   });
 
   const handleChange = (dateString: string) => {
-    // 기존 controlChange 호출
     controlChange(dateString);
 
-    // onPropsChange 호출 (props로 전달된 경우)
     if (props.onPropsChange) {
       const event = {
         target: {
@@ -53,46 +49,35 @@ function FormDatePicker<T extends FieldValues>({ ref, ...props }: TProps<T>) {
 
   const currentYear = dayjs().year();
   const nextYear = currentYear + 1;
-  const disabledDate = (current: any) => {
-    // 현재 날짜가 올해나 내년에 속하지 않는 경우 비활성화
-    const year = current.year();
-    return year < currentYear || year > nextYear;
-  };
-  const hideUnavailableYears = (value: any) => {
-    if (typeof window !== 'undefined') {
-      const yearDropdown = document.querySelector('.ant-picker-year-panel ul');
-      if (yearDropdown) {
-        const years = yearDropdown.querySelectorAll('li');
-        years.forEach((yearItem) => {
-          const year = parseInt(yearItem.innerText, 10);
-          if (year < currentYear || year > nextYear) {
-            yearItem.style.display = 'none';
-          }
-        });
-      }
-    }
-  };
 
   return (
     <>
       {props.year ? (
         <>
-          {/*<dl ref={el} className={props.className}>*/}
           <dl className={props.className}>
             <dt>
               <label>{props.title}</label>
               {props.required && <span className={'req'}>*</span>}
             </dt>
             <dd>
-              <div className={'formBox'}>
-                <DatePicker.YearPicker
+              <div className={'formBox border'}>
+                {/* antd YearPicker 제거 → native 연도 select (올해/내년만 노출) */}
+                <select
                   name={name}
-                  onChange={controlChange}
-                  value={(value ? dayjs(value) : null) as any} // 실제로는 Dayjs 요구되나 타입 정의 수준에서의 불일치로 인한 오류이니 타입스크립트 컴파일 시점 에러는 무시하기
-                  disabledDate={disabledDate}
-                  onOpenChange={hideUnavailableYears}
-                  ref={ref}
-                />
+                  value={value ? String(dayjs(value).year()) : ''}
+                  disabled={props.disabled}
+                  onChange={(e) => handleChange(e.target.value)}
+                  style={{ width: '100%' }}
+                >
+                  <option value="" disabled hidden>
+                    연도 선택
+                  </option>
+                  {[currentYear, nextYear].map((y) => (
+                    <option key={y} value={String(y)}>
+                      {y}
+                    </option>
+                  ))}
+                </select>
               </div>
               {error && (
                 <span className={'error_txt'} style={{ marginTop: '5px' }}>
@@ -101,17 +86,11 @@ function FormDatePicker<T extends FieldValues>({ ref, ...props }: TProps<T>) {
               )}
             </dd>
           </dl>
-          {error && (
-            <span className={'error_txt'} style={{ marginTop: '5px' }}>
-              {error?.message}
-            </span>
-          )}
         </>
       ) : (
         <>
           {props.title && (
             <>
-              {/*<dl ref={el} className={props.className}>*/}
               <dl className={props.className}>
                 <dt style={{ ...props.style }}>
                   <label>{props.title}</label>

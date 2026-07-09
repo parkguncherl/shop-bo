@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { FieldError, FieldValues, useController } from 'react-hook-form';
 import { BaseInputAtom } from '../atom/BaseInputAtom';
 import { TControl } from '../../types/Control';
-import { AutoComplete, InputRef } from 'antd';
 import { useCommonStore } from '../../stores';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { authApi } from '../../libs';
@@ -278,7 +277,7 @@ const FormInput = function FormInput<T extends FieldValues>({
                 style={style}
                 maxLength={maxLength}
                 readonly={readOnly ?? false}
-                ref={mergeRefs<InputRef>(ref, refForUseController)}
+                ref={mergeRefs<HTMLInputElement>(ref, refForUseController)}
                 onFocus={() => {
                   if (handleOnFocus) {
                     handleOnFocus();
@@ -321,7 +320,7 @@ const FormInput = function FormInput<T extends FieldValues>({
             style={style}
             maxLength={maxLength}
             readonly={readOnly ?? false}
-            ref={mergeRefs<InputRef>(ref, refForUseController)}
+            ref={mergeRefs<HTMLInputElement>(ref, refForUseController)}
             onFocus={() => {
               handleFocus(name);
             }}
@@ -389,7 +388,7 @@ const FormInput = function FormInput<T extends FieldValues>({
                 onKeyDown={onKeyDown}
                 readonly={true}
                 allowClear={allowClear}
-                ref={mergeRefs<InputRef>(ref, refForUseController)}
+                ref={mergeRefs<HTMLInputElement>(ref, refForUseController)}
               />
               {children}
               <button className={`btn`} onClick={onClick} disabled={disable}>
@@ -419,7 +418,7 @@ const FormInput = function FormInput<T extends FieldValues>({
               style={style}
               maxLength={maxLength}
               readonly={readOnly ?? false}
-              ref={mergeRefs<InputRef>(ref, refForUseController)}
+              ref={mergeRefs<HTMLInputElement>(ref, refForUseController)}
               onFocus={() => {
                 handleFocus(name);
               }}
@@ -434,7 +433,15 @@ const FormInput = function FormInput<T extends FieldValues>({
       )}
       {inputType === 'autocomplete' && (
         <>
-          <AutoComplete placeholder={placeholder} value={value} onChange={handleChange} onKeyDown={onKeyDown} style={style} maxLength={maxLength} />
+          <input
+            placeholder={placeholder}
+            value={value ?? ''}
+            onChange={handleChange}
+            onKeyDown={onKeyDown}
+            style={style}
+            maxLength={maxLength}
+            autoComplete={'off'}
+          />
           {error && <span className={'error_txt'}>{error?.message}</span>}
         </>
       )}

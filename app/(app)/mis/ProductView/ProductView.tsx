@@ -19,7 +19,6 @@ import ImgPreviewBox, { ImgPreviewFileDet } from '../../../../components/content
 import { CustomSwitch } from '../../../../components/CustomSwitch';
 import SeasonButtonGroup from '../../../../components/SeasonButtonGroup';
 import { FileDet } from '../../../../generated';
-import CustomDatePickerAsPartiallyStateFulFn from '../../../../components/CustomDatePickerAsPartiallyStateFulFn';
 import { useDarkMode } from '../../../../contexts/ThemeContext';
 
 type ProductViewFilter = {

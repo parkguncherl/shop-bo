@@ -5,7 +5,6 @@ import { useQuery } from '@tanstack/react-query';
 import { toastError } from './ToastMessage';
 import { DropDownOption } from '../types/DropDownOptions';
 import DropDownAtom from './atom/DropDownAtom';
-import { SelectCommonPlacement } from 'antd/lib/_util/motion';
 import { AxiosError } from 'axios';
 
 interface Props {
@@ -23,7 +22,7 @@ interface Props {
   required?: boolean; // 필수 입력 여부
   dtWidth?: string; // 드롭다운 너비
   defaultOptions?: DropDownOption[]; // 기본 옵션 목록
-  placement?: SelectCommonPlacement; // 드롭다운 위치 설정
+  placement?: string; // 드롭다운 위치 설정 (native select 에서는 미사용)
   wrapperClassNames?: string; // 래퍼 클래스 이름
   type?: 'cpo' | 'multiple'; // 선택 유형 (단일 또는 다중 선택)
   dropDownStyle?: React.CSSProperties; // 드롭다운 스타일

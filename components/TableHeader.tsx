@@ -2,7 +2,6 @@ import React, { RefObject, useRef, useState } from 'react';
 import { Utils } from '../libs/utils';
 import DropDownAtom from './atom/DropDownAtom';
 import { PageObject } from '../generated';
-import { Input, InputRef } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import { CellClassParams, IRowNode } from 'ag-grid-community';
 import { toastInfo } from './ToastMessage';
@@ -43,7 +42,7 @@ export const TableHeader = ({
   const [searchText, setSearchText] = useState<string>('');
   //const [searchedRowNum, setSearchedRowNum] = useState<number>(-1);
   //const [searchedColumnNum, setSearchedColumnNum] = useState<number>(0);
-  const inputRef = useRef<InputRef>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   return (
     <div className="gridBoxInfo">
@@ -104,12 +103,13 @@ export const TableHeader = ({
           {gridRef && (
             <li className={`gridFindDiv ${searchText?.length > 0 ? 'focus' : ''}`}>
               <span>{title ?? '검색'}</span>
-              <Input
+              <input
                 ref={inputRef}
                 style={{ width: 225 }} // 글자크기 16자까지 들어가게 대표님 요청
                 placeholder={'표 내 검색'}
                 type={'text'}
                 name={'searchText'}
+                autoComplete={'off'}
                 onChange={(e) => {
                   if (searchText !== e.target.value) {
                     rowPosition = -1;

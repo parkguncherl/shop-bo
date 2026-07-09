@@ -1,0 +1,179 @@
+/**
+ * Tailwind CSS v4 + shadcn/ui 기반 스타일
+ *
+ * ⚠️ 중요: Tailwind의 preflight(전역 CSS 리셋)를 의도적으로 제외합니다.
+ *   preflight를 로드하면 기존 antd / scss 화면의 기본 스타일(버튼, input, 리스트 등)이
+ *   전부 리셋되어 깨집니다. 아래처럼 theme + utilities 레이어만 import 하면
+ *   Tailwind 유틸리티 클래스는 shadcn 컴포넌트에서만 동작하고 기존 화면에는 영향이 없습니다.
+ *
+ *   추후 antd를 완전히 제거하는 시점에 preflight를 켜려면:
+ *     @import "tailwindcss";  (아래 분리 import를 이 한 줄로 교체)
+ */
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/* shadcn 컴포넌트 애니메이션 (accordion, dialog 등) */
+@import "tw-animate-css";
+
+/* 다크모드 변형: 기존 프로젝트가 <html data-theme="dark"> 를 사용하므로 그에 맞춤 */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ── shadcn 디자인 토큰 (new-york, oklch) ─────────────────────────── */
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+}
+
+[data-theme="dark"] {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+}
+
+/* ── Tailwind 유틸리티로 토큰 노출 (bg-background, text-foreground 등) ── */
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+/**
+ * antd Modal 제거 대체: Modal 심(components/modal/Modal.tsx)이 쓰는 `.ant-modal-*`
+ * 레이아웃 기본 CSS. antd cssinjs 가 주던 구조 스타일을 직접 제공한다.
+ * 색상/여백 등 세부는 기존 프로젝트 scss(.popUpGroup 등)가 위에 오버라이드한다.
+ */
+.ant-modal-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.45);
+}
+.ant-modal-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow: auto;
+  outline: 0;
+}
+.ant-modal-wrap.ant-modal-centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ant-modal {
+  position: relative;
+  box-sizing: border-box;
+  margin: 32px auto;
+  max-width: calc(100vw - 32px);
+  pointer-events: none;
+}
+.ant-modal-wrap.ant-modal-centered .ant-modal {
+  margin: 0;
+}
+.ant-modal-content {
+  position: relative;
+  padding: 20px 24px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  pointer-events: auto;
+}
+.ant-modal-header {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.ant-modal-title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.88);
+  word-wrap: break-word;
+}
+.ant-modal-body {
+  font-size: 14px;
+  line-height: 1.5714;
+  word-wrap: break-word;
+}
+.ant-modal-footer {
+  margin-top: 16px;
+  padding-top: 12px;
+  text-align: right;
+}
+.ant-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 16px;
+  line-height: 1;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.ant-modal-close:hover {
+  color: rgba(0, 0, 0, 0.88);
+  background: rgba(0, 0, 0, 0.06);
+}

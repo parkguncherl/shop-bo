@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Utils } from '../libs/utils';
 import { toastError } from './ToastMessage';
 import { AlertMessage } from '../libs/const';
-import { Input, InputRef } from 'antd';
 import { Simulate } from 'react-dom/test-utils';
 import keyDown = Simulate.keyDown;
 import { CheckBox } from './CheckBox';
@@ -20,7 +19,7 @@ interface Props {
   filters?: object;
   checked?: boolean;
   wrapperClassNames?: string;
-  reference?: React.RefObject<InputRef>;
+  reference?: React.RefObject<HTMLInputElement>;
   list?: string; // datalist 사용을 위한 속성
   keyDownEvent?: (e: React.KeyboardEvent) => void;
 }
@@ -73,13 +72,14 @@ export const CustomInputChk = ({
           </dt>
           <dd>
             <div className="formBox inpChk">
-              <Input
+              <input
                 placeholder={placeholder}
                 disabled={disable}
                 type={type}
-                value={value}
+                value={value ?? ''}
                 name={name}
                 ref={reference}
+                autoComplete={'off'}
                 onChange={(e) => {
                   if (onChange) {
                     onChange(name, e.target.value);
@@ -94,13 +94,14 @@ export const CustomInputChk = ({
         </dl>
       ) : (
         <>
-          <Input
+          <input
             placeholder={placeholder}
             disabled={disable}
             type={type}
-            value={value}
+            value={value ?? ''}
             name={name}
             ref={reference}
+            autoComplete={'off'}
             onChange={(e) => {
               if (onChange) {
                 onChange(name, e.target.value);

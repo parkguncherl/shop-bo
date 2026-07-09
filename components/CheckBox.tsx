@@ -1,19 +1,23 @@
 import React from 'react';
-import { Checkbox } from 'antd';
-import { CheckboxChangeEvent } from 'antd/es/checkbox';
 
 type Props = {
   label?: string;
   checked?: boolean;
-  onChange?: (e: CheckboxChangeEvent) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   children?: React.ReactNode;
-  // type?: 'circle' | 'rectangular';
 };
 
+/**
+ * antd Checkbox 제거 → native checkbox.
+ * onChange 는 native ChangeEvent(e.target.checked) 를 전달.
+ */
 export const CheckBox = ({ label, checked, onChange, children }: Props) => {
   return (
-    <Checkbox checked={checked} onChange={onChange} onKeyPress={(e) => e.preventDefault()}>
-      {label} {children}
-    </Checkbox>
+    <label className="checkBox" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+      <input type="checkbox" checked={!!checked} onChange={onChange} onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()} />
+      <span>
+        {label} {children}
+      </span>
+    </label>
   );
 };

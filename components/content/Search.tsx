@@ -1,15 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { DropDown } from '../DropDown';
 import { CustomInput } from '../CustomInput';
-import CustomDatePicker from '../CustomDatePicker';
 import { DataList } from '../DataList';
-import { CustomTwoDatePicker } from '../CustomTwoDatePicker';
 import { CustomInputChk } from '../CustomInputChk';
-import { CustomSearchRadio } from '../CustomSearchRadio';
-import { CustomSearchCheckBox } from '../CustomSearchCheckBox';
-import CustomMonthPicker from '../CustomDatePickerM';
 import { CustomSwitch } from '../CustomSwitch';
-import { CustomSegmented } from '../CustomSegmented';
 import SearchBar from '../search/SearchBar';
 
 interface Props {
@@ -83,15 +77,9 @@ export const Search = ({ className, children, style, emptyMessage }: Props) => {
 
 Search.DropDown = DropDown;
 Search.Input = CustomInput;
-Search.DatePicker = CustomDatePicker;
-Search.DatePickerM = CustomMonthPicker;
-Search.TwoDatePicker = CustomTwoDatePicker;
 Search.DataList = DataList;
 Search.InputChk = CustomInputChk;
-Search.Radio = CustomSearchRadio;
-Search.Check = CustomSearchCheckBox;
 Search.Switch = CustomSwitch;
-Search.Segmented = CustomSegmented;
 Search.Bar = SearchBar;
 
 export default React.memo(Search);

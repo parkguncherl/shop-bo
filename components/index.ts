@@ -3,7 +3,6 @@ export * from './BtnCellRenderer';
 export * from './ImageSwiper';
 export * from './Button';
 export * from './CustomChart';
-export * from './CustomDatePicker';
 export * from './CustomTooltip';
 export * from './ErrorMessage';
 export * from './Input';

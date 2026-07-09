@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { DatePicker } from 'antd';
+import React from 'react';
 import dayjs from 'dayjs';
 
 interface Props {
@@ -21,39 +20,27 @@ interface Props {
   handleBlur?: (name: string) => void;
   focusStates?: { [key: string]: boolean };
   className?: string;
-  ref?: React.Ref<React.ComponentRef<typeof DatePicker>>;
+  ref?: React.Ref<HTMLInputElement>;
 }
 
-const DatePickerAtom = ({
-  name,
-  placeholder,
-  value,
-  disable,
-  onChange,
-  onEnter,
-  type = 'text',
-  required = false,
-  filters,
-  wrapperClassNames,
-  format = 'YYYY-MM-DD',
-  dtWidth,
-  style,
-  className,
-  allowClear = true,
-  ref,
-}: Props) => {
+/**
+ * antd DatePicker 제거 → native <input type="date"> 로 교체.
+ * 기존 `.formBox input` + `_dark.scss`의 input[type="date"] 스타일이 적용됨.
+ * onChange 는 'YYYY-MM-DD' 문자열을 넘김(값 없으면 '').
+ */
+const DatePickerAtom = ({ name, placeholder, value, disable, onChange, style, className, ref }: Props) => {
+  const dateVal = value && dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD') : '';
   return (
-    <div className={`formBox border ${className}`}>
-      <DatePicker
-        placeholder={placeholder}
-        disabled={disable}
-        format={format}
-        value={!value ? undefined : dayjs(value, format)}
+    <div className={`formBox border ${className ?? ''}`}>
+      <input
+        type="date"
         name={name}
-        allowClear={allowClear}
-        onChange={onChange}
+        value={dateVal}
+        disabled={disable}
+        placeholder={placeholder}
         style={style}
         ref={ref}
+        onChange={(e) => onChange?.(e.target.value)}
       />
     </div>
   );

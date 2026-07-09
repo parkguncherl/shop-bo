@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Segmented, Switch } from 'antd';
 
 interface Props {
   title?: string;
@@ -16,38 +15,40 @@ interface Props {
   uncheckedLabel: string; // unchecked 상태일 때 텍스트
 }
 
+/**
+ * antd Segmented/Switch 제거 → native 버튼 기반 세그먼트(title 있을 때) / 토글(없을 때).
+ * 다크모드 `.formBox button.segBtn--active` 스타일을 재사용.
+ */
 const CustomSwitchComponent = ({
   title,
   name,
   value = false,
   disabled,
   onChange,
-  onEnter,
   required = false,
-  filters,
   wrapperClassNames,
-  keyDownEvent,
   checkedLabel,
   uncheckedLabel,
 }: Props) => {
   const [checked, setChecked] = useState(value);
-  const [activeKey, setActiveKey] = useState(value ? checkedLabel : uncheckedLabel);
 
-  const handleSwitchChange = (nextChecked: boolean) => {
-    setChecked(nextChecked);
-    onChange?.(name, nextChecked);
-  };
-
-  const handleTabChange = (key: string) => {
-    setActiveKey(key);
-    onChange?.(name, key === checkedLabel);
-  };
-
-  // 외부 value 값이 바뀌면 내부 상태 동기화
   useEffect(() => {
     setChecked(value);
-    setActiveKey(value ? checkedLabel : uncheckedLabel);
-  }, [value, checkedLabel, uncheckedLabel]);
+  }, [value]);
+
+  const activeKey = checked ? checkedLabel : uncheckedLabel;
+
+  const onSeg = (key: string) => {
+    const next = key === checkedLabel;
+    setChecked(next);
+    onChange?.(name, next);
+  };
+
+  const onToggle = () => {
+    const next = !checked;
+    setChecked(next);
+    onChange?.(name, next);
+  };
 
   if (title) {
     return (
@@ -58,25 +59,50 @@ const CustomSwitchComponent = ({
         </dt>
         <dd>
           <div className="formBox">
-            <Segmented value={activeKey} onChange={handleTabChange} options={[checkedLabel, uncheckedLabel]} />
+            <div className="segBox" style={{ display: 'inline-flex', border: '1px solid #ddd', borderRadius: 4, overflow: 'hidden' }}>
+              {[checkedLabel, uncheckedLabel].map((opt) => {
+                const on = activeKey === opt;
+                return (
+                  <button
+                    key={opt}
+                    type="button"
+                    disabled={disabled}
+                    className={on ? 'segBtn segBtn--active' : 'segBtn'}
+                    onClick={() => onSeg(opt)}
+                    style={{ padding: '4px 14px', border: 'none', cursor: 'pointer', background: on ? '#5b21b6' : '#fff', color: on ? '#fff' : '#333' }}
+                  >
+                    {opt}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </dd>
       </dl>
     );
   }
 
-  return <Switch checkedChildren={checkedLabel} unCheckedChildren={uncheckedLabel} checked={checked} onChange={handleSwitchChange} disabled={disabled} />;
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onToggle}
+      className={checked ? 'toggleSwitch on' : 'toggleSwitch'}
+      style={{ padding: '3px 12px', borderRadius: 12, border: 'none', cursor: 'pointer', minWidth: 60, background: checked ? '#5b21b6' : '#bbb', color: '#fff', fontSize: 12 }}
+    >
+      {checked ? checkedLabel : uncheckedLabel}
+    </button>
+  );
 };
 
-// ✅ React.memo 로 감싸고 displayName 설정
-export const CustomSwitch = React.memo(CustomSwitchComponent, (prev, next) => {
-  return (
+export const CustomSwitch = React.memo(
+  CustomSwitchComponent,
+  (prev, next) =>
     prev.value === next.value &&
     prev.disabled === next.disabled &&
     prev.checkedLabel === next.checkedLabel &&
     prev.uncheckedLabel === next.uncheckedLabel &&
     prev.title === next.title &&
-    prev.wrapperClassNames === next.wrapperClassNames
-  );
-});
+    prev.wrapperClassNames === next.wrapperClassNames,
+);
 CustomSwitch.displayName = 'CustomSwitch';

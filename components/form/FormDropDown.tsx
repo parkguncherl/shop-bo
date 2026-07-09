@@ -5,7 +5,6 @@ import DropDownAtom from '../atom/DropDownAtom';
 import { authApi } from '../../libs';
 import { ApiResponseListCodeDropDown } from '../../generated';
 import { TControl } from '../../types/Control';
-import { Input } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
 
@@ -160,7 +159,7 @@ const FormDropDown = <T extends FieldValues>({ ...props }: TProps<T>) => {
           {props.title && (
             <dl ref={el} className={props.className}>
               <dt>
-                {props.gbCode ? <Input onChange={(e) => setGbVal(e.target.value)} value={gbVal} /> : <label>{props.title}</label>}
+                {props.gbCode ? <input onChange={(e) => setGbVal(e.target.value)} value={gbVal} autoComplete={'off'} /> : <label>{props.title}</label>}
                 {props.required && <span className={'req'}>*</span>}
               </dt>
               <dd>

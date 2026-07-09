@@ -1,7 +1,4 @@
 import { DropDownOption } from '../../types/DropDownOptions';
-import { Select, Space } from 'antd';
-import { SelectCommonPlacement } from 'antd/lib/_util/motion';
-import { BaseSelectRef } from 'rc-select';
 import React from 'react';
 
 interface Props {
@@ -12,7 +9,7 @@ interface Props {
   placeholder?: string;
   onChangeOptions?: (name: string, value: string | number, defaultValue?: string | number) => void;
   onChangeControl?: (e: any) => void;
-  placement?: SelectCommonPlacement;
+  placement?: string;
   readonly?: boolean;
   disabledOptionValues?: (string | number | undefined)[];
   style?: React.CSSProperties;
@@ -20,7 +17,7 @@ interface Props {
   defaultValues?: DropDownOption[];
   selectorShowAction?: ('focus' | 'click')[] | undefined;
   multiple?: boolean;
-  onKeyDown?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLSelectElement>) => void;
   optionClass?: string; // 옵션class
   dropDownStyle?: React.CSSProperties;
   virtual?: boolean;
@@ -28,9 +25,15 @@ interface Props {
   onFocus?: (e: React.FocusEvent<HTMLElement, Element>) => void;
   onBlur?: () => void;
   disabled?: boolean;
-  ref?: React.Ref<BaseSelectRef>;
+  ref?: React.Ref<HTMLSelectElement>;
 }
 
+/**
+ * antd Select 제거 → native <select> 로 교체.
+ * 기존 `.formBox select` scss(다크모드 포함)가 그대로 스타일링하므로 외형이 유지됨.
+ * 빈 값('전체' 등)과 multiple 모두 native 로 지원.
+ * (antd 고유 기능인 옵션 검색/가상스크롤/커스텀 옵션 렌더링은 미지원)
+ */
 const DropDownAtom = function DropDownAtom({
   value,
   values,
@@ -39,120 +42,84 @@ const DropDownAtom = function DropDownAtom({
   placeholder,
   onChangeOptions,
   onChangeControl,
-  placement = 'bottomLeft',
   readonly = false,
   disabledOptionValues = [],
   style,
   defaultValue,
-  selectorShowAction,
-  multiple,
   onKeyDown,
-  optionClass,
   dropDownStyle,
-  virtual,
   className,
   onFocus,
   onBlur,
   disabled,
+  multiple,
   ref,
 }: Props) {
-  const handleChange = (selectedValues: any) => {
-    if (onChangeOptions) {
-      onChangeOptions(name, selectedValues, defaultValue);
-    }
-    if (onChangeControl) {
-      onChangeControl(selectedValues);
-    }
+  const visibleOptions = (options ?? []).filter((f) => !disabledOptionValues?.includes(f.value));
+  const hasEmptyOption = visibleOptions.some((o) => String(o.value) === '');
+
+  const renderLabel = (label?: string) => (label ? label.replace('shopNewSeller', ' 신규') : label);
+
+  if (multiple) {
+    const handleMultiChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const selected = Array.from(e.target.selectedOptions).map((o) => o.value);
+      onChangeOptions?.(name, selected as unknown as string);
+      onChangeControl?.(selected);
+    };
+    return (
+      <select
+        multiple
+        name={name}
+        value={values ?? []}
+        onChange={handleMultiChange}
+        onKeyDown={onKeyDown}
+        disabled={disabled || readonly}
+        className={className}
+        style={{ width: '100%', ...(dropDownStyle ?? style) }}
+        ref={ref}
+        onFocus={onFocus}
+        onBlur={onBlur}
+      >
+        {visibleOptions.map((o, index) => (
+          <option key={`${o.key}${index}`} value={String(o.value)}>
+            {renderLabel(o.label)}
+          </option>
+        ))}
+      </select>
+    );
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const v = e.target.value;
+    const defOption = options?.find((o) => String(o.value) === v);
+    onChangeOptions?.(name, v, defOption?.defaultValue);
+    onChangeControl?.(v);
   };
 
   return (
-    <>
-      {multiple ? (
-        <Space>
-          <Select
-            mode="multiple"
-            allowClear
-            value={values || []} // 빈 배열로 기본값 설정
-            onChange={handleChange} // onChange로 선택된 값 업데이트
-            onKeyDown={onKeyDown}
-            placeholder={placeholder}
-            placement={placement}
-            disabled={disabled}
-            aria-readonly={readonly}
-            ref={ref}
-            showAction={selectorShowAction}
-            classNames={{ popup: { root: optionClass } }} // 최신 권장 방식
-            onFocus={onFocus}
-            styles={{ popup: { root: dropDownStyle } }}
-            onBlur={onBlur}
-          >
-            {options
-              ?.filter((f) => !disabledOptionValues?.includes(f.value))
-              .map((o, index: any) => {
-                return (
-                  <Select.Option key={o.key + index} value={o.value} name={name}>
-                    {o.label}
-                  </Select.Option>
-                );
-              })}
-          </Select>
-        </Space>
-      ) : (
-        <Select
-          value={options?.find((v) => String(v.value) === String(value ?? defaultValue))}
-          onSelect={(v) => {
-            if (onChangeOptions) {
-              onChangeOptions(name, v as string);
-            }
-          }}
-          onKeyDown={onKeyDown}
-          onChange={(value) => {
-            //            console.log('value =============>', value);
-            const defOption = options?.find((v) => v.value === value);
-            if (onChangeOptions) {
-              onChangeOptions(name, value as string, defOption?.defaultValue);
-            }
-            if (onChangeControl) {
-              onChangeControl(value);
-            }
-          }}
-          placeholder={placeholder}
-          placement={placement}
-          disabled={disabled}
-          aria-readonly={readonly}
-          style={dropDownStyle ? dropDownStyle : { width: '100%' }}
-          ref={ref}
-          showAction={selectorShowAction}
-          classNames={{ popup: { root: optionClass } }} // dropdownClassName 대체
-          styles={{
-            popup: {
-              root: dropDownStyle, // 드롭다운 전용 스타일
-            },
-          }}
-          virtual={virtual} // 가상 스크롤 여부
-          className={className}
-          onFocus={onFocus}
-          onBlur={onBlur}
-        >
-          {options
-            ?.filter((f) => !disabledOptionValues?.includes(f.value))
-            .map((o: any, index: any) => {
-              return (
-                <Select.Option key={o.key + index + o.value} value={o.value} name={name} defaultValue={o.defaultValue}>
-                  {/*{o.label}*/}
-                  {o.label?.includes('shopNewSeller') ? (
-                    <>
-                      {o.label.split('shopNewSeller')[0]} <span>신규</span>
-                    </>
-                  ) : (
-                    o.label
-                  )}
-                </Select.Option>
-              );
-            })}
-        </Select>
+    <select
+      name={name}
+      value={String(value ?? defaultValue ?? '')}
+      onChange={handleChange}
+      onKeyDown={onKeyDown}
+      disabled={disabled || readonly}
+      className={className}
+      style={{ width: '100%', ...(dropDownStyle ?? style) }}
+      ref={ref}
+      onFocus={onFocus}
+      onBlur={onBlur}
+    >
+      {placeholder && !hasEmptyOption && (
+        <option value="" disabled hidden>
+          {placeholder}
+        </option>
       )}
-    </>
+      {visibleOptions.map((o, index) => (
+        <option key={`${o.key}${index}${o.value}`} value={String(o.value)}>
+          {renderLabel(o.label)}
+        </option>
+      ))}
+    </select>
   );
 };
 

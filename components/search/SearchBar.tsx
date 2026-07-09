@@ -2,8 +2,6 @@ import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } 
 import { ApiResponse } from '../../generated';
 import { DataListOption } from '../../types/DataListOptions';
 import { toastError } from '../ToastMessage';
-import { InputRef } from 'antd';
-import { BaseSelectRef } from 'rc-select';
 import { AxiosPromise, AxiosResponse } from 'axios';
 import { DataList } from '../DataList';
 
@@ -45,8 +43,8 @@ export const SearchBar = <T,>({
   const [respondedDataList, setRespondedDataList] = useState<any[]>([]);
   const [selectedDataOnBar, setSelectedDataOnBar] = useState<T | undefined>(undefined);
 
-  const refOfInput = useRef<InputRef>(null);
-  const refOfSelect = useRef<BaseSelectRef>(null);
+  const refOfInput = useRef<HTMLInputElement>(null);
+  const refOfSelect = useRef<HTMLSelectElement>(null);
 
   useImperativeHandle(ref, () => ({
     focusOnInput: () => {
