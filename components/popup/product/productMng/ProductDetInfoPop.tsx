@@ -289,6 +289,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
         suppressHeaderMenuButton: true,
         editable: false,
         cellRenderer: StndrColorCell,
+        cellStyle: GridSetting.CellStyle.CENTER,
         cellRendererParams: { onColorChange },
       },
       {
