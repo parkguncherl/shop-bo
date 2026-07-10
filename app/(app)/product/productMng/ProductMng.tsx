@@ -602,7 +602,7 @@ const ProductMng = () => {
                   {/*  {`${selectedRowsData == undefined ? '상세정보 추가할 품목 선택' : '상세정보'}`}*/}
                   {/*</button>*/}
                   <button
-                    className={`btn ${selectedRowsData != undefined && 'btnPurple'}`}
+                    className={`btn btnPurple`}
                     onClick={() => {
                       if (selectedRowsData == undefined) {
                         toastError('품목 상세를 보시고자 하는 ROW 를 선택하세요');
