@@ -610,19 +610,6 @@ const ProductMng = () => {
                   >
                     {`${selectedRowsData == undefined ? '품목 데이터 선택' : '품목상세 목록 출력'}`}
                   </button>
-                  <button
-                    className={`btn ${selectedRowsData != undefined && 'btnPurple'}`}
-                    disabled={selectedRowsData == undefined}
-                    onClick={() => {
-                      if (selectedRowsData && selectedRowsData.id) {
-                        openModal('PROD_DEL', selectedRowsData);
-                      } else {
-                        console.error('선택된 품목에 대응하는 식별자를 찾을 수 없음');
-                      }
-                    }}
-                  >
-                    {selectedRowsData == undefined ? '삭제할 품목 선택' : '선택한 품목 삭제'}
-                  </button>
                 </div>
               </div>
             </div>

@@ -54,10 +54,11 @@ interface ProductContentShowPopProps {
  * */
 const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
-  const [updateProduct] = useProductMngStore((s) => [s.updateProduct]);
+  const [updateProduct, deleteProduct] = useProductMngStore((s) => [s.updateProduct, s.deleteProduct]);
 
   /** 팝업 내부 local state */
   const [openModConf, setOpenAddConf] = useState<{ open: boolean; stored?: ProductMngRequestUpdateProduct }>({ open: false });
+  const [openDelConf, setOpenDelConf] = useState(false);
 
   /** 품목 내용 입력 서식 */
   const {
@@ -81,6 +82,24 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
           if (onSuccess) onSuccess();
         } else {
           toastError(`컨텐츠 저장 도중 문제 발생 (${e.data.resultMessage})`);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+  });
+
+  const { mutate: deleteProductMutate } = useMutation({
+    mutationFn: deleteProduct,
+    onSuccess: async (e) => {
+      try {
+        if (e.data.resultCode === 200) {
+          toastSuccess('삭제되었습니다.');
+          setOpenDelConf(false);
+          reset();
+          if (onSuccess) onSuccess();
+        } else {
+          toastError(`삭제 도중 문제 발생 (${e.data.resultMessage})`);
         }
       } catch (e) {
         console.log(e);
@@ -182,6 +201,11 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
                 >
                   저장
                 </button>
+                {productInfo?.id && (
+                  <button className="btn" style={{ color: '#e24b4a', borderColor: '#e24b4a' }} onClick={() => setOpenDelConf(true)}>
+                    삭제
+                  </button>
+                )}
               </div>
               <div className="right">
                 <button
@@ -251,6 +275,20 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
             open: false,
           });
         }}
+      />
+      <ConfirmModal
+        open={openDelConf}
+        title={`[${productInfo?.prodNm}] 품목을 삭제 하시겠습니까?`}
+        warningMessage={'삭제 후 복구할 수 없습니다.'}
+        confirmText={'삭제'}
+        onConfirm={() => {
+          if (productInfo?.id) {
+            deleteProductMutate({ id: productInfo.id });
+          } else {
+            toastError('삭제할 품목의 식별자를 찾을 수 없습니다.');
+          }
+        }}
+        onClose={() => setOpenDelConf(false)}
       />
     </div>
   );

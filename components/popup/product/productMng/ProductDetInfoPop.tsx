@@ -283,7 +283,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
       },
       {
         field: 'stndrColor' as any,
-        headerName: '표준색상',
+        headerName: '색상',
         minWidth: 70,
         maxWidth: 70,
         suppressHeaderMenuButton: true,
