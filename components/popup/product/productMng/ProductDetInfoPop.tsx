@@ -1,4 +1,6 @@
-﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
+﻿import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { ChromePicker, ColorResult } from 'react-color';
 import { PopupFooter } from '../../PopupFooter';
 import { PopupContent } from '../../PopupContent';
 import { PopupLayout } from '../../PopupLayout';
@@ -36,6 +38,58 @@ interface ProductContentShowPopProps {
   onClose: (modHasBeenDone: boolean) => void; // 인자로 삭제, 수정, 추가가 일어난 상태인지를 전달
   productInfo?: ProductMngResponseProductInfo;
 }
+
+/**
+ * 표준색상(stndr_color) 그리드 셀 렌더러.
+ * 스와치 클릭 → ChromePicker(portal) → 6자리 hex 선택 시 params.onColorChange 호출.
+ */
+const StndrColorCell = (params: any) => {
+  const value: string | undefined = params.value; // '#' 없는 6자리 hex
+  const [open, setOpen] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0 });
+  const anchorRef = useRef<HTMLDivElement>(null);
+
+  const openPicker = () => {
+    const rect = anchorRef.current?.getBoundingClientRect();
+    if (rect) setCoords({ top: rect.bottom + window.scrollY + 2, left: rect.left + window.scrollX });
+    setOpen(true);
+  };
+
+  const onComplete = (c: ColorResult) => {
+    const hex6 = c.hex.replace('#', '').toLowerCase();
+    params.onColorChange?.(params, hex6);
+  };
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, height: '100%' }}>
+      <div
+        ref={anchorRef}
+        onClick={openPicker}
+        title="색상 선택"
+        style={{
+          width: 20,
+          height: 20,
+          borderRadius: 4,
+          border: '1px solid #999',
+          cursor: 'pointer',
+          flexShrink: 0,
+          background: value ? `#${value}` : 'repeating-conic-gradient(#ccc 0% 25%, #fff 0% 50%) 50% / 8px 8px',
+        }}
+      />
+      <span style={{ fontSize: 12 }}>{value ? `#${value}` : '선택'}</span>
+      {open &&
+        createPortal(
+          <>
+            <div style={{ position: 'fixed', inset: 0, zIndex: 10000 }} onClick={() => setOpen(false)} />
+            <div style={{ position: 'absolute', top: coords.top, left: coords.left, zIndex: 10001 }} onClick={(e) => e.stopPropagation()}>
+              <ChromePicker color={value ? `#${value}` : '#ffffff'} disableAlpha onChangeComplete={onComplete} />
+            </div>
+          </>,
+          document.body,
+        )}
+    </div>
+  );
+};
 
 /**
  * components/popup/product/productMng/ProductModPop.tsx
@@ -149,6 +203,19 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
     },
   });
 
+  /** 표준색상 선택 콜백 (기존행: 서버 수정 / 신규행: rhf setValue) */
+  const onColorChange = useCallback(
+    (params: any, hex6: string) => {
+      params.node?.setDataValue('stndrColor', hex6); // 그리드 즉시 반영
+      if (params.data?.id) {
+        updateProductDetMutate({ id: params.data.id, stndrColor: hex6 } as any);
+      } else {
+        setValue('stndrColor' as any, hex6, { shouldValidate: true });
+      }
+    },
+    [updateProductDetMutate, setValue],
+  );
+
   /** 컬럼 설정 */
   const columnDefs = useMemo<ColDef<ProductMngResponseProductDetInfo>[]>(
     () => [
@@ -187,6 +254,16 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
             return getValues('productDetColor');
           }
         },
+      },
+      {
+        field: 'stndrColor' as any,
+        headerName: '표준색상',
+        minWidth: 130,
+        maxWidth: 160,
+        suppressHeaderMenuButton: true,
+        editable: false,
+        cellRenderer: StndrColorCell,
+        cellRendererParams: { onColorChange },
       },
       {
         field: 'productDetSize',
@@ -309,7 +386,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
         },
       },
     ],
-    [updateProductDetMutate, setValue, getValues],
+    [updateProductDetMutate, setValue, getValues, onColorChange],
   );
 
   /** 상품상세정보 목록 조회 */
@@ -375,7 +452,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
   return (
     <div className="imgPopBox">
       <PopupLayout
-        width={620}
+        width={720}
         open={open}
         isEscClose={!(openAddConf.open || openDelConf.open)}
         title={productInfo?.prodNm + ' 의 상품상세 목록'}
