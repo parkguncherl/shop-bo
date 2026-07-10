@@ -473,7 +473,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
   return (
     <div className="imgPopBox">
       <PopupLayout
-        width={720}
+        width={900}
         open={open}
         isEscClose={!(openAddConf.open || openDelConf.open)}
         title={productInfo?.prodNm + ' 의 상품상세 목록'}
