@@ -85,7 +85,6 @@ const StndrColorCell = (params: any) => {
           background: value ? `#${value}` : 'repeating-conic-gradient(#ccc 0% 25%, #fff 0% 50%) 50% / 8px 8px',
         }}
       />
-      <span style={{ fontSize: 12 }}>{value ? `#${value}` : '선택'}</span>
       {open &&
         createPortal(
           <>
