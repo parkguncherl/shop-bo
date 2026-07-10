@@ -603,9 +603,12 @@ const ProductMng = () => {
                   {/*</button>*/}
                   <button
                     className={`btn ${selectedRowsData != undefined && 'btnPurple'}`}
-                    disabled={selectedRowsData == undefined}
                     onClick={() => {
-                      openModal('PROD_DET_INFO');
+                      if (selectedRowsData == undefined) {
+                        toastError('품목 상세를 보시고자 하는 ROW 를 선택하세요');
+                      } else {
+                        openModal('PROD_DET_INFO');
+                      }
                     }}
                   >
                     {`품목상세`}
