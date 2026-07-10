@@ -1,6 +1,6 @@
 ﻿import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ChromePicker, ColorResult } from 'react-color';
+import { CirclePicker, ColorResult } from 'react-color';
 import { PopupFooter } from '../../PopupFooter';
 import { PopupContent } from '../../PopupContent';
 import { PopupLayout } from '../../PopupLayout';
@@ -43,8 +43,14 @@ interface ProductContentShowPopProps {
  * 표준색상(stndr_color) 그리드 셀 렌더러.
  * 스와치 클릭 → ChromePicker(portal) → 6자리 hex 선택 시 params.onColorChange 호출.
  */
+// 3자리 hex(#제외) → 6자리로 확장 (표시/피커용). 6자리는 그대로 반환.
+const expandHex = (hex?: string) => {
+  if (!hex) return '';
+  return hex.length === 3 ? hex.split('').map((c) => c + c).join('') : hex;
+};
+
 const StndrColorCell = (params: any) => {
-  const value: string | undefined = params.value; // '#' 없는 6자리 hex
+  const value: string | undefined = params.value; // '#' 없는 3자리 hex
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0 });
   const anchorRef = useRef<HTMLDivElement>(null);
@@ -57,7 +63,10 @@ const StndrColorCell = (params: any) => {
 
   const onComplete = (c: ColorResult) => {
     const hex6 = c.hex.replace('#', '').toLowerCase();
-    params.onColorChange?.(params, hex6);
+    // 각 채널(0~255)을 가장 가까운 3자리 표현값(0~15)으로 반올림해 축약 (예: ff00aa → f0a)
+    const toNibble = (pair: string) => Math.round(parseInt(pair, 16) / 17).toString(16);
+    const hex3 = toNibble(hex6.slice(0, 2)) + toNibble(hex6.slice(2, 4)) + toNibble(hex6.slice(4, 6));
+    params.onColorChange?.(params, hex3);
   };
 
   return (
@@ -81,8 +90,21 @@ const StndrColorCell = (params: any) => {
         createPortal(
           <>
             <div style={{ position: 'fixed', inset: 0, zIndex: 10000 }} onClick={() => setOpen(false)} />
-            <div style={{ position: 'absolute', top: coords.top, left: coords.left, zIndex: 10001 }} onClick={(e) => e.stopPropagation()}>
-              <ChromePicker color={value ? `#${value}` : '#ffffff'} disableAlpha onChangeComplete={onComplete} />
+            <div
+              style={{
+                position: 'absolute',
+                top: coords.top,
+                left: coords.left,
+                zIndex: 10001,
+                background: '#fff',
+                border: '1px solid #ddd',
+                borderRadius: 8,
+                padding: 12,
+                boxShadow: '0 6px 16px rgba(0,0,0,0.15)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <CirclePicker color={value ? `#${expandHex(value)}` : '#ffffff'} onChangeComplete={onComplete} />
             </div>
           </>,
           document.body,
