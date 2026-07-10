@@ -46,7 +46,12 @@ interface ProductContentShowPopProps {
 // 3자리 hex(#제외) → 6자리로 확장 (표시/피커용). 6자리는 그대로 반환.
 const expandHex = (hex?: string) => {
   if (!hex) return '';
-  return hex.length === 3 ? hex.split('').map((c) => c + c).join('') : hex;
+  return hex.length === 3
+    ? hex
+        .split('')
+        .map((c) => c + c)
+        .join('')
+    : hex;
 };
 
 const StndrColorCell = (params: any) => {
@@ -279,8 +284,8 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
       {
         field: 'stndrColor' as any,
         headerName: '표준색상',
-        minWidth: 130,
-        maxWidth: 160,
+        minWidth: 70,
+        maxWidth: 70,
         suppressHeaderMenuButton: true,
         editable: false,
         cellRenderer: StndrColorCell,
@@ -473,7 +478,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
   return (
     <div className="imgPopBox">
       <PopupLayout
-        width={900}
+        width={800}
         open={open}
         isEscClose={!(openAddConf.open || openDelConf.open)}
         title={productInfo?.prodNm + ' 의 상품상세 목록'}
