@@ -9,38 +9,36 @@ import {
   PartnerCodeResponseLowerSelect,
   ProductMngRequestCategoryProductInfoFilter,
   ProductMngResponseCategoryProductInfo,
-  ProductMngResponseProductDetInfo,
-  ProductMngResponseProductInfo,
   ProductMngRequestProductInfoWithExclusionFilter,
+  ProductMngResponseProductInfoByExclusion,
 } from '../../../../generated';
 import TunedGrid, { TunedGridRef } from '../../../grid/TunedGrid';
 import { PopupSearchBox, PopupSearchType } from '../../content';
 import CustomGridLoading from '../../../CustomGridLoading';
 import CustomNoRowsOverlay from '../../../CustomNoRowsOverlay';
 import { GridSetting } from '../../../../libs/ag-grid';
-import { ColDef, RowDragEndEvent } from 'ag-grid-community';
+import { ColDef, GridReadyEvent, RowDragEndEvent } from 'ag-grid-community';
 import useFilters from '../../../../hooks/useFilters';
 import { Search } from '../../../content';
 import { PARTNER_CODE } from '../../../../libs/const';
 import { usePartnerCodeStore } from '../../../../stores/usePartnerCodeStore';
-import { ConfirmModal } from '../../../ConfirmModal';
 import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
 
-interface ConfirmModalProps {
-  type: 'ADD_TO_CATEGORY' | 'DEL_FROM_CATEGORY';
-  active: boolean;
-  stored_temporary?: unknown;
-}
+// interface ConfirmModalProps {
+//   type: 'ADD_TO_CATEGORY' | 'DEL_FROM_CATEGORY';
+//   active: boolean;
+//   stored_temporary?: unknown;
+// }
 
-interface ConfForAddToCategory extends ConfirmModalProps {
-  type: 'ADD_TO_CATEGORY';
-  stored_temporary?: ProductMngResponseProductInfo & { categoryId: number };
-}
-
-interface ConfForDelFromCategory extends ConfirmModalProps {
-  type: 'DEL_FROM_CATEGORY';
-  stored_temporary?: ProductMngResponseCategoryProductInfo;
-}
+// interface ConfForAddToCategory extends ConfirmModalProps {
+//   type: 'ADD_TO_CATEGORY';
+//   stored_temporary?: ProductMngResponseProductInfoByExclusion & { categoryId: number };
+// }
+//
+// interface ConfForDelFromCategory extends ConfirmModalProps {
+//   type: 'DEL_FROM_CATEGORY';
+//   stored_temporary?: ProductMngResponseCategoryProductInfo;
+// }
 
 interface ProductContentShowPopProps {
   open: boolean;
@@ -64,22 +62,24 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
 
   /** 팝업 내부 local state */
   const [productInfoListByCategory, setProductInfoListByCategory] = useState<ProductMngResponseCategoryProductInfo[]>([]);
-  const [productInfoList, setProductInfoList] = useState<ProductMngResponseProductInfo[]>([]);
-  const [modalsStatus, setModalsStatus] = useState<ConfForAddToCategory | ConfForDelFromCategory>({
-    type: 'ADD_TO_CATEGORY',
-    active: false,
-    stored_temporary: undefined,
-  });
+  const [productInfoListWithExclusion, setProductInfoListWithExclusion] = useState<ProductMngResponseProductInfoByExclusion[]>([]);
+  // const [modalsStatus, setModalsStatus] = useState<ConfForAddToCategory | ConfForDelFromCategory>({
+  //   type: 'ADD_TO_CATEGORY',
+  //   active: false,
+  //   stored_temporary: undefined,
+  // });
 
   // 각각 좌, 우측 선택된 행의 상태
-  const [selectedProductInfoByCategory, setSelectedProductInfoByCategory] = useState<ProductMngResponseCategoryProductInfo | undefined>(undefined);
-  const [selectedProductInfo, setSelectedProductInfo] = useState<ProductMngResponseProductInfo | undefined>(undefined);
+  // const [selectedProductInfoByCategory, setSelectedProductInfoByCategory] = useState<ProductMngResponseCategoryProductInfo | undefined>(undefined);
+  // const [selectedProductInfo, setSelectedProductInfo] = useState<ProductMngResponseProductInfoByExclusion | undefined>(undefined);
 
   const [lowerPartnerCodeList, setLowerPartnerCodeList] = useState<PartnerCodeResponseLowerSelect[]>([]);
 
   /** 참조(ref) */
   const RefForLeftGrid = useRef<TunedGridRef<ProductMngResponseCategoryProductInfo>>(null);
-  const RefForRightGrid = useRef<TunedGridRef<ProductMngResponseProductInfo>>(null);
+  const RefForRightGrid = useRef<TunedGridRef<ProductMngResponseProductInfoByExclusion>>(null);
+
+  const refAsFlag = useRef<ProductMngRequestCategoryProductInfoFilter & ProductMngRequestProductInfoWithExclusionFilter>({ categoryId: undefined });
 
   /** 검색 필터 */
   const [filtersForProdInfoByCategory, onChangeFiltersForProdInfoByCategory, filtersForProdInfoByCategoryReset] =
@@ -90,6 +90,16 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
     useFilters<ProductMngRequestProductInfoWithExclusionFilter>({
       prodNm: undefined,
     });
+
+  /** 검색 필터 동기화 시점 추가적 동작을 정의할수 있는 common callback */
+  const onChangeFiltersForProdInfoByCategoryCommonCallback = (name: string, value: string | number) => {
+    onChangeFiltersForProdInfoByCategory(name, value);
+    refAsFlag.current = { ...refAsFlag.current, [name]: value };
+  };
+  const onChangeFiltersForProdInfoListWithExclusionCommonCallback = (name: string, value: string | number) => {
+    onChangeFiltersForProdInfoListWithExclusion(name, value);
+    refAsFlag.current = { ...refAsFlag.current, [name]: value };
+  };
 
   /** 컬럼 설정 */
   const columnDefsOnLeft = useMemo<ColDef<ProductMngResponseCategoryProductInfo>[]>(
@@ -138,7 +148,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
     [],
   );
 
-  const columnDefsOnRight = useMemo<ColDef<ProductMngResponseProductInfo>[]>(
+  const columnDefsOnRight = useMemo<ColDef<ProductMngResponseProductInfoByExclusion>[]>(
     () => [
       {
         field: 'no',
@@ -148,6 +158,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
         valueGetter: (params) => (params.node ? (params.node.rowIndex ?? 0) + 1 : ''),
         cellStyle: GridSetting.CellStyle.CENTER,
         suppressHeaderMenuButton: true,
+        rowDrag: true,
       },
       {
         field: 'prodNm',
@@ -181,13 +192,13 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('추가되었습니다.');
-          setModalsStatus((prevState) => {
-            return {
-              ...prevState,
-              active: false,
-              stored_temporary: undefined,
-            };
-          });
+          // setModalsStatus((prevState) => {
+          //   return {
+          //     ...prevState,
+          //     active: false,
+          //     stored_temporary: undefined,
+          //   };
+          // });
           productInfosByCategoryRefetch();
           productInfosWithExclusionRefetch();
         } else {
@@ -205,13 +216,13 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('삭제되었습니다.');
-          setModalsStatus((prevState) => {
-            return {
-              ...prevState,
-              active: false,
-              stored_temporary: undefined,
-            };
-          });
+          // setModalsStatus((prevState) => {
+          //   return {
+          //     ...prevState,
+          //     active: false,
+          //     stored_temporary: undefined,
+          //   };
+          // });
           productInfosByCategoryRefetch();
           productInfosWithExclusionRefetch();
         } else {
@@ -297,7 +308,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
     if (isProductInfosWithExclusionSuccess) {
       const { resultCode, body, resultMessage } = productInfosWithExclusion.data;
       if (resultCode === 200) {
-        setProductInfoList(body || []);
+        setProductInfoListWithExclusion(body || []);
       } else {
         toastError(resultMessage);
       }
@@ -321,8 +332,8 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
     productInfosWithExclusionRefetch();
   };
 
-  /** row 드래그 이벤트 */
-  const onRowDragEndHandler = async (event: RowDragEndEvent) => {
+  /** 죄측 그리드 하 row 드래그 이벤트 */
+  const onRowDragEndHandlerOfLeftSided = async (event: RowDragEndEvent) => {
     const movingNode = event.node;
     const overNode = event.overNode;
 
@@ -364,6 +375,58 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
     }
   };
 
+  /** 죄측 그리드 초기화 동작(우측 그리드로의 드롭을 가능토록 하는 초기화 구성 또한 정의) */
+  const onLeftGridReady = (params: GridReadyEvent<ProductMngResponseCategoryProductInfo>) => {
+    if (RefForRightGrid.current) {
+      // 우측 그리드가 준비된 후 drop zone 연결
+      const dropZoneParams = RefForRightGrid.current.api.getRowDropZoneParams({
+        /** 우측 그리드로의 드랍 시점 이벤트*/
+        onDragStop: (dragParams: RowDragEndEvent<ProductMngResponseCategoryProductInfo>) => {
+          /** prodInfo 삭제 동작 */
+          const droppedNodesData = dragParams.node.data;
+          //console.log('droppedNodesData to Right: ', droppedNodesData?.categoryId);
+          if (droppedNodesData) {
+            deleteCategoryProductMutate({
+              id: droppedNodesData.categoryProductId, // 이때의 id는 카테고리 연결상품정보 아이디(PK)
+            });
+          }
+        },
+      });
+
+      if (dropZoneParams) {
+        params.api.addRowDropZone(dropZoneParams); // 드롭존 추가
+      }
+    }
+  };
+
+  /** 우측 그리드 초기화 동작(우측 그리드로의 드롭을 가능토록 하는 초기화 구성 또한 정의) */
+  const onRightGridReady = (params: GridReadyEvent<ProductMngResponseProductInfoByExclusion>) => {
+    if (RefForLeftGrid.current) {
+      // 좌측 그리드가 준비된 후 drop zone 연결
+      const dropZoneParams = RefForLeftGrid.current.api.getRowDropZoneParams({
+        /** 좌측 그리드로의 드랍 시점 이벤트*/
+        onDragStop: (dragParams: RowDragEndEvent<ProductMngResponseProductInfoByExclusion>) => {
+          /** prodInfo 추가 동작 */
+          const droppedNodesData = dragParams.node.data;
+          // console.log('droppedNodesData to Left: ', droppedNodesData);
+          // console.log('refAsFlag.current: ', refAsFlag.current);
+          if (droppedNodesData) {
+            if (refAsFlag.current.categoryId) {
+              insertCategoryProductMutate({
+                categoryId: refAsFlag.current.categoryId,
+                productId: droppedNodesData.id,
+              });
+            }
+          }
+        },
+      });
+
+      if (dropZoneParams) {
+        params.api.addRowDropZone(dropZoneParams); // 드롭존 추가
+      }
+    }
+  };
+
   const categoryOptions = useMemo(() => {
     return lowerPartnerCodeList.map((lowerPartnerCode) => ({
       key: String(lowerPartnerCode.id),
@@ -377,74 +440,75 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
       <PopupLayout
         width={1000}
         open={open}
-        isEscClose={!modalsStatus.active}
+        //isEscClose={!modalsStatus.active}
+        isEscClose={true}
         title={'카테고리별 상품'}
         onClose={commonOnCloseCallback}
         footer={
           <PopupFooter>
             <div className="btnArea between">
               <div className="left">
-                <button
-                  className={`btn ${selectedProductInfoByCategory != undefined && filtersForProdInfoByCategory.categoryId && 'btnPurple'}`}
-                  disabled={selectedProductInfoByCategory === undefined}
-                  onClick={() => {
-                    setModalsStatus({
-                      type: 'DEL_FROM_CATEGORY',
-                      active: true,
-                      stored_temporary: selectedProductInfoByCategory,
-                    });
-                  }}
-                >
-                  {/*{`${*/}
-                  {/*  selectedProductInfoByCategory != undefined && filtersForProdInfoByCategory.categoryId*/}
-                  {/*    ? (lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||*/}
-                  {/*        '알수 없는 카테고리') +*/}
-                  {/*      ' 에 해당하는 ' +*/}
-                  {/*      selectedProductInfoByCategory.prodNm?.slice(0, 7) +*/}
-                  {/*      ((selectedProductInfoByCategory.prodNm || '').length > 7 ? '..' : '') +*/}
-                  {/*      ' 을 삭제'*/}
-                  {/*    : filtersForProdInfoByCategory.categoryId*/}
-                  {/*    ? (*/}
-                  {/*        lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||*/}
-                  {/*        '알수 없음'*/}
-                  {/*      ).slice(0, 5) +*/}
-                  {/*      ((*/}
-                  {/*        lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||*/}
-                  {/*        '알수 없는 카테고리'*/}
-                  {/*      ).length > 5*/}
-                  {/*        ? '..'*/}
-                  {/*        : '') +*/}
-                  {/*      ' 내에서 삭제할 상품 선택'*/}
-                  {/*    : '카테고리 선택'*/}
-                  {/*}`}*/}
-                  {'카테고리에서 삭제'}
-                </button>
-                <button
-                  className={`btn ${selectedProductInfo != undefined && filtersForProdInfoByCategory.categoryId && 'btnPurple'}`}
-                  disabled={selectedProductInfo == undefined || !filtersForProdInfoByCategory.categoryId}
-                  onClick={() => {
-                    setModalsStatus({
-                      type: 'ADD_TO_CATEGORY',
-                      active: true,
-                      stored_temporary: {
-                        ...selectedProductInfo,
-                        categoryId: filtersForProdInfoByCategory.categoryId,
-                      },
-                    } as ConfForAddToCategory);
-                  }}
-                >
-                  {/*{`${*/}
-                  {/*  selectedProductInfo != undefined && filtersForProdInfoByCategory.categoryId*/}
-                  {/*    ? selectedProductInfo.prodNm?.slice(0, 7) +*/}
-                  {/*      ((selectedProductInfo.prodNm || '').length > 7 ? '..' : '') +*/}
-                  {/*      ' 을(를) ' +*/}
-                  {/*      (lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||*/}
-                  {/*        '알수 없는 카테고리') +*/}
-                  {/*      ' 의 상품으로 추가 '*/}
-                  {/*    : '카테고리 선택 후 추가'*/}
-                  {/*}`}*/}
-                  {'카테고리에 추가'}
-                </button>
+                {/*<button*/}
+                {/*  className={`btn ${selectedProductInfoByCategory != undefined && filtersForProdInfoByCategory.categoryId && 'btnPurple'}`}*/}
+                {/*  disabled={selectedProductInfoByCategory === undefined}*/}
+                {/*  onClick={() => {*/}
+                {/*    setModalsStatus({*/}
+                {/*      type: 'DEL_FROM_CATEGORY',*/}
+                {/*      active: true,*/}
+                {/*      stored_temporary: selectedProductInfoByCategory,*/}
+                {/*    });*/}
+                {/*  }}*/}
+                {/*>*/}
+                {/*  /!*{`${*!/*/}
+                {/*  /!*  selectedProductInfoByCategory != undefined && filtersForProdInfoByCategory.categoryId*!/*/}
+                {/*  /!*    ? (lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||*!/*/}
+                {/*  /!*        '알수 없는 카테고리') +*!/*/}
+                {/*  /!*      ' 에 해당하는 ' +*!/*/}
+                {/*  /!*      selectedProductInfoByCategory.prodNm?.slice(0, 7) +*!/*/}
+                {/*  /!*      ((selectedProductInfoByCategory.prodNm || '').length > 7 ? '..' : '') +*!/*/}
+                {/*  /!*      ' 을 삭제'*!/*/}
+                {/*  /!*    : filtersForProdInfoByCategory.categoryId*!/*/}
+                {/*  /!*    ? (*!/*/}
+                {/*  /!*        lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||*!/*/}
+                {/*  /!*        '알수 없음'*!/*/}
+                {/*  /!*      ).slice(0, 5) +*!/*/}
+                {/*  /!*      ((*!/*/}
+                {/*  /!*        lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||*!/*/}
+                {/*  /!*        '알수 없는 카테고리'*!/*/}
+                {/*  /!*      ).length > 5*!/*/}
+                {/*  /!*        ? '..'*!/*/}
+                {/*  /!*        : '') +*!/*/}
+                {/*  /!*      ' 내에서 삭제할 상품 선택'*!/*/}
+                {/*  /!*    : '카테고리 선택'*!/*/}
+                {/*  /!*}`}*!/*/}
+                {/*  {'카테고리에서 삭제'}*/}
+                {/*</button>*/}
+                {/*<button*/}
+                {/*  className={`btn ${selectedProductInfo != undefined && filtersForProdInfoByCategory.categoryId && 'btnPurple'}`}*/}
+                {/*  disabled={selectedProductInfo == undefined || !filtersForProdInfoByCategory.categoryId}*/}
+                {/*  onClick={() => {*/}
+                {/*    setModalsStatus({*/}
+                {/*      type: 'ADD_TO_CATEGORY',*/}
+                {/*      active: true,*/}
+                {/*      stored_temporary: {*/}
+                {/*        ...selectedProductInfo,*/}
+                {/*        categoryId: filtersForProdInfoByCategory.categoryId,*/}
+                {/*      },*/}
+                {/*    } as ConfForAddToCategory);*/}
+                {/*  }}*/}
+                {/*>*/}
+                {/*  /!*{`${*!/*/}
+                {/*  /!*  selectedProductInfo != undefined && filtersForProdInfoByCategory.categoryId*!/*/}
+                {/*  /!*    ? selectedProductInfo.prodNm?.slice(0, 7) +*!/*/}
+                {/*  /!*      ((selectedProductInfo.prodNm || '').length > 7 ? '..' : '') +*!/*/}
+                {/*  /!*      ' 을(를) ' +*!/*/}
+                {/*  /!*      (lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||*!/*/}
+                {/*  /!*        '알수 없는 카테고리') +*!/*/}
+                {/*  /!*      ' 의 상품으로 추가 '*!/*/}
+                {/*  /!*    : '카테고리 선택 후 추가'*!/*/}
+                {/*  /!*}`}*!/*/}
+                {/*  {'카테고리에 추가'}*/}
+                {/*</button>*/}
               </div>
               <div className="right">
                 <button className="btn" onClick={commonOnCloseCallback}>
@@ -463,7 +527,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                 name={'categoryId'}
                 defaultOptions={categoryOptions}
                 value={filtersForProdInfoByCategory.categoryId}
-                onChange={onChangeFiltersForProdInfoByCategory}
+                onChange={onChangeFiltersForProdInfoByCategoryCommonCallback}
                 dropDownStyle={{ width: '280px' }}
               />
               <Search.Input
@@ -472,7 +536,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                 placeholder={'키워드 입력 후 엔터키 클릭'}
                 value={filtersForProdInfoListWithExclusion.prodNm}
                 onEnter={search}
-                onChange={onChangeFiltersForProdInfoListWithExclusion}
+                onChange={onChangeFiltersForProdInfoListWithExclusionCommonCallback}
                 filters={filtersForProdInfoListWithExclusion}
               />
             </PopupSearchType>
@@ -480,9 +544,10 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
           <div className="mt10">
             <div className="layoutBox">
               <div className={'layout60'}>
-                <TunedGrid<ProductMngResponseProductDetInfo>
+                <TunedGrid<ProductMngResponseCategoryProductInfo>
                   columnDefs={columnDefsOnLeft}
                   rowData={productInfoListByCategory}
+                  onGridReady={onLeftGridReady}
                   loadingOverlayComponent={CustomGridLoading}
                   noRowsOverlayComponent={CustomNoRowsOverlay}
                   ref={RefForLeftGrid}
@@ -491,17 +556,18 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                     mode: 'singleRow',
                     enableClickSelection: true,
                   }}
-                  onSelectionChanged={(event) => {
-                    const selectedRows = event.api.getSelectedRows();
-                    setSelectedProductInfoByCategory(selectedRows.length > 0 ? selectedRows[0] : undefined);
-                  }}
-                  onRowDragEnd={onRowDragEndHandler}
+                  // onSelectionChanged={(event) => {
+                  //   const selectedRows = event.api.getSelectedRows();
+                  //   setSelectedProductInfoByCategory(selectedRows.length > 0 ? selectedRows[0] : undefined);
+                  // }}
+                  onRowDragEnd={onRowDragEndHandlerOfLeftSided}
                 />
               </div>
               <div className={'layout40'}>
-                <TunedGrid<ProductMngResponseProductDetInfo>
+                <TunedGrid<ProductMngResponseProductInfoByExclusion>
                   columnDefs={columnDefsOnRight}
-                  rowData={productInfoList}
+                  rowData={productInfoListWithExclusion}
+                  onGridReady={onRightGridReady}
                   loadingOverlayComponent={CustomGridLoading}
                   noRowsOverlayComponent={CustomNoRowsOverlay}
                   ref={RefForRightGrid}
@@ -510,48 +576,49 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                     mode: 'singleRow',
                     enableClickSelection: true,
                   }}
-                  onSelectionChanged={(event) => {
-                    const selectedRows = event.api.getSelectedRows();
-                    setSelectedProductInfo(selectedRows.length > 0 ? selectedRows[0] : undefined);
-                  }}
+                  // onSelectionChanged={(event) => {
+                  //   const selectedRows = event.api.getSelectedRows();
+                  //   setSelectedProductInfo(selectedRows.length > 0 ? selectedRows[0] : undefined);
+                  // }}
                 />
               </div>
             </div>
           </div>
         </PopupContent>
       </PopupLayout>
-      <ConfirmModal
-        open={modalsStatus.active && (modalsStatus.type == 'ADD_TO_CATEGORY' || modalsStatus.type == 'DEL_FROM_CATEGORY')}
-        title={
-          modalsStatus.type == 'DEL_FROM_CATEGORY'
-            ? modalsStatus.stored_temporary?.prodNm + ' 을 해당 카테고리의 상품 목록에서 삭제하시겠습니까?'
-            : modalsStatus.stored_temporary?.prodNm + ' 을 해당 카테고리의 상품 목록으로 추가하시겠습니까?'
-        }
-        confirmText={'확인'}
-        onConfirm={() => {
-          if (modalsStatus.type == 'DEL_FROM_CATEGORY') {
-            // 카테고리로부터 제거
-            deleteCategoryProductMutate({
-              id: modalsStatus.stored_temporary?.categoryProductId, // 이때의 id는 카테고리 연결상품정보 아이디(PK)
-            });
-          } else {
-            // 카테고리로 추가
-            insertCategoryProductMutate({
-              categoryId: modalsStatus.stored_temporary?.categoryId,
-              productId: modalsStatus.stored_temporary?.id,
-            });
-          }
-        }}
-        onClose={() => {
-          setModalsStatus((prevState) => {
-            return {
-              ...prevState,
-              active: false,
-              stored_temporary: undefined,
-            };
-          });
-        }}
-      />
+      {/*<ConfirmModal*/}
+      {/*  open={modalsStatus.active && (modalsStatus.type == 'ADD_TO_CATEGORY' || modalsStatus.type == 'DEL_FROM_CATEGORY')}*/}
+      {/*  title={*/}
+      {/*    modalsStatus.type == 'DEL_FROM_CATEGORY'*/}
+      {/*      ? modalsStatus.stored_temporary?.prodNm + ' 을 해당 카테고리의 상품 목록에서 삭제하시겠습니까?'*/}
+      {/*      : modalsStatus.stored_temporary?.prodNm + ' 을 해당 카테고리의 상품 목록으로 추가하시겠습니까?'*/}
+      {/*  }*/}
+      {/*  confirmText={'확인'}*/}
+      {/*  onConfirm={() => {*/}
+      {/*    // todo 추후 제거*/}
+      {/*    if (modalsStatus.type == 'DEL_FROM_CATEGORY') {*/}
+      {/*      // 카테고리로부터 제거*/}
+      {/*      deleteCategoryProductMutate({*/}
+      {/*        id: modalsStatus.stored_temporary?.categoryProductId, // 이때의 id는 카테고리 연결상품정보 아이디(PK)*/}
+      {/*      });*/}
+      {/*    } else {*/}
+      {/*      // 카테고리로 추가*/}
+      {/*      insertCategoryProductMutate({*/}
+      {/*        categoryId: modalsStatus.stored_temporary?.categoryId,*/}
+      {/*        productId: modalsStatus.stored_temporary?.id,*/}
+      {/*      });*/}
+      {/*    }*/}
+      {/*  }}*/}
+      {/*  onClose={() => {*/}
+      {/*    setModalsStatus((prevState) => {*/}
+      {/*      return {*/}
+      {/*        ...prevState,*/}
+      {/*        active: false,*/}
+      {/*        stored_temporary: undefined,*/}
+      {/*      };*/}
+      {/*    });*/}
+      {/*  }}*/}
+      {/*/>*/}
     </div>
   );
 };
