@@ -75,7 +75,7 @@ const StndrColorCell = (params: any) => {
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6, height: '100%' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, height: '100%' }}>
       <div
         ref={anchorRef}
         onClick={openPicker}

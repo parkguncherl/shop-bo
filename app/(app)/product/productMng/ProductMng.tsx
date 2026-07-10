@@ -608,7 +608,7 @@ const ProductMng = () => {
                       openModal('PROD_DET_INFO');
                     }}
                   >
-                    {`${selectedRowsData == undefined ? '품목 데이터 선택' : '품목상세 목록 출력'}`}
+                    {`품목상세`}
                   </button>
                 </div>
               </div>
@@ -622,14 +622,14 @@ const ProductMng = () => {
                         targetedFileSetInfo?.type == 'rep'
                           ? '대표이미지'
                           : targetedFileSetInfo?.type == 'detail'
-                          ? '상세이미지'
-                          : targetedFileSetInfo?.type == 'size'
-                          ? '사이즈이미지'
-                          : targetedFileSetInfo?.type == 'etc'
-                          ? '기타이미지'
-                          : detFilters.prodDetColor != undefined
-                          ? detFilters.prodDetColor
-                          : '알수 없음'
+                            ? '상세이미지'
+                            : targetedFileSetInfo?.type == 'size'
+                              ? '사이즈이미지'
+                              : targetedFileSetInfo?.type == 'etc'
+                                ? '기타이미지'
+                                : detFilters.prodDetColor != undefined
+                                  ? detFilters.prodDetColor
+                                  : '알수 없음'
                       }`,
                 }}
                 srcInfo={
