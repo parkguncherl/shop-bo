@@ -653,6 +653,35 @@
     background-color: rgba(0, 0, 0, 0.7) !important;
   }
 
+  // 모달 배경 · 텍스트 (globals.css 흰 배경 오버라이드)
+  .ant-modal-content {
+    background: var(--dark-surface-2) !important;
+    color: var(--dark-text) !important;
+  }
+  .ant-modal-header {
+    background: var(--dark-surface-2) !important;
+    border-bottom-color: var(--dark-border) !important;
+  }
+  .ant-modal-title {
+    color: var(--dark-text) !important;
+  }
+  .ant-modal-body {
+    color: var(--dark-text) !important;
+  }
+  // 컨펌 모달 본문 텍스트
+  .confirm .ant-modal-body div {
+    color: var(--dark-text) !important;
+  }
+  // 로그아웃 모달 버튼
+  .ant-modal.logout .ant-modal-footer .right button.btn {
+    background-color: var(--dark-surface) !important;
+    color: var(--dark-text) !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    &:hover {
+      background-color: #383855 !important;
+    }
+  }
+
   // 팝업 타이틀
   .popUpGroup .ant-modal-header .popupHeader h3,
   .popUpGroup .ant-modal-title .popupHeader h3,
