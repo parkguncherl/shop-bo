@@ -567,7 +567,7 @@ const ProductMng = () => {
               <div className="btnArea between">
                 <div className="left">
                   <button
-                    className={'btn btnGray'}
+                    className={'btn btnPurple'}
                     onClick={() => {
                       partnerCodeOpenModal('PARTNER_CODE_OPEN');
                     }}
@@ -575,7 +575,7 @@ const ProductMng = () => {
                     카테고리
                   </button>
                   <button
-                    className={'btn btnGray'}
+                    className={'btn btnPurple'}
                     onClick={() => {
                       openModal('PROD_BY_CATEGORY');
                     }}

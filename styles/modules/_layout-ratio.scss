@@ -16,8 +16,22 @@
       }
     }
   }
+  & .layout55 {
+    width: calc(55% - 5px);
+    & .searchArea {
+      & > div {
+        height: auto;
+        & dl {
+          width: 70%;
+        }
+      }
+    }
+  }
   & .layout50 {
     width: calc(50% - 5px);
+  }
+  & .layout45 {
+    width: calc(45% - 5px);
   }
   & .layout40 {
     width: calc(40% - 5px);

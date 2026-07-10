@@ -117,8 +117,8 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
       {
         field: 'categoryNm',
         headerName: '카테고리',
-        minWidth: 80,
-        maxWidth: 80,
+        minWidth: 100,
+        maxWidth: 100,
         suppressHeaderMenuButton: true,
       },
       {
@@ -129,18 +129,18 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
         suppressHeaderMenuButton: true,
       },
       {
-        field: 'prodSizes',
-        headerName: '크기',
-        minWidth: 120,
-        maxWidth: 140,
+        field: 'prodColors',
+        headerName: '색상',
+        minWidth: 160,
+        maxWidth: 160,
         suppressHeaderMenuButton: true,
         cellStyle: GridSetting.CellStyle.LEFT,
       },
       {
-        field: 'prodColors',
-        headerName: '색상',
-        minWidth: 140,
-        maxWidth: 160,
+        field: 'prodSizes',
+        headerName: '크기',
+        minWidth: 80,
+        maxWidth: 80,
         suppressHeaderMenuButton: true,
         cellStyle: GridSetting.CellStyle.LEFT,
       },
@@ -163,23 +163,23 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
       {
         field: 'prodNm',
         headerName: '상품명',
-        minWidth: 150,
-        maxWidth: 150,
+        minWidth: 200,
+        maxWidth: 200,
         suppressHeaderMenuButton: true,
       },
       {
         field: 'prodColors',
         headerName: '색상',
-        minWidth: 150,
-        maxWidth: 150,
+        minWidth: 160,
+        maxWidth: 160,
         suppressHeaderMenuButton: true,
-        cellStyle: GridSetting.CellStyle.CENTER,
+        cellStyle: GridSetting.CellStyle.LEFT,
       },
       {
         field: 'prodSizes',
         headerName: '크기',
-        minWidth: 150,
-        maxWidth: 150,
+        minWidth: 80,
+        maxWidth: 80,
         suppressHeaderMenuButton: true,
       },
     ],
@@ -438,7 +438,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
   return (
     <div className="imgPopBox">
       <PopupLayout
-        width={1000}
+        width={1250}
         open={open}
         //isEscClose={!modalsStatus.active}
         isEscClose={true}
@@ -543,7 +543,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
           </PopupSearchBox>
           <div className="mt10">
             <div className="layoutBox">
-              <div className={'layout60'}>
+              <div className={'layout55'}>
                 <TunedGrid<ProductMngResponseCategoryProductInfo>
                   columnDefs={columnDefsOnLeft}
                   rowData={productInfoListByCategory}
@@ -563,7 +563,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                   onRowDragEnd={onRowDragEndHandlerOfLeftSided}
                 />
               </div>
-              <div className={'layout40'}>
+              <div className={'layout45'}>
                 <TunedGrid<ProductMngResponseProductInfoByExclusion>
                   columnDefs={columnDefsOnRight}
                   rowData={productInfoListWithExclusion}
