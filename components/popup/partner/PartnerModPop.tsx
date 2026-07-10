@@ -154,6 +154,7 @@ const PartnerModPop = ({ datas }: Props) => {
   return (
     <PopupLayout
       width={820}
+      className={'wideInputPop'}
       isEscClose={false}
       open={modalType.type === 'MOD'}
       title={'화주 수정하기'}

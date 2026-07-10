@@ -280,9 +280,29 @@
       color: var(--dark-text) !important;
       border-color: var(--dark-border) !important;
       &::placeholder { color: #555570 !important; }
-      &:disabled, &:read-only {
-        background-color: #1a1a28 !important;
-        color: #555570 !important;
+    }
+    // 흐림 처리는 실제 비활성/읽기전용 요소에만 (native select 는 항상 :read-only 로 매칭되므로 제외)
+    & input:disabled, & textarea:disabled, & select:disabled,
+    & input:read-only, & textarea:read-only {
+      background-color: #1a1a28 !important;
+      color: #555570 !important;
+    }
+
+    // native select: 기본 렌더링을 끄고 직접 스타일링해 닫힌 값 텍스트를 선명하게
+    & select:not(:disabled) {
+      color-scheme: dark;
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+      appearance: none !important;
+      color: #ffffff !important;
+      font-weight: 400 !important;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%23cccccc' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") !important;
+      background-repeat: no-repeat !important;
+      background-position: right 8px center !important;
+      padding-right: 26px !important;
+      & option {
+        background-color: var(--dark-surface-2) !important;
+        color: var(--dark-text) !important;
       }
     }
 
@@ -672,13 +692,36 @@
   .confirm .ant-modal-body div {
     color: var(--dark-text) !important;
   }
-  // 로그아웃 모달 버튼
+  // 모달 본문 내 native textarea/input (인라인 흰 배경 오버라이드, ag-grid 제외)
+  .ant-modal-body textarea:not([class*="ag-"]),
+  .ant-modal-body input:not([class*="ag-"]):not([type="checkbox"]):not([type="radio"]) {
+    background-color: var(--dark-surface-2) !important;
+    color: var(--dark-text) !important;
+    border-color: var(--dark-border) !important;
+    &::placeholder { color: #555570 !important; }
+  }
+  // 모달 본문 폼 레이블/셀 (팝업 pop_search_box dt/dd 흰 배경 오버라이드)
+  .ant-modal-body {
+    dl dt {
+      background-color: var(--dark-surface) !important;
+      border-color: var(--dark-border) !important;
+      label { color: var(--dark-text) !important; }
+    }
+    dl dd {
+      color: var(--dark-text) !important;
+    }
+    [class*="pop_search"] > div {
+      border-color: var(--dark-border) !important;
+    }
+  }
+  // 로그아웃 모달 버튼 (다크모드 가시성)
   .ant-modal.logout .ant-modal-footer .right button.btn {
     background-color: var(--dark-surface) !important;
     color: var(--dark-text) !important;
-    border: 1px solid rgba(255,255,255,0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
     &:hover {
       background-color: #383855 !important;
+      border-color: rgba(255, 255, 255, 0.4) !important;
     }
   }
 

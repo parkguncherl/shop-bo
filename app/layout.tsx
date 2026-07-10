@@ -17,7 +17,7 @@ import 'swiper/css/pagination';
  * 해당 애플리케이션의 DOM 중 최상위 영역, 해당 영역에서 전역 provider 제공
  * */
 export const metadata: Metadata = {
-  title: '맵시꾼',
+  title: 'MAPSIGGUN',
   icons: { icon: '/favicon_logo.svg' },
 };
 const layout = ({ children }: { children: React.ReactNode }) => {

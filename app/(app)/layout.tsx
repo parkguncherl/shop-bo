@@ -3,7 +3,6 @@ import stylesForLayout from '../../styles/layout/layout.module.scss';
 import stylesForHeader from '../../styles/layout/header.module.scss';
 
 import NavList from '../../components/layout/leftNav/NavList';
-import CurTime from '../../components/layout/leftNav/CurTime';
 import BriefUserInfo from '../../components/layout/leftNav/BriefUserInfo';
 import Link from 'next/link';
 import SignOutBtn from '../../components/layout/header/SignOutBtn';
@@ -27,7 +26,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
           <div className={stylesForHeader.left}>
             <h1>
               <Link href={'/'} style={{ display: 'flex', alignItems: 'center', color: '#fff', fontSize: '18px', fontWeight: 700, letterSpacing: '2px' }}>
-                {'맵시꾼'}
+                {'MAPSIGGUN'}
               </Link>
             </h1>
           </div>
@@ -48,9 +47,6 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
             <ul>
               <li className="ico_user">
                 <BriefUserInfo />
-              </li>
-              <li className="ico_date">
-                <CurTime />
               </li>
             </ul>
             <nav>

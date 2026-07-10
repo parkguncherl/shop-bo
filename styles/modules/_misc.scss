@@ -323,3 +323,32 @@ dl.imgToggle {
     .ant-segmented-item-label { padding: 0 6px; font-size: 11px; }
   }
 }
+
+// ── wideInputPop: 팝업 폼 입력을 셀(dd) 제한폭까지 확장 ──────────
+.wideInputPop {
+  // 한 행(pop_search_box > div) 안의 dl 들이 폭을 균등하게 채우도록
+  .ant-modal-body dl {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    width: auto !important;
+  }
+  // 레이블 셀은 고정폭 유지
+  .ant-modal-body dl dt {
+    flex: 0 0 127px !important;
+    width: 127px !important;
+  }
+  // 값 셀은 남은 공간을 모두 채움
+  .ant-modal-body dl dd {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+  }
+  // 입력 컨테이너와 실제 입력 요소를 셀 폭까지 확장
+  .ant-modal-body dl dd .formBox,
+  .ant-modal-body dl dd .formBox input,
+  .ant-modal-body dl dd .formBox select,
+  .ant-modal-body dl dd .formBox textarea {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
