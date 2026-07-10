@@ -97,8 +97,8 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
       {
         field: 'no',
         headerName: 'NO',
-        minWidth: 40,
-        maxWidth: 60,
+        minWidth: 37,
+        maxWidth: 37,
         valueGetter: (params) => (params.node ? (params.node.rowIndex ?? 0) + 1 : ''),
         cellStyle: GridSetting.CellStyle.CENTER,
         suppressHeaderMenuButton: true,
@@ -108,14 +108,14 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
         field: 'categoryNm',
         headerName: '카테고리',
         minWidth: 80,
-        maxWidth: 100,
+        maxWidth: 80,
         suppressHeaderMenuButton: true,
       },
       {
         field: 'prodNm',
         headerName: '상품명',
-        minWidth: 80,
-        maxWidth: 100,
+        minWidth: 200,
+        maxWidth: 200,
         suppressHeaderMenuButton: true,
       },
       {
@@ -143,8 +143,8 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
       {
         field: 'no',
         headerName: 'NO',
-        minWidth: 40,
-        maxWidth: 60,
+        minWidth: 37,
+        maxWidth: 37,
         valueGetter: (params) => (params.node ? (params.node.rowIndex ?? 0) + 1 : ''),
         cellStyle: GridSetting.CellStyle.CENTER,
         suppressHeaderMenuButton: true,
@@ -152,24 +152,24 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
       {
         field: 'prodNm',
         headerName: '상품명',
-        minWidth: 80,
-        maxWidth: 100,
-        suppressHeaderMenuButton: true,
-      },
-      {
-        field: 'prodSizes',
-        headerName: '크기',
-        minWidth: 120,
-        maxWidth: 140,
+        minWidth: 150,
+        maxWidth: 150,
         suppressHeaderMenuButton: true,
       },
       {
         field: 'prodColors',
         headerName: '색상',
-        minWidth: 140,
-        maxWidth: 160,
+        minWidth: 150,
+        maxWidth: 150,
         suppressHeaderMenuButton: true,
         cellStyle: GridSetting.CellStyle.CENTER,
+      },
+      {
+        field: 'prodSizes',
+        headerName: '크기',
+        minWidth: 150,
+        maxWidth: 150,
+        suppressHeaderMenuButton: true,
       },
     ],
     [],
@@ -479,7 +479,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
           </PopupSearchBox>
           <div className="mt10">
             <div className="layoutBox">
-              <div className={'layout50'}>
+              <div className={'layout60'}>
                 <TunedGrid<ProductMngResponseProductDetInfo>
                   columnDefs={columnDefsOnLeft}
                   rowData={productInfoListByCategory}
@@ -498,7 +498,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                   onRowDragEnd={onRowDragEndHandler}
                 />
               </div>
-              <div className={'layout50'}>
+              <div className={'layout40'}>
                 <TunedGrid<ProductMngResponseProductDetInfo>
                   columnDefs={columnDefsOnRight}
                   rowData={productInfoList}
