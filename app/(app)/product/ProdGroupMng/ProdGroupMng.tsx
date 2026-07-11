@@ -336,7 +336,6 @@ const ProdGroupMng = () => {
   const {
     data: contentsProductInfoListResponse,
     isSuccess: isContentsProductInfoListResponseSuccess,
-    // isLoading: isContentsProductInfoListResponseLoading,
     refetch: contentsProductInfoListRefetch,
   } = useQuery({
     queryKey: ['/productContentList/contentsProductInfoList', filtersForContentsProduct.contentsId],
@@ -534,8 +533,8 @@ const ProdGroupMng = () => {
         onClose={() => closeModal(modals.type)}
         onSuccess={() => {
           closeModal(modals.type);
-          productContentListResponseRefetch();
-          contentsProductInfoListRefetch();
+          //productContentListResponseRefetch();
+          //contentsProductInfoListRefetch();
         }}
       />
       <ProductAddPop
@@ -544,7 +543,9 @@ const ProdGroupMng = () => {
         selectedContent={selectedRowsData}
         onSuccess={() => {
           closeModal('ADD_PROD');
-          contentsProductInfoListRefetch();
+          productContentListResponseRefetch();
+          //contentsProductInfoListRefetch();
+          //gridRef.current.
         }}
       />
       <ProductContentPreviewPop
