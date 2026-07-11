@@ -622,6 +622,21 @@
     -webkit-text-fill-color: #ffffff !important;
     opacity: 1 !important;
   }
+  // global.scss 의 흰 배경 규칙(높은 특이도)을 셀 편집 시 덮어씀
+  .ag-theme-quartz .ag-wrapper.ag-input-wrapper.ag-text-field-input-wrapper {
+    background-color: var(--dark-surface-2) !important;
+  }
+  .ag-theme-quartz .ag-wrapper.ag-input-wrapper.ag-text-field-input-wrapper
+  .ag-input-field-input.ag-text-field-input,
+  .ag-theme-quartz .ag-wrapper.ag-input-wrapper.ag-text-field-input-wrapper
+  > .ag-input-field-input.ag-text-field-input,
+  .ag-theme-quartz .ag-wrapper.ag-input-wrapper.ag-text-field-input-wrapper
+  > .ag-input-field-input.ag-text-field-input:focus {
+    background-color: #2a2a42 !important;
+    color: #ffffff !important;
+    caret-color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
 
   // ── 일반 텍스트 ─────────────────────────────────────────
   strong, span, p, label, td, th, dt, dd, li { color: inherit; }

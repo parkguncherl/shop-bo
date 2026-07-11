@@ -53,42 +53,45 @@ const ProdGroupMng = () => {
   const rightGridRef = useRef<TunedGridRef<ProductContentListResponseProductContent>>(null);
 
   /** 컬럼 설정 - 권한 컬럼 포함 */
-  const columnDefs = useMemo<ColDef<ProductContentListResponseProductContent | { no: number }>[]>(() => [
-    {
-      field: 'no',
-      headerName: 'NO',
-      minWidth: 37,
-      maxWidth: 37,
-      valueGetter: (params) => (params.node ? (params.node.rowIndex ?? 0) + 1 : ''),
-      cellStyle: GridSetting.CellStyle.CENTER,
-      suppressHeaderMenuButton: true,
-    },
-    {
-      field: 'newsTitle',
-      headerName: '제목',
-      minWidth: 200,
-      maxWidth: 250,
-      suppressHeaderMenuButton: true,
-      editable: true,
-      cellStyle: { cursor: 'text' },
-    },
-    {
-      field: 'imageCnt',
-      headerName: '이미지',
-      minWidth: 50,
-      maxWidth: 50,
-      suppressHeaderMenuButton: true,
-      cellStyle: GridSetting.CellStyle.CENTER,
-    },
-    {
-      field: 'productCnt',
-      headerName: '연결상품',
-      minWidth: 60,
-      maxWidth: 60,
-      suppressHeaderMenuButton: true,
-      cellStyle: GridSetting.CellStyle.CENTER,
-    },
-  ], []);
+  const columnDefs = useMemo<ColDef<ProductContentListResponseProductContent | { no: number }>[]>(
+    () => [
+      {
+        field: 'no',
+        headerName: 'NO',
+        minWidth: 37,
+        maxWidth: 37,
+        valueGetter: (params) => (params.node ? (params.node.rowIndex ?? 0) + 1 : ''),
+        cellStyle: GridSetting.CellStyle.CENTER,
+        suppressHeaderMenuButton: true,
+      },
+      {
+        field: 'newsTitle',
+        headerName: '제목',
+        minWidth: 200,
+        maxWidth: 250,
+        suppressHeaderMenuButton: true,
+        editable: true,
+        cellStyle: { cursor: 'text' },
+      },
+      {
+        field: 'imageCnt',
+        headerName: '이미지',
+        minWidth: 50,
+        maxWidth: 50,
+        suppressHeaderMenuButton: true,
+        cellStyle: GridSetting.CellStyle.CENTER,
+      },
+      {
+        field: 'productCnt',
+        headerName: '연결상품',
+        minWidth: 60,
+        maxWidth: 60,
+        suppressHeaderMenuButton: true,
+        cellStyle: GridSetting.CellStyle.CENTER,
+      },
+    ],
+    [],
+  );
 
   /** 컬럼 설정 - 권한 컬럼 포함 */
   const [rightColumnDefs] = useState<ColDef<ContentProductInfoWithImg | { no: number }>[]>([
@@ -397,7 +400,8 @@ const ProdGroupMng = () => {
               rowData={productContentList}
               columnDefs={columnDefs}
               defaultColDef={defaultColDef}
-              onRowDoubleClicked={(e) => openModal('SHOW', e.data)}
+              rowSelection={{ mode: 'singleRow', enableClickSelection: true }}
+              //              onRowDoubleClicked={(e) => openModal('SHOW', e.data)}
               onCellValueChanged={handleTitleCellValueChanged}
               stopEditingWhenCellsLoseFocus={true}
               onSelectionChanged={(event) => {

@@ -111,6 +111,27 @@
       width: 100%;
       padding: 2px 0 2px 0;
 
+      // 최하단 편집 문단은 남은 높이를 모두 채워 본문 입력 영역을 꽉 채움
+      &:last-child {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+
+        .per_textArea_element {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+
+          .textArea_wrapper {
+            flex: 1;
+
+            textarea {
+              height: 100%;
+            }
+          }
+        }
+      }
+
       & > .ant-input {
         font-size: medium;
       }
@@ -179,7 +200,14 @@
         padding: 2px;
 
         .textArea_wrapper {
+          width: 100%;
 
+          textarea {
+            width: 100%;
+            min-height: 120px;
+            box-sizing: border-box;
+            resize: vertical;
+          }
         }
 
         .err_msg_wrapper {
