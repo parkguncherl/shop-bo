@@ -352,3 +352,11 @@ dl.imgToggle {
     max-width: 100% !important;
   }
 }
+
+// 팝업 내 이미지 미리보기 박스가 하단 버튼(footer)을 가리지 않도록 위로 올림
+.ant-modal-content .productImgBox {
+  bottom: 95px;
+  &.on.onSize {
+    height: calc(100% - 178px); // 상단 위치 유지 (bottom +45 만큼 높이 축소)
+  }
+}

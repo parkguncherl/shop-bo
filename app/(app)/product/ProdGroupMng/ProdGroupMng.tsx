@@ -397,6 +397,7 @@ const ProdGroupMng = () => {
               onGridReady={onGridReady}
               loading={isProductContentListResponseLoading}
               rowData={productContentList}
+              getRowId={(params) => String(params.data.id)}
               columnDefs={columnDefs}
               defaultColDef={defaultColDef}
               rowSelection={{ mode: 'singleRow', enableClickSelection: true }}
@@ -541,11 +542,9 @@ const ProdGroupMng = () => {
         open={modals.type == 'ADD_PROD' && modals.active}
         onClose={() => closeModal('ADD_PROD')}
         selectedContent={selectedRowsData}
-        onSuccess={() => {
+        onSuccess={async () => {
           closeModal('ADD_PROD');
-          productContentListResponseRefetch();
-          //contentsProductInfoListRefetch();
-          //gridRef.current.
+          await Promise.all([productContentListResponseRefetch(), contentsProductInfoListRefetch()]);
         }}
       />
       <ProductContentPreviewPop
