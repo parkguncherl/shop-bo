@@ -1,22 +1,22 @@
 ﻿'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Search, Table, Title, toastSuccess } from '../../../../components';
+import { Search, Table, Title, toastSuccess } from '@/components';
 import { CellValueChangedEvent, ColDef, RowDragEndEvent, SelectionChangedEvent } from 'ag-grid-community';
-import { TableHeader, toastError } from '../../../../components';
-import { useCommonStore } from '../../../../stores';
+import { TableHeader, toastError } from '@/components';
+import { useCommonStore } from '@/stores';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
-import { useAgGridApi } from '../../../../hooks';
-import { authApi } from '../../../../libs';
+import { defaultColDef, GridSetting } from '@/libs/ag-grid';
+import { useAgGridApi } from '@/hooks';
+import { authApi } from '@/libs';
 import TunedGrid, { TunedGridRef } from '../../../../components/grid/TunedGrid';
-import { useProductContentListStore } from '../../../../stores/product/useProductContentListStore';
+import { useProductContentListStore } from '@/stores/product/useProductContentListStore';
 import useFilters from '../../../../hooks/useFilters';
 import useDebounce from '../../../../hooks/useDebounce';
-import { Placeholder } from '../../../../libs/const';
-import { ConfirmModal } from '../../../../components/ConfirmModal';
+import { Placeholder } from '@/libs/const';
+import { ConfirmModal } from '@/components/ConfirmModal';
 import ProductAddPop from '../../../../components/popup/product/contentList/ProductAddPop';
-import { CustomSwitch } from '../../../../components/CustomSwitch';
+import { CustomSwitch } from '@/components/CustomSwitch';
 import ImgPreviewBox, { ImgPreviewFileDet } from '../../../../components/content/ImgPreviewBox';
 import ProductContentPop from '../../../../components/popup/product/contentList/ProductContentPop';
 import ProductContentPreviewPop from '../../../../components/popup/product/contentList/ProductContentPreviewPop';
@@ -26,7 +26,7 @@ import {
   ProductContentListRequestProductContentListFilter,
   ProductContentListResponseContentProductInfo,
   ProductContentListResponseProductContent,
-} from '../../../../generated';
+} from '@/generated';
 
 type ContentProductInfoWithImg = ProductContentListResponseContentProductInfo & { imgUrl?: string };
 
@@ -51,6 +51,11 @@ const ProdGroupMng = () => {
 
   const gridRef = useRef<TunedGridRef<ProductContentListResponseProductContent>>(null);
   const rightGridRef = useRef<TunedGridRef<ProductContentListResponseProductContent>>(null);
+
+  /** 오른쪽 그리드 셀 세로 중앙 정렬 (rowHeight 50 대응) */
+  const rcCenter = { ...GridSetting.CellStyle.CENTER, display: 'flex', alignItems: 'center', justifyContent: 'center' };
+  const rcLeft = { ...GridSetting.CellStyle.LEFT, display: 'flex', alignItems: 'center' };
+  const rcRight = { ...GridSetting.CellStyle.RIGHT, display: 'flex', alignItems: 'center' };
 
   /** 컬럼 설정 - 권한 컬럼 포함 */
   const columnDefs = useMemo<ColDef<ProductContentListResponseProductContent | { no: number }>[]>(
@@ -101,7 +106,7 @@ const ProdGroupMng = () => {
       minWidth: 50,
       maxWidth: 50,
       valueGetter: (params) => (params.node ? (params.node.rowIndex ?? 0) + 1 : ''),
-      cellStyle: GridSetting.CellStyle.CENTER,
+      cellStyle: rcCenter,
       suppressHeaderMenuButton: true,
     },
     {
@@ -114,55 +119,55 @@ const ProdGroupMng = () => {
       cellRenderer: (params: { value?: string }) =>
         params.value ? <img src={params.value} style={{ height: '46px', width: '46px', objectFit: 'cover', borderRadius: '4px' }} /> : null,
     },
-    { field: 'prodNm', headerName: '상품명', minWidth: 130, maxWidth: 200, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.LEFT },
+    { field: 'prodNm', headerName: '상품명', minWidth: 130, maxWidth: 200, suppressHeaderMenuButton: true, cellStyle: rcLeft },
     {
       field: 'prodTpNm',
       headerName: '분류',
-      minWidth: 120,
-      maxWidth: 120,
+      minWidth: 80,
+      maxWidth: 80,
       suppressHeaderMenuButton: true,
-      cellStyle: GridSetting.CellStyle.CENTER,
+      cellStyle: rcCenter,
     },
     {
       field: 'prodDetTpNm',
       headerName: '소분류',
-      minWidth: 120,
-      maxWidth: 120,
+      minWidth: 80,
+      maxWidth: 80,
       suppressHeaderMenuButton: true,
-      cellStyle: GridSetting.CellStyle.CENTER,
+      cellStyle: rcCenter,
     },
     {
       field: 'prodColors',
       headerName: '칼라',
-      minWidth: 120,
-      maxWidth: 120,
+      minWidth: 80,
+      maxWidth: 80,
       suppressHeaderMenuButton: true,
-      cellStyle: GridSetting.CellStyle.LEFT,
+      cellStyle: rcLeft,
     },
     {
       field: 'prodSizes',
       headerName: '사이즈',
-      minWidth: 120,
-      maxWidth: 120,
+      minWidth: 80,
+      maxWidth: 80,
       suppressHeaderMenuButton: true,
-      cellStyle: GridSetting.CellStyle.LEFT,
+      cellStyle: rcLeft,
     },
     {
       field: 'sellAmt',
       headerName: '판매가',
-      minWidth: 160,
-      maxWidth: 160,
+      minWidth: 60,
+      maxWidth: 60,
       suppressHeaderMenuButton: true,
-      cellStyle: GridSetting.CellStyle.CENTER,
+      cellStyle: rcRight,
       cellRenderer: 'NUMBER_COMMA',
     },
     {
       field: 'discountRate',
-      headerName: '할인율',
-      minWidth: 80,
-      maxWidth: 80,
+      headerName: '할인%',
+      minWidth: 50,
+      maxWidth: 50,
       suppressHeaderMenuButton: true,
-      cellStyle: GridSetting.CellStyle.RIGHT,
+      cellStyle: rcRight,
     },
   ]);
 

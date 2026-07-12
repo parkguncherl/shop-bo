@@ -10,7 +10,7 @@ import HistoryBox from '../../components/layout/header/tab/HistoryBox';
 import FavoriteBox from '../../components/layout/header/tab/FavoriteBox';
 import AuthStatusChecker from '../../components/layout/header/AuthStatusChecker';
 import ThemeApplier from '../../components/layout/ThemeApplier';
-import AntdThemeProvider from '../../components/layout/AntdThemeProvider';
+import ThemeProvider from '../../components/layout/ThemeProvider';
 
 /**
  * (server side)AppLayout
@@ -18,7 +18,7 @@ import AntdThemeProvider from '../../components/layout/AntdThemeProvider';
  * */
 const layout = async ({ children }: { children: React.ReactNode }) => {
   return (
-    <AntdThemeProvider>
+    <ThemeProvider>
       <div className={`appLayout ${stylesForLayout.layout}`}>
         <ThemeApplier />
         <header className={`${stylesForHeader.header}`}>
@@ -56,7 +56,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
           <div className={`content ${stylesForLayout.content}`}>{children}</div>
         </div>
       </div>
-    </AntdThemeProvider>
+    </ThemeProvider>
   );
 };
 export default layout;
