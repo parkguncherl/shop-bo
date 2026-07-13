@@ -38,8 +38,9 @@ const DatePickerAtom = ({ name, placeholder, value, disable, onChange, style, cl
         value={dateVal}
         disabled={disable}
         placeholder={placeholder}
-        style={style}
+        style={{ minHeight: 28, cursor: 'pointer', ...style }}
         ref={ref}
+        onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker?.()}
         onChange={(e) => onChange?.(e.target.value)}
       />
     </div>
