@@ -13,13 +13,13 @@ import {
   ProductMngRequestInsertProductDet,
   ProductMngResponseProductDetInfo,
   ProductMngResponseProductInfo,
-} from '../../../../generated';
-import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
+} from '@/generated';
+import { useProductMngStore } from '@/stores/product/useProductMngStore';
 import TunedGrid, { TunedGridRef } from '../../../grid/TunedGrid';
 import { PopupSearchBox, PopupSearchType } from '../../content';
 import CustomGridLoading from '../../../CustomGridLoading';
 import CustomNoRowsOverlay from '../../../CustomNoRowsOverlay';
-import { GridSetting } from '../../../../libs/ag-grid';
+import { GridSetting } from '@/libs/ag-grid';
 import { ColDef } from 'ag-grid-community';
 import { GlobalError, SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';

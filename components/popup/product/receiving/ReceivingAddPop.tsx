@@ -10,7 +10,7 @@ import FormDatePicker from '../../../form/FormDatePicker';
 import FormDropDown from '../../../form/FormDropDown';
 import { SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { toastError, toastSuccess } from '@/components';
+import { Table, toastError, toastSuccess } from '@/components';
 import { ConfirmModal } from '../../../ConfirmModal';
 import { useReceivingStore } from '@/stores/product/useReceivingStore';
 import { authApi } from '@/libs';
@@ -176,7 +176,7 @@ const ReceivingAddPop = ({ open, onClose, onSuccess }: ReceivingAddPopProps) => 
                   검색
                 </button>
               </div>
-              <div style={{ height: 300 }}>
+              <Table>
                 <TunedGrid
                   headerHeight={32}
                   onGridReady={onGridReady}
@@ -187,9 +187,9 @@ const ReceivingAddPop = ({ open, onClose, onSuccess }: ReceivingAddPopProps) => 
                   rowSelection={{ mode: 'singleRow', enableClickSelection: true }}
                   domLayout="normal"
                   onRowClicked={(e) => setSelectedDet(e.data ?? null)}
-                  className="default"
+                  className="factorySettleDetailPop "
                 />
-              </div>
+              </Table>
               {selectedDet && (
                 <div
                   style={{

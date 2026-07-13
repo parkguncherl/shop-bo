@@ -1,7 +1,7 @@
 'use client';
 
 import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
-import { Search, Title, toastSuccess } from '@/components';
+import { Search, Table, TableHeader, Title, toastSuccess } from '@/components';
 import { CellEditingStoppedEvent, ColDef } from 'ag-grid-community';
 import { toastError } from '@/components';
 import { useCommonStore } from '@/stores';
@@ -11,14 +11,14 @@ import { useAgGridApi } from '@/hooks';
 import useFilters from '../../../../hooks/useFilters';
 import CustomNoRowsOverlay from '../../../../components/CustomNoRowsOverlay';
 import CustomGridLoading from '../../../../components/CustomGridLoading';
-import TunedGrid from '../../../../components/grid/TunedGrid';
+import TunedGrid, { TunedGridRef } from '../../../../components/grid/TunedGrid';
 import { authApi } from '@/libs';
 import dayjs from 'dayjs';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { useReceivingStore } from '@/stores/product/useReceivingStore';
 import ReceivingAddPop from '../../../../components/popup/product/receiving/ReceivingAddPop';
 import ReceivingModPop from '../../../../components/popup/product/receiving/ReceivingModPop';
-import type { ReceivingResponseReceivingItem } from '@/generated';
+import { ReceivingResponseReceivingItem } from '@/generated';
 
 type ListFilter = {
   fromDate: string;
@@ -32,7 +32,6 @@ const INLINE_EDITABLE = new Set(['plusMinus', 'receivCnt', 'etcCntn']);
 const PlusMinusCellEditor = forwardRef((props: any, ref) => {
   const [value, setValue] = useState<string>(props.value ?? 'P');
   const selectRef = useRef<HTMLSelectElement>(null);
-
   //useImperativeHandle(ref, () => ({ getValue: () => value }));
 
   // useEffect(() => {
@@ -72,6 +71,7 @@ const today = dayjs().format('YYYY-MM-DD');
 
 const Receiving = () => {
   const { onGridReady } = useAgGridApi();
+  const gridRef = useRef<TunedGridRef<ReceivingResponseReceivingItem>>(null);
   const menuNm = useCommonStore((s) => s.menuNm);
   const [modals, openModal, closeModal, deleteReceiving, updateReceivingIfExist] = useReceivingStore((s) => [
     s.modals,
@@ -258,7 +258,7 @@ const Receiving = () => {
     <div>
       <Title title={menuNm ?? '입고/출고 관리'} reset={reset} search={refetch} />
 
-      <Search className="type_1">
+      <Search className="type_2">
         <dl>
           <dt>입출고일</dt>
           <dd>
@@ -337,26 +337,11 @@ const Receiving = () => {
           </dd>
         </dl>
       </Search>
-
-      <div style={{ padding: '0 16px 16px' }}>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 8, justifyContent: 'flex-end' }}>
-          <button className="btn btn_primary" onClick={() => openModal('RECEIVING_ADD')}>
-            입고/출고 등록
-          </button>
-          {selectedRow && (
-            <>
-              <button className="btn btn_default" onClick={() => openModal('RECEIVING_MOD', selectedRow)}>
-                수정
-              </button>
-              <button className="btn btn_danger" onClick={() => openModal('RECEIVING_DEL', selectedRow)}>
-                삭제
-              </button>
-            </>
-          )}
-        </div>
-
+      <Table>
+        <TableHeader count={rowData.length} search={refetch}></TableHeader>
         <TunedGrid
           headerHeight={35}
+          ref={gridRef}
           onGridReady={onGridReady}
           loading={isLoading}
           rowData={rowData}
@@ -366,11 +351,45 @@ const Receiving = () => {
           loadingOverlayComponent={CustomGridLoading}
           noRowsOverlayComponent={CustomNoRowsOverlay}
           className="default"
-          domLayout="autoHeight"
           stopEditingWhenCellsLoseFocus
           onRowClicked={(e) => setSelectedRow(e.data ?? null)}
           onCellEditingStopped={onCellEditingStopped}
         />
+      </Table>
+      <div className="btnArea between">
+        <div className="right">
+          <button className="btn btnPurple" onClick={() => openModal('RECEIVING_ADD')}>
+            입고/출고 등록
+          </button>
+          <button
+            className="btn btnPurple"
+            onClick={() => {
+              const api = gridRef.current?.api;
+              const selectedNode = api?.getSelectedNodes();
+              if (api && selectedNode && selectedNode.length == 1) {
+                openModal('RECEIVING_MOD', selectedRow);
+              } else {
+                toastError('수정하고자하는 건을 먼저 선택하세요');
+              }
+            }}
+          >
+            수정
+          </button>
+          <button
+            className="btn btnPurple"
+            onClick={() => {
+              const api = gridRef.current?.api;
+              const selectedNode = api?.getSelectedNodes();
+              if (api && selectedNode && selectedNode.length == 1) {
+                openModal('RECEIVING_DEL', selectedRow);
+              } else {
+                toastError('삭제 하고자 하는 건을 먼저 선택하세요');
+              }
+            }}
+          >
+            삭제
+          </button>
+        </div>
       </div>
 
       <ReceivingAddPop open={modals.active && modals.type === 'RECEIVING_ADD'} onClose={() => closeModal('RECEIVING_ADD')} onSuccess={refetch} />

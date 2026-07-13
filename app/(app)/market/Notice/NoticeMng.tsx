@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { ColDef } from 'ag-grid-community';
-import { Search, Table, Title } from '../../../../components';
+import { Search, Table, TableHeader, Title } from '../../../../components';
 import { toastError, toastSuccess } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
 import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
@@ -16,6 +16,7 @@ import { ConfirmModal } from '../../../../components/ConfirmModal';
 import NoticeMngAddPop from '../../../../components/popup/market/notice/NoticeMngAddPop';
 import NoticeMngModPop from '../../../../components/popup/market/notice/NoticeMngModPop';
 import useFilters from '../../../../hooks/useFilters';
+import { Header } from '@/components/layout/Header';
 
 export type NoticeItem = {
   id: number;
@@ -206,6 +207,7 @@ const NoticeMng = () => {
         />
       </Search>
       <Table>
+        <TableHeader count={rowData.length} search={refetch}></TableHeader>
         <TunedGrid
           headerHeight={35}
           onGridReady={onGridReady}
