@@ -507,7 +507,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
                     }
                   }}
                 >
-                  {productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length == 0 ? '신규 작성' : isValid ? '제출' : '작성중..'}
+                  {productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length == 0 ? '신규 작성' : isValid ? '저장' : '작성중..'}
                 </button>
                 <button
                   className={`btn ${productInfo != undefined && selectedRowsData != undefined && 'btnPurple'}`}
