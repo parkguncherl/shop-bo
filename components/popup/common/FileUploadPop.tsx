@@ -196,22 +196,9 @@ export const FileUploadPop = ({ open, onClose, onSuccess, onlyImg = false, fileI
       footer={
         <PopupFooter>
           <div className={'btnArea'}>
-            <button className={'btn'} onClick={handleUpload} disabled={isUploading} style={{ opacity: isUploading ? 0.7 : 1, cursor: isUploading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 7 }}>
-              {isUploading && (
-                <span style={{
-                  display: 'inline-block',
-                  width: 14,
-                  height: 14,
-                  border: '2px solid rgba(124,92,191,0.3)',
-                  borderTopColor: 'var(--purple)',
-                  borderRadius: '50%',
-                  animation: 'spin 0.7s linear infinite',
-                  flexShrink: 0,
-                }} />
-              )}
+            <button className={'btn'} onClick={handleUpload} disabled={isUploading} style={{ opacity: isUploading ? 0.6 : 1, cursor: isUploading ? 'not-allowed' : 'pointer' }}>
               {isUploading ? '업로드 중...' : (onlyImg ? '이미지 업로드' : '파일 업로드')}
             </button>
-            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             <button className={'btn'} onClick={onCloseCommonHandler}>
               닫기
             </button>
