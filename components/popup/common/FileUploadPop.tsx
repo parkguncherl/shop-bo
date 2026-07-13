@@ -38,6 +38,7 @@ export const FileUploadPop = ({ open, onClose, onSuccess, onlyImg = false, fileI
   /** 상태 관리 - 배열로 변경 */
   const [files, setFiles] = useState<UploadFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   // 닫힘 및 초기화 핸들러
   const onCloseCommonHandler = () => {
@@ -149,30 +150,24 @@ export const FileUploadPop = ({ open, onClose, onSuccess, onlyImg = false, fileI
       toastError('선택된 파일이 없습니다.');
       return;
     }
+    if (isUploading) return;
 
     const formData = new FormData();
-    // 멀티 파일 추가
     files.forEach((f) => {
       formData.append('uploadFiles', f.file);
     });
 
-    // fileId 가 있으면 기존 그룹에 추가, 없으면 신규 그룹 생성(서버에서 fileId 발급)
     if (fileId) {
       formData.append('fileId', fileId.toString());
     }
 
-    // if (imageFileWidth && imageFileHeight) {
-    //   formData.append('imageFileWidth', imageFileWidth.toString());
-    //   formData.append('imageFileHeight', imageFileHeight.toString());
-    // }
-
+    setIsUploading(true);
     authApi
       .post('/common/imgfile/uploads', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       .then((response) => {
         if (response.data.resultCode === 200) {
-          // body 는 업로드된 파일 목록(List). 단일 이미지 사용처를 위해 첫 번째 항목을 전달
           const body = response.data.body;
           const first = Array.isArray(body) ? body[0] : body;
           if (onSuccess) onSuccess(first);
@@ -185,6 +180,9 @@ export const FileUploadPop = ({ open, onClose, onSuccess, onlyImg = false, fileI
       .catch((error) => {
         console.error(error);
         toastError('업로드 중 오류가 발생했습니다.');
+      })
+      .finally(() => {
+        setIsUploading(false);
       });
   };
 
@@ -198,8 +196,8 @@ export const FileUploadPop = ({ open, onClose, onSuccess, onlyImg = false, fileI
       footer={
         <PopupFooter>
           <div className={'btnArea'}>
-            <button className={'btn'} onClick={handleUpload}>
-              {onlyImg ? '이미지 업로드' : '파일 업로드'}
+            <button className={'btn'} onClick={handleUpload} disabled={isUploading} style={{ opacity: isUploading ? 0.6 : 1, cursor: isUploading ? 'not-allowed' : 'pointer' }}>
+              {isUploading ? '업로드 중...' : (onlyImg ? '이미지 업로드' : '파일 업로드')}
             </button>
             <button className={'btn'} onClick={onCloseCommonHandler}>
               닫기
