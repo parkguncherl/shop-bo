@@ -124,10 +124,9 @@ const FormDropDown = <T extends FieldValues>({ ...props }: TProps<T>) => {
             {props.required && <span className={'req'}>*</span>}
           </dt>
           <dd>
-            <div className={`formBox ${props.disabled ? 'disabled' : ''} ${focusStates[name] ? 'focus' : ''} border`}>
+            <div>
               <DropDownAtom
                 name={name}
-                //values={values}
                 values={valuesAsPureFn(value, props.multiple)}
                 options={(props.codeUpper ? newDropDownData(dropDownDataRes) : props.options || []).filter(
                   (f) => !props.startWith || String(f.value).startsWith(String(props.startWith)),

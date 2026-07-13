@@ -288,8 +288,8 @@
       color: #555570 !important;
     }
 
-    // native select: 기본 렌더링을 끄고 직접 스타일링해 닫힌 값 텍스트를 선명하게
-    & select:not(:disabled) {
+    // native select: 기본 렌더링을 끄고 직접 스타일링해 닫힌 값 텍스트를 선명하게 (multiple 제외)
+    & select:not(:disabled):not([multiple]) {
       color-scheme: dark;
       -webkit-appearance: none !important;
       -moz-appearance: none !important;

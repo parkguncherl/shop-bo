@@ -62,12 +62,6 @@
     padding-top: 2px;
     padding-bottom: 2px;
   }
-  // 멀티셀렉트는 height 고정 해제 — 뒤에 선언해야 위 28px를 덮어씀
-  & select[multiple] {
-    height: auto;
-    min-height: 100px;
-    padding: 4px 6px;
-  }
   // antInput
   & .ant-input-affix-wrapper {
     padding: 0;

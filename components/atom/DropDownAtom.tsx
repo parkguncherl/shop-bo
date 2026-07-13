@@ -61,31 +61,35 @@ const DropDownAtom = function DropDownAtom({
   const renderLabel = (label?: string) => (label ? label.replace('shopNewSeller', ' 신규') : label);
 
   if (multiple) {
-    const handleMultiChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const selected = Array.from(e.target.selectedOptions).map((o) => o.value);
-      onChangeOptions?.(name, selected as unknown as string);
-      onChangeControl?.(selected);
+    const checked = values ?? [];
+    const toggle = (val: string) => {
+      const next = checked.includes(val) ? checked.filter((v) => v !== val) : [...checked, val];
+      onChangeOptions?.(name, next as unknown as string);
+      onChangeControl?.(next);
     };
     return (
-      <select
-        multiple
-        name={name}
-        value={values ?? []}
-        onChange={handleMultiChange}
-        onKeyDown={onKeyDown}
-        disabled={disabled || readonly}
-        className={className}
-        style={{ width: '100%', ...(dropDownStyle ?? style) }}
-        ref={ref}
-        onFocus={onFocus}
-        onBlur={onBlur}
-      >
-        {visibleOptions.map((o, index) => (
-          <option key={`${o.key}${index}`} value={String(o.value)}>
-            {renderLabel(o.label)}
-          </option>
-        ))}
-      </select>
+      <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', padding: '4px 2px' }}>
+        {visibleOptions.map((o) => {
+          const val = String(o.value);
+          const isChecked = checked.includes(val);
+          return (
+            <label
+              key={val}
+              style={{ display: 'flex', alignItems: 'center', gap: 5, cursor: disabled || readonly ? 'default' : 'pointer', userSelect: 'none' }}
+            >
+              <input
+                type="checkbox"
+                value={val}
+                checked={isChecked}
+                disabled={disabled || readonly}
+                onChange={() => toggle(val)}
+                style={{ width: 14, height: 14, cursor: 'pointer', accentColor: '#7c5cbf' }}
+              />
+              <span style={{ fontSize: 'var(--s-size)' }}>{renderLabel(o.label)}</span>
+            </label>
+          );
+        })}
+      </div>
     );
   }
 
