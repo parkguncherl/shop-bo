@@ -30,6 +30,7 @@ type TProps<T extends FieldValues> = TControl<T> & {
   onKeyDown?: (e: React.KeyboardEvent) => void;
   defaultValue?: string;
   startWith?: string;
+  placeholder?: string;
 };
 
 /** 불필요한 리 랜더링 방지 차원에서 컴포넌트 외부에 정의 */
@@ -40,7 +41,7 @@ const newDropDownData = (res: AxiosResponse<ApiResponseListCodeDropDown> | undef
         key: v.codeCd,
         value: v.codeCd,
         label: v.codeNm,
-      } as DropDownOption),
+      }) as DropDownOption,
   );
 const valuesAsPureFn = <T extends FieldValues>(value: PathValue<T, Path<T> & string>, multiple?: boolean | undefined) => {
   return multiple ? (Array.isArray(value) ? value : []) : value;
@@ -185,6 +186,7 @@ const FormDropDown = <T extends FieldValues>({ ...props }: TProps<T>) => {
                     }}
                     onKeyDown={props.onKeyDown}
                     disabled={props.disabled}
+                    placeholder={props.placeholder}
                     defaultValue={props.defaultValue || ''}
                   />
                 </div>

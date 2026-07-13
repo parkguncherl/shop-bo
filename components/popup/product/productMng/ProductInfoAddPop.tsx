@@ -91,10 +91,6 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
   const [openAddConf, setOpenAddConf] = useState<{ open: boolean; stored?: ProductMngRequestInsertProduct }>({ open: false });
   const [prodCd, setProdCd] = useState<string>('');
 
-  useEffect(() => {
-    console.log('prodCd ==>', prodCd);
-  }, [prodCd]);
-
   /** 품목 내용 입력 서식 */
   const {
     handleSubmit,
@@ -264,6 +260,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
                     name={'product.prodTp'}
                     title={'품목유형'}
                     codeUpper={'90010'}
+                    placeholder={'선택'}
                     onChange={(name, value) => {
                       setProdCd(String(value));
                     }}
