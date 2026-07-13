@@ -20,7 +20,7 @@ export const BtnCellRenderer = ({ title, styles, onClick }: Props) => {
         textAlign: 'center',
         fontSize: '11px',
         fontWeight: '300',
-        color: '#333',
+        color: 'var(--dark-text, #333)',
         ...styles,
       }}
     >

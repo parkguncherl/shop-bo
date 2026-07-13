@@ -1,14 +1,12 @@
 // C:\work\shop-frontend\stores\useNoticeStore.ts
 
-import { create } from 'zustand';
+import { create, StateCreator } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { ApiResponse, PageObject } from '../generated';
-type NoticeRequestCreate = any;
-type NoticeRequestUpdate = any;
+import { ApiResponse, NoticeRequestCreate, NoticeRequestUpdate, PageObject } from '@/generated';
 import { AxiosPromise, AxiosRequestConfig } from 'axios';
-import { authApi } from '../libs';
-import { StateCreator } from 'zustand/esm';
+import { authApi } from '@/libs';
+import { NoticeResponse } from '@/generated/src/model/notice-response';
 
 // 모달 타입 정의
 type ModalType = 'ADD' | 'MOD' | 'DETAIL';
@@ -22,26 +20,12 @@ export type NoticeRequestPagingFilter = {
   authCds: number[];
 };
 
-// 공지사항 상세 정보 인터페이스 정의
-export interface NoticeDetail {
-  id: number;
-  noticeCd: string;
-  title: string;
-  moveUri: string;
-  authCds: string;
-  creUser: string;
-  creTm: string;
-  updUser: string;
-  updTm: string;
-  readCnt: number;
-}
-
 // 공지사항 상태 인터페이스 정의
 interface NoticeState {
   paging: PageObject;
   setPaging: (pagingInfo: PageObject | undefined) => void;
-  selectedNotice: NoticeDetail | undefined;
-  setSelectedNotice: (notice: NoticeDetail) => void;
+  selectedNotice: NoticeResponse | undefined;
+  setSelectedNotice: (notice: NoticeResponse) => void;
   modalType: { type: ModalType; active: boolean };
   openModal: (type: ModalType) => void;
   closeModal: (type: ModalType) => void;
@@ -57,7 +41,7 @@ interface NoticeApiState {
   createNotice: (noticeRequest: NoticeRequestCreate) => AxiosPromise<ApiResponse>;
   updateNotice: (noticeRequest: NoticeRequestUpdate) => AxiosPromise<ApiResponse>;
   deleteNotice: (noticeId: number) => AxiosPromise<ApiResponse>;
-  getNoticeDetail: (noticeId: number) => AxiosPromise<ApiResponse>; // ApiResponse<NoticeDetail>에서 변경
+  getNoticeResponse: (noticeId: number) => AxiosPromise<ApiResponse>; // ApiResponse<NoticeResponse>에서 변경
 }
 
 // 초기 상태 및 메서드 정의
@@ -193,7 +177,7 @@ const initialStateCreator: StateCreator<NoticeState & NoticeApiState, any> = (se
       }
     },
     // 공지사항 상세 조회 메서드 (조회수 증가 포함)
-    getNoticeDetail: async (noticeId) => {
+    getNoticeResponse: async (noticeId) => {
       set({ loading: true, error: null });
       try {
         const response = await authApi.get<ApiResponse>(`/notice/detail/${noticeId}`);

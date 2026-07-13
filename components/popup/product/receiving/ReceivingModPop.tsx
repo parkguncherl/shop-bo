@@ -14,45 +14,20 @@ import { toastError, toastSuccess } from '../../../ToastMessage';
 import { ConfirmModal } from '../../../ConfirmModal';
 import { useReceivingStore } from '../../../../stores/product/useReceivingStore';
 import dayjs from 'dayjs';
-
-export interface ReceivingItem {
-  id: number;
-  productDetId: number;
-  prodNm: string;
-  productDetSize: string;
-  productDetColor: string;
-  receivDate: string;
-  receivCnt: number;
-  plusMinus: string;
-  etcCntn?: string;
-  updUser?: string;
-  updTm?: string;
-}
-
-export interface ReceivingModFields {
-  receivDate: string;
-  receivCnt: number;
-  plusMinus: string;
-  etcCntn?: string;
-}
+import { ReceivingRequestUpdateReceiving, ReceivingResponseReceivingItem } from '@/generated';
 
 interface ReceivingModPopProps {
   open: boolean;
-  item: ReceivingItem | null;
+  item: ReceivingResponseReceivingItem | null;
   onClose: () => void;
   onSuccess?: () => void;
 }
 
 const ReceivingModPop = ({ open, item, onClose, onSuccess }: ReceivingModPopProps) => {
   const [updateReceiving] = useReceivingStore((s) => [s.updateReceiving]);
-  const [openModConf, setOpenModConf] = useState<{ open: boolean; stored?: ReceivingModFields & { id: number } }>({ open: false });
+  const [openModConf, setOpenModConf] = useState<{ open: boolean; stored?: ReceivingRequestUpdateReceiving & { id: number } }>({ open: false });
 
-  const {
-    handleSubmit,
-    control,
-    setValue,
-    reset,
-  } = useForm<ReceivingModFields>({
+  const { handleSubmit, control, setValue, reset } = useForm<ReceivingRequestUpdateReceiving>({
     mode: 'onChange',
   });
 
@@ -84,7 +59,7 @@ const ReceivingModPop = ({ open, item, onClose, onSuccess }: ReceivingModPopProp
     },
   });
 
-  const onValid: SubmitHandler<ReceivingModFields> = (data) => {
+  const onValid: SubmitHandler<ReceivingRequestUpdateReceiving> = (data) => {
     if (!item?.id) {
       console.error('수정 대상 id를 찾을 수 없음');
       return;
@@ -95,7 +70,7 @@ const ReceivingModPop = ({ open, item, onClose, onSuccess }: ReceivingModPopProp
     });
   };
 
-  const onInvalid: SubmitErrorHandler<ReceivingModFields> = (errors) => {
+  const onInvalid: SubmitErrorHandler<ReceivingRequestUpdateReceiving> = (errors) => {
     if (errors) {
       toastError('문제가 되는 영역 혹은 누락된 영역을 수정 및 추가한 후 재시도하십시요.');
     }
@@ -126,60 +101,95 @@ const ReceivingModPop = ({ open, item, onClose, onSuccess }: ReceivingModPopProp
           </PopupFooter>
         }
       >
-        <PopupContent style={{ maxHeight: 'calc(85vh - 160px)', overflowY: 'auto' }}>
-          <PopupFormBox className="">
-            {item && (
-              <PopupFormGroup title="상품정보">
-                <PopupFormType className="type2">
-                  <dl>
-                    <dt><label>상품명</label></dt>
-                    <dd><div className="formBox border disabled"><span style={{ padding: '0 8px' }}>{item.prodNm}</span></div></dd>
-                  </dl>
-                  <dl>
-                    <dt><label>컬러 / 사이즈</label></dt>
-                    <dd><div className="formBox border disabled"><span style={{ padding: '0 8px' }}>{item.productDetColor} / {item.productDetSize}</span></div></dd>
-                  </dl>
-                </PopupFormType>
-              </PopupFormGroup>
-            )}
+        <PopupContent>
+          <div className="layoutBox">
+            {/* 왼쪽: 상품정보 */}
+            <div className="layout70">
+              <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, padding: '4px 0', borderBottom: '1px solid var(--dark-border, #ddd)' }}>
+                상품정보
+              </div>
+              {item ? (
+                <PopupFormBox className="">
+                  <PopupFormGroup>
+                    <PopupFormType className="type1">
+                      <dl>
+                        <dt><label>상품명</label></dt>
+                        <dd>
+                          <div className="formBox border disabled">
+                            <span style={{ padding: '0 8px' }}>{item.prodNm}</span>
+                          </div>
+                        </dd>
+                      </dl>
+                    </PopupFormType>
+                    <PopupFormType className="type1">
+                      <dl>
+                        <dt><label>컬러</label></dt>
+                        <dd>
+                          <div className="formBox border disabled">
+                            <span style={{ padding: '0 8px' }}>{item.productDetColor}</span>
+                          </div>
+                        </dd>
+                      </dl>
+                    </PopupFormType>
+                    <PopupFormType className="type1">
+                      <dl>
+                        <dt><label>사이즈</label></dt>
+                        <dd>
+                          <div className="formBox border disabled">
+                            <span style={{ padding: '0 8px' }}>{item.productDetSize}</span>
+                          </div>
+                        </dd>
+                      </dl>
+                    </PopupFormType>
+                    <PopupFormType className="type1">
+                      <dl>
+                        <dt><label>입출고일</label></dt>
+                        <dd>
+                          <div className="formBox border disabled">
+                            <span style={{ padding: '0 8px' }}>{item.receivDate}</span>
+                          </div>
+                        </dd>
+                      </dl>
+                    </PopupFormType>
+                  </PopupFormGroup>
+                </PopupFormBox>
+              ) : (
+                <div style={{ color: 'var(--dark-text, #aaa)', fontSize: 13, padding: '16px 0' }}>선택된 항목이 없습니다.</div>
+              )}
+            </div>
 
-            <PopupFormGroup title="입출고 정보">
-              <PopupFormType className="type2">
-                <FormDatePicker<ReceivingModFields>
-                  control={control}
-                  name="receivDate"
-                  title="입출고일"
-                  required
-                />
-                <FormDropDown<ReceivingModFields>
-                  control={control}
-                  name="plusMinus"
-                  title="구분"
-                  required
-                  options={[
-                    { key: 0, value: 'P', label: '+ 입고' },
-                    { key: 1, value: 'M', label: '- 출고' },
-                  ]}
-                />
-              </PopupFormType>
-              <PopupFormType className="type2">
-                <FormInput<ReceivingModFields>
-                  control={control}
-                  name="receivCnt"
-                  label="수량"
-                  type="number"
-                  required
-                  placeholder="수량"
-                />
-                <FormInput<ReceivingModFields>
-                  control={control}
-                  name="etcCntn"
-                  label="비고"
-                  placeholder="메모 (선택)"
-                />
-              </PopupFormType>
-            </PopupFormGroup>
-          </PopupFormBox>
+            {/* 오른쪽: 입출고 정보 */}
+            <div className="layout30">
+              <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, padding: '4px 0', borderBottom: '1px solid var(--dark-border, #ddd)' }}>
+                입출고 정보
+              </div>
+              <PopupFormBox className="">
+                <PopupFormGroup>
+                  <PopupFormType className="type1">
+                    <FormDatePicker<ReceivingRequestUpdateReceiving> control={control} name="receivDate" title="입출고일" required />
+                  </PopupFormType>
+                  <PopupFormType className="type1">
+                    <FormDropDown<ReceivingRequestUpdateReceiving>
+                      control={control}
+                      name="plusMinus"
+                      title="구분"
+                      required
+                      options={[
+                        { key: 0, value: 'P', label: '+ 입고' },
+                        { key: 1, value: 'M', label: '- 출고' },
+                      ]}
+                    />
+                  </PopupFormType>
+                  <PopupFormType className="type1">
+                    <FormInput<ReceivingRequestUpdateReceiving> control={control} name="receivCnt" label="수량" type="number" required placeholder="수량" />
+                  </PopupFormType>
+                  <PopupFormType className="type1">
+                    <FormInput<ReceivingRequestUpdateReceiving> control={control} name="etcCntn" label="비고" placeholder="메모 (선택)" />
+                  </PopupFormType>
+                </PopupFormGroup>
+              </PopupFormBox>
+            </div>
+          </div>
         </PopupContent>
       </PopupLayout>
 

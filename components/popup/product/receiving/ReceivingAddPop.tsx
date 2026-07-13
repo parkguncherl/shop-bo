@@ -10,30 +10,16 @@ import FormDatePicker from '../../../form/FormDatePicker';
 import FormDropDown from '../../../form/FormDropDown';
 import { SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { toastError, toastSuccess } from '../../../ToastMessage';
+import { toastError, toastSuccess } from '@/components';
 import { ConfirmModal } from '../../../ConfirmModal';
-import { useReceivingStore } from '../../../../stores/product/useReceivingStore';
-import { authApi } from '../../../../libs';
+import { useReceivingStore } from '@/stores/product/useReceivingStore';
+import { authApi } from '@/libs';
 import { ColDef } from 'ag-grid-community';
 import TunedGrid from '../../../grid/TunedGrid';
-import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
-import { useAgGridApi } from '../../../../hooks';
+import { defaultColDef, GridSetting } from '@/libs/ag-grid';
+import { useAgGridApi } from '@/hooks';
 import dayjs from 'dayjs';
-
-interface ProductDetSearchItem {
-  productDetId: number;
-  prodId: number;
-  prodNm: string;
-  productDetSize: string;
-  productDetColor: string;
-}
-
-export interface ReceivingAddFields {
-  receivDate: string;
-  receivCnt: number;
-  plusMinus: string;
-  etcCntn?: string;
-}
+import { ReceivingRequestInsertReceiving, ReceivingResponseProductDetSearchItem } from '@/generated';
 
 interface ReceivingAddPopProps {
   open: boolean;
@@ -47,15 +33,10 @@ const ReceivingAddPop = ({ open, onClose, onSuccess }: ReceivingAddPopProps) => 
 
   const [searchKeyword, setSearchKeyword] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedDet, setSelectedDet] = useState<ProductDetSearchItem | null>(null);
-  const [openAddConf, setOpenAddConf] = useState<{ open: boolean; stored?: ReceivingAddFields & { productDetId: number } }>({ open: false });
+  const [selectedDet, setSelectedDet] = useState<ReceivingResponseProductDetSearchItem | null>(null);
+  const [openAddConf, setOpenAddConf] = useState<{ open: boolean; stored?: ReceivingRequestInsertReceiving }>({ open: false });
 
-  const {
-    handleSubmit,
-    control,
-    reset,
-    clearErrors,
-  } = useForm<ReceivingAddFields>({
+  const { handleSubmit, control, reset, clearErrors } = useForm<ReceivingRequestInsertReceiving>({
     mode: 'onChange',
     defaultValues: {
       receivDate: dayjs().format('YYYY-MM-DD'),
@@ -65,25 +46,38 @@ const ReceivingAddPop = ({ open, onClose, onSuccess }: ReceivingAddPopProps) => 
   });
 
   /** 상품상세 검색 */
-  const { data: searchData, isFetching } = useQuery({
-    queryKey: ['/receiving/productDetSearchList', searchQuery],
+  const {
+    data: searchData,
+    isFetching,
+    refetch,
+  } = useQuery({
+    queryKey: ['/receiving/productDetSearchList', searchQuery, open, searchKeyword],
     queryFn: () => authApi.get('/receiving/productDetSearchList', { params: { prodNm: searchQuery } }),
     enabled: true,
   });
-  const searchRows: ProductDetSearchItem[] = searchData?.data?.body ?? [];
+  const searchRows: ReceivingResponseProductDetSearchItem[] = searchData?.data?.body ?? [];
 
-  const columnDefs: ColDef<ProductDetSearchItem>[] = [
+  const columnDefs: ColDef<ReceivingResponseProductDetSearchItem>[] = [
     {
       headerName: 'No',
-      minWidth: 50,
-      maxWidth: 50,
+      minWidth: 37,
+      maxWidth: 37,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
       valueGetter: (p) => (p.node?.rowIndex != null ? p.node.rowIndex + 1 : ''),
     },
-    { field: 'prodNm', headerName: '상품명', minWidth: 160, suppressHeaderMenuButton: true },
-    { field: 'productDetColor', headerName: '컬러', minWidth: 80, maxWidth: 100, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
-    { field: 'productDetSize', headerName: '사이즈', minWidth: 70, maxWidth: 90, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
+    { field: 'prodNm', headerName: '상품명', minWidth: 160, maxWidth: 160, suppressHeaderMenuButton: true },
+    {
+      field: 'stock',
+      headerName: '재고',
+      minWidth: 50,
+      maxWidth: 50,
+      suppressHeaderMenuButton: true,
+      cellRenderer: 'NUMBER_COMMA',
+      cellStyle: GridSetting.CellStyle.RIGHT,
+    },
+    { field: 'productDetColor', headerName: '컬러', minWidth: 100, maxWidth: 100, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
+    { field: 'productDetSize', headerName: '사이즈', minWidth: 90, maxWidth: 90, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
   ];
 
   const { mutate: insertMutate } = useMutation({
@@ -92,6 +86,7 @@ const ReceivingAddPop = ({ open, onClose, onSuccess }: ReceivingAddPopProps) => 
       try {
         if (e.data.resultCode === 200) {
           toastSuccess('저장되었습니다.');
+          refetch();
           if (onSuccess) onSuccess();
         } else {
           toastError(`저장 도중 문제 발생 (${e.data.resultMessage})`);
@@ -116,18 +111,18 @@ const ReceivingAddPop = ({ open, onClose, onSuccess }: ReceivingAddPopProps) => 
     }
   }, [open]);
 
-  const onValid: SubmitHandler<ReceivingAddFields> = (data) => {
+  const onValid: SubmitHandler<ReceivingRequestInsertReceiving> = (data) => {
     if (!selectedDet) {
       toastError('상품상세를 선택해주세요.');
       return;
     }
     setOpenAddConf({
       open: true,
-      stored: { ...data, productDetId: selectedDet.productDetId },
+      stored: { ...data, productDetId: selectedDet.productDetId ?? 0 },
     });
   };
 
-  const onInvalid: SubmitErrorHandler<ReceivingAddFields> = (errors) => {
+  const onInvalid: SubmitErrorHandler<ReceivingRequestInsertReceiving> = (errors) => {
     if (errors) {
       toastError('문제가 되는 영역 혹은 누락된 영역을 수정 및 추가한 후 재시도하십시요.');
     }
@@ -136,7 +131,7 @@ const ReceivingAddPop = ({ open, onClose, onSuccess }: ReceivingAddPopProps) => 
   return (
     <>
       <PopupLayout
-        width={800}
+        width={900}
         open={open}
         isEscClose={true}
         title="입고/출고 등록"
@@ -158,90 +153,92 @@ const ReceivingAddPop = ({ open, onClose, onSuccess }: ReceivingAddPopProps) => 
           </PopupFooter>
         }
       >
-        <PopupContent style={{ maxHeight: 'calc(85vh - 160px)', overflowY: 'auto' }}>
-          <PopupFormBox className="">
-            {/* 상품상세 검색 */}
-            <PopupFormGroup title="상품상세 검색">
-              <PopupFormType className="type1">
-                <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-                  <div className="formBox border" style={{ flex: 1 }}>
-                    <input
-                      className=""
-                      placeholder="상품명 검색"
-                      value={searchKeyword}
-                      onChange={(e) => setSearchKeyword(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === 'Enter') setSearchQuery(searchKeyword); }}
-                      style={{ border: 'none', width: '100%', outline: 'none', padding: '0 8px' }}
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    className="btn"
-                    onClick={() => setSearchQuery(searchKeyword)}
-                  >
-                    검색
-                  </button>
-                </div>
-                <div style={{ height: 180 }}>
-                  <TunedGrid
-                    headerHeight={32}
-                    onGridReady={onGridReady}
-                    loading={isFetching}
-                    rowData={searchRows}
-                    columnDefs={columnDefs}
-                    defaultColDef={defaultColDef}
-                    rowSelection={{ mode: 'singleRow', enableClickSelection: true }}
-                    domLayout="normal"
-                    onRowClicked={(e) => setSelectedDet(e.data ?? null)}
-                    className="default"
+        <PopupContent>
+          <div className="layoutBox">
+            {/* 왼쪽: 상품상세 검색 */}
+            <div className="layout70">
+              <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, padding: '4px 0', borderBottom: '1px solid var(--dark-border, #ddd)' }}>
+                상품상세 검색
+              </div>
+              <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                <div className="formBox border" style={{ flex: 1 }}>
+                  <input
+                    placeholder="상품명 검색"
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') setSearchQuery(searchKeyword);
+                    }}
+                    style={{ border: 'none', width: '100%', outline: 'none', padding: '0 8px' }}
                   />
                 </div>
-                {selectedDet && (
-                  <div style={{ marginTop: 8, padding: '6px 12px', background: '#f0f7ff', border: '1px solid #91caff', borderRadius: 4, fontSize: 13 }}>
-                    선택된 상품: <b>{selectedDet.prodNm}</b> &nbsp;/&nbsp; {selectedDet.productDetColor} &nbsp;/&nbsp; {selectedDet.productDetSize}
-                  </div>
-                )}
-              </PopupFormType>
-            </PopupFormGroup>
+                <button type="button" className="btn" onClick={() => setSearchQuery(searchKeyword)}>
+                  검색
+                </button>
+              </div>
+              <div style={{ height: 300 }}>
+                <TunedGrid
+                  headerHeight={32}
+                  onGridReady={onGridReady}
+                  loading={isFetching}
+                  rowData={searchRows}
+                  columnDefs={columnDefs}
+                  defaultColDef={defaultColDef}
+                  rowSelection={{ mode: 'singleRow', enableClickSelection: true }}
+                  domLayout="normal"
+                  onRowClicked={(e) => setSelectedDet(e.data ?? null)}
+                  className="default"
+                />
+              </div>
+              {selectedDet && (
+                <div
+                  style={{
+                    marginTop: 8,
+                    padding: '6px 12px',
+                    background: 'var(--dark-surface-2, #f0f7ff)',
+                    border: '1px solid var(--purple, #91caff)',
+                    borderRadius: 4,
+                    fontSize: 13,
+                    color: 'var(--dark-text, #333)',
+                  }}
+                >
+                  선택: <b>{selectedDet.prodNm}</b> / {selectedDet.productDetColor} / {selectedDet.productDetSize}
+                </div>
+              )}
+            </div>
 
-            {/* 입출고 정보 */}
-            <PopupFormGroup title="입출고 정보">
-              <PopupFormType className="type2">
-                <FormDatePicker<ReceivingAddFields>
-                  control={control}
-                  name="receivDate"
-                  title="입출고일"
-                  required
-                />
-                <FormDropDown<ReceivingAddFields>
-                  control={control}
-                  name="plusMinus"
-                  title="구분"
-                  required
-                  options={[
-                    { key: 0, value: 'P', label: '+ 입고' },
-                    { key: 1, value: 'M', label: '- 출고' },
-                  ]}
-                />
-              </PopupFormType>
-              <PopupFormType className="type2">
-                <FormInput<ReceivingAddFields>
-                  control={control}
-                  name="receivCnt"
-                  label="수량"
-                  type="number"
-                  required
-                  placeholder="수량"
-                />
-                <FormInput<ReceivingAddFields>
-                  control={control}
-                  name="etcCntn"
-                  label="비고"
-                  placeholder="메모 (선택)"
-                />
-              </PopupFormType>
-            </PopupFormGroup>
-          </PopupFormBox>
+            {/* 오른쪽: 입출고 정보 */}
+            <div className="layout30">
+              <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, padding: '4px 0', borderBottom: '1px solid var(--dark-border, #ddd)' }}>
+                입출고 정보
+              </div>
+              <PopupFormBox className="">
+                <PopupFormGroup>
+                  <PopupFormType className="type1">
+                    <FormDatePicker<ReceivingRequestInsertReceiving> control={control} name="receivDate" title="입출고일" required />
+                  </PopupFormType>
+                  <PopupFormType className="type1">
+                    <FormDropDown<ReceivingRequestInsertReceiving>
+                      control={control}
+                      name="plusMinus"
+                      title="구분"
+                      required
+                      options={[
+                        { key: 0, value: 'P', label: '+ 입고' },
+                        { key: 1, value: 'M', label: '- 출고' },
+                      ]}
+                    />
+                  </PopupFormType>
+                  <PopupFormType className="type1">
+                    <FormInput<ReceivingRequestInsertReceiving> control={control} name="receivCnt" label="수량" type="number" required placeholder="수량" />
+                  </PopupFormType>
+                  <PopupFormType className="type1">
+                    <FormInput<ReceivingRequestInsertReceiving> control={control} name="etcCntn" label="비고" placeholder="메모 (선택)" />
+                  </PopupFormType>
+                </PopupFormGroup>
+              </PopupFormBox>
+            </div>
+          </div>
         </PopupContent>
       </PopupLayout>
 

@@ -1,9 +1,10 @@
 ﻿import { BaseTextAreaAtom, BaseTextAreaAtomProps } from '../atom/BaseTextAreaAtom';
 import { Control, FieldError, FieldPathByValue, FieldValues, PathValue, useController } from 'react-hook-form';
 import React, { useEffect, useReducer, useRef, useState } from 'react';
-import { toastError } from '../ToastMessage';
+import { toastError } from '@/components';
+import { EnhancedTextAreasMode, FileInfo, ContentElement } from './formContentTypes';
+export type { EnhancedTextAreasMode, FileInfo, ContentElement };
 
-export type EnhancedTextAreasMode = 'edit' | 'preview';
 type FormEnhancedTextAreaProps<TForm extends FieldValues> = {
   control: Control<TForm>;
   name: FieldPathByValue<TForm, ContentElement[]>;
@@ -13,17 +14,8 @@ type FormEnhancedTextAreaProps<TForm extends FieldValues> = {
   inputType?: 'label' | 'single';
   dtWidth?: string;
   textAreaBoxHeight?: string;
+  autoSize?: unknown;
 };
-export interface FileInfo {
-  detId?: number; // 내부에서 file det Id 관리가 용이하도록 지정한 key
-  file?: File; // 단순 파일 출력을 위한 경우는 생략 가능(브라우저 paste 이벤트 등에 의하지 않고는 할당되지 않으리라 가정)
-  fileSrcUrl?: string; // 이미지 파일 출력을 위한 url
-}
-export interface ContentElement {
-  id: number; // 기본 1부터 시작, 순차적일 필요는 없으나 후행하는 요소의 id는 선행 요소의 id보다 커야 함
-  partialContent?: string; // 이미지인 경우 undefined
-  fileInfo?: FileInfo;
-}
 
 interface PerContentStatus {
   id: number;

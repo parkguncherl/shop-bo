@@ -38,7 +38,6 @@ export default function ModalLayout({
   });
 
   const onStart = (_e: any, uiData: any) => {
-    // eslint-disable-next-line no-unsafe-optional-chaining
     const { clientWidth, clientHeight } = window?.document?.documentElement;
     const targetRect = draggleRef?.current?.getBoundingClientRect();
     if (!disabled) {
@@ -92,7 +91,7 @@ export default function ModalLayout({
             cursor: draggable ? 'move' : 'default',
             fontWeight: 500,
             fontSize: 20,
-            color: '#333',
+            color: 'var(--dark-text, #333)',
           }}
           onMouseOver={() => {
             if (draggable) {

@@ -75,7 +75,7 @@ export const BaseInputAtom = function BaseInputAtom({
             background: 'transparent',
             cursor: 'pointer',
             padding: 0,
-            color: '#888',
+            color: 'var(--dark-text, #888)',
           }}
           aria-label={showPw ? '비밀번호 숨기기' : '비밀번호 표시'}
         >

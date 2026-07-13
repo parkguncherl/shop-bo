@@ -1,34 +1,20 @@
-﻿import { CodeRequestDelete, CodeRequestUpdate, CodeResponsePaging } from '../../../../generated';
-import { useCodeStore, useCommonStore } from '../../../../stores';
+﻿import { CodeRequestDelete, CodeRequestUpdate, CodeResponsePaging } from '@/generated';
+import { useCodeStore, useCommonStore } from '@/stores';
 import React, { useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toastError, toastSuccess } from '../../../ToastMessage';
+import { toastError, toastSuccess } from '@/components';
 import { PopupContent } from '../../PopupContent';
 import { PopupSearchBox, PopupSearchType } from '../../content';
-import { Input } from '../../../Input';
+import { Input } from '@/components';
 import { PopupFooter } from '../../PopupFooter';
-import { Placeholder } from '../../../../libs/const';
+import { Placeholder } from '@/libs/const';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { YupSchema } from '../../../../libs';
+import { YupSchema } from '@/libs';
 import FormInput from '../../../form/FormInput';
 import FormDropDown from '../../../form/FormDropDown';
 import Loading from '../../../Loading';
 import { PopupLayout } from '../../PopupLayout';
-
-type Maybe<T> = T | null | undefined;
-
-export type CodeRequestUpdateFields = {
-  id: number;
-  codeUpper: string;
-  codeCd: string;
-  codeNm: string;
-  codeDesc?: Maybe<string>;
-  codeEtc1?: Maybe<string>;
-  codeEtc2?: Maybe<string>;
-  codeOrder?: Maybe<number>;
-  delYn: string;
-};
 
 interface Props {
   data: CodeResponsePaging;
@@ -43,7 +29,7 @@ export const CodeModPop = ({ data }: Props) => {
     control,
     formState: { errors, isValid },
     clearErrors,
-  } = useForm<CodeRequestUpdateFields>({
+  } = useForm<CodeRequestUpdate>({
     resolver: yupResolver(YupSchema.CodeRequestForUpdate()), // 완료
     defaultValues: {
       id: data.id,
@@ -54,7 +40,7 @@ export const CodeModPop = ({ data }: Props) => {
       codeEtc1: data.codeEtc1,
       codeEtc2: data.codeEtc2,
       codeOrder: data.codeOrder,
-      delYn: data.deleteYn === 'Y' ? 'Y' : 'N',
+      delYn: data.delYn,
     },
     mode: 'onSubmit',
   });
@@ -135,7 +121,7 @@ export const CodeModPop = ({ data }: Props) => {
     deleteCodeMutate({ id: data.id, codeUpper: data.codeUpper, codeCd: data.codeCd } as CodeRequestDelete);
   };
 
-  const onValid: SubmitHandler<CodeRequestUpdateFields> = (formData) => {
+  const onValid: SubmitHandler<CodeRequestUpdate> = (formData) => {
     console.log('formData ==>', formData);
     updateCodeMutate(formData as CodeRequestUpdate);
   };
@@ -186,11 +172,11 @@ export const CodeModPop = ({ data }: Props) => {
                 {data.codeUpper == 'TOP' ? (
                   <Input title={'코드'} disable={true} value={data.codeCd} />
                 ) : (
-                  <FormInput<CodeRequestUpdateFields> control={control} name={'codeCd'} label={'코드'} placeholder={Placeholder.Input} required={true} />
+                  <FormInput<CodeRequestUpdate> control={control} name={'codeCd'} label={'코드'} placeholder={Placeholder.Input} required={true} />
                 )}
               </PopupSearchType>
               <PopupSearchType className={'type_1'}>
-                <FormInput<CodeRequestUpdateFields> control={control} name={'codeNm'} label={'이름'} placeholder={Placeholder.Input} required={true} />
+                <FormInput<CodeRequestUpdate> control={control} name={'codeNm'} label={'이름'} placeholder={Placeholder.Input} required={true} />
               </PopupSearchType>
               {data.codeUpper === 'TOP' && (
                 <PopupSearchType className={'type_1'}>
@@ -198,19 +184,19 @@ export const CodeModPop = ({ data }: Props) => {
                 </PopupSearchType>
               )}
               <PopupSearchType className={'type_1'}>
-                <FormInput<CodeRequestUpdateFields> control={control} name={'codeDesc'} label={'설명'} placeholder={Placeholder.Input} />
+                <FormInput<CodeRequestUpdate> control={control} name={'codeDesc'} label={'설명'} placeholder={Placeholder.Input} />
               </PopupSearchType>
               <PopupSearchType className={'type_1'}>
-                <FormInput<CodeRequestUpdateFields> control={control} name={'codeEtc1'} label={'기타정보1'} placeholder={Placeholder.Input} />
+                <FormInput<CodeRequestUpdate> control={control} name={'codeEtc1'} label={'기타정보1'} placeholder={Placeholder.Input} />
               </PopupSearchType>
               <PopupSearchType className={'type_1'}>
-                <FormInput<CodeRequestUpdateFields> control={control} name={'codeEtc2'} label={'기타정보2'} placeholder={Placeholder.Input} />
+                <FormInput<CodeRequestUpdate> control={control} name={'codeEtc2'} label={'기타정보2'} placeholder={Placeholder.Input} />
               </PopupSearchType>
               <PopupSearchType className={'type_1'}>
-                <FormInput<CodeRequestUpdateFields> control={control} name={'codeOrder'} label={'순서'} placeholder={Placeholder.Input} required={true} />
+                <FormInput<CodeRequestUpdate> control={control} name={'codeOrder'} label={'순서'} placeholder={Placeholder.Input} required={true} />
               </PopupSearchType>
               <PopupSearchType className={'type_1'}>
-                <FormDropDown<CodeRequestUpdateFields>
+                <FormDropDown<CodeRequestUpdate>
                   control={control}
                   name={'delYn'}
                   title={'사용여부'}

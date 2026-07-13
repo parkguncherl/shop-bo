@@ -18,22 +18,6 @@ import PopupFormBox from '../../content/PopupFormBox';
 import PopupFormType from '../../content/PopupFormType';
 import PopupFormGroup from '../../content/PopupFormGroup';
 
-export type AccountRequestUpdateFields = {
-  id: number;
-  loginId: string;
-  userNm: string;
-  phoneNo: string;
-  authCd: string;
-  useYn: UserRequestCreateUseYn;
-  belongNm: string;
-  deptNm?: string;
-  positionNm?: string;
-  partnerId?: number;
-  tema?: string;
-  orgPartnerId?: number | undefined;
-  orgPartnerNm?: string | null;
-};
-
 interface AccountModPopProps {
   open: boolean;
   onClose: () => void;
@@ -57,7 +41,7 @@ export const AccountModPop = ({ data, open, onClose }: AccountModPopProps) => {
     reset,
     // formState: { errors, isValid },
     // clearErrors,
-  } = useForm<AccountRequestUpdateFields>({
+  } = useForm<UserRequestUpdate>({
     resolver: yupResolver(YupSchema.AccountRequestForUpdate()), // 완료
     defaultValues: {
       id: data.id,
@@ -267,7 +251,7 @@ export const AccountModPop = ({ data, open, onClose }: AccountModPopProps) => {
               <PopupFormGroup>
                 <PopupFormType className={'type1'}>
                   <FormInput label={'ID(e-mail)'} name={'loginId'} control={control} disable={true} />
-                  <FormInput<AccountRequestUpdateFields>
+                  <FormInput<UserRequestUpdate>
                     control={control}
                     name={'userNm'}
                     label={'이름'}
@@ -276,7 +260,7 @@ export const AccountModPop = ({ data, open, onClose }: AccountModPopProps) => {
                   />
                 </PopupFormType>
                 <PopupFormType className={'type1'}>
-                  <FormInput<AccountRequestUpdateFields>
+                  <FormInput<UserRequestUpdate>
                     control={control}
                     name={'phoneNo'}
                     label={'휴대전화 번호'}
@@ -285,7 +269,7 @@ export const AccountModPop = ({ data, open, onClose }: AccountModPopProps) => {
                   />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
-                  <FormDropDown<AccountRequestUpdateFields>
+                  <FormDropDown<UserRequestUpdate>
                     control={control}
                     title={'권한'}
                     name={'authCd'}
@@ -296,21 +280,21 @@ export const AccountModPop = ({ data, open, onClose }: AccountModPopProps) => {
                     //   setUserAuthCd(value ? Number(value) : 0);
                     // }}
                   />
-                  <FormDropDown<AccountRequestUpdateFields> control={control} title={'상태'} name={'useYn'} codeUpper={'10030'} required={true} />
+                  <FormDropDown<UserRequestUpdate> control={control} title={'상태'} name={'useYn'} codeUpper={'10030'} required={true} />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
-                  <FormInput<AccountRequestUpdateFields>
+                  <FormInput<UserRequestUpdate>
                     control={control}
                     name={'belongNm'}
                     label={'소속'}
                     placeholder={Placeholder.Input || ''}
                     required={true}
                   />
-                  <FormInput<AccountRequestUpdateFields> control={control} name={'deptNm'} label={'부서'} placeholder={Placeholder.Input || ''} />
+                  <FormInput<UserRequestUpdate> control={control} name={'deptNm'} label={'부서'} placeholder={Placeholder.Input || ''} />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
-                  <FormInput<AccountRequestUpdateFields> control={control} name={'positionNm'} label={'직책'} placeholder={Placeholder.Input || ''} />
-                  <FormDropDown<AccountRequestUpdateFields> control={control} title={'테마'} name={'tema'} options={temaOptions} required={false} />
+                  <FormInput<UserRequestUpdate> control={control} name={'positionNm'} label={'직책'} placeholder={Placeholder.Input || ''} />
+                  <FormDropDown<UserRequestUpdate> control={control} title={'테마'} name={'tema'} options={temaOptions} required={false} />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
                   <dl>

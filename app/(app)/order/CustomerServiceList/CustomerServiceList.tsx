@@ -3,23 +3,23 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ColDef } from 'ag-grid-community';
-import { Search, Table, Title } from '../../../../components';
-import { toastError } from '../../../../components';
-import { useCommonStore } from '../../../../stores';
-import { defaultColDef, GridSetting, formatDateWithDay, formatDateWithMinute } from '../../../../libs/ag-grid';
-import { useAgGridApi } from '../../../../hooks';
-import { authApi } from '../../../../libs';
+import { Search, Table, Title } from '@/components';
+import { toastError } from '@/components';
+import { useCommonStore } from '@/stores';
+import { defaultColDef, GridSetting, formatDateWithDay, formatDateWithMinute } from '@/libs/ag-grid';
+import { useAgGridApi } from '@/hooks';
+import { authApi } from '@/libs';
 import useFilters from '../../../../hooks/useFilters';
 import CustomNoRowsOverlay from '../../../../components/CustomNoRowsOverlay';
 import CustomGridLoading from '../../../../components/CustomGridLoading';
 import TunedGrid from '../../../../components/grid/TunedGrid';
 import dayjs from 'dayjs';
-import { Utils } from '../../../../libs/utils';
-import { ComuResponseBoListItem, ComuResponseMessage, ComuResponseThread } from '../../../../generated';
+import { Utils } from '@/libs/utils';
+import { ComuResponseBoListItem, ComuResponseMessage, ComuResponseThread } from '@/generated';
 import { ICellRendererParams } from 'ag-grid-community';
-import { PartnerCodePop } from '../../../../components/popup/system/PartnerCodePop';
-import { PARTNER_CODE } from '../../../../libs/const';
-import { usePartnerCodeStore } from '../../../../stores/usePartnerCodeStore';
+import { PartnerCodePop } from '@/components/popup/system/PartnerCodePop';
+import { PARTNER_CODE } from '@/libs/const';
+import { usePartnerCodeStore } from '@/stores/usePartnerCodeStore';
 
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
 
@@ -62,12 +62,14 @@ function MessageBubble({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {!isAdmin && <span style={{ fontSize: 11, color: '#888', marginBottom: 2, marginLeft: 4 }}>{msg.creUser}</span>}
+      {!isAdmin && <span style={{ fontSize: 11, color: 'var(--dark-text, #888)', marginBottom: 2, marginLeft: 4 }}>{msg.creUser}</span>}
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, flexDirection: isAdmin ? 'row-reverse' : 'row' }}>
         {!isAdmin && <div style={avatarStyle}>{msg.creUser?.slice(0, 1) ?? 'U'}</div>}
         <div style={{ maxWidth: 260 }}>
           {msg.comuCntn && (
-            <div style={{ ...bubbleStyle, background: isAdmin ? '#1a6ef5' : '#f0f0f0', color: isAdmin ? '#fff' : '#222' }}>
+            <div
+              style={{ ...bubbleStyle, background: isAdmin ? '#1a6ef5' : 'var(--dark-surface-2, #f0f0f0)', color: isAdmin ? '#fff' : 'var(--dark-text, #222)' }}
+            >
               <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{msg.comuCntn}</p>
             </div>
           )}
@@ -106,8 +108,10 @@ function MessageBubble({
               삭제
             </button>
           )}
-          {isAdmin && <span style={{ fontSize: 10, color: msg.readYn === 'Y' ? '#333' : '#bbb' }}>{msg.readYn === 'Y' ? '읽음' : '안읽음'}</span>}
-          <span style={{ fontSize: 10, color: '#aaa' }}>{Utils.formatMonthDayTime(msg.creTm)}</span>
+          {isAdmin && (
+            <span style={{ fontSize: 10, color: msg.readYn === 'Y' ? 'var(--dark-text, #333)' : '#bbb' }}>{msg.readYn === 'Y' ? '읽음' : '안읽음'}</span>
+          )}
+          <span style={{ fontSize: 10, color: 'var(--dark-text, #aaa)' }}>{Utils.formatMonthDayTime(msg.creTm)}</span>
         </div>
       </div>
 
@@ -130,12 +134,7 @@ function RemarkCheckboxRenderer(props: ICellRendererParams<ComuResponseBoListIte
   const checked = data.remarkYn === 'Y';
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-      <input
-        type="checkbox"
-        checked={checked}
-        style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#e53e3e' }}
-        onChange={() => onToggle(data)}
-      />
+      <input type="checkbox" checked={checked} style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#e53e3e' }} onChange={() => onToggle(data)} />
     </div>
   );
 }
@@ -161,7 +160,6 @@ const CustomerServiceList = () => {
     toDate: today,
   });
 
-
   const [rowData, setRowData] = useState<ComuResponseBoListItem[]>([]);
   const [selectedThread, setSelectedThread] = useState<ComuResponseThread | null>(null);
   const [selectedItem, setSelectedItem] = useState<ComuResponseBoListItem | null>(null);
@@ -182,18 +180,14 @@ const CustomerServiceList = () => {
 
   const handleRemarkToggle = async (item: ComuResponseBoListItem) => {
     const next = item.remarkYn === 'Y' ? 'N' : 'Y';
-    setRowData((prev) =>
-      prev.map((r) => (r.comuId === item.comuId ? { ...r, remarkYn: next } : r)),
-    );
+    setRowData((prev) => prev.map((r) => (r.comuId === item.comuId ? { ...r, remarkYn: next } : r)));
     await saveRemark(item.comuId!, next, item.comment);
   };
 
   const handleCommentChanged = async (params: import('ag-grid-community').CellValueChangedEvent<ComuResponseBoListItem>) => {
     const item = params.data;
     if (!item?.comuId) return;
-    setRowData((prev) =>
-      prev.map((r) => (r.comuId === item.comuId ? { ...r, comment: params.newValue } : r)),
-    );
+    setRowData((prev) => prev.map((r) => (r.comuId === item.comuId ? { ...r, comment: params.newValue } : r)));
     await saveRemark(item.comuId, item.remarkYn ?? 'N', params.newValue);
   };
 
@@ -417,12 +411,35 @@ const CustomerServiceList = () => {
                 <input type="date" value={filters.toDate} onChange={(e) => onChangeFilters('toDate', e.target.value)} className="dateInput" />
               </div>
               <div style={{ display: 'flex', gap: 4 }}>
-                {([
-                  { label: '당일', fn: () => { const d = dayjs().format('YYYY-MM-DD'); onChangeFilters('fromDate', d); onChangeFilters('toDate', d); } },
-                  { label: '1주일', fn: () => { onChangeFilters('fromDate', dayjs().subtract(6, 'day').format('YYYY-MM-DD')); onChangeFilters('toDate', dayjs().format('YYYY-MM-DD')); } },
-                  { label: '1개월', fn: () => { onChangeFilters('fromDate', dayjs().subtract(1, 'month').format('YYYY-MM-DD')); onChangeFilters('toDate', dayjs().format('YYYY-MM-DD')); } },
-                ] as { label: string; fn: () => void }[]).map(({ label, fn }) => (
-                  <button key={label} className="btn" onClick={fn} style={{ height: 28, padding: '0 10px', fontSize: 12, whiteSpace: 'nowrap' }}>{label}</button>
+                {(
+                  [
+                    {
+                      label: '당일',
+                      fn: () => {
+                        const d = dayjs().format('YYYY-MM-DD');
+                        onChangeFilters('fromDate', d);
+                        onChangeFilters('toDate', d);
+                      },
+                    },
+                    {
+                      label: '1주일',
+                      fn: () => {
+                        onChangeFilters('fromDate', dayjs().subtract(6, 'day').format('YYYY-MM-DD'));
+                        onChangeFilters('toDate', dayjs().format('YYYY-MM-DD'));
+                      },
+                    },
+                    {
+                      label: '1개월',
+                      fn: () => {
+                        onChangeFilters('fromDate', dayjs().subtract(1, 'month').format('YYYY-MM-DD'));
+                        onChangeFilters('toDate', dayjs().format('YYYY-MM-DD'));
+                      },
+                    },
+                  ] as { label: string; fn: () => void }[]
+                ).map(({ label, fn }) => (
+                  <button key={label} className="btn" onClick={fn} style={{ height: 28, padding: '0 10px', fontSize: 12, whiteSpace: 'nowrap' }}>
+                    {label}
+                  </button>
                 ))}
               </div>
             </div>
@@ -436,13 +453,7 @@ const CustomerServiceList = () => {
           placeholder={'상품명 검색'}
           onEnter={() => refetch()}
         />
-        <Search.DropDown
-          title={'문의종류'}
-          name={'comuType'}
-          codeUpper={'10130'}
-          value={filters.comuType}
-          onChange={onChangeFilters}
-        />
+        <Search.DropDown title={'문의종류'} name={'comuType'} codeUpper={'10130'} value={filters.comuType} onChange={onChangeFilters} />
         <dl>
           <dt>특이사항</dt>
           <dd>
@@ -501,20 +512,30 @@ const CustomerServiceList = () => {
 
         {/* 우: 채팅 패널 */}
         <div
-          style={{ flex: 1, display: 'flex', flexDirection: 'column', height: 'calc(100vh - 338px)', minHeight: 300, border: '1px solid #e0e0e0', borderRadius: 8, overflow: 'hidden', background: '#fff' }}
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            height: 'calc(100vh - 338px)',
+            minHeight: 300,
+            border: '1px solid var(--dark-border, #e0e0e0)',
+            borderRadius: 8,
+            overflow: 'hidden',
+            background: 'var(--dark-surface, #fff)',
+          }}
         >
           {!selectedItem ? (
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaa', fontSize: 14 }}>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--dark-text, #aaa)', fontSize: 14 }}>
               문의를 선택하면 대화 내용이 표시됩니다.
             </div>
           ) : (
             <>
               {/* 채팅 헤더 */}
-              <div style={{ padding: '10px 16px', borderBottom: '1px solid #e8e8e8', background: '#fafafa' }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#222' }}>
+              <div style={{ padding: '10px 16px', borderBottom: '1px solid var(--dark-border, #e8e8e8)', background: 'var(--dark-surface-2, #fafafa)' }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--dark-text, #222)' }}>
                   [{selectedItem.comuTypeName}] {selectedItem.topProductName ?? '-'}
                 </div>
-                <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>
+                <div style={{ fontSize: 12, color: 'var(--dark-text, #888)', marginTop: 2 }}>
                   {selectedItem.orderNo} · {selectedItem.paymentStatusName} · 구매일{' '}
                   {selectedItem.orderDate ? dayjs(selectedItem.orderDate).format('YYYY-MM-DD') : '-'}
                 </div>
@@ -533,7 +554,7 @@ const CustomerServiceList = () => {
               </div>
 
               {/* 답변 입력 */}
-              <div style={{ borderTop: '1px solid #e8e8e8', padding: '10px 12px', background: '#fafafa' }}>
+              <div style={{ borderTop: '1px solid var(--dark-border, #e8e8e8)', padding: '10px 12px', background: 'var(--dark-surface-2, #fafafa)' }}>
                 {previewUrls.length > 0 && (
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
                     {previewUrls.map((url, i) => (
@@ -621,13 +642,13 @@ const avatarStyle: React.CSSProperties = {
   width: 32,
   height: 32,
   borderRadius: '50%',
-  background: '#e0e0e0',
+  background: 'var(--dark-surface-2, #e0e0e0)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   fontSize: 13,
   fontWeight: 700,
-  color: '#555',
+  color: 'var(--dark-text, #555)',
   flexShrink: 0,
 };
 
@@ -639,21 +660,20 @@ const bubbleStyle: React.CSSProperties = {
   wordBreak: 'break-word',
 };
 
-
 const iconBtnStyle: React.CSSProperties = {
   background: 'none',
-  border: '1px solid #d0d0d0',
+  border: '1px solid var(--dark-border, #d0d0d0)',
   borderRadius: 6,
   padding: '5px 8px',
   cursor: 'pointer',
-  color: '#555',
+  color: 'var(--dark-text, #555)',
   flexShrink: 0,
 };
 
 const textareaStyle: React.CSSProperties = {
   flex: 1,
   resize: 'none',
-  border: '1px solid #d0d0d0',
+  border: '1px solid var(--dark-border, #d0d0d0)',
   borderRadius: 8,
   padding: '8px 10px',
   fontSize: 13,

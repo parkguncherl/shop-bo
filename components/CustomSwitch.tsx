@@ -59,7 +59,7 @@ const CustomSwitchComponent = ({
         </dt>
         <dd>
           <div className="formBox">
-            <div className="segBox" style={{ display: 'inline-flex', border: '1px solid #ddd', borderRadius: 4, overflow: 'hidden' }}>
+            <div className="segBox" style={{ display: 'inline-flex', border: '1px solid var(--dark-border, #ddd)', borderRadius: 4, overflow: 'hidden' }}>
               {[checkedLabel, uncheckedLabel].map((opt) => {
                 const on = activeKey === opt;
                 return (
@@ -69,7 +69,13 @@ const CustomSwitchComponent = ({
                     disabled={disabled}
                     className={on ? 'segBtn segBtn--active' : 'segBtn'}
                     onClick={() => onSeg(opt)}
-                    style={{ padding: '4px 14px', border: 'none', cursor: 'pointer', background: on ? '#5b21b6' : '#fff', color: on ? '#fff' : '#333' }}
+                    style={{
+                      padding: '4px 14px',
+                      border: 'none',
+                      cursor: 'pointer',
+                      background: on ? 'var(--purple, #5b21b6)' : 'var(--dark-surface, #fff)',
+                      color: on ? '#fff' : 'var(--dark-text, #333)',
+                    }}
                   >
                     {opt}
                   </button>
@@ -88,7 +94,16 @@ const CustomSwitchComponent = ({
       disabled={disabled}
       onClick={onToggle}
       className={checked ? 'toggleSwitch on' : 'toggleSwitch'}
-      style={{ padding: '3px 12px', borderRadius: 12, border: 'none', cursor: 'pointer', minWidth: 60, background: checked ? '#5b21b6' : '#bbb', color: '#fff', fontSize: 12 }}
+      style={{
+        padding: '3px 12px',
+        borderRadius: 12,
+        border: 'none',
+        cursor: 'pointer',
+        minWidth: 60,
+        background: checked ? 'var(--purple, #5b21b6)' : '#bbb',
+        color: '#fff',
+        fontSize: 12,
+      }}
     >
       {checked ? checkedLabel : uncheckedLabel}
     </button>

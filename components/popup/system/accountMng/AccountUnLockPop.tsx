@@ -1,28 +1,20 @@
-﻿import { useAccountStore } from '../../../../stores';
+﻿import { useAccountStore } from '@/stores';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React, { useRef, useState } from 'react';
 import { PopupContent } from '../../PopupContent';
 import { PopupSearchBox, PopupSearchType } from '../../content';
 import { PopupFooter } from '../../PopupFooter';
-import { toastError, toastSuccess } from '../../../ToastMessage';
-import { UserRequestUnLock, UserResponseSelectByLoginId } from '../../../../generated';
-import { Placeholder } from '../../../../libs/const';
+import { toastError, toastSuccess } from '@/components';
+import { UserRequestUnLock, UserResponseSelectByLoginId } from '@/generated';
+import { Placeholder } from '@/libs/const';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { YupSchema } from '../../../../libs';
+import { YupSchema } from '@/libs';
 import FormInput from '../../../form/FormInput';
-import { Label } from '../../../Label';
+import { Label } from '@/components';
 import styles from '../../../../styles/popup/popup.module.scss';
 import Loading from '../../../Loading';
 import { PopupLayout } from '../../PopupLayout';
-
-export type AccountRequestUnLockFields = {
-  id: number;
-  loginId: string;
-  loginPass: string;
-  userNm: string;
-  phoneNo: string;
-};
 
 interface Props {
   data: UserResponseSelectByLoginId;
@@ -37,7 +29,7 @@ export const AccountUnLockPop = ({ data }: Props) => {
     control,
     formState: { errors, isValid },
     clearErrors,
-  } = useForm<AccountRequestUnLockFields>({
+  } = useForm<UserRequestUnLock>({
     resolver: yupResolver(YupSchema.AccountUnLockRequest()), // 완료
     defaultValues: {
       id: data.id,
@@ -117,7 +109,7 @@ export const AccountUnLockPop = ({ data }: Props) => {
             </p>
             <PopupSearchBox>
               <div className={styles.inp_pw} style={{ display: 'block' }}>
-                <FormInput<AccountRequestUnLockFields>
+                <FormInput<UserRequestUnLock>
                   control={control}
                   type={isPassVisible ? 'password' : 'text'}
                   name={'loginPass'}

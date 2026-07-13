@@ -2,20 +2,20 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { ColDef, RowClickedEvent } from 'ag-grid-community';
-import { Search, Table, Title } from '../../../../components';
+import { Search, Table, Title } from '@/components';
 import { useQuery } from '@tanstack/react-query';
-import { toastError } from '../../../../components';
-import { useCommonStore } from '../../../../stores';
-import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
-import { useAgGridApi } from '../../../../hooks';
+import { toastError } from '@/components';
+import { useCommonStore } from '@/stores';
+import { defaultColDef, GridSetting } from '@/libs/ag-grid';
+import { useAgGridApi } from '@/hooks';
 import useFilters from '../../../../hooks/useFilters';
 import CustomNoRowsOverlay from '../../../../components/CustomNoRowsOverlay';
 import CustomGridLoading from '../../../../components/CustomGridLoading';
 import TunedGrid from '../../../../components/grid/TunedGrid';
-import { authApi } from '../../../../libs';
+import { authApi } from '@/libs';
 import dayjs from 'dayjs';
 import ReactECharts from 'echarts-for-react';
-import { useDarkMode } from '../../../../contexts/ThemeContext';
+import { useDarkMode } from '@/contexts/ThemeContext';
 
 type ViewType = 'monthly' | 'weekly';
 
@@ -255,14 +255,54 @@ const MonthlyView = () => {
       },
       legend: { bottom: 0, data: ['총구매금액', '구매건수'], textStyle: { color: chartTextColor } },
       grid: { left: 16, right: 60, top: 50, bottom: 50, containLabel: true },
-      xAxis: { type: 'category', data: periods, axisLabel: { rotate: periods.length > 8 ? 30 : 0, fontSize: 11, color: chartTextColor }, axisLine: { lineStyle: { color: chartAxisColor } } },
+      xAxis: {
+        type: 'category',
+        data: periods,
+        axisLabel: { rotate: periods.length > 8 ? 30 : 0, fontSize: 11, color: chartTextColor },
+        axisLine: { lineStyle: { color: chartAxisColor } },
+      },
       yAxis: [
-        { type: 'value', name: '구매건수', nameTextStyle: { fontSize: 11, color: chartTextColor }, axisLabel: { color: chartTextColor }, splitLine: { show: false } },
-        { type: 'value', name: '총구매금액', nameTextStyle: { fontSize: 11, color: chartTextColor }, axisLabel: { color: chartTextColor, formatter: (v: number) => (v >= 10000 ? Math.floor(v / 10000) + '만' : v.toLocaleString()) }, splitLine: { lineStyle: { color: splitLineColor } } },
+        {
+          type: 'value',
+          name: '구매건수',
+          nameTextStyle: { fontSize: 11, color: chartTextColor },
+          axisLabel: { color: chartTextColor },
+          splitLine: { show: false },
+        },
+        {
+          type: 'value',
+          name: '총구매금액',
+          nameTextStyle: { fontSize: 11, color: chartTextColor },
+          axisLabel: { color: chartTextColor, formatter: (v: number) => (v >= 10000 ? Math.floor(v / 10000) + '만' : v.toLocaleString()) },
+          splitLine: { lineStyle: { color: splitLineColor } },
+        },
       ],
       series: [
-        { name: '총구매금액', type: 'bar', yAxisIndex: 1, data: amtData, itemStyle: { color: '#5b8ff9' }, label: { show: true, position: 'top', fontSize: 10, color: chartTextColor, formatter: (p: any) => (p.value >= 10000 ? Math.floor(p.value / 10000) + '만' : p.value.toLocaleString()) } },
-        { name: '구매건수', type: 'line', yAxisIndex: 0, data: cntData, itemStyle: { color: '#e86452' }, lineStyle: { width: 2 }, symbol: 'circle', symbolSize: 6, label: { show: true, position: 'top', fontSize: 10, color: chartTextColor, formatter: '{c}건' } },
+        {
+          name: '총구매금액',
+          type: 'bar',
+          yAxisIndex: 1,
+          data: amtData,
+          itemStyle: { color: '#5b8ff9' },
+          label: {
+            show: true,
+            position: 'top',
+            fontSize: 10,
+            color: chartTextColor,
+            formatter: (p: any) => (p.value >= 10000 ? Math.floor(p.value / 10000) + '만' : p.value.toLocaleString()),
+          },
+        },
+        {
+          name: '구매건수',
+          type: 'line',
+          yAxisIndex: 0,
+          data: cntData,
+          itemStyle: { color: '#e86452' },
+          lineStyle: { width: 2 },
+          symbol: 'circle',
+          symbolSize: 6,
+          label: { show: true, position: 'top', fontSize: 10, color: chartTextColor, formatter: '{c}건' },
+        },
       ],
     };
   }, [statData, chartTextColor, chartAxisColor, splitLineColor]);
@@ -288,10 +328,10 @@ const MonthlyView = () => {
                 style={{
                   height: 32,
                   padding: '0 8px',
-                  border: '1px solid #d9d9d9',
+                  border: '1px solid var(--dark-border, #d9d9d9)',
                   borderRadius: 6,
                   fontSize: 13,
-                  background: '#fff',
+                  background: 'var(--dark-surface, #fff)',
                   cursor: 'pointer',
                   minWidth: 100,
                 }}
@@ -315,12 +355,35 @@ const MonthlyView = () => {
                 <input type="date" value={filters.toDate} onChange={(e) => onChangeFilters('toDate', e.target.value)} className="dateInput" />
               </div>
               <div style={{ display: 'flex', gap: 4 }}>
-                {([
-                  { label: '당일', fn: () => { const d = dayjs().format('YYYY-MM-DD'); onChangeFilters('fromDate', d); onChangeFilters('toDate', d); } },
-                  { label: '1주일', fn: () => { onChangeFilters('fromDate', dayjs().subtract(6, 'day').format('YYYY-MM-DD')); onChangeFilters('toDate', dayjs().format('YYYY-MM-DD')); } },
-                  { label: '1개월', fn: () => { onChangeFilters('fromDate', dayjs().subtract(1, 'month').format('YYYY-MM-DD')); onChangeFilters('toDate', dayjs().format('YYYY-MM-DD')); } },
-                ] as { label: string; fn: () => void }[]).map(({ label, fn }) => (
-                  <button key={label} className="btn" onClick={fn} style={{ height: 28, padding: '0 10px', fontSize: 12, whiteSpace: 'nowrap' }}>{label}</button>
+                {(
+                  [
+                    {
+                      label: '당일',
+                      fn: () => {
+                        const d = dayjs().format('YYYY-MM-DD');
+                        onChangeFilters('fromDate', d);
+                        onChangeFilters('toDate', d);
+                      },
+                    },
+                    {
+                      label: '1주일',
+                      fn: () => {
+                        onChangeFilters('fromDate', dayjs().subtract(6, 'day').format('YYYY-MM-DD'));
+                        onChangeFilters('toDate', dayjs().format('YYYY-MM-DD'));
+                      },
+                    },
+                    {
+                      label: '1개월',
+                      fn: () => {
+                        onChangeFilters('fromDate', dayjs().subtract(1, 'month').format('YYYY-MM-DD'));
+                        onChangeFilters('toDate', dayjs().format('YYYY-MM-DD'));
+                      },
+                    },
+                  ] as { label: string; fn: () => void }[]
+                ).map(({ label, fn }) => (
+                  <button key={label} className="btn" onClick={fn} style={{ height: 28, padding: '0 10px', fontSize: 12, whiteSpace: 'nowrap' }}>
+                    {label}
+                  </button>
                 ))}
               </div>
             </div>
@@ -333,7 +396,7 @@ const MonthlyView = () => {
         <div className="layout20">
           <p style={{ margin: '0 0 6px 2px', fontSize: 13, fontWeight: 600, color: chartTextColor }}>
             {periodLabel}별 판매 실적
-            {selectedPeriod && <span style={{ marginLeft: 8, fontWeight: 400, color: '#888', fontSize: 12 }}>({selectedPeriod})</span>}
+            {selectedPeriod && <span style={{ marginLeft: 8, fontWeight: 400, color: 'var(--dark-text, #888)', fontSize: 12 }}>({selectedPeriod})</span>}
           </p>
           <Table>
             <TunedGrid
@@ -357,9 +420,9 @@ const MonthlyView = () => {
           <p style={{ margin: '0 0 6px 2px', fontSize: 13, fontWeight: 600, color: chartTextColor }}>
             상품별 상세 실적
             {selectedPeriod ? (
-              <span style={{ marginLeft: 6, fontWeight: 400, color: '#555', fontSize: 12 }}> {selectedPeriod}</span>
+              <span style={{ marginLeft: 6, fontWeight: 400, color: 'var(--dark-text, #555)', fontSize: 12 }}> {selectedPeriod}</span>
             ) : (
-              <span style={{ fontWeight: 400, color: '#aaa', fontSize: 12, marginLeft: 6 }}>행을 클릭하세요</span>
+              <span style={{ fontWeight: 400, color: 'var(--dark-text, #aaa)', fontSize: 12, marginLeft: 6 }}>행을 클릭하세요</span>
             )}
           </p>
           <Table>

@@ -19,7 +19,7 @@ const baseStyle: React.CSSProperties = {
   height: 32,
   fontSize: 13,
   fontWeight: 500,
-  border: '1px solid #d9d9d9',
+  border: '1px solid var(--dark-border, #d9d9d9)',
   cursor: 'pointer',
   transition: 'background 0.2s, color 0.2s',
   marginLeft: -1,
@@ -28,17 +28,17 @@ const baseStyle: React.CSSProperties = {
 
 const activeStyle: React.CSSProperties = {
   ...baseStyle,
-  background: '#4b5563',
+  background: 'var(--purple, #4b5563)',
   color: '#fff',
-  borderColor: '#4b5563',
+  borderColor: 'var(--purple, #4b5563)',
   zIndex: 1,
 };
 
 const inactiveStyle: React.CSSProperties = {
   ...baseStyle,
-  background: '#f3f4f6',
-  color: '#6b7280',
-  borderColor: '#d9d9d9',
+  background: 'var(--dark-surface-2, #f3f4f6)',
+  color: 'var(--dark-text, #6b7280)',
+  borderColor: 'var(--dark-border, #d9d9d9)',
 };
 
 const SeasonButtonGroup = ({ value = [], onChange }: Props) => {

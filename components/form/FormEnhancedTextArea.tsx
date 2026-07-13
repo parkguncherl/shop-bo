@@ -1,10 +1,11 @@
 import { BaseTextAreaAtom, BaseTextAreaAtomProps } from '../atom/BaseTextAreaAtom';
 import { FieldError, FieldValues, useController } from 'react-hook-form';
-import { TControl } from '../../types/Control';
+import { TControl } from '@/types/Control';
 import React, { useEffect, useRef, useState } from 'react';
-import { toastError } from '../ToastMessage';
+import { toastError } from '@/components';
+import { EnhancedTextAreasMode, FileInfo, ContentElement } from './formContentTypes';
+export type { EnhancedTextAreasMode, FileInfo, ContentElement };
 
-export type EnhancedTextAreasMode = 'edit' | 'preview';
 type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
   TControl<T> & {
     //ref?: React.Ref<HTMLTextAreaElement>; todo 추후 useImperativeHandle 등의 방법으로 참조를 통한 동작 사용 가능토록 하기
@@ -13,16 +14,8 @@ type FormEnhancedTextAreaProps<T extends FieldValues> = BaseTextAreaAtomProps &
     inputType?: 'label' | 'single';
     dtWidth?: string;
     textAreaBoxHeight?: string;
+    autoSize?: unknown;
   };
-export interface FileInfo {
-  file?: File; // 단순 파일 출력을 위한 경우는 생략 가능(브라우저 paste 이벤트 등에 의하지 않고는 할당되지 않으리라 가정)
-  fileSrcUrl?: string; // 이미지 파일 출력 혹은 버킷 참조를 위한 url
-}
-export interface ContentElement {
-  id: number; // 기본 1부터 시작, 순차적일 필요는 없으나 후행하는 요소의 id는 선행 요소의 id보다 커야 함
-  partialContent?: string; // 이미지인 경우 undefined
-  fileInfo?: FileInfo;
-}
 
 interface ContentElementInfo extends ContentElement {
   init: boolean; // 추가(마운트) 이후 별도의 편집을 위한 상호작용이 부재한 경우 true

@@ -1,24 +1,24 @@
 'use client';
 
 import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
-import { Search, Title, toastSuccess } from '../../../../components';
+import { Search, Title, toastSuccess } from '@/components';
 import { CellEditingStoppedEvent, ColDef } from 'ag-grid-community';
-import { toastError } from '../../../../components';
-import { useCommonStore } from '../../../../stores';
+import { toastError } from '@/components';
+import { useCommonStore } from '@/stores';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
-import { useAgGridApi } from '../../../../hooks';
+import { defaultColDef, GridSetting } from '@/libs/ag-grid';
+import { useAgGridApi } from '@/hooks';
 import useFilters from '../../../../hooks/useFilters';
 import CustomNoRowsOverlay from '../../../../components/CustomNoRowsOverlay';
 import CustomGridLoading from '../../../../components/CustomGridLoading';
 import TunedGrid from '../../../../components/grid/TunedGrid';
-import { authApi } from '../../../../libs';
+import { authApi } from '@/libs';
 import dayjs from 'dayjs';
-import { ConfirmModal } from '../../../../components/ConfirmModal';
-import { useReceivingStore } from '../../../../stores/product/useReceivingStore';
+import { ConfirmModal } from '@/components/ConfirmModal';
+import { useReceivingStore } from '@/stores/product/useReceivingStore';
 import ReceivingAddPop from '../../../../components/popup/product/receiving/ReceivingAddPop';
 import ReceivingModPop from '../../../../components/popup/product/receiving/ReceivingModPop';
-import type { ReceivingItem } from '../../../../components/popup/product/receiving/ReceivingModPop';
+import type { ReceivingResponseReceivingItem } from '@/generated';
 
 type ListFilter = {
   fromDate: string;
@@ -88,10 +88,10 @@ const Receiving = () => {
     prodNm: '',
   });
 
-  const [rowData, setRowData] = useState<ReceivingItem[]>([]);
-  const [selectedRow, setSelectedRow] = useState<ReceivingItem | null>(null);
+  const [rowData, setRowData] = useState<ReceivingResponseReceivingItem[]>([]);
+  const [selectedRow, setSelectedRow] = useState<ReceivingResponseReceivingItem | null>(null);
 
-  const columnDefs: ColDef<ReceivingItem>[] = [
+  const columnDefs: ColDef<ReceivingResponseReceivingItem>[] = [
     {
       headerName: 'No',
       minWidth: 55,
@@ -229,7 +229,7 @@ const Receiving = () => {
   });
 
   const onCellEditingStopped = useCallback(
-    (e: CellEditingStoppedEvent<ReceivingItem>) => {
+    (e: CellEditingStoppedEvent<ReceivingResponseReceivingItem>) => {
       const field = e.column.getColId();
       if (!INLINE_EDITABLE.has(field)) return;
       if (e.newValue === e.oldValue) return;
@@ -377,7 +377,7 @@ const Receiving = () => {
 
       <ReceivingModPop
         open={modals.active && modals.type === 'RECEIVING_MOD'}
-        item={(modals.stored_temporary as ReceivingItem) ?? null}
+        item={(modals.stored_temporary as ReceivingResponseReceivingItem) ?? null}
         onClose={() => closeModal('RECEIVING_MOD')}
         onSuccess={refetch}
       />
@@ -387,7 +387,7 @@ const Receiving = () => {
         title="해당 입고/출고 내역을 삭제하시겠습니까?"
         warningMessage="삭제 후 복구할 수 없습니다."
         onConfirm={() => {
-          const item = modals.stored_temporary as ReceivingItem;
+          const item = modals.stored_temporary as ReceivingResponseReceivingItem;
           if (item?.id) deleteMutate({ id: item.id });
         }}
         onClose={(_r) => closeModal('RECEIVING_DEL')}

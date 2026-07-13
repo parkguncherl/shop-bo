@@ -1,29 +1,20 @@
 ﻿import React, { useEffect, useRef, useState } from 'react';
-import { Menu, MenuRequestCreate } from '../../../../generated';
+import { Menu, MenuRequestCreate } from '@/generated';
 import { PopupContent, PopupFooter, PopupLayout } from '../../index';
 import { PopupSearchBox, PopupSearchType } from '../../content';
-import { Input, toastError, toastSuccess } from '../../../index';
-import { useMenuStore } from '../../../../stores';
+import { Input, toastError, toastSuccess } from '@/components';
+import { useMenuStore } from '@/stores';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import FormInput from '../../../form/FormInput';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { YupSchema } from '../../../../libs';
+import { YupSchema } from '@/libs';
 import Loading from '../../../Loading';
 
 interface Props {
   data: Menu;
   callback?: () => void;
 }
-
-export type MenuRequestCreateFields = {
-  upMenuCd: string;
-  menuCd: string;
-  menuNm: string;
-  menuOrder: number;
-  menuUri: string;
-  menuEngNm?: string;
-};
 
 export const MenuAddPop = ({ data, callback }: Props) => {
   const menuUriTitle = data.upMenuCd === 'TOP' ? 'ICO' : 'URI';
@@ -34,7 +25,7 @@ export const MenuAddPop = ({ data, callback }: Props) => {
     control,
     formState: { errors, isValid },
     clearErrors,
-  } = useForm<MenuRequestCreateFields>({
+  } = useForm<MenuRequestCreate>({
     resolver: yupResolver(YupSchema.MenuRequest({ upMenuCd: data.upMenuCd, menuUriTitle })), // 완료
     defaultValues: data,
     mode: 'onSubmit',
@@ -120,19 +111,19 @@ export const MenuAddPop = ({ data, callback }: Props) => {
                 <Input title={'상위코드명'} disable={true} value={data.upMenuCd === 'TOP' ? 'TOP' : data.upMenuNm} />
               </PopupSearchType>
               <PopupSearchType className={'type_1'}>
-                <FormInput<MenuRequestCreateFields> control={control} name={'menuCd'} label={'코드'} required={true} />
+                <FormInput<MenuRequestCreate> control={control} name={'menuCd'} label={'코드'} required={true} />
               </PopupSearchType>
               <PopupSearchType className={'type_1'}>
-                <FormInput<MenuRequestCreateFields> control={control} name={'menuNm'} label={'이름'} required={true} />
+                <FormInput<MenuRequestCreate> control={control} name={'menuNm'} label={'이름'} required={true} />
               </PopupSearchType>
               <PopupSearchType className={'type_1'}>
-                <FormInput<MenuRequestCreateFields> control={control} name={'menuEngNm'} label={'영문명'} />
+                <FormInput<MenuRequestCreate> control={control} name={'menuEngNm'} label={'영문명'} />
               </PopupSearchType>
               <PopupSearchType className={'type_1'}>
-                <FormInput<MenuRequestCreateFields> control={control} name={'menuUri'} label={menuUriTitle} required={true} />
+                <FormInput<MenuRequestCreate> control={control} name={'menuUri'} label={menuUriTitle} required={true} />
               </PopupSearchType>
               <PopupSearchType className={'type_1'}>
-                <FormInput<MenuRequestCreateFields> control={control} name={'menuOrder'} label={'순서'} required={true} />
+                <FormInput<MenuRequestCreate> control={control} name={'menuOrder'} label={'순서'} required={true} />
               </PopupSearchType>
             </PopupSearchBox>
           </PopupContent>
