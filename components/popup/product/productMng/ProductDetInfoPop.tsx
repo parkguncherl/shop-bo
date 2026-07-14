@@ -54,6 +54,17 @@ const expandHex = (hex?: string) => {
     : hex;
 };
 
+// 표준색상 팔레트 (화이트/그레이/블랙 + 다양한 색상)
+const STNDR_COLOR_PALETTE = [
+  '#FFFFFF', '#F5F5F5', '#E0E0E0', '#BDBDBD', '#9E9E9E', '#757575', '#424242', '#000000',
+  '#F44336', '#E91E63', '#FF5252', '#FF4081', '#D50000', '#C2185B',
+  '#9C27B0', '#673AB7', '#7C4DFF', '#B388FF', '#6200EA',
+  '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4', '#40C4FF', '#0091EA',
+  '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#69F0AE', '#00C853',
+  '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#FFD740', '#FF6D00',
+  '#795548', '#8D6E63', '#607D8B', '#90A4AE',
+];
+
 const StndrColorCell = (params: any) => {
   const value: string | undefined = params.value; // '#' 없는 3자리 hex
   const [open, setOpen] = useState(false);
@@ -100,15 +111,22 @@ const StndrColorCell = (params: any) => {
                 top: coords.top,
                 left: coords.left,
                 zIndex: 10001,
-                background: '#fff',
-                border: '1px solid #ddd',
+                background: '#f2f2f2',
+                border: '1px solid #ccc',
                 borderRadius: 8,
                 padding: 12,
                 boxShadow: '0 6px 16px rgba(0,0,0,0.15)',
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              <CirclePicker color={value ? `#${expandHex(value)}` : '#ffffff'} onChangeComplete={onComplete} />
+              <CirclePicker
+                color={value ? `#${expandHex(value)}` : '#ffffff'}
+                colors={STNDR_COLOR_PALETTE}
+                circleSize={22}
+                circleSpacing={10}
+                width="352px"
+                onChangeComplete={onComplete}
+              />
             </div>
           </>,
           document.body,

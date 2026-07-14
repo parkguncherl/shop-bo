@@ -156,9 +156,7 @@ const ReceivingAddPop = ({ open, onClose, onSuccess }: ReceivingAddPopProps) => 
           <div className="layoutBox">
             {/* 왼쪽: 상품상세 검색 */}
             <div className="layout70">
-              <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, padding: '4px 0', borderBottom: '1px solid var(--dark-border, #ddd)' }}>
-                상품상세 검색
-              </div>
+              <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, padding: '4px 0' }}>상품상세 검색</div>
               <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
                 <div className="formBox border" style={{ flex: 1 }}>
                   <input
@@ -190,10 +188,8 @@ const ReceivingAddPop = ({ open, onClose, onSuccess }: ReceivingAddPopProps) => 
             </div>
 
             {/* 오른쪽: 입출고 정보 */}
-            <div className="layout30" style={{ borderLeft: '1px solid var(--dark-border, #e0e0e0)', paddingLeft: 20 }}>
-              <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, padding: '4px 0', borderBottom: '1px solid var(--dark-border, #ddd)' }}>
-                입출고 정보
-              </div>
+            <div className="layout30" style={{ paddingLeft: 48 }}>
+              <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, padding: '4px 0' }}>입출고 정보</div>
               <PopupFormBox className="">
                 <PopupFormGroup>
                   <PopupFormType className="type1">
