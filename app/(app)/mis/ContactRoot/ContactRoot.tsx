@@ -32,6 +32,7 @@ type ContactItem = {
 
 const today = dayjs().format('YYYY-MM-DD');
 const monthAgo = dayjs().subtract(1, 'month').format('YYYY-MM-DD');
+const contentHeightStyle = { height: 'calc(100vh - 338px)', minHeight: 300 };
 
 const DEVICE_OPTIONS = [
   { label: '전체', value: '' },
@@ -72,12 +73,21 @@ const ContactRoot = () => {
     return {
       backgroundColor: 'transparent',
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-      legend: showByDevice
-        ? { bottom: 0, data: ['Mobile', 'Desktop', '기타'], textStyle: { color: chartTextColor } }
-        : { show: false },
+      legend: showByDevice ? { bottom: 0, data: ['Mobile', 'Desktop', '기타'], textStyle: { color: chartTextColor } } : { show: false },
       grid: { left: 16, right: 16, top: 50, bottom: showByDevice ? 50 : 30, containLabel: true },
-      xAxis: { type: 'category', data: labels, axisLabel: { rotate: 35, fontSize: 10, interval: 0, color: chartTextColor }, axisLine: { lineStyle: { color: chartAxisColor } } },
-      yAxis: { type: 'value', name: '건수', nameTextStyle: { color: chartTextColor }, axisLabel: { color: chartTextColor }, splitLine: { lineStyle: { color: splitLineColor } } },
+      xAxis: {
+        type: 'category',
+        data: labels,
+        axisLabel: { rotate: 35, fontSize: 10, interval: 0, color: chartTextColor },
+        axisLine: { lineStyle: { color: chartAxisColor } },
+      },
+      yAxis: {
+        type: 'value',
+        name: '건수',
+        nameTextStyle: { color: chartTextColor },
+        axisLabel: { color: chartTextColor },
+        splitLine: { lineStyle: { color: splitLineColor } },
+      },
       series: showByDevice
         ? [
             { name: 'Mobile', type: 'bar', stack: 'total', data: mobileData, itemStyle: { color: '#5b8ff9' }, label: { show: false } },
@@ -85,7 +95,13 @@ const ContactRoot = () => {
             { name: '기타', type: 'bar', stack: 'total', data: otherData, itemStyle: { color: '#f6bd16' }, label: { show: false } },
           ]
         : [
-            { name: '건수', type: 'bar', data: top20.map((d) => d.cnt), itemStyle: { color: filters.deviceType === 'mobile' ? '#5b8ff9' : '#61ddaa' }, label: { show: true, position: 'top', fontSize: 10, formatter: '{c}', color: chartTextColor } },
+            {
+              name: '건수',
+              type: 'bar',
+              data: top20.map((d) => d.cnt),
+              itemStyle: { color: filters.deviceType === 'mobile' ? '#5b8ff9' : '#61ddaa' },
+              label: { show: true, position: 'top', fontSize: 10, formatter: '{c}', color: chartTextColor },
+            },
           ],
     };
   }, [top20, filters.deviceType, chartTextColor, chartAxisColor, splitLineColor]);
@@ -164,12 +180,35 @@ const ContactRoot = () => {
                 <input type="date" value={filters.toDate} onChange={(e) => onChangeFilters('toDate', e.target.value)} className="dateInput" />
               </div>
               <div style={{ display: 'flex', gap: 4 }}>
-                {([
-                  { label: '당일', fn: () => { const d = dayjs().format('YYYY-MM-DD'); onChangeFilters('fromDate', d); onChangeFilters('toDate', d); } },
-                  { label: '1주일', fn: () => { onChangeFilters('fromDate', dayjs().subtract(6, 'day').format('YYYY-MM-DD')); onChangeFilters('toDate', dayjs().format('YYYY-MM-DD')); } },
-                  { label: '1개월', fn: () => { onChangeFilters('fromDate', dayjs().subtract(1, 'month').format('YYYY-MM-DD')); onChangeFilters('toDate', dayjs().format('YYYY-MM-DD')); } },
-                ] as { label: string; fn: () => void }[]).map(({ label, fn }) => (
-                  <button key={label} className="btn" onClick={fn} style={{ height: 28, padding: '0 10px', fontSize: 12, whiteSpace: 'nowrap' }}>{label}</button>
+                {(
+                  [
+                    {
+                      label: '당일',
+                      fn: () => {
+                        const d = dayjs().format('YYYY-MM-DD');
+                        onChangeFilters('fromDate', d);
+                        onChangeFilters('toDate', d);
+                      },
+                    },
+                    {
+                      label: '1주일',
+                      fn: () => {
+                        onChangeFilters('fromDate', dayjs().subtract(6, 'day').format('YYYY-MM-DD'));
+                        onChangeFilters('toDate', dayjs().format('YYYY-MM-DD'));
+                      },
+                    },
+                    {
+                      label: '1개월',
+                      fn: () => {
+                        onChangeFilters('fromDate', dayjs().subtract(1, 'month').format('YYYY-MM-DD'));
+                        onChangeFilters('toDate', dayjs().format('YYYY-MM-DD'));
+                      },
+                    },
+                  ] as { label: string; fn: () => void }[]
+                ).map(({ label, fn }) => (
+                  <button key={label} className="btn" onClick={fn} style={{ height: 28, padding: '0 10px', fontSize: 12, whiteSpace: 'nowrap' }}>
+                    {label}
+                  </button>
                 ))}
               </div>
             </div>
@@ -214,7 +253,9 @@ const ContactRoot = () => {
                 placeholder="유입 URL 검색"
                 value={filters.refererUrl}
                 onChange={(e) => onChangeFilters('refererUrl', e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') refetch(); }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') refetch();
+                }}
                 style={{ height: 32, padding: '0 8px', border: '1px solid #d9d9d9', borderRadius: 4, minWidth: 220 }}
               />
             </div>
@@ -241,14 +282,25 @@ const ContactRoot = () => {
         </div>
 
         {/* 오른쪽: ECharts TOP 20 */}
-        <div style={{ flex: 1, minWidth: 0, border: `1px solid ${isDark ? '#333350' : '#e8e8e8'}`, borderRadius: 4, background: isDark ? '#1e1e30' : '#fff', padding: '12px 8px' }}>
-          <p style={{ margin: '0 0 8px 8px', fontSize: 13, fontWeight: 600, color: chartTextColor }}>
-            유입 URL TOP 20 (건수 기준)
-          </p>
+        <div
+          style={{
+            flex: 1,
+            minWidth: 0,
+            ...contentHeightStyle,
+            border: `1px solid ${isDark ? '#333350' : '#e8e8e8'}`,
+            borderRadius: 4,
+            background: isDark ? '#1e1e30' : '#fff',
+            padding: '12px 8px',
+            boxSizing: 'border-box',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <p style={{ margin: '0 0 8px 8px', fontSize: 13, fontWeight: 600, color: chartTextColor }}>유입 URL TOP 20 (건수 기준)</p>
           {top20.length > 0 ? (
-            <ReactECharts option={chartOption} style={{ height: 420 }} />
+            <ReactECharts option={chartOption} style={{ flex: 1, minHeight: 0, width: '100%' }} />
           ) : (
-            <div style={{ height: 420, display: 'flex', alignItems: 'center', justifyContent: 'center', color: isDark ? '#555570' : '#aaa', fontSize: 13 }}>
+            <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: isDark ? '#555570' : '#aaa', fontSize: 13 }}>
               데이터가 없습니다.
             </div>
           )}
