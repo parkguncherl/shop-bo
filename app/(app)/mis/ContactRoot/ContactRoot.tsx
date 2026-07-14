@@ -300,7 +300,17 @@ const ContactRoot = () => {
           {top20.length > 0 ? (
             <ReactECharts option={chartOption} style={{ flex: 1, minHeight: 0, width: '100%' }} />
           ) : (
-            <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: isDark ? '#555570' : '#aaa', fontSize: 13 }}>
+            <div
+              style={{
+                flex: 1,
+                minHeight: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: isDark ? '#555570' : '#aaa',
+                fontSize: 13,
+              }}
+            >
               데이터가 없습니다.
             </div>
           )}
