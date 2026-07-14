@@ -139,12 +139,11 @@ const ReceivingAddPop = ({ open, onClose, onSuccess }: ReceivingAddPopProps) => 
         footer={
           <PopupFooter>
             <div className="btnArea between">
-              <div className="left">
+              <div className="left"></div>
+              <div className="right">
                 <button className="btn btn_blue" onClick={() => handleSubmit(onValid, onInvalid)()}>
                   저장
                 </button>
-              </div>
-              <div className="right">
                 <button className="btn" onClick={onClose}>
                   닫기
                 </button>
@@ -176,39 +175,22 @@ const ReceivingAddPop = ({ open, onClose, onSuccess }: ReceivingAddPopProps) => 
                   검색
                 </button>
               </div>
-              <Table>
-                <TunedGrid
-                  headerHeight={32}
-                  onGridReady={onGridReady}
-                  loading={isFetching}
-                  rowData={searchRows}
-                  columnDefs={columnDefs}
-                  defaultColDef={defaultColDef}
-                  rowSelection={{ mode: 'singleRow', enableClickSelection: true }}
-                  domLayout="normal"
-                  onRowClicked={(e) => setSelectedDet(e.data ?? null)}
-                  className="factorySettleDetailPop "
-                />
-              </Table>
-              {selectedDet && (
-                <div
-                  style={{
-                    marginTop: 8,
-                    padding: '6px 12px',
-                    background: 'var(--dark-surface-2, #f0f7ff)',
-                    border: '1px solid var(--purple, #91caff)',
-                    borderRadius: 4,
-                    fontSize: 13,
-                    color: 'var(--dark-text, #333)',
-                  }}
-                >
-                  선택: <b>{selectedDet.prodNm}</b> / {selectedDet.productDetColor} / {selectedDet.productDetSize}
-                </div>
-              )}
+              <TunedGrid
+                headerHeight={32}
+                onGridReady={onGridReady}
+                loading={isFetching}
+                rowData={searchRows}
+                columnDefs={columnDefs}
+                defaultColDef={defaultColDef}
+                rowSelection={{ mode: 'singleRow', enableClickSelection: true }}
+                domLayout="normal"
+                onRowClicked={(e) => setSelectedDet(e.data ?? null)}
+                className={'default check'}
+              />
             </div>
 
             {/* 오른쪽: 입출고 정보 */}
-            <div className="layout30">
+            <div className="layout30" style={{ borderLeft: '1px solid var(--dark-border, #e0e0e0)', paddingLeft: 20 }}>
               <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, padding: '4px 0', borderBottom: '1px solid var(--dark-border, #ddd)' }}>
                 입출고 정보
               </div>

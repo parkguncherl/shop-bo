@@ -31,6 +31,9 @@ export interface ModalShimProps {
 
 const hasFooter = (footer: React.ReactNode) => footer != null && footer !== true && footer !== false;
 
+// 모달이 열릴 때마다 증가하는 전역 z-index seed. 나중에 열린(중첩) 모달이 항상 위에 오도록 보장.
+let zSeed = 1000;
+
 export const Modal = ({
   open = false,
   onCancel,
@@ -47,7 +50,16 @@ export const Modal = ({
   children,
 }: ModalShimProps) => {
   const [mounted, setMounted] = useState(false);
+  const [zIndex, setZIndex] = useState(1000);
   useEffect(() => setMounted(true), []);
+
+  // 열릴 때마다 더 높은 z-index 부여 (중첩 모달이 부모 위에 오도록)
+  useEffect(() => {
+    if (open) {
+      zSeed += 10;
+      setZIndex(zSeed);
+    }
+  }, [open]);
 
   if (!mounted || !open) return null;
 
@@ -75,9 +87,10 @@ export const Modal = ({
 
   return createPortal(
     <div className="ant-modal-root">
-      <div className="ant-modal-mask" />
+      <div className="ant-modal-mask" style={{ zIndex }} />
       <div
         className={`ant-modal-wrap ${centered ? 'ant-modal-centered' : ''}`}
+        style={{ zIndex }}
         onClick={(e) => {
           if (maskClosable && e.target === e.currentTarget) {
             onCancel?.(e);
