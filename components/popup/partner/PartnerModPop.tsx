@@ -14,6 +14,7 @@ import { PartnerRequestDelete, PartnerRequestUpdate } from '../../../generated';
 
 type PartnerRequestUpdateExtended = PartnerRequestUpdate & {
   reviewPointRate?: number;
+  sizeInfo?: string;
   aiStudyText?: string;
   aiStudyProdDetailText?: string;
 };
@@ -94,6 +95,7 @@ const PartnerModPop = ({ datas }: Props) => {
         repNm: body.repNm,
         email: body.email,
         reviewPointRate: body.reviewPointRate,
+        sizeInfo: body.sizeInfo ?? '',
         aiStudyText: body.aiStudyText ?? '',
         aiStudyProdDetailText: body.aiStudyProdDetailText ?? '',
         creUser: body.creUser,
@@ -223,6 +225,13 @@ const PartnerModPop = ({ datas }: Props) => {
             <FormInput<PartnerRequestUpdate> control={control} name={'email'} label={'이메일'} placeholder={Placeholder.Input || ''} required={false} />
           </PopupSearchType>
           <PopupSearchType className={'type_2'}>
+            <FormInput<PartnerRequestUpdateExtended>
+              control={control}
+              name={'sizeInfo'}
+              label={'사이즈'}
+              placeholder={'예: 66,77 (콤마로 구분)'}
+              required={false}
+            />
             <FormInput<PartnerRequestUpdateExtended>
               control={control}
               name={'reviewPointRate'}

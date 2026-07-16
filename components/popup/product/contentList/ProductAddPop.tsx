@@ -352,7 +352,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
       >
         <PopupContent>
           <PopupSearchBox>
-            <PopupSearchType className={'type3'}>
+            <PopupSearchType className={'type_3'}>
               <Search.DropDown
                 title={'매장명'}
                 name={'partnerId'}

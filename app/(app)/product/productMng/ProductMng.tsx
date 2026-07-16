@@ -749,6 +749,7 @@ const ProductMng = () => {
       <ProductInfoAddPop
         //open={modals.active && (modals.type == 'PROD_INFO_ADD' || modals.type == 'PROD_DET_INFO_ADD')}
         open={modals.active && modals.type == 'PROD_INFO_ADD'}
+        sizeInfo={(productInfoList[0] as unknown as { sizeInfo?: string } | undefined)?.sizeInfo}
         onClose={() => {
           closeModal(modals.type);
         }}

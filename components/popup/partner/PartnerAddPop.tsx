@@ -11,7 +11,7 @@ import { Placeholder } from '../../../libs/const';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { CommonResponseFileDown, PartnerRequestCreate, PartnerResponsePaging } from '../../../generated';
 
-type PartnerRequestCreateExtended = PartnerRequestCreate & { reviewPointRate?: number };
+type PartnerRequestCreateExtended = PartnerRequestCreate & { reviewPointRate?: number; sizeInfo?: string };
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toastError, toastSuccess } from '../../ToastMessage';
@@ -159,6 +159,13 @@ const PartnerAddPop = ({ data }: Props) => {
             <FormInput<PartnerRequestCreate> control={control} name={'email'} label={'이메일'} placeholder={Placeholder.Input || ''} required={false} />
           </PopupSearchType>
           <PopupSearchType className={'type_2'}>
+            <FormInput<PartnerRequestCreateExtended>
+              control={control}
+              name={'sizeInfo'}
+              label={'사이즈'}
+              placeholder={'예: 66,77 (콤마로 구분)'}
+              required={false}
+            />
             <FormInput<PartnerRequestCreateExtended>
               control={control}
               name={'reviewPointRate'}

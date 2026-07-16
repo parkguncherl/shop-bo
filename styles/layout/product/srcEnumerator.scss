@@ -91,8 +91,38 @@
       }
     }
 
-    .btn_wrapper {
-      padding: 3px 0 3px 0;
-    }
+  }
+}
+/* 이미지 우클릭 컨텍스트 메뉴 */
+.imgContextMenu {
+  min-width: 120px;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+
+  li {
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #333;
+    border-radius: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover { background: #f2eefb; color: #6c3fc5; }
+    &.danger:hover { background: #fdecec; color: #d64545; }
+  }
+}
+
+[data-theme="dark"] .imgContextMenu {
+  background: #2a2a42;
+  border-color: rgba(255, 255, 255, 0.2);
+  li {
+    color: #d0d0e0;
+    &:hover { background: #3a2f5c; color: #a78bfa; }
+    &.danger:hover { background: #4a2b2b; color: #ff8a8a; }
   }
 }

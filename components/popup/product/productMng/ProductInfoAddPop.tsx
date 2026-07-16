@@ -74,6 +74,8 @@ interface ProductContentShowPopProps {
   onClose: () => void;
   onSuccess?: () => void;
   productInfo?: ProductMngResponseProductInfo;
+  /** 파트너 사이즈 정보 (콤마 구분, 예: 66,77) → 사이즈 콤보 옵션 */
+  sizeInfo?: string;
 }
 
 /**
@@ -83,9 +85,16 @@ interface ProductContentShowPopProps {
  * Author: park junsung
  * */
 // todo 현재 상세정보 추가 영역은 그리드를 통한 상세 목록으로 마이그레이션이 진행 중, 이후 해당 form 을 통한 추가 영역이 전적으로 불필요하다 판단될 시 조건부 영역 제거, 간소화
-const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductContentShowPopProps) => {
+const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
   const [insertProductInfo] = useProductMngStore((s) => [s.insertProductInfo]);
+
+  /** 파트너 사이즈 정보(콤마 구분) → label/value 동일한 콤보 옵션 */
+  const sizeOptions = (sizeInfo ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((s) => ({ key: s, value: s, label: s }));
 
   /** 팝업 내부 local state */
   const [openAddConf, setOpenAddConf] = useState<{ open: boolean; stored?: ProductMngRequestInsertProduct }>({ open: false });
@@ -270,6 +279,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
                     name={'product.prodDetTp'}
                     title={'품목상세유형'}
                     codeUpper={'90011'}
+                    placeholder={'선택'}
                     startWith={prodCd}
                   />
                 </PopupFormType>
@@ -300,12 +310,12 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo }: ProductCon
             )}
             <PopupFormGroup title={'상세'}>
               <PopupFormType className={'type2'}>
-                <FormInput<ProductInfoCreateFields>
+                <FormDropDown<ProductInfoCreateFields>
                   control={control}
                   name={'productDet.productDetSize'}
-                  label={'품목 사이즈'}
-                  inputType={'label'}
-                  placeholder={'사이즈'}
+                  title={'품목 사이즈'}
+                  options={sizeOptions}
+                  placeholder={'선택'}
                 />
                 <FormInput<ProductInfoCreateFields>
                   control={control}

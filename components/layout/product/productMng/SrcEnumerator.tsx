@@ -1,4 +1,5 @@
-﻿import React from 'react';
+﻿import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useCommonStore } from '../../../../stores';
 
 export interface SrcElement {
@@ -27,6 +28,8 @@ export interface SrcEnumeratorProps {
 }
 interface EnumElementProps {
   srcElement?: SrcElement;
+  isFirst?: boolean;
+  isLast?: boolean;
   toUpperReqHandler?: (event: ToUpperReqEvent) => void;
   oneStepMovementReqHandler?: (event: OneStepMovementReqEvent) => void;
   onImgDoubleClick?: (event: onImgDoubleClickEvent) => void;
@@ -47,7 +50,39 @@ interface DelReqHandlerEvent extends React.MouseEvent<HTMLButtonElement, MouseEv
   srcElement: SrcElement;
 }
 
-const EnumElement = ({ srcElement, toUpperReqHandler, oneStepMovementReqHandler, onImgDoubleClick, delReqHandler }: EnumElementProps) => {
+const EnumElement = ({ srcElement, isFirst, isLast, toUpperReqHandler, oneStepMovementReqHandler, onImgDoubleClick, delReqHandler }: EnumElementProps) => {
+  // 우클릭 컨텍스트 메뉴 상태 (화면 좌표)
+  const [menu, setMenu] = useState<{ x: number; y: number; e: React.MouseEvent } | null>(null);
+
+  const hasMenu = (toUpperReqHandler || oneStepMovementReqHandler || delReqHandler) && !!srcElement?.fileSrc;
+
+  const openMenu = (e: React.MouseEvent) => {
+    if (!hasMenu) return;
+    e.preventDefault();
+    setMenu({ x: e.clientX, y: e.clientY, e });
+  };
+  const closeMenu = () => setMenu(null);
+
+  // 메뉴 열림 시 외부 클릭 / ESC / 스크롤로 닫기
+  useEffect(() => {
+    if (!menu) return;
+    const onDown = () => closeMenu();
+    const onKey = (ev: KeyboardEvent) => ev.key === 'Escape' && closeMenu();
+    window.addEventListener('mousedown', onDown);
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('scroll', onDown, true);
+    return () => {
+      window.removeEventListener('mousedown', onDown);
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('scroll', onDown, true);
+    };
+  }, [menu]);
+
+  const run = (fn?: () => void) => {
+    if (fn) fn();
+    closeMenu();
+  };
+
   return (
     <div className={'enumElement'}>
       <div className={'element_container'}>
@@ -58,6 +93,7 @@ const EnumElement = ({ srcElement, toUpperReqHandler, oneStepMovementReqHandler,
               onDoubleClick={(e) => {
                 if (onImgDoubleClick) onImgDoubleClick({ ...e, srcElement: srcElement });
               }}
+              onContextMenu={openMenu}
             >
               <img src={srcElement.fileSrc} />
             </div>
@@ -67,37 +103,33 @@ const EnumElement = ({ srcElement, toUpperReqHandler, oneStepMovementReqHandler,
             </div>
           )}
         </div>
-        <div className={'btn_wrapper'}>
-          {(toUpperReqHandler || oneStepMovementReqHandler || delReqHandler) && srcElement?.fileSrc && (
-            <div className={'btnArea between'}>
-              <div className={'left'}>
-                {toUpperReqHandler && (
-                  <button className={'btn btnPurple'} onClick={(e) => toUpperReqHandler({ ...e, srcElement: srcElement })}>
-                    맨 위로
-                  </button>
-                )}
-                {delReqHandler && (
-                  <button className={'btn'} onClick={(e) => delReqHandler({ ...e, srcElement: srcElement })}>
-                    삭제
-                  </button>
-                )}
-              </div>
-              <div className={'right'}>
-                {oneStepMovementReqHandler && (
-                  <>
-                    <button className={'btn btnPurple'} onClick={(e) => oneStepMovementReqHandler({ ...e, srcElement: srcElement, direction: 'up' })}>
-                      위로
-                    </button>
-                    <button className={'btn'} onClick={(e) => oneStepMovementReqHandler({ ...e, srcElement: srcElement, direction: 'down' })}>
-                      아래로
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
       </div>
+
+      {/* 우클릭 컨텍스트 메뉴 (상위 transform 영향 배제 위해 body 로 portal) */}
+      {menu &&
+        srcElement &&
+        createPortal(
+          <ul
+            className={'imgContextMenu'}
+            style={{ position: 'fixed', top: menu.y, left: menu.x, zIndex: 2000 }}
+            onMouseDown={(e) => e.stopPropagation()}
+            onContextMenu={(e) => e.preventDefault()}
+          >
+            {toUpperReqHandler && <li onClick={() => run(() => toUpperReqHandler({ ...menu.e, srcElement } as ToUpperReqEvent))}>맨 위로</li>}
+            {oneStepMovementReqHandler && !isFirst && (
+              <li onClick={() => run(() => oneStepMovementReqHandler({ ...menu.e, srcElement, direction: 'up' } as OneStepMovementReqEvent))}>위로</li>
+            )}
+            {oneStepMovementReqHandler && !isLast && (
+              <li onClick={() => run(() => oneStepMovementReqHandler({ ...menu.e, srcElement, direction: 'down' } as OneStepMovementReqEvent))}>아래로</li>
+            )}
+            {delReqHandler && (
+              <li className={'danger'} onClick={() => run(() => delReqHandler({ ...menu.e, srcElement } as DelReqHandlerEvent))}>
+                삭제
+              </li>
+            )}
+          </ul>,
+          document.body,
+        )}
     </div>
   );
 };
@@ -186,6 +218,8 @@ const SrcEnumerator = ({ srcInfo, title, callBack, children }: SrcEnumeratorProp
               <EnumElement
                 key={index}
                 srcElement={srcElement}
+                isFirst={index === 0}
+                isLast={index === srcInfo.srcElements.length - 1}
                 toUpperReqHandler={
                   srcElement.fileSeq != undefined && srcElement.fileSeq != 1
                     ? (event) => {

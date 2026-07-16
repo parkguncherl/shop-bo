@@ -49,7 +49,7 @@ export const BaseInputAtom = function BaseInputAtom({
         <input
           type={showPw ? 'text' : 'password'}
           name={name}
-          value={value}
+          value={value ?? ''}
           style={{ ...style, paddingRight: 30, width: '100%' }}
           placeholder={placeholder}
           onChange={onChange}
