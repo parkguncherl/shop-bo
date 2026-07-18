@@ -38,21 +38,21 @@ const darkAntStyles = `
 
   /* ── Modal ── */
   .ant-modal-content {
-    background-color: #1e1e30 !important;
+    background-color: #252538 !important;
     box-shadow: 0 0 0 1px rgba(255,255,255,0.55), 0 8px 40px rgba(0,0,0,0.65) !important;
     outline: none !important;
   }
   .ant-modal-header {
-    background-color: #1e1e30 !important;
+    background-color: #252538 !important;
     border-bottom: 1px solid rgba(255,255,255,0.12) !important;
     margin-bottom: 0 !important;
     padding: 20px 50px 15px !important;
   }
   .ant-modal-body {
-    background-color: #1e1e30 !important;
+    background-color: #252538 !important;
   }
   .ant-modal-footer {
-    background-color: #1e1e30 !important;
+    background-color: #252538 !important;
     border-top: 1px solid rgba(255,255,255,0.12) !important;
     margin-top: 0 !important;
   }

@@ -89,7 +89,7 @@ export const BaseInputAtom = function BaseInputAtom({
     <input
       type={type}
       name={name}
-      value={value}
+      value={value ?? ''}
       style={style}
       placeholder={placeholder}
       onChange={onChange}

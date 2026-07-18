@@ -715,10 +715,16 @@
     border-color: var(--dark-border) !important;
     &::placeholder { color: #555570 !important; }
   }
-  // 모달 본문 폼 레이블/셀 (팝업 pop_search_box dt/dd 흰 배경 오버라이드)
+  // 팝목 폼 그룹 타이틀 바 (품목정보/상세 등) — 페이지 배경(거의 검정) 대신 밝은 톤
+  .popupFormBox .popupFormGroup h4 {
+    background-color: #2f2f47 !important;
+    color: var(--dark-text) !important;
+  }
+
+  // 모달 본문 폼 레이블/셀 (라벨 뒤 밝은 블록 제거 → 모달 배경에 녹임)
   .ant-modal-body {
     dl dt {
-      background-color: var(--dark-surface) !important;
+      background-color: transparent !important;
       border-color: var(--dark-border) !important;
       label { color: var(--dark-text) !important; }
     }
