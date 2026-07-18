@@ -20,23 +20,7 @@ import dayjs from 'dayjs';
 
 /** form 영역 입력 인터페이스 */
 export interface ProductModFields extends ProductMngRequestUpdateProduct {
-  // prodNm: string;
-  // prodTp: string;
-  // prodDetTp: string;
-  // composition: string;
-  // // repFileId?: number;
-  // // detailFileId?: number;
-  // // sizeFileId?: number;
-  // // etcFileId?: number;
-  // makeYmd: string;
-  // orgAmt: number;
-  // sellAmt: number;
-  // discountRate?: number;
   weather: ('spring' | 'summer' | 'autumn' | 'winter')[];
-  // isSpring?: string;
-  // isSummer?: string;
-  // isAutumn?: string;
-  // isWinter?: string;
 }
 
 interface ProductContentShowPopProps {
@@ -187,7 +171,7 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
         width={900}
         open={open}
         isEscClose={true}
-        title={'[' + productInfo?.prodNm + '] 의 정보를 수정'}
+        title={'[' + productInfo?.prodNm + ' / ' + productInfo?.id + '] 의 정보를 수정'}
         onClose={onClose}
         footer={
           <PopupFooter>
