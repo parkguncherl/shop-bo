@@ -2,6 +2,9 @@
 .layoutBox {
   display: flex;
   justify-content: space-between;
+  & .layout75 {
+    width: calc(75% - 5px);
+  }
   & .layout70 {
     width: calc(70% - 5px);
   }
@@ -38,6 +41,9 @@
   }
   & .layout30 {
     width: calc(30% - 5px);
+  }
+  & .layout25 {
+    width: calc(25% - 5px);
   }
   & .layout20 {
     width: calc(20% - 5px);

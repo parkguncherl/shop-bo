@@ -379,15 +379,15 @@ const ProductMng = () => {
         suppressHeaderMenuButton: true,
         cellStyle: GridSetting.CellStyle.CENTER,
       },
-      /*
       {
         field: 'sizeFileIdCnt',
-        headerName: '사이즈이미지',
-        minWidth: 80,
-        maxWidth: 80,
+        headerName: 'SIZE',
+        minWidth: 40,
+        maxWidth: 40,
         suppressHeaderMenuButton: true,
         cellStyle: GridSetting.CellStyle.CENTER,
       },
+      /*
       { field: 'etcFileIdCnt', headerName: '기타이미지', minWidth: 80, maxWidth: 80, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
 */
     ],
@@ -544,7 +544,7 @@ const ProductMng = () => {
       <Table>
         <div className="tblPreview">
           <div className="layoutBox">
-            <div className={'layout70'}>
+            <div className={'layout75'}>
               <TableHeader count={productInfoList.length} search={search}></TableHeader>
               <TunedGrid<ProductMngResponseProductInfo>
                 headerHeight={35}
@@ -618,7 +618,7 @@ const ProductMng = () => {
                 </div>
               </div>
             </div>
-            <div className={'layout30'}>
+            <div className={'layout25'}>
               <SrcEnumerator
                 title={{
                   left: !targetedFileSetInfo
