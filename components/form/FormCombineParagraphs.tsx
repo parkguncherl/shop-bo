@@ -436,7 +436,7 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
                             <div className={'btnArea between'}>
                               {contentElement.fileInfo.file?.name && <p>{contentElement.fileInfo.file.name}</p>}
                               <button
-                                className="btn btnPurple"
+                                className="btn btn_primary"
                                 onClick={() => {
                                   controlChange([...value.filter((prev: ContentElement) => prev.id != contentElement.id)]); // 지움 동작
                                 }}
@@ -667,7 +667,7 @@ const FormCombineParagraphs = <TForm extends FieldValues>({
                                 <div className={'btnArea between'}>
                                   {contentElement.fileInfo.file?.name && <p>{contentElement.fileInfo.file.name}</p>}
                                   <button
-                                    className="btn btnPurple"
+                                    className="btn btn_primary"
                                     onClick={() => {
                                       controlChange([...value.filter((prev: ContentElement) => prev.id != contentElement.id)]); // 지움 동작
                                     }}

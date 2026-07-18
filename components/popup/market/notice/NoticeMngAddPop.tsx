@@ -74,7 +74,7 @@ const NoticeMngAddPop = ({ open, onClose, onSuccess }: Props) => {
           <PopupFooter>
             <div className="btnArea between">
               <div className="left">
-                <button className="btn btnPurple" onClick={handleSubmit(onValid, () => toastError('필수 항목을 확인해주세요.'))}>저장</button>
+                <button className="btn btn_primary" onClick={handleSubmit(onValid, () => toastError('필수 항목을 확인해주세요.'))}>저장</button>
               </div>
               <div className="right">
                 <button className="btn" onClick={handleClose}>닫기</button>

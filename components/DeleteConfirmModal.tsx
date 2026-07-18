@@ -26,7 +26,7 @@ export function DeleteConfirmModal({ dispTitle, open, width, style, onConfirm, o
             {isLoading ? (
               <button className={'btn'}>{'처리중'}</button>
             ) : (
-              <button className={'btn btnPurple'} onClick={onConfirm}>
+              <button className={'btn btn_primary'} onClick={onConfirm}>
                 {'확인'}
               </button>
             )}

@@ -169,7 +169,7 @@ const PartnerModPop = ({ datas }: Props) => {
             <button className="btn" title="삭제" onClick={(e) => setConfirmModal(true)}>
               삭제
             </button>
-            <button className="btn btnPurple" title="저장" onClick={handleSubmit(onValid)}>
+            <button className="btn btn_primary" title="저장" onClick={handleSubmit(onValid)}>
               저장
             </button>
             <button className="btn" title="닫기" onClick={() => closeModal('MOD')}>

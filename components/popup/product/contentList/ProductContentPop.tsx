@@ -338,7 +338,7 @@ const ProductContentPop = ({ open, onClose, onSuccess, mode = 'ADD', productCont
             <div className="btnArea between">
               <div className="left">
                 <button
-                  className={mode == 'SHOW' ? 'btn' : 'btn btnPurple'}
+                  className={mode == 'SHOW' ? 'btn' : 'btn btn_primary'}
                   onClick={() => {
                     const title = getValues('title');
                     const content = getValues('content');

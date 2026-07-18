@@ -110,7 +110,7 @@ const PartnerAddPop = ({ data }: Props) => {
       footer={
         <PopupFooter>
           <div className="btnArea">
-            <button className="btn btnPurple" title="저장" onClick={handleSubmit(onValid)}>
+            <button className="btn btn_primary" title="저장" onClick={handleSubmit(onValid)}>
               저장
             </button>
             <button className="btn" title="닫기" onClick={() => closeModal('ADD')}>

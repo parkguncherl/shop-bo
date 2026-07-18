@@ -234,7 +234,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
             <div className="btnArea between">
               <div className="left">
                 <button
-                  className="btn btnPurple"
+                  className="btn btn_primary"
                   onClick={() => {
                     handleSubmit(onValid, onInvalid)(); // 함수를 반환하므로 다음과 같이, 호출하여야
                   }}

@@ -51,7 +51,7 @@ const PopupNoticeMngAddPop = ({ open, onClose, onSuccess }: Props) => {
         footer={
           <PopupFooter>
             <div className="btnArea">
-              <button className="btn btnPurple" onClick={handleSave}>저장</button>
+              <button className="btn btn_primary" onClick={handleSave}>저장</button>
               <button className="btn" onClick={handleClose}>닫기</button>
             </div>
           </PopupFooter>

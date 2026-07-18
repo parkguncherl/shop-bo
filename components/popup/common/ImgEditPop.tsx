@@ -63,7 +63,7 @@ const ImgEditPop = ({ open, onClose, imgProps, onFileIsExportedByConf }: ImgEdit
             <div className="btnArea between">
               <div className="left">
                 <button
-                  className="btn btnPurple"
+                  className="btn btn_primary"
                   onClick={() => {
                     canvasByKonvaRef.current?.customs.api.addNewText();
                   }}
@@ -72,7 +72,7 @@ const ImgEditPop = ({ open, onClose, imgProps, onFileIsExportedByConf }: ImgEdit
                 </button>
 
                 <button
-                  className="btn btnPurple"
+                  className="btn btn_primary"
                   onClick={() => {
                     canvasByKonvaRef.current?.customs.api.addNewDimensionLine();
                   }}
@@ -81,7 +81,7 @@ const ImgEditPop = ({ open, onClose, imgProps, onFileIsExportedByConf }: ImgEdit
                 </button>
 
                 <button
-                  className={'btn ' + (!preview ? 'btnPurple' : '')}
+                  className={'btn ' + (!preview ? 'btn_primary' : '')}
                   onClick={() => {
                     setPreview(!preview);
                   }}
@@ -89,7 +89,7 @@ const ImgEditPop = ({ open, onClose, imgProps, onFileIsExportedByConf }: ImgEdit
                   {!preview ? '미리보기' : '편집'}
                 </button>
                 <button
-                  className="btn btnPurple"
+                  className="btn btn_primary"
                   disabled={!preview}
                   onClick={() => {
                     canvasByKonvaRef.current!.customs.api.exportAsFile().then((file: File | null) => {

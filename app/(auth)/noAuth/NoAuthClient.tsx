@@ -23,7 +23,7 @@ const NoAuthClient = () => {
             </button>
           </div>
           <div className={'btn_box'}>
-            <button className={'btnPurple'} onClick={() => router.push('/', undefined)}>
+            <button className={'btn_primary'} onClick={() => router.push('/', undefined)}>
               {'홈 바로가기'}
             </button>
           </div>

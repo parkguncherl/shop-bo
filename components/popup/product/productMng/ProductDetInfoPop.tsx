@@ -508,7 +508,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
               <div className="left">
                 <button
                   className={`btn ${
-                    productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length != 0 ? (isValid ? 'btnPurple' : '') : 'btnPurple'
+                    productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length != 0 ? (isValid ? 'btn_primary' : '') : 'btn_primary'
                   }`}
                   disabled={productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length != 0 ? !isValid : false}
                   onClick={() => {
@@ -528,7 +528,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
                   {productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length == 0 ? '신규 작성' : isValid ? '저장' : '작성중..'}
                 </button>
                 <button
-                  className={`btn ${productInfo != undefined && selectedRowsData != undefined && 'btnPurple'}`}
+                  className={`btn ${productInfo != undefined && selectedRowsData != undefined && 'btn_primary'}`}
                   disabled={productInfo == undefined || selectedRowsData == undefined}
                   onClick={() => {
                     if (selectedRowsData?.id) {

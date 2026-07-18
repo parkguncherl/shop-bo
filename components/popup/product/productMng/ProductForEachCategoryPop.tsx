@@ -449,7 +449,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
             <div className="btnArea between">
               <div className="left">
                 {/*<button*/}
-                {/*  className={`btn ${selectedProductInfoByCategory != undefined && filtersForProdInfoByCategory.categoryId && 'btnPurple'}`}*/}
+                {/*  className={`btn ${selectedProductInfoByCategory != undefined && filtersForProdInfoByCategory.categoryId && 'btn_primary'}`}*/}
                 {/*  disabled={selectedProductInfoByCategory === undefined}*/}
                 {/*  onClick={() => {*/}
                 {/*    setModalsStatus({*/}
@@ -484,7 +484,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                 {/*  {'카테고리에서 삭제'}*/}
                 {/*</button>*/}
                 {/*<button*/}
-                {/*  className={`btn ${selectedProductInfo != undefined && filtersForProdInfoByCategory.categoryId && 'btnPurple'}`}*/}
+                {/*  className={`btn ${selectedProductInfo != undefined && filtersForProdInfoByCategory.categoryId && 'btn_primary'}`}*/}
                 {/*  disabled={selectedProductInfo == undefined || !filtersForProdInfoByCategory.categoryId}*/}
                 {/*  onClick={() => {*/}
                 {/*    setModalsStatus({*/}

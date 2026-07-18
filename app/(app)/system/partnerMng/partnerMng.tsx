@@ -237,7 +237,7 @@ const PartnerMng = () => {
         </div>
         <div className={'btnArea'}>
           <button
-            className={'btn btnPurple'}
+            className={'btn btn_primary'}
             onClick={() => {
               setSelectedPartner({});
               openModal('ADD');

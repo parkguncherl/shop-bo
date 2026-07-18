@@ -153,28 +153,6 @@
     }
   }
 }
-.btnPurple.btn {
-  background-color: #6c3fc5;
-  border: 1px solid #6c3fc5;
-  color: #fff;
-  &:hover {
-    background-color: #5a33a8;
-    border-color: #5a33a8;
-    color: #fff;
-  }
-  &:active {
-    transform: scale(.9);
-  }
-  &:disabled {
-    background-color: #b49de0;
-    border-color: #b49de0;
-    color: #fff;
-    cursor: no-drop;
-    &:active {
-      transform: scale(1);
-    }
-  }
-}
 .btnRed.btn {
   background-color: #fff;
   border: 1px solid var(--red-color);
@@ -525,5 +503,14 @@ button[class*="btn_"] {
   font-size: var(--s-size);
   color: #666;
   cursor: pointer;
+  transition: background-color .15s, border-color .15s;
+
+  &:hover:not(:disabled) {
+    background-color: #eceef1;
+    border-color: #c5c9ce;
+  }
+  &:active:not(:disabled) {
+    background-color: #e0e3e7;
+  }
 }
 

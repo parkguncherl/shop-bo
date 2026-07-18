@@ -200,7 +200,7 @@ export function ConfirmModal<FT extends FieldValues>({
           </div>
           <div className="right">
             <button
-              className={'btn btnPurple'}
+              className={'btn btn_primary'}
               ref={buttonConfConfirmRef}
               tabIndex={0}
               onClick={() => {

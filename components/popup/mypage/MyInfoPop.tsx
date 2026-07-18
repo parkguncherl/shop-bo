@@ -122,7 +122,7 @@ export const MyInfoPop = ({ open, onClose }: Props) => {
       footer={
         <PopupFooter>
           <div className="btnArea right">
-            <button className="btn btnPurple" onClick={handleSubmit(onValid)} disabled={isPending}>
+            <button className="btn btn_primary" onClick={handleSubmit(onValid)} disabled={isPending}>
               저장
             </button>
             <button className="btn" onClick={onClose}>

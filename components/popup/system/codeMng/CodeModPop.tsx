@@ -140,7 +140,7 @@ export const CodeModPop = ({ data }: Props) => {
               ? menuUpdYn && (
                   <PopupFooter>
                     <div className={'btnArea'}>
-                      <button className={'btn btnPurple'} onClick={handleSubmit(onValid)}>
+                      <button className={'btn btn_primary'} onClick={handleSubmit(onValid)}>
                         {'저장'}
                       </button>
                       <button className={'btn '} onClick={() => closeModal('MOD')}>
@@ -152,7 +152,7 @@ export const CodeModPop = ({ data }: Props) => {
               : menuUpdYn && (
                   <PopupFooter>
                     <div className={'btnArea'}>
-                      <button className={'btn btnPurple'} onClick={handleSubmit(onValid)}>
+                      <button className={'btn btn_primary'} onClick={handleSubmit(onValid)}>
                         {'저장'}
                       </button>
                       <button className={'btn '} onClick={() => closeModal('MOD')}>

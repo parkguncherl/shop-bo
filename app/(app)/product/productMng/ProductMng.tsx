@@ -569,7 +569,7 @@ const ProductMng = () => {
               <div className="btnArea between">
                 <div className="left">
                   <button
-                    className={'btn btnPurple'}
+                    className={'btn btn_primary'}
                     onClick={() => {
                       partnerCodeOpenModal('PARTNER_CODE_OPEN');
                     }}
@@ -577,7 +577,7 @@ const ProductMng = () => {
                     카테고리
                   </button>
                   <button
-                    className={'btn btnPurple'}
+                    className={'btn btn_primary'}
                     onClick={() => {
                       openModal('PROD_BY_CATEGORY');
                     }}
@@ -587,7 +587,7 @@ const ProductMng = () => {
                 </div>
                 <div className="right">
                   <button
-                    className={'btn btnPurple'}
+                    className={'btn btn_primary'}
                     onClick={() => {
                       openModal('PROD_INFO_ADD');
                     }}
@@ -595,7 +595,7 @@ const ProductMng = () => {
                     품목추가
                   </button>
                   {/*<button*/}
-                  {/*  className={`btn ${selectedRowsData != undefined && 'btnPurple'}`}*/}
+                  {/*  className={`btn ${selectedRowsData != undefined && 'btn_primary'}`}*/}
                   {/*  disabled={selectedRowsData == undefined}*/}
                   {/*  onClick={() => {*/}
                   {/*    openModal('PROD_DET_INFO_ADD');*/}
@@ -604,7 +604,7 @@ const ProductMng = () => {
                   {/*  {`${selectedRowsData == undefined ? '상세정보 추가할 품목 선택' : '상세정보'}`}*/}
                   {/*</button>*/}
                   <button
-                    className={`btn btnPurple`}
+                    className={`btn btn_primary`}
                     onClick={() => {
                       if (selectedRowsData == undefined) {
                         toastError('품목 상세를 보시고자 하는 ROW 를 선택하세요');
@@ -693,7 +693,7 @@ const ProductMng = () => {
                       <div className="left"></div>
                       <div className="right">
                         <button
-                          className={'btn btnPurple'}
+                          className={'btn btn_primary'}
                           onClick={() => {
                             openModal('INIT_BOARD');
                           }}
@@ -701,7 +701,7 @@ const ProductMng = () => {
                           {'빈 캔버스'}
                         </button>
                         <button
-                          className={'btn btnPurple'}
+                          className={'btn btn_primary'}
                           onClick={() => {
                             openModal('IMG_UPLOAD');
                           }}

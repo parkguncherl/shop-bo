@@ -655,7 +655,7 @@
   // ── 버튼 ────────────────────────────────────────────────
   .btn {
     &.white,
-    &:not([class*="btnBlue"]):not([class*="btnPurple"]):not([class*="btnRed"]):not([class*="btnBlack"]):not([class*="btnGray"]) {
+    &:not([class*="btnBlue"]):not([class*="btnRed"]):not([class*="btnBlack"]):not([class*="btnGray"]) {
       background-color: #2a2a40 !important;
       border: 1px solid rgba(255, 255, 255, 0.2) !important;
       color: var(--dark-text) !important;

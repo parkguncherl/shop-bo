@@ -171,7 +171,7 @@ export const AccountAddPop = ({ open, onClose }: AccountAddPopProps) => {
               <div className={'btnArea between'}>
                 <div className="left"></div>
                 <div className="right">
-                  <button className={'btn btnPurple'} onClick={handleSubmit(onValid)}>
+                  <button className={'btn btn_primary'} onClick={handleSubmit(onValid)}>
                     저장
                   </button>
                   <button className={'btn '} onClick={onClose}>

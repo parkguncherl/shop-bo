@@ -358,11 +358,11 @@ const Receiving = () => {
       </Table>
       <div className="btnArea between">
         <div className="right">
-          <button className="btn btnPurple" onClick={() => openModal('RECEIVING_ADD')}>
+          <button className="btn btn_primary" onClick={() => openModal('RECEIVING_ADD')}>
             입고/출고 등록
           </button>
           <button
-            className="btn btnPurple"
+            className="btn btn_primary"
             onClick={() => {
               const api = gridRef.current?.api;
               const selectedNode = api?.getSelectedNodes();
@@ -376,7 +376,7 @@ const Receiving = () => {
             수정
           </button>
           <button
-            className="btn btnPurple"
+            className="btn btn_primary"
             onClick={() => {
               const api = gridRef.current?.api;
               const selectedNode = api?.getSelectedNodes();

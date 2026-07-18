@@ -166,7 +166,7 @@ export const MenuAuthPop = ({ data, callback }: Props) => {
         footer={
           <PopupFooter>
             <div className={'btnArea'}>
-              <button className="btn btnPurple" onClick={updateAuthFn}>
+              <button className="btn btn_primary" onClick={updateAuthFn}>
                 저장
               </button>
               <button className="btn" onClick={() => closeModal('AUTH_MOD')}>

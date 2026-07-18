@@ -105,7 +105,7 @@ export const CodeAddPop = ({ data }: Props) => {
             <PopupFooter>
               <div className={'btnArea'}>
                 <button
-                  className={'btn btnPurple'}
+                  className={'btn btn_primary'}
                   onClick={(e) => {
                     handleSubmit(onValid, onInvalid)(e);
                   }}

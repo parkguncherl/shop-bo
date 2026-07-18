@@ -420,7 +420,7 @@ const ProdGroupMng = () => {
             <div className="btnArea between">
               <div className="left">
                 <button
-                  className={'btn btnPurple'}
+                  className={'btn btn_primary'}
                   onClick={() => {
                     openModal('ADD');
                   }}
@@ -428,7 +428,7 @@ const ProdGroupMng = () => {
                   {'신규'}
                 </button>
                 <button
-                  className={selectedRowsData == undefined ? 'btn' : 'btn btnPurple'}
+                  className={selectedRowsData == undefined ? 'btn' : 'btn btn_primary'}
                   disabled={selectedRowsData == undefined}
                   onClick={() => {
                     openModal('MOD', selectedRowsData);
@@ -437,7 +437,7 @@ const ProdGroupMng = () => {
                   {'수정'}
                 </button>
                 <button
-                  className={'btn btnPurple'}
+                  className={'btn btn_primary'}
                   onClick={() => {
                     const selectedRows = gridRef.current?.api.getSelectedRows();
                     if (selectedRows && selectedRows.length > 0) {
@@ -450,7 +450,7 @@ const ProdGroupMng = () => {
                   {'삭제'}
                 </button>
                 <button
-                  className={selectedRowsData == undefined ? 'btn' : 'btn btnPurple'}
+                  className={selectedRowsData == undefined ? 'btn' : 'btn btn_primary'}
                   disabled={selectedRowsData == undefined}
                   onClick={() => openModal('PREVIEW', selectedRowsData)}
                 >
@@ -459,7 +459,7 @@ const ProdGroupMng = () => {
               </div>
               <div className="right">
                 <button
-                  className={'btn btnPurple'}
+                  className={'btn btn_primary'}
                   onClick={() => {
                     if (selectedRowsData) {
                       openModal('ADD_PROD');
@@ -508,7 +508,7 @@ const ProdGroupMng = () => {
               <div className="left"></div>
               <div className="right">
                 <button
-                  className={'btn btnPurple'}
+                  className={'btn btn_primary'}
                   onClick={() => {
                     // todo
                   }}

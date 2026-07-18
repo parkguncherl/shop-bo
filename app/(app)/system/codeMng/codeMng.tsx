@@ -291,7 +291,7 @@ const CodeMng = () => {
           className={'wmsDefault'}
         />
         <div className={'btnArea'}>
-          <button className={'btn btnPurple'} onClick={() => openModal('ADD')}>
+          <button className={'btn btn_primary'} onClick={() => openModal('ADD')}>
             신규
           </button>
           {menuExcelYn && (

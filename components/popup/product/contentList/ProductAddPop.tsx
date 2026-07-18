@@ -321,7 +321,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
               <div></div>
               <div className="right">
                 <button
-                  className="btn btnPurple"
+                  className="btn btn_primary"
                   onClick={() => {
                     if (selectedRowsDataList.length == 0) {
                       toastError('추가하고자 하는 품목을 하나 이상 선택하십시요.');

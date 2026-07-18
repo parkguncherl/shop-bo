@@ -132,7 +132,7 @@ const ProductContents = () => {
                 <div className={'btn-wrapper'}>
                   <div className={'btn-per-wrapper'}>
                     <button
-                      className={'btn btnPurple'}
+                      className={'btn btn_primary'}
                       onClick={() => {
                         if (errors.content == undefined) {
                           openModal('ADD_CONF');
