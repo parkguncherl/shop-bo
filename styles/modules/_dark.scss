@@ -659,9 +659,11 @@
       background-color: #2a2a40 !important;
       border: 1px solid rgba(255, 255, 255, 0.2) !important;
       color: var(--dark-text) !important;
+      // hover: 브랜드 틴트 (테두리·글자 퍼플, 배경 옅은 퍼플)
       &:hover {
-        background-color: #383855 !important;
-        border-color: rgba(255, 255, 255, 0.4) !important;
+        background-color: #2f2648 !important;
+        border-color: #a78bfa !important;
+        color: #c4b5fd !important;
       }
       &:disabled {
         background-color: #1e1e2e !important;

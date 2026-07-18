@@ -503,14 +503,16 @@ button[class*="btn_"] {
   font-size: var(--s-size);
   color: #666;
   cursor: pointer;
-  transition: background-color .15s, border-color .15s;
+  transition: background-color .15s, border-color .15s, color .15s;
 
+  // hover: 브랜드 틴트 (테두리·글자 퍼플, 배경 옅은 퍼플)
   &:hover:not(:disabled) {
-    background-color: #eceef1;
-    border-color: #c5c9ce;
+    background-color: #f2eefb;
+    border-color: #6c3fc5;
+    color: #6c3fc5;
   }
   &:active:not(:disabled) {
-    background-color: #e0e3e7;
+    background-color: #e7ddf7;
   }
 }
 
