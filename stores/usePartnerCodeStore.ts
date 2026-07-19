@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { AxiosPromise } from 'axios';
-import { authApi } from '../libs';
+import { authApi } from '@/libs';
 import { StateCreator } from 'zustand';
 import {
   ApiResponse,
@@ -16,9 +16,9 @@ import {
   PartnerCodeRequestSoftDelete,
   PartnerCodeResponseLowerSelect,
   PartnerCodeResponsePaging,
-} from '../generated';
+} from '@/generated';
 
-type ModalType = 'PARTNER_CODE_OPEN';
+type ModalType = 'PARTNER_CODE_P0001_OPEN' | 'PARTNER_CODE_P0006_OPEN';
 
 interface ModalState {
   type: ModalType;
@@ -49,7 +49,7 @@ interface PartnerCodeApiState {
 
 const initialStateCreator: StateCreator<PartnerCodeState & PartnerCodeApiState, any> = (set, get, api) => {
   return {
-    modals: { type: 'PARTNER_CODE_OPEN', active: false, stored_temporary: undefined },
+    modals: { type: 'PARTNER_CODE_P0001_OPEN', active: false, stored_temporary: undefined },
     openModal: (type: any, stored_temp: any) => {
       set((state) => ({
         modals: {

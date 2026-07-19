@@ -571,10 +571,18 @@ const ProductMng = () => {
                   <button
                     className={'btn btn_primary'}
                     onClick={() => {
-                      partnerCodeOpenModal('PARTNER_CODE_OPEN');
+                      partnerCodeOpenModal('PARTNER_CODE_P0001_OPEN');
                     }}
                   >
                     카테고리
+                  </button>
+                  <button
+                    className={'btn btn_primary'}
+                    onClick={() => {
+                      partnerCodeOpenModal('PARTNER_CODE_P0006_OPEN');
+                    }}
+                  >
+                    협력업체관리
                   </button>
                   <button
                     className={'btn btn_primary'}
@@ -787,9 +795,16 @@ const ProductMng = () => {
       <PartnerCodePop
         partnerCodeUpper={PARTNER_CODE.categories.code}
         title={'품목카테고리관리'}
-        activated={partnerCodeModals?.type === 'PARTNER_CODE_OPEN' && partnerCodeModals.active}
+        activated={partnerCodeModals?.type === 'PARTNER_CODE_P0001_OPEN' && partnerCodeModals.active}
         codeName={PARTNER_CODE.categories.name}
-        onCloseRequestEmerged={() => partnerCodeCloseModal('PARTNER_CODE_OPEN')}
+        onCloseRequestEmerged={() => partnerCodeCloseModal('PARTNER_CODE_P0001_OPEN')}
+      />
+      <PartnerCodePop
+        partnerCodeUpper={PARTNER_CODE.domae.code}
+        title={'협력업체관리'}
+        activated={partnerCodeModals?.type === 'PARTNER_CODE_P0006_OPEN' && partnerCodeModals.active}
+        codeName={PARTNER_CODE.domae.name}
+        onCloseRequestEmerged={() => partnerCodeCloseModal('PARTNER_CODE_P0006_OPEN')}
       />
       <ProductForEachCategoryPop open={modals.type == 'PROD_BY_CATEGORY' && modals.active} onClose={() => closeModal('PROD_BY_CATEGORY')} />
       <ConfirmModal

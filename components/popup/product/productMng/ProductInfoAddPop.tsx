@@ -9,64 +9,25 @@ import FormInput from '../../../form/FormInput';
 import { SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { YupSchema } from '../../../../libs';
-import { toastError, toastSuccess } from '../../../ToastMessage';
+import { YupSchema } from '@/libs';
+import { toastError, toastSuccess } from '@/components';
 import { ConfirmModal } from '../../../ConfirmModal';
 import { ProductMngRequestInsertProduct, ProductMngRequestInsertProductDet, ProductMngResponseProductInfo } from '../../../../generated';
-import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
+import { useProductMngStore } from '@/stores/product/useProductMngStore';
 import FormDropDown from '../../../form/FormDropDown';
 import FormDatePicker from '../../../form/FormDatePicker';
 import dayjs from 'dayjs';
+import { usePartnerCodeList } from '@/customHook/usePartnerCodeList';
 
 /** form 영역 입력 인터페이스 */
+export interface ProductCreateFields extends ProductMngRequestInsertProduct {
+  weather: ('spring' | 'summer' | 'autumn' | 'winter')[];
+}
+
 export interface ProductInfoCreateFields {
-  // id?: number;
-  // prodNm: string;
-  // prodTp: string;
-  // prodDetTp: string;
-  // composition: string;
-  // repFileId?: number;
-  // detailFileId?: number;
-  // sizeFileId?: number;
-  // etcFileId?: number;
-  // makeYmd: string;
-  // orgAmt: number;
-  // sellAmt: number;
-  // discountRate?: number;
-  // // isSpring?: string;
-  // // isSummer?: string;
-  // // isAutumn?: string;
-  // // isWinter?: string;
   id?: number;
   product?: ProductCreateFields;
-  productDet: ProductDetCreateFields;
-}
-export interface ProductCreateFields extends ProductMngRequestInsertProduct {
-  // prodNm: string;
-  // prodTp: string;
-  // prodDetTp: string;
-  // composition: string;
-  // // repFileId?: number;
-  // // detailFileId?: number;
-  // // sizeFileId?: number;
-  // // etcFileId?: number;
-  // makeYmd: string;
-  // orgAmt: number;
-  // sellAmt: number;
-  // discountRate?: number;
-  weather: ('spring' | 'summer' | 'autumn' | 'winter')[];
-  // isSpring?: string;
-  // isSummer?: string;
-  // isAutumn?: string;
-  // isWinter?: string;
-}
-export interface ProductDetCreateFields extends ProductMngRequestInsertProductDet {
-  // productDetSeq: number;
-  // productDetSize: string;
-  // productDetColor: string;
-  // skuDiscountRate: number;
-  // //fileId?: number;
-  // sleepYn: string;
+  productDet: ProductMngRequestInsertProductDet;
 }
 
 interface ProductContentShowPopProps {
@@ -87,6 +48,7 @@ interface ProductContentShowPopProps {
 // todo 현재 상세정보 추가 영역은 그리드를 통한 상세 목록으로 마이그레이션이 진행 중, 이후 해당 form 을 통한 추가 영역이 전적으로 불필요하다 판단될 시 조건부 영역 제거, 간소화
 const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
+  const domaeCodeList = usePartnerCodeList({ codeUpper: 'P0006' });
   const [insertProductInfo] = useProductMngStore((s) => [s.insertProductInfo]);
 
   /** 파트너 사이즈 정보(콤마 구분) → label/value 동일한 콤보 옵션 */
@@ -305,6 +267,15 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
                     ]}
                   />
                   <FormInput<ProductInfoCreateFields> control={control} name={'product.discountRate'} label={'할인율'} />
+                </PopupFormType>
+                <PopupFormType className={'type2'}>
+                  <FormDropDown<ProductInfoCreateFields>
+                    control={control}
+                    name={'product.domaeId'}
+                    title={'계절'}
+                    multiple={true}
+                    options={domaeCodeList || []}
+                  />
                 </PopupFormType>
               </PopupFormGroup>
             )}

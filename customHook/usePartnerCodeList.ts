@@ -1,8 +1,9 @@
 // hooks/usePartnerCodeList.ts
 import { useQuery } from '@tanstack/react-query';
-import { authApi } from '../libs';
-import { toastError } from '../components';
-import { PartnerCodeResponseLowerSelect } from '../generated';
+import { authApi } from '@/libs';
+import { toastError } from '@/components';
+import { PartnerCodeResponseLowerSelect } from '@/generated';
+import { DropDownOption } from '@/types/DropDownOptions';
 interface UsePartnerCodeListParams {
   codeUpper: string;
   searchKeyword?: string;
@@ -43,7 +44,7 @@ export const usePartnerCodeList = ({
             value: item.codeCd,
             label: item.codeNm,
             defCodeVal: item.defCodeVal,
-          }) as PartnerCodeResponseLowerSelect,
+          }) as DropDownOption,
       );
     },
     enabled: enabled,

@@ -2,20 +2,20 @@ import React, { useEffect, useRef, useState } from 'react';
 import { PopupContent } from '../PopupContent';
 import { PopupFooter } from '../PopupFooter';
 import { PopupLayout } from '../PopupLayout';
-import { Search } from '../../content';
+import { Search } from '@/components';
 import CustomGridLoading from '../../CustomGridLoading';
 import CustomNoRowsOverlay from '../../CustomNoRowsOverlay';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toastError, toastSuccess } from '../../ToastMessage';
-import { formatDateWithDay, GridSetting } from '../../../libs/ag-grid';
+import { toastError, toastSuccess } from '@/components';
+import { formatDateWithDay, GridSetting } from '@/libs/ag-grid';
 import { ColDef, GridApi } from 'ag-grid-community';
 import { ConfirmModal } from '../../ConfirmModal';
 import useFilters from '../../../hooks/useFilters';
 import TunedGrid, { TunedGridRef } from '../../grid/TunedGrid';
-import { usePausedEventQueue } from '../../../customFn/pausedEventsQueue';
-import { usePartnerCodeStore } from '../../../stores/usePartnerCodeStore';
+import { usePausedEventQueue } from '@/customFn/pausedEventsQueue';
+import { usePartnerCodeStore } from '@/stores/usePartnerCodeStore';
 import { useSession } from 'next-auth/react';
-import { PartnerCodeResponseLowerSelect } from '../../../generated';
+import { PartnerCodeResponseLowerSelect } from '@/generated';
 
 interface Props {
   partnerCodeUpper: string;

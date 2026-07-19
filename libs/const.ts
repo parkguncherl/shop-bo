@@ -41,6 +41,7 @@ export const PARTNER_CODE = {
   fit: { code: 'P0003', name: '잘맞는지' },
   bodySize: { code: 'P0004', name: '신체사이즈' },
   weight: { code: 'P0005', name: '몸무게' },
+  domae: { code: 'P0006', name: '협력업체' },
 };
 
 export const DefaultOptions = {

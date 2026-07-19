@@ -3,5 +3,4 @@ export interface DropDownOption {
   value?: string | number;
   label?: string;
   defaultValue?: string | number;
-  zoneId?: number;
 }
