@@ -30,6 +30,7 @@ import { PartnerCodePop } from '../../../../components/popup/system/PartnerCodeP
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import ProductForEachCategoryPop from '../../../../components/popup/product/productMng/ProductForEachCategoryPop';
 import ImgEditPop, { ImgPropsOnEditPop } from '../../../../components/popup/common/ImgEditPop';
+import { usePartnerCodeList } from '@/customHook/usePartnerCodeList';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
@@ -59,7 +60,7 @@ const ProductMng = () => {
     s.uploadImageFiles,
     s.deleteFile,
   ]);
-
+  const domaeCode = usePartnerCodeList({ codeUpper: 'P0006', orderType: 'NAME' });
   /** 품목관리 스토어 - State */
   const [modals, openModal, closeModal, deleteProduct] = useProductMngStore((s) => [s.modals, s.openModal, s.closeModal, s.deleteProduct]);
   const [partnerCodeModals, partnerCodeOpenModal, partnerCodeCloseModal] = usePartnerCodeStore((s) => [s.modals, s.openModal, s.closeModal]);
@@ -68,6 +69,7 @@ const ProductMng = () => {
   const [filters, onChangeFilters] = useFilters<ProductMngRequestProductInfoFilter & { partnerId?: number }>({
     prodNm: undefined,
     partnerId: undefined,
+    domaeId: undefined,
   });
 
   const { data: partnerOptions = [] } = usePartnerList({ enabled: true });
@@ -531,11 +533,11 @@ const ProductMng = () => {
       <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} />
       <Search className="type_2">
         <Search.DropDown
-          title={'매장명'}
-          name={'partnerId'}
-          value={filters.partnerId}
-          onChange={(_name, value) => onChangeFilters('partnerId', value ? Number(value) : undefined)}
-          defaultOptions={partnerOptions}
+          title={'협력업체'}
+          name={'domaeId'}
+          value={filters.domaeId}
+          onChange={(_name, value) => onChangeFilters('domaeId', value ? Number(value) : undefined)}
+          defaultOptions={domaeCode.data}
           showAll={true}
           dropDownStyle={{ width: '120px' }}
         />
