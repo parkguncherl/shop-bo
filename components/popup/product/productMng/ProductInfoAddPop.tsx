@@ -48,7 +48,7 @@ interface ProductContentShowPopProps {
 // todo 현재 상세정보 추가 영역은 그리드를 통한 상세 목록으로 마이그레이션이 진행 중, 이후 해당 form 을 통한 추가 영역이 전적으로 불필요하다 판단될 시 조건부 영역 제거, 간소화
 const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
-  const domaeCodeList = usePartnerCodeList({ codeUpper: 'P0006' });
+  const domaeCode = usePartnerCodeList({ codeUpper: 'P0006', orderType: 'NAME' });
   const [insertProductInfo] = useProductMngStore((s) => [s.insertProductInfo]);
 
   /** 파트너 사이즈 정보(콤마 구분) → label/value 동일한 콤보 옵션 */
@@ -268,13 +268,13 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
                   />
                   <FormInput<ProductInfoCreateFields> control={control} name={'product.discountRate'} label={'할인율'} />
                 </PopupFormType>
-                <PopupFormType className={'type2'}>
+                <PopupFormType className={'type_2'}>
                   <FormDropDown<ProductInfoCreateFields>
                     control={control}
                     name={'product.domaeId'}
-                    title={'계절'}
-                    multiple={true}
-                    options={domaeCodeList || []}
+                    title={'협력업체'}
+                    multiple={false}
+                    options={domaeCode.data}
                   />
                 </PopupFormType>
               </PopupFormGroup>

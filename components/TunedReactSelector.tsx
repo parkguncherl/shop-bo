@@ -51,18 +51,34 @@ export const TunedReactSelector = ({ title, name, values, placeholder, options =
   const customStyles = {
     control: (provided: any) => ({
       ...provided,
-      minHeight: '32px',
+      // 검색영역 일반 input(.formBox.border 바깥 높이 ≈ 30px)과 높이를 맞춘다
+      minHeight: '30px',
+      height: '30px',
+      boxSizing: 'border-box',
       fontSize: '13px',
       ...(isDark && { backgroundColor: dk.bg, borderColor: dk.border, boxShadow: 'none' }),
     }),
     valueContainer: (provided: any) => ({
       ...provided,
       padding: '0 8px',
-      minHeight: '32px',
-      height: '32px',
+      minHeight: '28px',
+      height: '28px',
       display: 'flex',
       alignItems: 'center',
       overflow: 'hidden',
+    }),
+    // 우측 드롭다운 화살표/클리어 아이콘이 컨트롤 높이를 밀어올리지 않도록 축소
+    indicatorsContainer: (provided: any) => ({
+      ...provided,
+      height: '28px',
+    }),
+    dropdownIndicator: (provided: any) => ({
+      ...provided,
+      padding: '0 4px',
+    }),
+    clearIndicator: (provided: any) => ({
+      ...provided,
+      padding: '0 4px',
     }),
     singleValue: (provided: any) => ({
       ...provided,
@@ -78,7 +94,7 @@ export const TunedReactSelector = ({ title, name, values, placeholder, options =
       fontSize: '13px',
       margin: 0,
       padding: 0,
-      lineHeight: '32px',
+      lineHeight: '28px',
       color: isDark ? dk.text : 'inherit',
     }),
     placeholder: (provided: any) => ({
