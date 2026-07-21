@@ -240,7 +240,7 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
                 <FormInput<ProductModFields> control={control} name={'discountRate'} label={'할인율'} />
               </PopupFormType>
               <PopupFormType className={'type2'}>
-                <FormDropDown<ProductModFields> control={control} name={'domaeId'} title={'협력업체'} multiple={false} options={domaeCode.data} />
+                <FormDropDown<ProductModFields> control={control} name={'domaeId'} title={'협력업체'} multiple={false} options={domaeCode.data} required />
                 <FormDropDown<ProductModFields>
                   control={control}
                   name={'showYn'}

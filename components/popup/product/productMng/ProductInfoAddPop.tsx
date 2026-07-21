@@ -91,6 +91,9 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
     resolver: yupResolver(YupSchema.InsertProductInfoRequest()),
     mode: 'onChange',
     defaultValues: {
+      product: {
+        showYn: 'N',
+      },
       productDet: {
         skuDiscountRate: 0,
         sleepYn: 'N',
@@ -134,6 +137,12 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
       console.error('품목정보는 전달되었으나 유효한 식별자를 찾을 수 없음');
       return;
     }
+
+    if (productInfo && productInfo.prodColors && productInfo.prodColors.includes(',')) {
+      toastError('컬러정보에는 대표컬러만 넣으세요 [,삭제]');
+      return;
+    }
+
     if (productInfo?.id) {
       // 품목상세정보만 추가하는 경우
       const insertProductInfoReqObj: ProductMngRequestInsertProduct = {
@@ -188,7 +197,6 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
       if (data.categoryId) {
         (insertProductInfoReqObj as any).categoryId = data.categoryId;
       }
-
       setOpenAddConf({
         open: true,
         stored: insertProductInfoReqObj,
@@ -293,6 +301,8 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
                     title={'협력업체'}
                     multiple={false}
                     options={domaeCode.data}
+                    placeholder={'선택'}
+                    required
                   />
                   <FormDropDown<ProductInfoCreateFields>
                     control={control}
@@ -308,7 +318,13 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
                 {/* 두께/신축성/비침/세탁/안감 — 임시 숨김 */}
                 <PopupFormType className={'type2'}>
                   <FormInput<ProductInfoCreateFields> control={control} name={'product.composition'} label={'혼용율'} />
-                  <FormDropDown<ProductInfoCreateFields> control={control} name={'categoryId'} title={'카테고리'} options={categoryOptions} placeholder={'선택'} />
+                  <FormDropDown<ProductInfoCreateFields>
+                    control={control}
+                    name={'categoryId'}
+                    title={'카테고리'}
+                    options={categoryOptions}
+                    placeholder={'선택'}
+                  />
                 </PopupFormType>
                 <PopupFormType className={'type_1'}>
                   <FormInput<ProductInfoCreateFields>
@@ -333,7 +349,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
                 <FormInput<ProductInfoCreateFields>
                   control={control}
                   name={'productDet.productDetColor'}
-                  label={'품목 컬러'}
+                  label={'대표품목컬러'}
                   inputType={'label'}
                   placeholder={'컬러'}
                 />

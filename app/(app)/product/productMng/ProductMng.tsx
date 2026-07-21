@@ -8,7 +8,7 @@ import {
   ProductMngResponseProductDetInfo,
   ProductMngResponseProductInfo,
 } from '../../../../generated';
-import { CellClickedEvent, ColDef, ICellEditorParams, RowClassParams } from 'ag-grid-community';
+import { CellClickedEvent, ColDef, ICellEditorParams } from 'ag-grid-community';
 import { TableHeader, toastError } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -31,7 +31,6 @@ import { ConfirmModal } from '../../../../components/ConfirmModal';
 import ProductForEachCategoryPop from '../../../../components/popup/product/productMng/ProductForEachCategoryPop';
 import ImgEditPop, { ImgPropsOnEditPop } from '../../../../components/popup/common/ImgEditPop';
 import { usePartnerCodeList } from '@/customHook/usePartnerCodeList';
-import { CustomSwitch } from '@/components/CustomSwitch';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
@@ -210,7 +209,7 @@ const ProductMng = () => {
     isLoading: isProductInfosLoading,
     refetch: productInfosRefetch,
   } = useQuery({
-    queryKey: ['/productMng/productInfoList', { partnerId: filters.partnerId }],
+    queryKey: ['/productMng/productInfoList', { partnerId: filters.partnerId, domaeId: filters.domaeId, showYn: filters.showYn, prodNm: filters.prodNm }],
     queryFn: () =>
       authApi.get('/productMng/productInfoList', {
         params: {
@@ -544,13 +543,17 @@ const ProductMng = () => {
           dropDownStyle={{ width: '120px' }}
         />
         <Search.Input title={'품목명'} name={'prodNm'} placeholder={Placeholder.Input} value={filters.prodNm} onChange={onChangeFilters} onEnter={onSearch} />
-        <CustomSwitch
+        <Search.DropDown
           title={'전시여부'}
           name={'showYn'}
-          allLabel={'전체'}
-          checkedLabel={'전시'}
-          uncheckedLabel={'미전시'}
-          onChange={(_e, value) => onChangeFilters('showYn', value === true ? 'Y' : value === false ? 'N' : undefined)}
+          value={filters.showYn}
+          onChange={onChangeFilters}
+          defaultOptions={[
+            { key: 'Y', value: 'Y', label: '전시' },
+            { key: 'N', value: 'N', label: '미전시' },
+          ]}
+          showAll={true}
+          dropDownStyle={{ width: '100px' }}
         />
       </Search>
       <Table>
