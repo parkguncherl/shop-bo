@@ -243,7 +243,7 @@ export const YupSchema = {
         prodNm: yup.string().required('상품명은 필수값입니다!'),
         prodTp: yup.string().required('상품유형은 필수값입니다!'),
         prodDetTp: yup.string().required('상품상세유형은 필수값입니다!'),
-        composition: yup.string().required('혼용율은 필수값입니다!'),
+        composition: yup.string().notRequired(),
         // repFileId: yup.number().notRequired(),
         // detailFileId: yup.number().notRequired(),
         // sizeFileId: yup.number().notRequired(),

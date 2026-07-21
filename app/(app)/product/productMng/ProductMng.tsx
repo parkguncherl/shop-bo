@@ -31,6 +31,7 @@ import { ConfirmModal } from '../../../../components/ConfirmModal';
 import ProductForEachCategoryPop from '../../../../components/popup/product/productMng/ProductForEachCategoryPop';
 import ImgEditPop, { ImgPropsOnEditPop } from '../../../../components/popup/common/ImgEditPop';
 import { usePartnerCodeList } from '@/customHook/usePartnerCodeList';
+import { CustomSwitch } from '@/components/CustomSwitch';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
@@ -70,6 +71,7 @@ const ProductMng = () => {
     prodNm: undefined,
     partnerId: undefined,
     domaeId: undefined,
+    showYn: undefined,
   });
 
   const { data: partnerOptions = [] } = usePartnerList({ enabled: true });
@@ -542,6 +544,14 @@ const ProductMng = () => {
           dropDownStyle={{ width: '120px' }}
         />
         <Search.Input title={'품목명'} name={'prodNm'} placeholder={Placeholder.Input} value={filters.prodNm} onChange={onChangeFilters} onEnter={onSearch} />
+        <CustomSwitch
+          title={'전시여부'}
+          name={'showYn'}
+          allLabel={'전체'}
+          checkedLabel={'전시'}
+          uncheckedLabel={'미전시'}
+          onChange={(_e, value) => onChangeFilters('showYn', value === true ? 'Y' : value === false ? 'N' : undefined)}
+        />
       </Search>
       <Table>
         <div className="tblPreview">
@@ -555,6 +565,7 @@ const ProductMng = () => {
                 rowData={productInfoList}
                 columnDefs={columnDefs}
                 defaultColDef={defaultColDef}
+                rowClassRules={{ 'row-muted': (p) => (p.data as any)?.showYn === 'N' }}
                 rowSelection={{
                   mode: 'singleRow',
                   enableClickSelection: true,

@@ -214,21 +214,17 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
             <PopupFormGroup title={'품목정보'}>
               <PopupFormType className={'type2'}>
                 <FormInput<ProductModFields> control={control} name={'prodNm'} label={'품목명'} placeholder={'제목'} />
-                <FormDropDown<ProductModFields> control={control} name={'prodTp'} title={'품목유형'} codeUpper={'90010'} />
-              </PopupFormType>
-              <PopupFormType className={'type2'}>
-                <FormDropDown<ProductModFields> control={control} name={'prodDetTp'} title={'품목상세유형'} codeUpper={'90011'} />
-                <FormInput<ProductModFields> control={control} name={'composition'} label={'혼용율'} />
-              </PopupFormType>
-              <PopupFormType className={'type2'}>
                 <FormDatePicker<ProductModFields> control={control} name={'makeYmd'} title={'제조일자'} />
-                <FormInput<ProductModFields> control={control} name={'discountRate'} label={'할인율'} />
+              </PopupFormType>
+              <PopupFormType className={'type2'}>
+                <FormDropDown<ProductModFields> control={control} name={'prodTp'} title={'품목유형'} codeUpper={'90010'} />
+                <FormDropDown<ProductModFields> control={control} name={'prodDetTp'} title={'품목상세유형'} codeUpper={'90011'} />
               </PopupFormType>
               <PopupFormType className={'type2'}>
                 <FormInput<ProductModFields> control={control} name={'orgAmt'} label={'원가'} />
                 <FormInput<ProductModFields> control={control} name={'sellAmt'} label={'판매가'} />
               </PopupFormType>
-              <PopupFormType className={'type1'}>
+              <PopupFormType className={'type2'}>
                 <FormDropDown<ProductModFields>
                   control={control}
                   name={'weather'}
@@ -241,9 +237,20 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
                     { key: 3, value: 'winter', label: '겨울' },
                   ]}
                 />
+                <FormInput<ProductModFields> control={control} name={'discountRate'} label={'할인율'} />
               </PopupFormType>
-              <PopupFormType className={'type_2'}>
+              <PopupFormType className={'type2'}>
                 <FormDropDown<ProductModFields> control={control} name={'domaeId'} title={'협력업체'} multiple={false} options={domaeCode.data} />
+                <FormDropDown<ProductModFields>
+                  control={control}
+                  name={'showYn'}
+                  title={'전시여부'}
+                  options={[
+                    { key: 0, value: 'Y', label: '전시' },
+                    { key: 1, value: 'N', label: '미전시' },
+                  ]}
+                  placeholder={'선택'}
+                />
               </PopupFormType>
               <PopupFormType className={'type2'}>
                 <FormDropDown<ProductModFields> control={control} name={'thickTp'} title={'두께'} codeUpper={'90030'} placeholder={'선택'} required />
@@ -255,6 +262,9 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
               </PopupFormType>
               <PopupFormType className={'type_2'}>
                 <FormDropDown<ProductModFields> control={control} name={'transTp'} title={'안감'} codeUpper={'90060'} placeholder={'선택'} required />
+              </PopupFormType>
+              <PopupFormType className={'type_1'}>
+                <FormInput<ProductModFields> control={control} name={'detInfo'} label={'상품설명'} inputType={'textarea'} style={{ height: 120 }} />
               </PopupFormType>
             </PopupFormGroup>
           </PopupFormBox>

@@ -222,8 +222,9 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
           <PopupFormBox className={''}>
             {!productInfo?.id && (
               <PopupFormGroup title={'품목정보'}>
-                <PopupFormType className={'type1'}>
+                <PopupFormType className={'type2'}>
                   <FormInput<ProductInfoCreateFields> control={control} name={'product.prodNm'} label={'품목명'} placeholder={'제목'} />
+                  <FormDatePicker<ProductInfoCreateFields> control={control} name={'product.makeYmd'} title={'제조일자'} />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
                   <FormDropDown<ProductInfoCreateFields>
@@ -246,10 +247,6 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
                   />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
-                  <FormDatePicker<ProductInfoCreateFields> control={control} name={'product.makeYmd'} title={'제조일자'} />
-                  <FormInput<ProductInfoCreateFields> control={control} name={'product.composition'} label={'혼용율'} />
-                </PopupFormType>
-                <PopupFormType className={'type2'}>
                   <FormInput<ProductInfoCreateFields> control={control} name={'product.orgAmt'} label={'원가'} />
                   <FormInput<ProductInfoCreateFields> control={control} name={'product.sellAmt'} label={'판매가'} />
                 </PopupFormType>
@@ -268,7 +265,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
                   />
                   <FormInput<ProductInfoCreateFields> control={control} name={'product.discountRate'} label={'할인율'} />
                 </PopupFormType>
-                <PopupFormType className={'type_2'}>
+                <PopupFormType className={'type2'}>
                   <FormDropDown<ProductInfoCreateFields>
                     control={control}
                     name={'product.domaeId'}
@@ -276,17 +273,71 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
                     multiple={false}
                     options={domaeCode.data}
                   />
+                  <FormDropDown<ProductInfoCreateFields>
+                    control={control}
+                    name={'product.showYn'}
+                    title={'전시여부'}
+                    options={[
+                      { key: 0, value: 'Y', label: '전시' },
+                      { key: 1, value: 'N', label: '미전시' },
+                    ]}
+                    placeholder={'선택'}
+                  />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
-                  <FormDropDown<ProductInfoCreateFields> control={control} name={'product.thickTp'} title={'두께'} codeUpper={'90030'} placeholder={'선택'} required />
-                  <FormDropDown<ProductInfoCreateFields> control={control} name={'product.spanTp'} title={'신축성'} codeUpper={'90040'} placeholder={'선택'} required />
+                  <FormDropDown<ProductInfoCreateFields>
+                    control={control}
+                    name={'product.thickTp'}
+                    title={'두께'}
+                    codeUpper={'90030'}
+                    placeholder={'선택'}
+                    required
+                  />
+                  <FormDropDown<ProductInfoCreateFields>
+                    control={control}
+                    name={'product.spanTp'}
+                    title={'신축성'}
+                    codeUpper={'90040'}
+                    placeholder={'선택'}
+                    required
+                  />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
-                  <FormDropDown<ProductInfoCreateFields> control={control} name={'product.showTp'} title={'비침'} codeUpper={'90050'} placeholder={'선택'} required />
-                  <FormDropDown<ProductInfoCreateFields> control={control} name={'product.laundryTp'} title={'세탁'} codeUpper={'90070'} placeholder={'선택'} required />
+                  <FormDropDown<ProductInfoCreateFields>
+                    control={control}
+                    name={'product.showTp'}
+                    title={'비침'}
+                    codeUpper={'90050'}
+                    placeholder={'선택'}
+                    required
+                  />
+                  <FormDropDown<ProductInfoCreateFields>
+                    control={control}
+                    name={'product.laundryTp'}
+                    title={'세탁'}
+                    codeUpper={'90070'}
+                    placeholder={'선택'}
+                    required
+                  />
                 </PopupFormType>
                 <PopupFormType className={'type_2'}>
-                  <FormDropDown<ProductInfoCreateFields> control={control} name={'product.transTp'} title={'안감'} codeUpper={'90060'} placeholder={'선택'} required />
+                  <FormDropDown<ProductInfoCreateFields>
+                    control={control}
+                    name={'product.transTp'}
+                    title={'안감'}
+                    codeUpper={'90060'}
+                    placeholder={'선택'}
+                    required
+                  />
+                </PopupFormType>
+                <PopupFormType className={'type_1'}>
+                  <FormInput<ProductInfoCreateFields>
+                    control={control}
+                    name={'product.detInfo'}
+                    label={'상품설명'}
+                    inputType={'textarea'}
+                    style={{ height: 120 }}
+                  />
                 </PopupFormType>
               </PopupFormGroup>
             )}

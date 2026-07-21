@@ -5,7 +5,7 @@ interface Props {
   name: string;
   value?: boolean; // Switch 상태 값
   disabled?: boolean;
-  onChange?: (name: string, value: boolean) => void;
+  onChange?: (name: string, value: boolean | undefined) => void;
   onEnter?: () => void;
   required?: boolean;
   filters?: object;
@@ -13,6 +13,7 @@ interface Props {
   keyDownEvent?: (e: React.KeyboardEvent) => void;
   checkedLabel: string; // checked 상태일 때 텍스트
   uncheckedLabel: string; // unchecked 상태일 때 텍스트
+  allLabel?: string; // 전체(undefined) 상태 버튼 텍스트 — 지정 시 3단계 세그먼트
 }
 
 /**
@@ -29,16 +30,25 @@ const CustomSwitchComponent = ({
   wrapperClassNames,
   checkedLabel,
   uncheckedLabel,
+  allLabel,
 }: Props) => {
-  const [checked, setChecked] = useState(value);
+  const [checked, setChecked] = useState<boolean | undefined>(value);
 
   useEffect(() => {
     setChecked(value);
   }, [value]);
 
-  const activeKey = checked ? checkedLabel : uncheckedLabel;
+  // allLabel 있으면 undefined = 전체
+  const activeKey = allLabel && checked === undefined
+    ? allLabel
+    : checked ? checkedLabel : uncheckedLabel;
 
   const onSeg = (key: string) => {
+    if (allLabel && key === allLabel) {
+      setChecked(undefined);
+      onChange?.(name, undefined);
+      return;
+    }
     const next = key === checkedLabel;
     setChecked(next);
     onChange?.(name, next);
@@ -60,7 +70,7 @@ const CustomSwitchComponent = ({
         <dd>
           <div className="formBox">
             <div className="segBox" style={{ display: 'inline-flex', border: '1px solid var(--dark-border, #ddd)', borderRadius: 4, overflow: 'hidden' }}>
-              {[checkedLabel, uncheckedLabel].map((opt) => {
+              {(allLabel ? [allLabel, checkedLabel, uncheckedLabel] : [checkedLabel, uncheckedLabel]).map((opt) => {
                 const on = activeKey === opt;
                 return (
                   <button

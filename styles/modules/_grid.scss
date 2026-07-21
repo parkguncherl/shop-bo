@@ -593,6 +593,10 @@
     color: #000;
     font-weight: 200;
   }
+  & .ag-row.row-muted {
+    opacity: 0.45;
+    color: #888;
+  }
   & .ag-header-viewport {
     background-color: #5c5c5c; // 그리드 헤더 배경색
     & .ag-header-cell-label {
