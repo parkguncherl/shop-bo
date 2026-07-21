@@ -292,7 +292,7 @@ const CodeMng = () => {
         />
         <div className={'btnArea'}>
           <button className={'btn btn_primary'} onClick={() => openModal('ADD')}>
-            신규
+            등록
           </button>
           {menuExcelYn && (
             <>

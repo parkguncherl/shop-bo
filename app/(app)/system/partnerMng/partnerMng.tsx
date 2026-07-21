@@ -243,7 +243,7 @@ const PartnerMng = () => {
               openModal('ADD');
             }}
           >
-            화주 신규추가
+            등록
           </button>
         </div>
         <Pagination pageObject={paging} setPaging={setPaging} />

@@ -359,7 +359,7 @@ const Receiving = () => {
       <div className="btnArea between">
         <div className="right">
           <button className="btn btn_primary" onClick={() => openModal('RECEIVING_ADD')}>
-            입고/출고 등록
+            등록
           </button>
           <button
             className="btn btn_primary"

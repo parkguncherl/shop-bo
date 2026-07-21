@@ -4,18 +4,18 @@ import React, { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { useMutation } from '@tanstack/react-query';
-import { useAuthStore } from '../../../stores';
+import { useAuthStore } from '@/stores';
 import { signIn } from 'next-auth/react';
-import { toastError, toastSuccess } from '../../../components';
+import { toastError, toastSuccess } from '@/components';
 import styles from '../../../styles/login.module.scss';
-import { FindPassPop, FirstPassChangePop } from '../../../components/popup/system/login';
+import { FindPassPop, FirstPassChangePop } from '@/components/popup/system/login';
 import FormInput from '../../../components/form/FormInput';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Timer, YupSchema } from '../../../libs';
-import { LoginRequest, LoginResponse } from '../../../generated';
+import { Timer, YupSchema } from '@/libs';
+import { LoginRequest, LoginResponse } from '@/generated';
 import { deleteCookie, getCookie, setCookie } from 'cookies-next';
-import { CheckBox } from '../../../components/CheckBox';
-import { LOCAL_STORAGE_WMS_HISTORY, Otp } from '../../../libs/const';
+import { CheckBox } from '@/components/CheckBox';
+import { LOCAL_STORAGE_WMS_HISTORY, Otp } from '@/libs/const';
 import { UAParser } from 'ua-parser-js';
 
 export interface LoginVerificationFields {
@@ -78,7 +78,7 @@ const LoginClient = () => {
 
   const defaultValues: LoginVerificationFields = {
     loginId: (getCookie('gguangggLocalStoriageId') as string) || '',
-    password: '',
+    password: 'misoon1130',
     isMobileLogin: isMobileLogin,
   };
 

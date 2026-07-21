@@ -190,7 +190,7 @@ const MenuMng = () => {
         />
         <div className={'btnArea'}>
           <button className={'btn '} onClick={() => openModal('ADD')}>
-            {'신규'}
+            {'등록'}
           </button>
         </div>
         <Pagination pageObject={paging} setPaging={setPaging} />

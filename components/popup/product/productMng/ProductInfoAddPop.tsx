@@ -49,7 +49,7 @@ interface ProductContentShowPopProps {
  */
 const buildDefaultValues = () => ({
   product: {
-    showYn: 'N',
+    showYn: 'Y', // 전시여부 기본값: 전시
     makeYmd: dayjs().format('YYYY-MM-DD'), // 제조일자 기본값: 오늘
   },
   productDet: {

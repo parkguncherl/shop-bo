@@ -616,7 +616,7 @@ const ProductMng = () => {
                       openModal('PROD_INFO_ADD');
                     }}
                   >
-                    품목추가
+                    등록
                   </button>
                   {/*<button*/}
                   {/*  className={`btn ${selectedRowsData != undefined && 'btn_primary'}`}*/}

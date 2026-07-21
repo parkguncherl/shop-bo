@@ -216,14 +216,23 @@ const ProdGroupMng = () => {
     }
   };
 
-  /** 검색 버튼 클릭 시 */
-  const search = async () => {
-    await onSearch();
+  /**
+   * 새로고침(원형) 버튼: 검색 필터 초기화 후 목록 재조회.
+   * onFiltersReset() 은 상태 갱신이라 같은 틱에서 바로 refetch 하면 이전 filters 로 조회된다.
+   * 따라서 플래그를 세워 리렌더 이후(useEffect)에 재조회한다.
+   */
+  const [isFilterReset, setIsFilterReset] = useState(false);
+  const reset = async () => {
+    onFiltersReset();
+    setIsFilterReset(true);
   };
 
-  const onSearch = async () => {
-    await productContentListResponseRefetch();
-  };
+  useEffect(() => {
+    if (isFilterReset) {
+      setIsFilterReset(false);
+      productContentListResponseRefetch;
+    }
+  }, [isFilterReset]);
 
   /** row선택 이벤트 (이미지) */
   const onSelectionChangedByRigSideGrid = (e: SelectionChangedEvent) => {
@@ -381,7 +390,7 @@ const ProdGroupMng = () => {
     <div>
       <div className="layoutBox">
         <div className={'layout30'}>
-          <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} />
+          <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} reset={reset} />
           <Search className="type_2">
             <Search.Input
               title={'컨텐츠 제목'}
@@ -395,7 +404,7 @@ const ProdGroupMng = () => {
             />
           </Search>
           <Table>
-            <TableHeader count={((paging.curPage || 1) - 1) * (paging.pageRowCount || 0) + productContentList.length} search={search}></TableHeader>
+            <TableHeader count={((paging.curPage || 1) - 1) * (paging.pageRowCount || 0) + productContentList.length}></TableHeader>
             <TunedGrid<ProductContentListResponseProductContent>
               headerHeight={35}
               ref={gridRef}
@@ -425,7 +434,7 @@ const ProdGroupMng = () => {
                     openModal('ADD');
                   }}
                 >
-                  {'신규'}
+                  {'등록'}
                 </button>
                 <button
                   className={selectedRowsData == undefined ? 'btn' : 'btn btn_primary'}
@@ -483,12 +492,12 @@ const ProdGroupMng = () => {
               checkedLabel={'켜기'}
               uncheckedLabel={'끄기'}
               onChange={(e, value) => {
-                setImgPreviewBoxOn(value);
+                setImgPreviewBoxOn(!!value);
               }}
             />
           </Search>
           <Table>
-            <TableHeader count={contentsProductInfoList.length} search={search}></TableHeader>
+            <TableHeader count={contentsProductInfoList.length}></TableHeader>
             <TunedGrid<ContentProductInfoWithImg>
               headerHeight={35}
               rowHeight={50}
@@ -537,10 +546,10 @@ const ProdGroupMng = () => {
         mode={modals.type as 'SHOW' | 'ADD' | 'MOD' | undefined}
         productContentData={modals.stored_temporary}
         onClose={() => closeModal(modals.type)}
-        onSuccess={() => {
+        onSuccess={async () => {
           closeModal(modals.type);
-          //productContentListResponseRefetch();
-          //contentsProductInfoListRefetch();
+          // 등록/수정 후 좌측 컨텐츠 목록 재조회 (신규 건이 바로 보이도록)
+          await productContentListResponseRefetch();
         }}
       />
       <ProductAddPop

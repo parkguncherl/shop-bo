@@ -341,10 +341,8 @@ const ProductContentPop = ({ open, onClose, onSuccess, mode = 'ADD', productCont
                   className={mode == 'SHOW' ? 'btn' : 'btn btn_primary'}
                   onClick={() => {
                     const title = getValues('title');
-                    const content = getValues('content');
-
-                    if (title == '' || content[0].partialContent == '') {
-                      toastError(title == '' ? '제목은 반드시 입력하셔야 합니다.' : '어떠한 내용도 없이 저장 혹은 수정할 수 없습니다.');
+                    if (title == '') {
+                      toastError('제목은 반드시 입력하셔야 합니다.');
                       return;
                     }
                     setOpenConf(true);
