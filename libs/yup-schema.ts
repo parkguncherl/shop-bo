@@ -242,7 +242,7 @@ export const YupSchema = {
         prodNm: yup.string().required('상품명은 필수값입니다!'),
         prodTp: yup.string().required('상품유형은 필수값입니다!'),
         prodDetTp: yup.string().required('상품상세유형은 필수값입니다!'),
-        composition: yup.string().notRequired(),
+        composition: yup.string().required('혼용율은 필수값입니다!'),
         domaeId: yup.number().typeError('협력업체는 필수값입니다!').required('협력업체는 필수값입니다!'),
         makeYmd: yup.string().required('등록일자는  필수값입니다!'),
         orgAmt: yup.number().typeError('원가는 숫자만 입력 가능합니다.').notRequired(),

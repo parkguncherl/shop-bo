@@ -43,6 +43,22 @@ interface ProductContentShowPopProps {
 }
 
 /**
+ * 폼 초기값 생성
+ * 열 때마다 호출되어 제조일자(makeYmd)는 항상 '오늘'로 채워진다.
+ * (useForm defaultValues 와 닫힘 시 reset 이 같은 값을 쓰도록 공통화)
+ */
+const buildDefaultValues = () => ({
+  product: {
+    showYn: 'N',
+    makeYmd: dayjs().format('YYYY-MM-DD'), // 제조일자 기본값: 오늘
+  },
+  productDet: {
+    skuDiscountRate: 0,
+    sleepYn: 'N',
+  },
+});
+
+/**
  * components/popup/product/productMng/ProductInfoAddPop.tsx
  * desc: 품목정보 추가 팝업
  * Date: 2026/03/17
@@ -90,15 +106,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
     // resolver: yupResolver(YupSchema.InsertProductInfoRequest(productInfo?.id)), todo
     resolver: yupResolver(YupSchema.InsertProductInfoRequest()),
     mode: 'onChange',
-    defaultValues: {
-      product: {
-        showYn: 'N',
-      },
-      productDet: {
-        skuDiscountRate: 0,
-        sleepYn: 'N',
-      },
-    },
+    defaultValues: buildDefaultValues(),
   });
 
   /** 품목컨텐츠 추가 요청 처리 동작 캐싱 */
@@ -121,12 +129,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
   useEffect(() => {
     if (!open) {
       // 닫힘 시점 동작
-      reset({
-        productDet: {
-          skuDiscountRate: 0,
-          sleepYn: 'N',
-        },
-      }); // 초기화
+      reset(buildDefaultValues()); // 초기화
       clearErrors(); // 에러 상태 초기화
     }
   }, [open]);
@@ -137,12 +140,6 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
       console.error('품목정보는 전달되었으나 유효한 식별자를 찾을 수 없음');
       return;
     }
-
-    if (productInfo && productInfo.prodColors && productInfo.prodColors.includes(',')) {
-      toastError('컬러정보에는 대표컬러만 넣으세요 [,삭제]');
-      return;
-    }
-
     if (productInfo?.id) {
       // 품목상세정보만 추가하는 경우
       const insertProductInfoReqObj: ProductMngRequestInsertProduct = {
@@ -162,6 +159,11 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
         stored: insertProductInfoReqObj,
       });
     } else {
+      if (data.productDet?.productDetColor?.includes(',')) {
+        toastError('컬러정보에는 대표컬러만 넣으세요 [콤마 삭제]');
+        return;
+      }
+
       // id 부재 --> 품목정보 또한 추가
       let insertProductInfoReqObj: ProductMngRequestInsertProduct = {
         ...data.product,
@@ -317,7 +319,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
                 </PopupFormType>
                 {/* 두께/신축성/비침/세탁/안감 — 임시 숨김 */}
                 <PopupFormType className={'type2'}>
-                  <FormInput<ProductInfoCreateFields> control={control} name={'product.composition'} label={'혼용율'} />
+                  <FormInput<ProductInfoCreateFields> control={control} name={'product.composition'} label={'혼용율'} required />
                   <FormDropDown<ProductInfoCreateFields>
                     control={control}
                     name={'categoryId'}
