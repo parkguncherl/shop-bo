@@ -277,6 +277,17 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
                     options={domaeCode.data}
                   />
                 </PopupFormType>
+                <PopupFormType className={'type2'}>
+                  <FormDropDown<ProductInfoCreateFields> control={control} name={'product.thickTp'} title={'두께'} codeUpper={'90030'} placeholder={'선택'} required />
+                  <FormDropDown<ProductInfoCreateFields> control={control} name={'product.spanTp'} title={'신축성'} codeUpper={'90040'} placeholder={'선택'} required />
+                </PopupFormType>
+                <PopupFormType className={'type2'}>
+                  <FormDropDown<ProductInfoCreateFields> control={control} name={'product.showTp'} title={'비침'} codeUpper={'90050'} placeholder={'선택'} required />
+                  <FormDropDown<ProductInfoCreateFields> control={control} name={'product.laundryTp'} title={'세탁'} codeUpper={'90070'} placeholder={'선택'} required />
+                </PopupFormType>
+                <PopupFormType className={'type_2'}>
+                  <FormDropDown<ProductInfoCreateFields> control={control} name={'product.transTp'} title={'안감'} codeUpper={'90060'} placeholder={'선택'} required />
+                </PopupFormType>
               </PopupFormGroup>
             )}
             <PopupFormGroup title={'상세'}>

@@ -257,6 +257,11 @@ export const YupSchema = {
         // isSummer: yup.string().notRequired(),
         // isAutumn: yup.string().notRequired(),
         // isWinter: yup.string().notRequired(),
+        thickTp: yup.string().required('두께는 필수값입니다!'),
+        spanTp: yup.string().required('신축성은 필수값입니다!'),
+        showTp: yup.string().required('비침은 필수값입니다!'),
+        laundryTp: yup.string().required('세탁은 필수값입니다!'),
+        transTp: yup.string().required('안감은 필수값입니다!'),
       }),
 
       productDet: yup
@@ -290,6 +295,11 @@ export const YupSchema = {
       // isSummer: yup.string().notRequired(),
       // isAutumn: yup.string().notRequired(),
       // isWinter: yup.string().notRequired(),
+      thickTp: yup.string().required('두께는 필수값입니다!'),
+      spanTp: yup.string().required('신축성은 필수값입니다!'),
+      showTp: yup.string().required('비침은 필수값입니다!'),
+      laundryTp: yup.string().required('세탁은 필수값입니다!'),
+      transTp: yup.string().required('안감은 필수값입니다!'),
     }) as yup.ObjectSchema<ProductModFields>,
 
   InsertProductDetRequest: (): yup.ObjectSchema<ProductDetInsertFields> =>
