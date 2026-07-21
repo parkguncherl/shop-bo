@@ -115,6 +115,19 @@
     }
   }
 }
+
+// 선택된 행의 tblBtn 은 '선택됨' 상태로 강조 (.on 은 렌더러에서 직접 부여)
+.tblBtn.on {
+  background-color: var(--main-color);
+  border-color: var(--main-color);
+  color: #fff;
+
+  &:hover {
+    background-color: var(--main-color);
+    color: #fff;
+    filter: brightness(0.92);
+  }
+}
 .btnGray.btn {
   background-color: #ddd;
   border: 1px solid #ddd;

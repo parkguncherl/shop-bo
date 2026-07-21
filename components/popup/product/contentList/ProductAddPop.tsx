@@ -107,22 +107,6 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
         cellStyle: GridSetting.CellStyle.LEFT,
       },
       {
-        field: 'prodTpNm',
-        headerName: '분류',
-        minWidth: 100,
-        maxWidth: 100,
-        suppressHeaderMenuButton: true,
-        cellStyle: GridSetting.CellStyle.CENTER,
-      },
-      {
-        field: 'prodDetTpNm',
-        headerName: '소분류',
-        minWidth: 120,
-        maxWidth: 120,
-        suppressHeaderMenuButton: true,
-        cellStyle: GridSetting.CellStyle.CENTER,
-      },
-      {
         field: 'prodColors',
         headerName: '칼라',
         minWidth: 120,
@@ -377,7 +361,7 @@ const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductCon
                 checkedLabel={'ON'}
                 uncheckedLabel={'OFF'}
                 value={imgPreviewBoxOn}
-                onChange={(_name, value) => setImgPreviewBoxOn(value)}
+                onChange={(_name, value) => setImgPreviewBoxOn(!!value)}
                 wrapperClassNames={'imgToggle'}
               />
             </PopupSearchType>

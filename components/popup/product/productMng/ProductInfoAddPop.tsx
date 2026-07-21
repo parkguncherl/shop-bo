@@ -24,6 +24,8 @@ import { PARTNER_CODE } from '@/libs/const';
 /** form 영역 입력 인터페이스 */
 export interface ProductCreateFields extends ProductMngRequestInsertProduct {
   weather: ('spring' | 'summer' | 'autumn' | 'winter')[];
+  /** 신상번호 (openapi 타입 재생성 전에도 쓸 수 있도록 명시) */
+  sinsangNo?: string;
 }
 
 export interface ProductInfoCreateFields {
@@ -93,7 +95,6 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
 
   /** 팝업 내부 local state */
   const [openAddConf, setOpenAddConf] = useState<{ open: boolean; stored?: ProductMngRequestInsertProduct }>({ open: false });
-  const [prodCd, setProdCd] = useState<string>('');
 
   /** 품목 내용 입력 서식 */
   const {
@@ -258,26 +259,6 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
                   <FormDatePicker<ProductInfoCreateFields> control={control} name={'product.makeYmd'} title={'등록일자'} />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
-                  <FormDropDown<ProductInfoCreateFields>
-                    control={control}
-                    name={'product.prodTp'}
-                    title={'품목유형'}
-                    codeUpper={'90010'}
-                    placeholder={'선택'}
-                    onChange={(name, value) => {
-                      setProdCd(String(value));
-                    }}
-                  />
-                  <FormDropDown<ProductInfoCreateFields>
-                    control={control}
-                    name={'product.prodDetTp'}
-                    title={'품목상세유형'}
-                    codeUpper={'90011'}
-                    placeholder={'선택'}
-                    startWith={prodCd}
-                  />
-                </PopupFormType>
-                <PopupFormType className={'type2'}>
                   <FormInput<ProductInfoCreateFields> control={control} name={'product.orgAmt'} label={'원가'} />
                   <FormInput<ProductInfoCreateFields> control={control} name={'product.sellAmt'} label={'판매가'} />
                 </PopupFormType>
@@ -327,6 +308,10 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
                     options={categoryOptions}
                     placeholder={'선택'}
                   />
+                </PopupFormType>
+                {/* 신상번호 — 혼용율 아래, 두 칸을 모두 차지하도록 한 줄(type_1) 배치 */}
+                <PopupFormType className={'type_1'}>
+                  <FormInput<ProductInfoCreateFields> control={control} name={'product.sinsangNo'} label={'신상번호'} />
                 </PopupFormType>
                 <PopupFormType className={'type_1'}>
                   <FormInput<ProductInfoCreateFields>

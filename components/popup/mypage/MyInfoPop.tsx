@@ -95,10 +95,12 @@ export const MyInfoPop = ({ open, onClose }: Props) => {
         ...data,
       }),
     onSuccess: async (res, variables) => {
-      if (res.data.resultCode === 200) {
+      // 280 = SUCCESS_CHANGE_USER_INFO (백엔드가 사용자 정보 변경 성공 시 200 이 아닌 280 을 반환)
+      if (res.data.resultCode === 200 || res.data.resultCode === 280) {
         toastSuccess('저장되었습니다.');
         onClose();
-        update({ user: { ...user, ...variables } });
+        // 세션을 갱신해야 ThemeApplier 가 테마(tema) 변경을 즉시 반영한다 (재로그인 불필요)
+        await update({ user: { ...user, ...variables } });
       } else {
         toastError(res.data.resultMessage);
       }

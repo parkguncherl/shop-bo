@@ -8,7 +8,7 @@ import {
   ProductMngResponseProductDetInfo,
   ProductMngResponseProductInfo,
 } from '../../../../generated';
-import { CellClickedEvent, ColDef, ICellEditorParams } from 'ag-grid-community';
+import { CellClickedEvent, CellStyle, ColDef, ICellEditorParams, ICellRendererParams } from 'ag-grid-community';
 import { TableHeader, toastError } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -33,6 +33,9 @@ import ImgEditPop, { ImgPropsOnEditPop } from '../../../../components/popup/comm
 import { usePartnerCodeList } from '@/customHook/usePartnerCodeList';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
+
+/** 목록 행 + 대표이미지 썸네일 URL (repFileId 로부터 비동기 해석) */
+type ProductInfoWithImg = ProductMngResponseProductInfo & { imgUrl?: string };
 
 interface targetedFileSetsElementInfo extends SrcElement {
   //fileSeq?: number;
@@ -80,7 +83,7 @@ const ProductMng = () => {
   });
 
   /** local states */
-  const [productInfoList, setProductInfoList] = useState<ProductMngResponseProductInfo[]>([]);
+  const [productInfoList, setProductInfoList] = useState<ProductInfoWithImg[]>([]);
   const [productDetInfo, setProductDetInfo] = useState<ProductMngResponseProductDetInfo | undefined>(undefined); // prodId + prodDetColor 조합으로 조회된 결과는 고유하리라 기대되니 배열이 아닌 단일 객체로 관리
   const [targetedFileSetInfo, setTargetedFileSetInfo] = useState<targetedFileSetInfo | undefined>(undefined);
   const [selectedRowsData, setSelectedRowsData] = useState<ProductMngResponseProductInfo | undefined>(undefined);
@@ -223,7 +226,21 @@ const ProductMng = () => {
     if (isProductInfosSuccess) {
       const { resultCode, body, resultMessage } = productInfos.data;
       if (resultCode === 200) {
-        setProductInfoList(body || []);
+        const rows: ProductInfoWithImg[] = body || [];
+        // 대표이미지 썸네일 URL 해석 (repFileId → 첫 파일 → presigned url)
+        Promise.all(
+          rows.map(async (row) => {
+            if (!row.repFileId) return { ...row };
+            try {
+              const fileDetList = await selectFileList(row.repFileId);
+              const first = fileDetList?.[0];
+              const imgUrl = first?.sysFileNm ? await getFileUrl(first.sysFileNm as string) : undefined;
+              return { ...row, imgUrl };
+            } catch {
+              return { ...row };
+            }
+          }),
+        ).then(setProductInfoList);
       } else {
         toastError(resultMessage);
       }
@@ -287,7 +304,13 @@ const ProductMng = () => {
   }, [productDetInfo]);
 
   /** 컬럼 설정 */
-  const columnDefs = useMemo<ColDef<ProductMngResponseProductInfo>[]>(
+  // rowHeight 를 키우면 textAlign 만으로는 글자가 위로 붙으므로, 셀마다 세로 중앙 정렬을 함께 준다
+  // (ProdGroupMng 와 동일한 방식)
+  const rcCenter: CellStyle = { ...GridSetting.CellStyle.CENTER, display: 'flex', alignItems: 'center', justifyContent: 'center' };
+  const rcLeft: CellStyle = { ...GridSetting.CellStyle.LEFT, display: 'flex', alignItems: 'center' };
+  const rcRight: CellStyle = { ...GridSetting.CellStyle.RIGHT, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' };
+
+  const columnDefs = useMemo<ColDef<ProductInfoWithImg>[]>(
     () => [
       {
         field: 'no',
@@ -295,19 +318,28 @@ const ProductMng = () => {
         minWidth: 35,
         maxWidth: 35,
         valueGetter: (params) => (params.node ? (params.node.rowIndex ?? 0) + 1 : ''),
-        cellStyle: GridSetting.CellStyle.CENTER,
+        cellStyle: rcCenter,
         suppressHeaderMenuButton: true,
       },
+      {
+        field: 'imgUrl',
+        headerName: '이미지',
+        minWidth: 56,
+        maxWidth: 56,
+        suppressHeaderMenuButton: true,
+        cellStyle: { padding: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+        cellRenderer: (params: { value?: string }) =>
+          params.value ? <img src={params.value} style={{ height: '46px', width: '46px', objectFit: 'cover', borderRadius: '4px' }} /> : null,
+      },
       { field: 'partnerNm', headerName: '매장', minWidth: 60, maxWidth: 60, suppressHeaderMenuButton: true },
-      { field: 'prodNm', headerName: '품목명', minWidth: 130, maxWidth: 130, suppressHeaderMenuButton: true },
-      { field: 'prodDetTpNm', headerName: '분류', minWidth: 80, maxWidth: 80, suppressHeaderMenuButton: true },
+      { field: 'prodNm', headerName: '품목명', minWidth: 200, maxWidth: 200, suppressHeaderMenuButton: true },
       { field: 'season', headerName: '계절', minWidth: 60, maxWidth: 60, suppressHeaderMenuButton: true },
       { field: 'prodSizes', headerName: '크기', minWidth: 80, maxWidth: 80, suppressHeaderMenuButton: true },
       {
         field: 'prodColors',
         headerName: '색상',
-        minWidth: 100,
-        maxWidth: 100,
+        minWidth: 150,
+        maxWidth: 150,
         editable: true,
         cellEditor: 'agSelectCellEditor',
         cellEditorParams: (params: ICellEditorParams) => {
@@ -343,15 +375,15 @@ const ProductMng = () => {
         },
         suppressHeaderMenuButton: true,
       },
-      { field: 'makeYmd', headerName: '출시일', minWidth: 80, maxWidth: 80, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
+      { field: 'makeYmd', headerName: '등록일', minWidth: 80, maxWidth: 80, suppressHeaderMenuButton: true, cellStyle: rcCenter },
       {
         field: 'relCount',
         headerName: '연계',
-        minWidth: 50,
-        maxWidth: 50,
+        minWidth: 37,
+        maxWidth: 37,
         suppressHeaderMenuButton: true,
         cellStyle: (params) => ({
-          ...GridSetting.CellStyle.CENTER,
+          ...rcCenter,
           ...(params.value != null && params.value < 1 ? { color: '#ff6b6b', fontWeight: 700, background: 'rgba(255, 80, 80, 0.12)' } : {}),
         }),
       },
@@ -361,7 +393,7 @@ const ProductMng = () => {
         minWidth: 60,
         maxWidth: 60,
         suppressHeaderMenuButton: true,
-        cellStyle: GridSetting.CellStyle.RIGHT,
+        cellStyle: rcRight,
         cellRenderer: 'NUMBER_COMMA',
       },
       {
@@ -370,28 +402,51 @@ const ProductMng = () => {
         minWidth: 60,
         maxWidth: 60,
         suppressHeaderMenuButton: true,
-        cellStyle: GridSetting.CellStyle.RIGHT,
+        cellStyle: rcRight,
         cellRenderer: 'NUMBER_COMMA',
       },
-      { field: 'repFileIdCnt', headerName: '대표', minWidth: 40, maxWidth: 40, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
+      {
+        field: 'repFileIdCnt',
+        headerName: '대표 IMG',
+        minWidth: 60,
+        maxWidth: 60,
+        suppressHeaderMenuButton: true,
+        // tblBtn 은 height 20px 고정 + margin 0 !important 이므로, 셀에서 수직 중앙 정렬해야 한다
+        cellStyle: GridSetting.CellStyle.FLEX_CENTER,
+        // 카운트를 버튼 형태로 노출 (실제 동작은 onCellClicked 에서 처리되므로 클릭 전파를 막지 않는다)
+        // .tblBtn 기본 높이(20px)는 rowHeight 50 에서 얇아 보이므로 이 컬럼에서만 인라인으로 키운다
+        // (전역 .tblBtn 은 코드관리 등 다른 화면과 공유하므로 건드리지 않는다)
+        // 선택 상태는 조상 셀렉터(.ag-row-selected) 대신 버튼에 직접 .on 을 붙여 표현한다
+        cellRenderer: (p: ICellRendererParams<ProductMngResponseProductInfo>) => (
+          <button
+            type={'button'}
+            className={`tblBtn${p.node?.isSelected() ? ' on' : ''}`}
+            style={{ width: '100%', height: '32px' }}
+          >
+            {p.value ?? 0} 건
+          </button>
+        ),
+      },
       {
         field: 'detailFileIdCnt',
-        headerName: '상세',
-        minWidth: 40,
-        maxWidth: 40,
+        headerName: '상세 IMG',
+        minWidth: 60,
+        maxWidth: 60,
         suppressHeaderMenuButton: true,
-        cellStyle: GridSetting.CellStyle.CENTER,
+        cellStyle: rcCenter,
+        hide: true,
       },
       {
         field: 'sizeFileIdCnt',
         headerName: 'SIZE',
-        minWidth: 40,
-        maxWidth: 40,
+        minWidth: 60,
+        maxWidth: 60,
         suppressHeaderMenuButton: true,
-        cellStyle: GridSetting.CellStyle.CENTER,
+        cellStyle: rcCenter,
+        hide: true,
       },
       /*
-      { field: 'etcFileIdCnt', headerName: '기타이미지', minWidth: 80, maxWidth: 80, suppressHeaderMenuButton: true, cellStyle: GridSetting.CellStyle.CENTER },
+      { field: 'etcFileIdCnt', headerName: '기타이미지', minWidth: 80, maxWidth: 80, suppressHeaderMenuButton: true, cellStyle: rcCenter },
 */
     ],
     [onChangeDetFilters],
@@ -406,12 +461,19 @@ const ProductMng = () => {
     await productInfosRefetch();
   };
 
-  const onCellClickedCallBack = async (event: CellClickedEvent<ProductMngResponseProductInfo>) => {
+  const onCellClickedCallBack = async (event: CellClickedEvent<ProductInfoWithImg>) => {
     const cellsColField = event.column.getColDef().field;
 
     // 대표이미지 이하 4개의 컬럼 중 하나를 클릭하는 경우 동작
     if (cellsColField && ['repFileIdCnt', 'detailFileIdCnt', 'sizeFileIdCnt', 'etcFileIdCnt'].includes(cellsColField)) {
-      setProductInfoList(productInfos?.data.body || []); // query cached 된 값으로 초기화(색상 목록과의 상호작용으로 어떠한 색상이 선택되어 있는 경우에 대한 초기화 동작)
+      // query cached 된 값으로 초기화(색상 목록과의 상호작용으로 어떠한 색상이 선택되어 있는 경우에 대한 초기화 동작)
+      // 단, 비동기로 해석해둔 대표이미지 URL(imgUrl)은 유지한다.
+      setProductInfoList((prevState) =>
+        ((productInfos?.data.body || []) as ProductInfoWithImg[]).map((row) => ({
+          ...row,
+          imgUrl: prevState.find((prev) => prev.id === row.id)?.imgUrl,
+        })),
+      );
       onDetFiltersReset(); // 상세정보 필터 또한 초기화
 
       // if (event.data && (event.data[cellsColField as keyof ProductMngResponseProductInfo] as number) == 0) {
@@ -561,13 +623,20 @@ const ProductMng = () => {
           <div className="layoutBox">
             <div className={'layout75'}>
               <TableHeader count={productInfoList.length} search={search}></TableHeader>
-              <TunedGrid<ProductMngResponseProductInfo>
+              <TunedGrid<ProductInfoWithImg>
                 headerHeight={35}
+                // 46px 썸네일이 들어가도록 (ProdGroupMng 우측 그리드와 동일)
+                rowHeight={50}
                 onGridReady={onGridReady}
                 loading={isProductInfosLoading}
                 rowData={productInfoList}
+                // 행 데이터가 통째로 교체돼도(onCellClicked 의 목록 초기화 등) 행 노드 동일성이 유지되어
+                // 선택 상태가 풀리지 않도록 한다 (ProdGroupMng 와 동일)
+                getRowId={(params) => String(params.data.id)}
                 columnDefs={columnDefs}
-                defaultColDef={defaultColDef}
+                // cellStyle 을 따로 지정하지 않은 컬럼도 세로 중앙 정렬되도록 기본값을 준다
+                // (공용 defaultColDef 는 제네릭 없는 ColDef 라 field 타입 충돌 방지를 위해 캐스팅)
+                defaultColDef={{ ...(defaultColDef as ColDef<ProductInfoWithImg>), cellStyle: rcLeft }}
                 rowClassRules={{ 'row-muted': (p) => (p.data as any)?.showYn === 'N' }}
                 rowSelection={{
                   mode: 'singleRow',
@@ -576,6 +645,8 @@ const ProductMng = () => {
                 onSelectionChanged={(event) => {
                   const selectedRows = event.api.getSelectedRows();
                   setSelectedRowsData(selectedRows.length > 0 ? selectedRows[0] : undefined);
+                  // 선택 여부에 따라 버튼 상태가 바뀌므로 해당 컬럼 셀만 강제로 다시 그린다
+                  event.api.refreshCells({ columns: ['repFileIdCnt'], force: true });
                 }}
                 popupParent={typeof document !== 'undefined' ? document.body : undefined} // ag grid 내장 드롭다운 사용 시 그리드가 사라지는 현상을 방지하기 위하여 document.body 영역을 popup의 부모 요소로 명시 박근철 수정
                 onCellClicked={onCellClickedCallBack}

@@ -121,22 +121,6 @@ const ProdGroupMng = () => {
     },
     { field: 'prodNm', headerName: '상품명', minWidth: 130, maxWidth: 200, suppressHeaderMenuButton: true, cellStyle: rcLeft },
     {
-      field: 'prodTpNm',
-      headerName: '분류',
-      minWidth: 80,
-      maxWidth: 80,
-      suppressHeaderMenuButton: true,
-      cellStyle: rcCenter,
-    },
-    {
-      field: 'prodDetTpNm',
-      headerName: '소분류',
-      minWidth: 80,
-      maxWidth: 80,
-      suppressHeaderMenuButton: true,
-      cellStyle: rcCenter,
-    },
-    {
       field: 'prodColors',
       headerName: '칼라',
       minWidth: 80,

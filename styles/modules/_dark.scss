@@ -684,6 +684,13 @@
     color: var(--dark-text-muted) !important;
     &:hover { background-color: #383855 !important; color: var(--dark-text) !important; }
   }
+  // 선택된 행의 tblBtn: 다크에서도 '선택됨'이 드러나도록 강조 (위 !important 를 덮어야 함)
+  .tblBtn.on {
+    background-color: var(--main-color) !important;
+    border-color: var(--main-color) !important;
+    color: #fff !important;
+    &:hover { background-color: var(--main-color) !important; color: #fff !important; filter: brightness(1.1); }
+  }
 
   // ── 팝업 (Ant Design Modal) ──────────────────────────────
   .ant-modal-mask {
