@@ -3,18 +3,18 @@
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ColDef } from 'ag-grid-community';
-import { Search, Table, Title } from '../../../../components';
-import { useCommonStore } from '../../../../stores';
-import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
-import { useAgGridApi } from '../../../../hooks';
-import TunedGrid from '../../../../components/grid/TunedGrid';
-import CustomNoRowsOverlay from '../../../../components/CustomNoRowsOverlay';
-import CustomGridLoading from '../../../../components/CustomGridLoading';
-import useFilters from '../../../../hooks/useFilters';
-import { authApi } from '../../../../libs';
+import { Search, Table, Title } from '@/components';
+import { useCommonStore } from '@/stores';
+import { defaultColDef, GridSetting } from '@/libs/ag-grid';
+import { useAgGridApi } from '@/hooks';
+import TunedGrid from '@/components/grid/TunedGrid';
+import CustomNoRowsOverlay from '@/components/CustomNoRowsOverlay';
+import CustomGridLoading from '@/components/CustomGridLoading';
+import useFilters from '@/hooks/useFilters';
+import { authApi } from '@/libs';
 import ReactECharts from 'echarts-for-react';
 import dayjs from 'dayjs';
-import { useDarkMode } from '../../../../contexts/ThemeContext';
+import { useDarkMode } from '@/contexts/ThemeContext';
 
 // ─── 상수 ─────────────────────────────────────────────────────────────────────
 

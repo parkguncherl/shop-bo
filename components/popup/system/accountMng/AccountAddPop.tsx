@@ -1,22 +1,22 @@
-﻿import { useAccountStore } from '../../../../stores';
+﻿import { useAccountStore } from '@/stores';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useEffect, useRef, useState } from 'react';
-import { PopupContent } from '../../PopupContent';
-import { PopupFooter } from '../../PopupFooter';
-import { toastError, toastSuccess } from '../../../ToastMessage';
-import { UserRequestCreate, UserRequestCreateUseYn } from '../../../../generated';
-import { DefaultOptions, Placeholder } from '../../../../libs/const';
+import { PopupContent } from '@/components/popup/PopupContent';
+import { PopupFooter } from '@/components/popup/PopupFooter';
+import { toastError, toastSuccess } from '@/components/ToastMessage';
+import { UserRequestCreate, UserRequestCreateUseYn } from '@/generated';
+import { DefaultOptions, Placeholder } from '@/libs/const';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { authApi, YupSchema } from '../../../../libs';
-import FormInput from '../../../form/FormInput';
-import FormDropDown from '../../../form/FormDropDown';
-import Loading from '../../../Loading';
-import { PopupLayout } from '../../PopupLayout';
+import { authApi, YupSchema } from '@/libs';
+import FormInput from '@/components/form/FormInput';
+import FormDropDown from '@/components/form/FormDropDown';
+import Loading from '@/components/Loading';
+import { PopupLayout } from '@/components/popup/PopupLayout';
 import { useSession } from 'next-auth/react';
-import PopupFormGroup from '../../content/PopupFormGroup';
-import PopupFormBox from '../../content/PopupFormBox';
-import PopupFormType from '../../content/PopupFormType';
+import PopupFormGroup from '@/components/popup/content/PopupFormGroup';
+import PopupFormBox from '@/components/popup/content/PopupFormBox';
+import PopupFormType from '@/components/popup/content/PopupFormType';
 
 interface AccountAddPopProps {
   open: boolean;

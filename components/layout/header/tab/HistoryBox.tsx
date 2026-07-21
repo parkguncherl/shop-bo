@@ -3,11 +3,11 @@
 import { ReactSortable, SortableEvent } from 'react-sortablejs';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { HistoryType, useCommonStore, useMypageStore } from '../../../../stores';
+import { HistoryType, useCommonStore, useMypageStore } from '@/stores';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toastError, toastSuccess } from '../../../ToastMessage';
-import { authApi } from '../../../../libs';
-import { ApiResponseAuthResponseMenuAuth } from '../../../../generated';
+import { toastError, toastSuccess } from '@/components/ToastMessage';
+import { authApi } from '@/libs';
+import { ApiResponseAuthResponseMenuAuth } from '@/generated';
 
 export interface HistoryBoxRefProps {
   closeAllTabs: () => void;

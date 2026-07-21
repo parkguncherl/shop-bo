@@ -16,8 +16,8 @@ import {
   SortChangedEvent,
   ViewportChangedEvent,
 } from 'ag-grid-community';
-import { AG_GRID_LOCALE_KO, GridSetting, withCommonKeyboardSuppress } from '../../libs/ag-grid';
-import { useCommonStore } from '../../stores';
+import { AG_GRID_LOCALE_KO, GridSetting, withCommonKeyboardSuppress } from '@/libs/ag-grid';
+import { useCommonStore } from '@/stores';
 
 type clickSelectionConfig = {
   colField: string; // 적용 대상 컬럼

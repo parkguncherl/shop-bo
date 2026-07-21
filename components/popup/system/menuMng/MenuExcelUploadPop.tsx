@@ -1,13 +1,13 @@
 ﻿import React, { useRef, useState } from 'react';
-import { useMenuStore } from '../../../../stores';
-import { PopupContent } from '../../PopupContent';
-import { PopupSearchBox, PopupSearchType } from '../../content';
-import { PopupFooter } from '../../PopupFooter';
-import { toastError, toastSuccess } from '../../../ToastMessage';
-import { authApi } from '../../../../libs';
+import { useMenuStore } from '@/stores';
+import { PopupContent } from '@/components/popup/PopupContent';
+import { PopupSearchBox, PopupSearchType } from '@/components/popup/content';
+import { PopupFooter } from '@/components/popup/PopupFooter';
+import { toastError, toastSuccess } from '@/components/ToastMessage';
+import { authApi } from '@/libs';
 import { useQueryClient } from '@tanstack/react-query';
-import ModalLayout from '../../../ModalLayout';
-import { Utils } from '../../../../libs/utils';
+import ModalLayout from '@/components/ModalLayout';
+import { Utils } from '@/libs/utils';
 
 interface Props {
   callback?: () => void;

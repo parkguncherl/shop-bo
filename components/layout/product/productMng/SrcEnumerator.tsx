@@ -1,6 +1,6 @@
 ﻿import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useCommonStore } from '../../../../stores';
+import { useCommonStore } from '@/stores';
 
 export interface SrcElement {
   fileNm?: string;

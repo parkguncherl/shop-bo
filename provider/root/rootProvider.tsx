@@ -13,7 +13,7 @@ import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AxiosResponse } from 'axios';
-import { ApiResponse } from '../../generated';
+import { ApiResponse } from '@/generated';
 
 // dayjs 플러그인 설정
 dayjs.extend(utc);

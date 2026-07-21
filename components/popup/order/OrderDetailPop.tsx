@@ -3,18 +3,18 @@
 import React, { useState } from 'react';
 import { ColDef } from 'ag-grid-community';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toastError, toastSuccess } from '../../ToastMessage';
-import { PopupLayout } from '../PopupLayout';
-import { PopupFooter } from '../PopupFooter';
-import { authApi } from '../../../libs';
-import { defaultColDef, GridSetting } from '../../../libs/ag-grid';
-import TunedGrid from '../../grid/TunedGrid';
-import CustomNoRowsOverlay from '../../CustomNoRowsOverlay';
-import CustomGridLoading from '../../CustomGridLoading';
-import { Table } from '../../content/Table';
-import type { OrderResponseInfo } from '../../../generated/src/model/order-response-info';
-import type { OrderResponseItem } from '../../../generated/src/model/order-response-item';
-import { useDarkMode } from '../../../contexts/ThemeContext';
+import { toastError, toastSuccess } from '@/components/ToastMessage';
+import { PopupLayout } from '@/components/popup/PopupLayout';
+import { PopupFooter } from '@/components/popup/PopupFooter';
+import { authApi } from '@/libs';
+import { defaultColDef, GridSetting } from '@/libs/ag-grid';
+import TunedGrid from '@/components/grid/TunedGrid';
+import CustomNoRowsOverlay from '@/components/CustomNoRowsOverlay';
+import CustomGridLoading from '@/components/CustomGridLoading';
+import { Table } from '@/components/content/Table';
+import type { OrderResponseInfo } from '@/generated/src/model/order-response-info';
+import type { OrderResponseItem } from '@/generated/src/model/order-response-item';
+import { useDarkMode } from '@/contexts/ThemeContext';
 
 interface Props {
   orderId: number;

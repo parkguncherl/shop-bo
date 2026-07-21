@@ -2,8 +2,8 @@
 
 import { useEffect } from 'react';
 import { signOut, useSession } from 'next-auth/react';
-import { useAuthStore } from '../../../stores';
-import Loading from '../../../components/Loading';
+import { useAuthStore } from '@/stores';
+import Loading from '@/components/Loading';
 
 /**
  * 로그아웃을 희망할 시 리다이렉트하는 페이지의 클라이언트 영역

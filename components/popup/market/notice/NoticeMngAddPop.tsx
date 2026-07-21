@@ -2,18 +2,18 @@
 
 import React, { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { PopupLayout } from '../../PopupLayout';
-import { PopupContent } from '../../PopupContent';
-import { PopupFooter } from '../../PopupFooter';
-import PopupFormBox from '../../content/PopupFormBox';
-import PopupFormGroup from '../../content/PopupFormGroup';
-import PopupFormType from '../../content/PopupFormType';
-import FormInput from '../../../form/FormInput';
-import FormDropDown from '../../../form/FormDropDown';
-import { authApi } from '../../../../libs';
-import { toastError, toastSuccess } from '../../../ToastMessage';
-import { FileUploadPop } from '../../common/FileUploadPop';
-import { useCommonStore } from '../../../../stores';
+import { PopupLayout } from '@/components/popup/PopupLayout';
+import { PopupContent } from '@/components/popup/PopupContent';
+import { PopupFooter } from '@/components/popup/PopupFooter';
+import PopupFormBox from '@/components/popup/content/PopupFormBox';
+import PopupFormGroup from '@/components/popup/content/PopupFormGroup';
+import PopupFormType from '@/components/popup/content/PopupFormType';
+import FormInput from '@/components/form/FormInput';
+import FormDropDown from '@/components/form/FormDropDown';
+import { authApi } from '@/libs';
+import { toastError, toastSuccess } from '@/components/ToastMessage';
+import { FileUploadPop } from '@/components/popup/common/FileUploadPop';
+import { useCommonStore } from '@/stores';
 
 interface Props {
   open: boolean;

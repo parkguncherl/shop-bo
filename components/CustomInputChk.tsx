@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Utils } from '../libs/utils';
+import { Utils } from '@/libs/utils';
 import { toastError } from './ToastMessage';
-import { AlertMessage } from '../libs/const';
+import { AlertMessage } from '@/libs/const';
 import { Simulate } from 'react-dom/test-utils';
 import keyDown = Simulate.keyDown;
 import { CheckBox } from './CheckBox';

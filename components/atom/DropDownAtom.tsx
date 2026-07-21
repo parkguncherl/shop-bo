@@ -1,4 +1,4 @@
-import { DropDownOption } from '../../types/DropDownOptions';
+import { DropDownOption } from '@/types/DropDownOptions';
 import React from 'react';
 
 interface Props {

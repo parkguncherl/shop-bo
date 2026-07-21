@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
-import { PopupContent } from '../PopupContent';
-import { PopupFooter } from '../PopupFooter';
-import { authApi } from '../../../libs';
-import { toastError, toastSuccess } from '../../ToastMessage';
-import { CommonResponseFileDown } from '../../../generated';
-import { PopupLayout } from '../PopupLayout';
+import { PopupContent } from '@/components/popup/PopupContent';
+import { PopupFooter } from '@/components/popup/PopupFooter';
+import { authApi } from '@/libs';
+import { toastError, toastSuccess } from '@/components/ToastMessage';
+import { CommonResponseFileDown } from '@/generated';
+import { PopupLayout } from '@/components/popup/PopupLayout';
 
 interface LimitationOnImg {
   maxWidth?: number;

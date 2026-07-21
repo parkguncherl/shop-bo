@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { CodeControllerApi } from '../generated';
+import { CodeControllerApi } from '@/generated';
 
 const codeApi = new CodeControllerApi();
 

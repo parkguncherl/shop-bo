@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import styles from '../styles/components/imageSwiper.module.scss';
+import styles from '@/styles/components/imageSwiper.module.scss';
 
 interface ImageSwiperProps {
   images: string[];

@@ -1,16 +1,16 @@
 ﻿'use client';
 
 import React, { useEffect, useState } from 'react';
-import { PopupFooter } from '../PopupFooter';
-import { PopupContent } from '../PopupContent';
-import { PopupLayout } from '../PopupLayout';
-import { useCommonStore } from '../../../stores';
-import { usePartnerStore } from '../../../stores/usePartnerStore';
-import { PopupSearchBox, PopupSearchType } from '../content';
-import FormInput from '../../form/FormInput';
-import FormDropDown from '../../form/FormDropDown';
-import { Placeholder } from '../../../libs/const';
-import { PartnerRequestDelete, PartnerRequestUpdate } from '../../../generated';
+import { PopupFooter } from '@/components/popup/PopupFooter';
+import { PopupContent } from '@/components/popup/PopupContent';
+import { PopupLayout } from '@/components/popup/PopupLayout';
+import { useCommonStore } from '@/stores';
+import { usePartnerStore } from '@/stores/usePartnerStore';
+import { PopupSearchBox, PopupSearchType } from '@/components/popup/content';
+import FormInput from '@/components/form/FormInput';
+import FormDropDown from '@/components/form/FormDropDown';
+import { Placeholder } from '@/libs/const';
+import { PartnerRequestDelete, PartnerRequestUpdate } from '@/generated';
 
 type PartnerRequestUpdateExtended = PartnerRequestUpdate & {
   reviewPointRate?: number;
@@ -19,12 +19,12 @@ type PartnerRequestUpdateExtended = PartnerRequestUpdate & {
   aiStudyProdDetailText?: string;
 };
 
-import { authApi } from '../../../libs';
+import { authApi } from '@/libs';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toastError, toastSuccess } from '../../ToastMessage';
-import { DeleteConfirmModal } from '../../DeleteConfirmModal';
-import { DropDownOption } from '../../../types/DropDownOptions';
-import useAppStore from '../../../stores/useAppStore';
+import { toastError, toastSuccess } from '@/components/ToastMessage';
+import { DeleteConfirmModal } from '@/components/DeleteConfirmModal';
+import { DropDownOption } from '@/types/DropDownOptions';
+import useAppStore from '@/stores/useAppStore';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 interface Props {

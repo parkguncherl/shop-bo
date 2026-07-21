@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
-import { ThemeContext } from '../../contexts/ThemeContext';
+import { ThemeContext } from '@/contexts/ThemeContext';
 
 /**
  * 테마(다크모드) 컨텍스트 제공자.

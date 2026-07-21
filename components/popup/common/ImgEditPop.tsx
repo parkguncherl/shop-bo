@@ -1,16 +1,16 @@
 ﻿import React, { useRef, useState } from 'react';
-import { PopupFooter } from '../PopupFooter';
-import { PopupContent } from '../PopupContent';
-import { PopupLayout } from '../PopupLayout';
-import CanvasByKonva, { CanvasByKonvaRef } from '../../drawing/CanvasByKonva';
-import useFilters from '../../../hooks/useFilters';
-import { CustomColorPicker } from '../../CustomColorPicker';
-import { toastError } from '../../ToastMessage';
-import { ConfirmModal } from '../../ConfirmModal';
-import { Search } from '../../content';
+import { PopupFooter } from '@/components/popup/PopupFooter';
+import { PopupContent } from '@/components/popup/PopupContent';
+import { PopupLayout } from '@/components/popup/PopupLayout';
+import CanvasByKonva, { CanvasByKonvaRef } from '@/components/drawing/CanvasByKonva';
+import useFilters from '@/hooks/useFilters';
+import { CustomColorPicker } from '@/components/CustomColorPicker';
+import { toastError } from '@/components/ToastMessage';
+import { ConfirmModal } from '@/components/ConfirmModal';
+import { Search } from '@/components/content';
 
-import icoUndo from '../../../public/images/ico_undo.svg';
-import icoRedo from '../../../public/images/ico_redo.svg';
+import icoUndo from '@/public/images/ico_undo.svg';
+import icoRedo from '@/public/images/ico_redo.svg';
 
 export interface ImgPropsOnEditPop {
   imgFileId?: number;

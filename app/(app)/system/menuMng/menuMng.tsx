@@ -1,19 +1,19 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { Table, Title } from '../../../../components';
-import { Menu, ApiResponseListMenu, MenuResponsePaging } from '../../../../generated';
+import { Table, Title } from '@/components';
+import { Menu, ApiResponseListMenu, MenuResponsePaging } from '@/generated';
 import { CellClickedEvent, ColDef, RowDoubleClickedEvent } from 'ag-grid-community';
-import { Pagination, TableHeader, toastError } from '../../../../components';
-import { useCommonStore, useMenuStore } from '../../../../stores';
+import { Pagination, TableHeader, toastError } from '@/components';
+import { useCommonStore, useMenuStore } from '@/stores';
 import { useQuery } from '@tanstack/react-query';
-import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
-import { useAgGridApi } from '../../../../hooks';
-import { MenuAddPop, MenuAuthPop, MenuModPop, MenuExcelUploadPop } from '../../../../components/popup/system/menuMng';
-import { authApi } from '../../../../libs';
-import { DropDownOption } from '../../../../types/DropDownOptions';
-import { AuthsCellRenderer } from '../../../../components/cellRenderer/menu/AuthsCellRender';
-import TunedGrid from '../../../../components/grid/TunedGrid';
+import { defaultColDef, GridSetting } from '@/libs/ag-grid';
+import { useAgGridApi } from '@/hooks';
+import { MenuAddPop, MenuAuthPop, MenuModPop, MenuExcelUploadPop } from '@/components/popup/system/menuMng';
+import { authApi } from '@/libs';
+import { DropDownOption } from '@/types/DropDownOptions';
+import { AuthsCellRenderer } from '@/components/cellRenderer/menu/AuthsCellRender';
+import TunedGrid from '@/components/grid/TunedGrid';
 
 /** 시스템 - 메뉴접근 권한관리 페이지 */
 const MenuMng = () => {

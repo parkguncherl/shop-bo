@@ -1,16 +1,16 @@
 import React from 'react';
-import stylesForLayout from '../../styles/layout/layout.module.scss';
-import stylesForHeader from '../../styles/layout/header.module.scss';
+import stylesForLayout from '@/styles/layout/layout.module.scss';
+import stylesForHeader from '@/styles/layout/header.module.scss';
 
-import NavList from '../../components/layout/leftNav/NavList';
-import BriefUserInfo from '../../components/layout/leftNav/BriefUserInfo';
+import NavList from '@/components/layout/leftNav/NavList';
+import BriefUserInfo from '@/components/layout/leftNav/BriefUserInfo';
 import Link from 'next/link';
-import SignOutBtn from '../../components/layout/header/SignOutBtn';
-import HistoryBox from '../../components/layout/header/tab/HistoryBox';
-import FavoriteBox from '../../components/layout/header/tab/FavoriteBox';
-import AuthStatusChecker from '../../components/layout/header/AuthStatusChecker';
-import ThemeApplier from '../../components/layout/ThemeApplier';
-import ThemeProvider from '../../components/layout/ThemeProvider';
+import SignOutBtn from '@/components/layout/header/SignOutBtn';
+import HistoryBox from '@/components/layout/header/tab/HistoryBox';
+import FavoriteBox from '@/components/layout/header/tab/FavoriteBox';
+import AuthStatusChecker from '@/components/layout/header/AuthStatusChecker';
+import ThemeApplier from '@/components/layout/ThemeApplier';
+import ThemeProvider from '@/components/layout/ThemeProvider';
 
 /**
  * (server side)AppLayout

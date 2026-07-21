@@ -9,17 +9,17 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { defaultColDef, GridSetting } from '@/libs/ag-grid';
 import { useAgGridApi } from '@/hooks';
 import { authApi } from '@/libs';
-import TunedGrid, { TunedGridRef } from '../../../../components/grid/TunedGrid';
+import TunedGrid, { TunedGridRef } from '@/components/grid/TunedGrid';
 import { useProductContentListStore } from '@/stores/product/useProductContentListStore';
-import useFilters from '../../../../hooks/useFilters';
-import useDebounce from '../../../../hooks/useDebounce';
+import useFilters from '@/hooks/useFilters';
+import useDebounce from '@/hooks/useDebounce';
 import { Placeholder } from '@/libs/const';
 import { ConfirmModal } from '@/components/ConfirmModal';
-import ProductAddPop from '../../../../components/popup/product/contentList/ProductAddPop';
+import ProductAddPop from '@/components/popup/product/contentList/ProductAddPop';
 import { CustomSwitch } from '@/components/CustomSwitch';
-import ImgPreviewBox, { ImgPreviewFileDet } from '../../../../components/content/ImgPreviewBox';
-import ProductContentPop from '../../../../components/popup/product/contentList/ProductContentPop';
-import ProductContentPreviewPop from '../../../../components/popup/product/contentList/ProductContentPreviewPop';
+import ImgPreviewBox, { ImgPreviewFileDet } from '@/components/content/ImgPreviewBox';
+import ProductContentPop from '@/components/popup/product/contentList/ProductContentPop';
+import ProductContentPreviewPop from '@/components/popup/product/contentList/ProductContentPreviewPop';
 import {
   FileDet,
   ProductContentListRequestContentsProductInfoListFilter,

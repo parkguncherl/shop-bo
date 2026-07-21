@@ -3,10 +3,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { useQuery } from '@tanstack/react-query';
-import { authApi } from '../../libs';
+import { authApi } from '@/libs';
 import dayjs from 'dayjs';
 import { useSession } from 'next-auth/react';
-import { useDarkMode } from '../../contexts/ThemeContext';
+import { useDarkMode } from '@/contexts/ThemeContext';
 
 type ProductViewItem = {
   prodId: number;

@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react';
-import { DropDown } from '../DropDown';
-import { CustomInput } from '../CustomInput';
-import { DataList } from '../DataList';
-import { CustomInputChk } from '../CustomInputChk';
-import { CustomSwitch } from '../CustomSwitch';
-import SearchBar from '../search/SearchBar';
+import { DropDown } from '@/components/DropDown';
+import { CustomInput } from '@/components/CustomInput';
+import { DataList } from '@/components/DataList';
+import { CustomInputChk } from '@/components/CustomInputChk';
+import { CustomSwitch } from '@/components/CustomSwitch';
+import SearchBar from '@/components/search/SearchBar';
 
 interface Props {
   className: string;

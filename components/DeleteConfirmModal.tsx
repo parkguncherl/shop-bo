@@ -3,7 +3,7 @@ import React, { PropsWithChildren } from 'react';
 import { PopupFooter } from './popup';
 import styled from 'styled-components';
 import Image from 'next/image';
-import ConfirmIcon from '../public/ico/ico_confirm.svg';
+import ConfirmIcon from '@/public/ico/ico_confirm.svg';
 
 interface Props {
   dispTitle?: string;

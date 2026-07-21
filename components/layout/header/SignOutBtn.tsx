@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ConfirmModal } from '../../ConfirmModal';
+import { ConfirmModal } from '@/components/ConfirmModal';
 import { useRouter } from 'next/navigation';
 
 /**

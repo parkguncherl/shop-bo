@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import { ICellRendererParams } from 'ag-grid-community';
-import { CodeResponsePaging } from '../../../generated';
-import { useCodeStore, useCommonStore } from '../../../stores';
+import { CodeResponsePaging } from '@/generated';
+import { useCodeStore, useCommonStore } from '@/stores';
 
 type ICellRendererType = ICellRendererParams;
 

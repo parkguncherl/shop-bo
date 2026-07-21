@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Draggable from 'react-draggable';
-import { Modal } from '../modal/Modal';
+import { Modal } from '@/components/modal/Modal';
 import { PopupHeader } from './PopupHeader';
 
 // const cx = classNames.bind(styles);

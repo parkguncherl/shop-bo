@@ -1,8 +1,8 @@
 // hooks/usePartnerCodeList.ts
 import { useQuery } from '@tanstack/react-query';
-import { authApi } from '../libs';
-import { toastError } from '../components';
-import { PartnerResponseForSearching } from '../generated';
+import { authApi } from '@/libs';
+import { toastError } from '@/components';
+import { PartnerResponseForSearching } from '@/generated';
 interface UsePartnerListParams {
   enabled?: boolean;
   staleTime?: number;

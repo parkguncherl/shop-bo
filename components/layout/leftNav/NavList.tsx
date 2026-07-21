@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { ApiResponseListLeftMenu, LeftMenu } from '../../../generated';
+import { ApiResponseListLeftMenu, LeftMenu } from '@/generated';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { authApi } from '../../../libs';
+import { authApi } from '@/libs';
 import { useSession } from 'next-auth/react';
 
 interface IMenu {

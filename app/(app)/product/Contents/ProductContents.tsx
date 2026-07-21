@@ -1,18 +1,18 @@
 ﻿'use client';
 
 import React, { useState } from 'react';
-import { Title, toastError, toastSuccess } from '../../../../components';
-import { useCommonStore } from '../../../../stores';
+import { Title, toastError, toastSuccess } from '@/components';
+import { useCommonStore } from '@/stores';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { YupSchema } from '../../../../libs';
-import FormEnhancedTextArea, { ContentElement, EnhancedTextAreasMode, FileInfo } from '../../../../components/form/FormEnhancedTextArea';
-import FormInput from '../../../../components/form/FormInput';
-import { ConfirmModal } from '../../../../components/ConfirmModal';
+import { YupSchema } from '@/libs';
+import FormEnhancedTextArea, { ContentElement, EnhancedTextAreasMode, FileInfo } from '@/components/form/FormEnhancedTextArea';
+import FormInput from '@/components/form/FormInput';
+import { ConfirmModal } from '@/components/ConfirmModal';
 import { SubmitErrorHandler } from 'react-hook-form/dist/types/form';
-import { useProductContentsStore } from '../../../../stores/product/useProductContentsStore';
+import { useProductContentsStore } from '@/stores/product/useProductContentsStore';
 import { useMutation } from '@tanstack/react-query';
-import { Formatter } from '../../../../libs/const';
+import { Formatter } from '@/libs/const';
 
 // todo export
 export interface ProductContentsFields {

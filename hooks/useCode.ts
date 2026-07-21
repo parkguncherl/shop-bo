@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { authApi } from '../libs';
+import { authApi } from '@/libs';
 
 export function useCode(codeUpper: string) {
   return useQuery({

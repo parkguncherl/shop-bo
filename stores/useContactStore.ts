@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { ApiResponsePageResponseContactResponsePaging, ContactResponsePaging, PageObject } from '../generated';
+import { ApiResponsePageResponseContactResponsePaging, ContactResponsePaging, PageObject } from '@/generated';
 import { AxiosPromise } from 'axios';
-import { authApi } from '../libs';
+import { authApi } from '@/libs';
 
 type ModalType = 'DETAIL';
 

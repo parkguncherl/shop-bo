@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import DropDownAtom from './atom/DropDownAtom';
-import { DataListOption } from '../types/DataListOptions';
+import { DataListOption } from '@/types/DataListOptions';
 
 interface Props {
   options?: DataListOption[];

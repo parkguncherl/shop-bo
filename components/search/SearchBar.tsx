@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { ApiResponse } from '../../generated';
-import { DataListOption } from '../../types/DataListOptions';
-import { toastError } from '../ToastMessage';
+import { ApiResponse } from '@/generated';
+import { DataListOption } from '@/types/DataListOptions';
+import { toastError } from '@/components/ToastMessage';
 import { AxiosPromise, AxiosResponse } from 'axios';
-import { DataList } from '../DataList';
+import { DataList } from '@/components/DataList';
 
 interface Props<T> {
   title?: string;

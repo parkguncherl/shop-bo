@@ -1,22 +1,22 @@
 ﻿import React, { useEffect, useReducer, useState } from 'react';
-import { PopupFooter } from '../../PopupFooter';
-import { PopupContent } from '../../PopupContent';
-import { PopupLayout } from '../../PopupLayout';
-import PopupFormBox from '../../content/PopupFormBox';
-import PopupFormGroup from '../../content/PopupFormGroup';
-import PopupFormType from '../../content/PopupFormType';
-import FormInput from '../../../form/FormInput';
+import { PopupFooter } from '@/components/popup/PopupFooter';
+import { PopupContent } from '@/components/popup/PopupContent';
+import { PopupLayout } from '@/components/popup/PopupLayout';
+import PopupFormBox from '@/components/popup/content/PopupFormBox';
+import PopupFormGroup from '@/components/popup/content/PopupFormGroup';
+import PopupFormType from '@/components/popup/content/PopupFormType';
+import FormInput from '@/components/form/FormInput';
 import { SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { YupSchema } from '../../../../libs';
-import { toastError, toastSuccess } from '../../../ToastMessage';
-import { Formatter, RegExpression } from '../../../../libs/const';
-import { ConfirmModal } from '../../../ConfirmModal';
-import FormCombineParagraphs, { ContentElement, EnhancedTextAreasMode, FileInfo } from '../../../form/FormCombineParagraphs';
-import { useProductContentListStore } from '../../../../stores/product/useProductContentListStore';
-import { ProductContentListResponseProductContent } from '../../../../generated';
-import { useCommonStore } from '../../../../stores';
+import { YupSchema } from '@/libs';
+import { toastError, toastSuccess } from '@/components/ToastMessage';
+import { Formatter, RegExpression } from '@/libs/const';
+import { ConfirmModal } from '@/components/ConfirmModal';
+import FormCombineParagraphs, { ContentElement, EnhancedTextAreasMode, FileInfo } from '@/components/form/FormCombineParagraphs';
+import { useProductContentListStore } from '@/stores/product/useProductContentListStore';
+import { ProductContentListResponseProductContent } from '@/generated';
+import { useCommonStore } from '@/stores';
 
 interface ProductContentShowPopProps {
   open: boolean;

@@ -1,15 +1,15 @@
 ﻿import React, { useEffect, useRef, useState } from 'react';
 import { Menu, MenuRequestCreate } from '@/generated';
-import { PopupContent, PopupFooter, PopupLayout } from '../../index';
-import { PopupSearchBox, PopupSearchType } from '../../content';
+import { PopupContent, PopupFooter, PopupLayout } from '@/components/popup/index';
+import { PopupSearchBox, PopupSearchType } from '@/components/popup/content';
 import { Input, toastError, toastSuccess } from '@/components';
 import { useMenuStore } from '@/stores';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import FormInput from '../../../form/FormInput';
+import FormInput from '@/components/form/FormInput';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '@/libs';
-import Loading from '../../../Loading';
+import Loading from '@/components/Loading';
 
 interface Props {
   data: Menu;

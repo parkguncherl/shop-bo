@@ -1,8 +1,8 @@
 ﻿import React from 'react';
-import { PopupContent, PopupFooter, PopupLayout } from '../../index';
-import { PopupSearchBox, PopupSearchType } from '../../content';
-import { Label } from '../../../index';
-import { useContactState } from '../../../../stores';
+import { PopupContent, PopupFooter, PopupLayout } from '@/components/popup';
+import { PopupSearchBox, PopupSearchType } from '@/components/popup/content';
+import { Label } from '@/components';
+import { useContactState } from '@/stores';
 import { isEmpty } from 'lodash';
 
 export const AccessLogDeatilPop = () => {

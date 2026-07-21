@@ -3,9 +3,9 @@ import { createStore, useStore } from 'zustand';
 
 import { Session } from 'next-auth';
 import { signOut, useSession } from 'next-auth/react';
-import { ISessionUser } from '../types/next-auth';
-import { toastError } from '../components';
-import Loading from '../components/Loading';
+import { ISessionUser } from '@/types/next-auth';
+import { toastError } from '@/components';
+import Loading from '@/components/Loading';
 
 interface IProps {
   children: React.ReactNode;

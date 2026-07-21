@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import ModalLayout from '../components/ModalLayout';
+import ModalLayout from '@/components/ModalLayout';
 
 interface Props {
   width: number;

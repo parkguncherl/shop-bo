@@ -1,4 +1,4 @@
-import { PageObject } from '../generated';
+import { PageObject } from '@/generated';
 import Link from 'next/link';
 interface Props {
   pageObject: PageObject;

@@ -1,20 +1,20 @@
 ﻿import { useAccountStore } from '@/stores';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React, { useRef, useState } from 'react';
-import { PopupContent } from '../../PopupContent';
-import { PopupSearchBox, PopupSearchType } from '../../content';
-import { PopupFooter } from '../../PopupFooter';
+import { PopupContent } from '@/components/popup/PopupContent';
+import { PopupSearchBox, PopupSearchType } from '@/components/popup/content';
+import { PopupFooter } from '@/components/popup/PopupFooter';
 import { toastError, toastSuccess } from '@/components';
 import { UserRequestUnLock, UserResponseSelectByLoginId } from '@/generated';
 import { Placeholder } from '@/libs/const';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '@/libs';
-import FormInput from '../../../form/FormInput';
+import FormInput from '@/components/form/FormInput';
 import { Label } from '@/components';
-import styles from '../../../../styles/popup/popup.module.scss';
-import Loading from '../../../Loading';
-import { PopupLayout } from '../../PopupLayout';
+import styles from '@/styles/popup/popup.module.scss';
+import Loading from '@/components/Loading';
+import { PopupLayout } from '@/components/popup/PopupLayout';
 
 interface Props {
   data: UserResponseSelectByLoginId;

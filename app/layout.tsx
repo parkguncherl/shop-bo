@@ -1,10 +1,10 @@
 import React from 'react';
-import RootProvider from '../provider/root/rootProvider';
+import RootProvider from '@/provider/root/rootProvider';
 import GlobalErrorBoundary from './globalErrorBoundary';
 import { Metadata } from 'next';
 
 // 정적 css 파일 목록
-import '../styles/global.scss';
+import '@/styles/global.scss';
 // Tailwind CSS v4 + shadcn/ui 기반 스타일 (preflight 제외 → 기존 antd/scss 화면에 영향 없음)
 import './globals.css';
 

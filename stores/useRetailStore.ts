@@ -4,7 +4,7 @@ import { immer } from 'zustand/middleware/immer';
 import {
   ApiResponse,
   PageObject,
-} from '../generated';
+} from '@/generated';
 type RetailRequestPagingFilter = any;
 type RetailResponsePaging = any;
 type RetailRequestCreate = any;
@@ -15,7 +15,7 @@ type RetailRequestUpdateSleepStatus = any;
 type RetailResponseDetail = any;
 type RetailRequestRetailAmtFilter = any;
 import { AxiosPromise } from 'axios';
-import { authApi } from '../libs';
+import { authApi } from '@/libs';
 import { StateCreator } from 'zustand/esm';
 
 type ModalType = 'CATEGORYSETTING' | 'ADD' | 'MOD' | 'CONFIRM' | 'DELETE' | 'DELETE_RECOMMAND' | 'UPDATE_SLEEP_STATUS';

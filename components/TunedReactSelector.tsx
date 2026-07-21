@@ -1,7 +1,7 @@
 import React, { useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { useDarkMode } from '../contexts/ThemeContext';
+import { useDarkMode } from '@/contexts/ThemeContext';
 import { ActionMeta, InputActionMeta, SelectInstance } from 'react-select';
-import { DropDownOption } from '../types/DropDownOptions';
+import { DropDownOption } from '@/types/DropDownOptions';
 import ClientSidedReactSelect from './clientSideOnly/ClientSidedReactSelect';
 
 interface Props {

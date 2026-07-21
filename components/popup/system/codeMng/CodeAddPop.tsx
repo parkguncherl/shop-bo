@@ -1,19 +1,19 @@
-﻿import { CodeRequestCreate, CodeResponsePaging } from '../../../../generated';
+﻿import { CodeRequestCreate, CodeResponsePaging } from '@/generated';
 import React, { useRef } from 'react';
-import { PopupContent } from '../../PopupContent';
-import { PopupSearchBox, PopupSearchType } from '../../content';
-import { Input } from '../../../Input';
-import { PopupFooter } from '../../PopupFooter';
-import { useCodeStore } from '../../../../stores';
+import { PopupContent } from '@/components/popup/PopupContent';
+import { PopupSearchBox, PopupSearchType } from '@/components/popup/content';
+import { Input } from '@/components/Input';
+import { PopupFooter } from '@/components/popup/PopupFooter';
+import { useCodeStore } from '@/stores';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toastError, toastSuccess } from '../../../ToastMessage';
-import { Placeholder } from '../../../../libs/const';
+import { toastError, toastSuccess } from '@/components/ToastMessage';
+import { Placeholder } from '@/libs/const';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { YupSchema } from '../../../../libs';
-import FormInput from '../../../form/FormInput';
-import Loading from '../../../Loading';
-import { PopupLayout } from '../../PopupLayout';
+import { YupSchema } from '@/libs';
+import FormInput from '@/components/form/FormInput';
+import Loading from '@/components/Loading';
+import { PopupLayout } from '@/components/popup/PopupLayout';
 
 export type CodeRequestCreateFields = {
   codeUpper: string;

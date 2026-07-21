@@ -3,18 +3,18 @@ import { useCodeStore, useCommonStore } from '@/stores';
 import React, { useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toastError, toastSuccess } from '@/components';
-import { PopupContent } from '../../PopupContent';
-import { PopupSearchBox, PopupSearchType } from '../../content';
+import { PopupContent } from '@/components/popup/PopupContent';
+import { PopupSearchBox, PopupSearchType } from '@/components/popup/content';
 import { Input } from '@/components';
-import { PopupFooter } from '../../PopupFooter';
+import { PopupFooter } from '@/components/popup/PopupFooter';
 import { Placeholder } from '@/libs/const';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '@/libs';
-import FormInput from '../../../form/FormInput';
-import FormDropDown from '../../../form/FormDropDown';
-import Loading from '../../../Loading';
-import { PopupLayout } from '../../PopupLayout';
+import FormInput from '@/components/form/FormInput';
+import FormDropDown from '@/components/form/FormDropDown';
+import Loading from '@/components/Loading';
+import { PopupLayout } from '@/components/popup/PopupLayout';
 
 interface Props {
   data: CodeResponsePaging;

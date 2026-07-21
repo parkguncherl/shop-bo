@@ -1,4 +1,4 @@
-import { JwtAuthToken, UserResponseSelectByLoginId } from '../generated';
+import { JwtAuthToken, UserResponseSelectByLoginId } from '@/generated';
 
 interface ISessionUser extends UserResponseSelectByLoginId {
   token: JwtAuthToken;

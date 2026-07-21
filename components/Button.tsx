@@ -1,5 +1,5 @@
 import React, { ReactElement, ReactNode } from 'react';
-import { IComponentProps } from '../types/IComponentProps';
+import { IComponentProps } from '@/types/IComponentProps';
 
 type ButtonStyle = IComponentProps;
 

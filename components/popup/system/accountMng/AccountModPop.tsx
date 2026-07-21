@@ -1,22 +1,22 @@
-﻿import { UserRequestCreateUseYn, UserRequestDelete, UserRequestPasswordInit, UserRequestUpdate, UserResponseSelectByLoginId } from '../../../../generated';
-import { useAccountStore, useCommonStore } from '../../../../stores';
+﻿import { UserRequestCreateUseYn, UserRequestDelete, UserRequestPasswordInit, UserRequestUpdate, UserResponseSelectByLoginId } from '@/generated';
+import { useAccountStore, useCommonStore } from '@/stores';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React, { useEffect, useRef, useState } from 'react';
-import { PopupContent } from '../../PopupContent';
-import { PopupFooter } from '../../PopupFooter';
-import { toastError, toastSuccess } from '../../../ToastMessage';
-import { DefaultOptions, Placeholder } from '../../../../libs/const';
-import { DeleteConfirmModal } from '../../../DeleteConfirmModal';
+import { PopupContent } from '@/components/popup/PopupContent';
+import { PopupFooter } from '@/components/popup/PopupFooter';
+import { toastError, toastSuccess } from '@/components/ToastMessage';
+import { DefaultOptions, Placeholder } from '@/libs/const';
+import { DeleteConfirmModal } from '@/components/DeleteConfirmModal';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { YupSchema } from '../../../../libs';
-import FormInput from '../../../form/FormInput';
-import FormDropDown from '../../../form/FormDropDown';
-import Loading from '../../../Loading';
-import { PopupLayout } from '../../PopupLayout';
-import PopupFormBox from '../../content/PopupFormBox';
-import PopupFormType from '../../content/PopupFormType';
-import PopupFormGroup from '../../content/PopupFormGroup';
+import { YupSchema } from '@/libs';
+import FormInput from '@/components/form/FormInput';
+import FormDropDown from '@/components/form/FormDropDown';
+import Loading from '@/components/Loading';
+import { PopupLayout } from '@/components/popup/PopupLayout';
+import PopupFormBox from '@/components/popup/content/PopupFormBox';
+import PopupFormType from '@/components/popup/content/PopupFormType';
+import PopupFormGroup from '@/components/popup/content/PopupFormGroup';
 
 interface AccountModPopProps {
   open: boolean;

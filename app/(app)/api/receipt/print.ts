@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { handlePrinterApiRoute } from '../../../../Receipt/ReceiptPrinter';
+import { handlePrinterApiRoute } from '@/Receipt/ReceiptPrinter';
 
 /**
  * 영수증 출력 API 라우트 핸들러

@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { PopupLayout } from '../../PopupLayout';
-import { PopupContent } from '../../PopupContent';
-import { PopupFooter } from '../../PopupFooter';
-import { ProductContentListResponseProductContent } from '../../../../generated';
-import { useCommonStore } from '../../../../stores';
-import { RegExpression } from '../../../../libs/const';
+import { PopupLayout } from '@/components/popup/PopupLayout';
+import { PopupContent } from '@/components/popup/PopupContent';
+import { PopupFooter } from '@/components/popup/PopupFooter';
+import { ProductContentListResponseProductContent } from '@/generated';
+import { useCommonStore } from '@/stores';
+import { RegExpression } from '@/libs/const';
 
 interface Props {
   open: boolean;

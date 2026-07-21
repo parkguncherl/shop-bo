@@ -1,6 +1,6 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { ApiResponseLoginResponse } from '../../../../../generated';
+import { ApiResponseLoginResponse } from '@/generated';
 import dayjs from 'dayjs';
 import axios from 'axios';
 

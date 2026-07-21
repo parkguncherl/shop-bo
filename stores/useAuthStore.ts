@@ -1,8 +1,8 @@
 import { create, StateCreator } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { authApi, publicApi } from '../libs';
-import { ApiResponse, ApiResponseLoginResponse, JwtAuthToken, LoginRequest, User } from '../generated';
+import { authApi, publicApi } from '@/libs';
+import { ApiResponse, ApiResponseLoginResponse, JwtAuthToken, LoginRequest, User } from '@/generated';
 import { AxiosPromise } from 'axios';
 
 type ModalType = 'FIRST' | 'LONGTIMENOSEE' | 'FINDPASS';

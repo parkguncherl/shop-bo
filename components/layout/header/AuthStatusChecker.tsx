@@ -1,11 +1,11 @@
 'use client';
 
-import { ApiResponseAuthResponseMenuAuth } from '../../../generated';
-import { authApi } from '../../../libs';
+import { ApiResponseAuthResponseMenuAuth } from '@/generated';
+import { authApi } from '@/libs';
 import { usePathname, useRouter } from 'next/navigation';
-import { toastError } from '../../ToastMessage';
-import { LOCAL_STORAGE_WMS_HISTORY } from '../../../libs/const';
-import { useCommonStore } from '../../../stores';
+import { toastError } from '@/components/ToastMessage';
+import { LOCAL_STORAGE_WMS_HISTORY } from '@/libs/const';
+import { useCommonStore } from '@/stores';
 import { useEffect } from 'react';
 
 /**

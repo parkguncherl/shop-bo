@@ -8,16 +8,16 @@ import { useCommonStore } from '@/stores';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { defaultColDef, GridSetting } from '@/libs/ag-grid';
 import { useAgGridApi } from '@/hooks';
-import useFilters from '../../../../hooks/useFilters';
-import CustomNoRowsOverlay from '../../../../components/CustomNoRowsOverlay';
-import CustomGridLoading from '../../../../components/CustomGridLoading';
-import TunedGrid, { TunedGridRef } from '../../../../components/grid/TunedGrid';
+import useFilters from '@/hooks/useFilters';
+import CustomNoRowsOverlay from '@/components/CustomNoRowsOverlay';
+import CustomGridLoading from '@/components/CustomGridLoading';
+import TunedGrid, { TunedGridRef } from '@/components/grid/TunedGrid';
 import { authApi } from '@/libs';
 import dayjs from 'dayjs';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { useReceivingStore } from '@/stores/product/useReceivingStore';
-import ReceivingAddPop from '../../../../components/popup/product/receiving/ReceivingAddPop';
-import ReceivingModPop from '../../../../components/popup/product/receiving/ReceivingModPop';
+import ReceivingAddPop from '@/components/popup/product/receiving/ReceivingAddPop';
+import ReceivingModPop from '@/components/popup/product/receiving/ReceivingModPop';
 import { ReceivingResponseReceivingItem } from '@/generated';
 
 type ListFilter = {

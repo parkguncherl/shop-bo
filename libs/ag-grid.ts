@@ -1,7 +1,7 @@
 // C:\work\shop-frontend\libs\ag-grid.ts
 
 import { ColDef, SuppressKeyboardEventParams } from 'ag-grid-community';
-import CustomTooltip from '../components/CustomTooltip';
+import CustomTooltip from '@/components/CustomTooltip';
 import { Utils } from './utils';
 import dayjs from 'dayjs';
 

@@ -11,9 +11,9 @@ import {
   CodeRequestUpdate,
   CodeResponsePaging,
   PageObject,
-} from '../generated';
+} from '@/generated';
 import { AxiosPromise } from 'axios';
-import { authApi, authDownApi } from '../libs';
+import { authApi, authDownApi } from '@/libs';
 import { StateCreator } from 'zustand/esm';
 
 type CodeControllerApiSelectCodePagingRequest = any;

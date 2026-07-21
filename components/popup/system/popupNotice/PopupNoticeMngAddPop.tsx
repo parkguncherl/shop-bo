@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { PopupLayout } from '../../PopupLayout';
-import { PopupContent } from '../../PopupContent';
-import { PopupFooter } from '../../PopupFooter';
-import { authApi } from '../../../../libs';
-import { toastError, toastSuccess } from '../../../ToastMessage';
-import { FileUploadPop } from '../../common/FileUploadPop';
-import { useCommonStore } from '../../../../stores';
+import { PopupLayout } from '@/components/popup/PopupLayout';
+import { PopupContent } from '@/components/popup/PopupContent';
+import { PopupFooter } from '@/components/popup/PopupFooter';
+import { authApi } from '@/libs';
+import { toastError, toastSuccess } from '@/components/ToastMessage';
+import { FileUploadPop } from '@/components/popup/common/FileUploadPop';
+import { useCommonStore } from '@/stores';
 
 interface Props {
   open: boolean;

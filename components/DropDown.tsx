@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { authApi } from '../libs';
-import { ApiResponseListCodeDropDown } from '../generated';
+import { authApi } from '@/libs';
+import { ApiResponseListCodeDropDown } from '@/generated';
 import { useQuery } from '@tanstack/react-query';
 import { toastError } from './ToastMessage';
-import { DropDownOption } from '../types/DropDownOptions';
+import { DropDownOption } from '@/types/DropDownOptions';
 import DropDownAtom from './atom/DropDownAtom';
 import { AxiosError } from 'axios';
 

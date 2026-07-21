@@ -1,7 +1,7 @@
 import React, { RefObject, useRef, useState } from 'react';
-import { Utils } from '../libs/utils';
+import { Utils } from '@/libs/utils';
 import DropDownAtom from './atom/DropDownAtom';
-import { PageObject } from '../generated';
+import { PageObject } from '@/generated';
 import { AgGridReact } from 'ag-grid-react';
 import { CellClassParams, IRowNode } from 'ag-grid-community';
 import { toastInfo } from './ToastMessage';

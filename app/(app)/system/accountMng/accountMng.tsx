@@ -2,23 +2,23 @@
 'use client';
 
 import React, { useEffect, useMemo } from 'react';
-import { Search, Table, Title } from '../../../../components';
-import { Pagination, TableHeader, toastError } from '../../../../components';
-import { useAccountStore } from '../../../../stores';
-import { UserResponsePaging, UserResponseSelectByLoginId } from '../../../../generated';
+import { Search, Table, Title } from '@/components';
+import { Pagination, TableHeader, toastError } from '@/components';
+import { useAccountStore } from '@/stores';
+import { UserResponsePaging, UserResponseSelectByLoginId } from '@/generated';
 import { CellDoubleClickedEvent, ColDef } from 'ag-grid-community';
 import { useQuery } from '@tanstack/react-query';
-import { useAgGridApi } from '../../../../hooks';
-import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
-import useFilters from '../../../../hooks/useFilters';
-import { authApi } from '../../../../libs';
-import { Placeholder } from '../../../../libs/const';
-import { AccountAddPop, AccountModPop, AccountUnLockPop } from '../../../../components/popup/system/accountMng';
-import { LockCellRender, LockCellRenderProps } from '../../../../components/cellRenderer/account/LockCellRender';
-import { useCommonStore } from '../../../../stores';
-import CustomGridLoading from '../../../../components/CustomGridLoading';
-import CustomNoRowsOverlay from '../../../../components/CustomNoRowsOverlay';
-import TunedGrid from '../../../../components/grid/TunedGrid';
+import { useAgGridApi } from '@/hooks';
+import { defaultColDef, GridSetting } from '@/libs/ag-grid';
+import useFilters from '@/hooks/useFilters';
+import { authApi } from '@/libs';
+import { Placeholder } from '@/libs/const';
+import { AccountAddPop, AccountModPop, AccountUnLockPop } from '@/components/popup/system/accountMng';
+import { LockCellRender, LockCellRenderProps } from '@/components/cellRenderer/account/LockCellRender';
+import { useCommonStore } from '@/stores';
+import CustomGridLoading from '@/components/CustomGridLoading';
+import CustomNoRowsOverlay from '@/components/CustomNoRowsOverlay';
+import TunedGrid from '@/components/grid/TunedGrid';
 import { AxiosResponse } from 'axios';
 
 /** 응답 data(userByLoginId) 에서 사용하고자 하는 본문을 추출하는 순수함수 */

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { MyInfoPop } from '../../popup/mypage/MyInfoPop';
+import { MyInfoPop } from '@/components/popup/mypage/MyInfoPop';
 
 const BriefUserInfo = () => {
   const { data: session } = useSession();

@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../../styles/popup/popup.module.scss';
+import styles from '@/styles/popup/popup.module.scss';
 
 interface Props {
   children: React.ReactNode;

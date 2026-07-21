@@ -1,9 +1,9 @@
 import { create, StateCreator } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { ApiResponse, CommonRequestFileRearrangementRequest, FileDet } from '../generated';
+import { ApiResponse, CommonRequestFileRearrangementRequest, FileDet } from '@/generated';
 import { AxiosPromise } from 'axios';
-import { authApi, authDownApi } from '../libs';
+import { authApi, authDownApi } from '@/libs';
 
 type ModalType = 'UPLOAD' | 'UPLOADS' | 'IMAGES' | 'PRIVACY' | 'FILES';
 

@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Search, Table, Title, toastSuccess } from '../../../../components';
+import { Search, Table, Title, toastSuccess } from '@/components';
 import {
   ProductMngRequestProductDetInfoFilter,
   ProductMngRequestProductInfoFilter,
@@ -9,27 +9,27 @@ import {
   ProductMngResponseProductInfo,
 } from '@/generated';
 import { CellClickedEvent, CellStyle, ColDef, ICellEditorParams, ICellRendererParams } from 'ag-grid-community';
-import { TableHeader, toastError } from '../../../../components';
-import { useCommonStore } from '../../../../stores';
+import { TableHeader, toastError } from '@/components';
+import { useCommonStore } from '@/stores';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
-import { useAgGridApi } from '../../../../hooks';
-import { authApi } from '../../../../libs';
-import TunedGrid from '../../../../components/grid/TunedGrid';
-import useFilters from '../../../../hooks/useFilters';
-import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
-import { PARTNER_CODE, Placeholder } from '../../../../libs/const';
-import SrcEnumerator, { SrcElement, SrcEnumeratorProps } from '../../../../components/layout/product/productMng/SrcEnumerator';
-import { FileUploadPop } from '../../../../components/popup/common';
-import ProductInfoAddPop from '../../../../components/popup/product/productMng/ProductInfoAddPop';
-import ProductModPop from '../../../../components/popup/product/productMng/ProductModPop';
-import ProductDetInfoPop from '../../../../components/popup/product/productMng/ProductDetInfoPop';
-import { usePartnerCodeStore } from '../../../../stores/usePartnerCodeStore';
-import { usePartnerList } from '../../../../customHook/usePartnerList';
-import { PartnerCodePop } from '../../../../components/popup/system/PartnerCodePop';
-import { ConfirmModal } from '../../../../components/ConfirmModal';
-import ProductForEachCategoryPop from '../../../../components/popup/product/productMng/ProductForEachCategoryPop';
-import ImgEditPop, { ImgPropsOnEditPop } from '../../../../components/popup/common/ImgEditPop';
+import { defaultColDef, GridSetting } from '@/libs/ag-grid';
+import { useAgGridApi } from '@/hooks';
+import { authApi } from '@/libs';
+import TunedGrid from '@/components/grid/TunedGrid';
+import useFilters from '@/hooks/useFilters';
+import { useProductMngStore } from '@/stores/product/useProductMngStore';
+import { PARTNER_CODE, Placeholder } from '@/libs/const';
+import SrcEnumerator, { SrcElement, SrcEnumeratorProps } from '@/components/layout/product/productMng/SrcEnumerator';
+import { FileUploadPop } from '@/components/popup/common';
+import ProductInfoAddPop from '@/components/popup/product/productMng/ProductInfoAddPop';
+import ProductModPop from '@/components/popup/product/productMng/ProductModPop';
+import ProductDetInfoPop from '@/components/popup/product/productMng/ProductDetInfoPop';
+import { usePartnerCodeStore } from '@/stores/usePartnerCodeStore';
+import { usePartnerList } from '@/customHook/usePartnerList';
+import { PartnerCodePop } from '@/components/popup/system/PartnerCodePop';
+import { ConfirmModal } from '@/components/ConfirmModal';
+import ProductForEachCategoryPop from '@/components/popup/product/productMng/ProductForEachCategoryPop';
+import ImgEditPop, { ImgPropsOnEditPop } from '@/components/popup/common/ImgEditPop';
 import { usePartnerCodeList } from '@/customHook/usePartnerCodeList';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
@@ -692,6 +692,10 @@ const ProductMng = () => {
                 // 행 데이터가 통째로 교체돼도(onCellClicked 의 목록 초기화 등) 행 노드 동일성이 유지되어
                 // 선택 상태가 풀리지 않도록 한다 (ProdGroupMng 와 동일)
                 getRowId={(params) => String(params.data.id)}
+                // getRowId 로 행 노드를 재사용하면 데이터가 안 바뀐 셀은 다시 그리지 않는다.
+                // NO 컬럼은 데이터가 아니라 rowIndex 기반이라 필터 후 이전 순번이 남으므로,
+                // 모델(데이터/필터/정렬)이 갱신될 때 해당 컬럼만 강제로 다시 그린다.
+                onModelUpdated={(e) => e.api.refreshCells({ columns: ['no'], force: true })}
                 columnDefs={columnDefs}
                 // cellStyle 을 따로 지정하지 않은 컬럼도 세로 중앙 정렬되도록 기본값을 준다
                 // (공용 defaultColDef 는 제네릭 없는 ColDef 라 field 타입 충돌 방지를 위해 캐스팅)

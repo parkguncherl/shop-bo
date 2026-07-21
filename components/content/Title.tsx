@@ -1,11 +1,11 @@
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { TitleCategory } from './TitleCategory';
-import { useMypageStore } from '../../stores';
-import { ApiResponseListSelectFavorites } from '../../generated';
+import { useMypageStore } from '@/stores';
+import { ApiResponseListSelectFavorites } from '@/generated';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { authApi } from '../../libs';
-import { toastError, toastSuccess } from '../ToastMessage';
-import CustomShortcutButton, { COMMON_SHORTCUTS } from '../CustomShortcutButton';
+import { authApi } from '@/libs';
+import { toastError, toastSuccess } from '@/components/ToastMessage';
+import CustomShortcutButton, { COMMON_SHORTCUTS } from '@/components/CustomShortcutButton';
 
 interface Props {
   title: string;

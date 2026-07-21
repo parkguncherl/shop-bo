@@ -1,10 +1,10 @@
 import { useController, FieldValues, Path, PathValue } from 'react-hook-form';
-import { DropDownOption } from '../../types/DropDownOptions';
+import { DropDownOption } from '@/types/DropDownOptions';
 import React, { useRef, useState } from 'react';
-import DropDownAtom from '../atom/DropDownAtom';
-import { authApi } from '../../libs';
-import { ApiResponseListCodeDropDown } from '../../generated';
-import { TControl } from '../../types/Control';
+import DropDownAtom from '@/components/atom/DropDownAtom';
+import { authApi } from '@/libs';
+import { ApiResponseListCodeDropDown } from '@/generated';
+import { TControl } from '@/types/Control';
 import { useQuery } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
 

@@ -1,7 +1,7 @@
 import { Swiper, SwiperRef, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import React, { useEffect, useRef } from 'react';
-import { FileDet } from '../../generated';
+import { FileDet } from '@/generated';
 
 import 'swiper/css';
 import 'swiper/css/navigation';

@@ -1,10 +1,10 @@
 import { AxiosPromise } from 'axios';
 import { StateCreator } from 'zustand/esm';
-import { authApi } from '../../libs';
+import { authApi } from '@/libs';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { ApiResponse, ProductContentsRequestInsertProductContents } from '../../generated';
+import { ApiResponse, ProductContentsRequestInsertProductContents } from '@/generated';
 
 type ModalType = 'ADD_CONF';
 

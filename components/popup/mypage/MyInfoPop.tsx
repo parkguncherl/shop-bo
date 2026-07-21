@@ -6,16 +6,16 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useMutation } from '@tanstack/react-query';
-import { authApi } from '../../../libs';
-import { toastError, toastSuccess } from '../../ToastMessage';
-import { PopupLayout } from '../PopupLayout';
-import { PopupContent } from '../PopupContent';
-import { PopupFooter } from '../PopupFooter';
-import PopupFormBox from '../content/PopupFormBox';
-import PopupFormGroup from '../content/PopupFormGroup';
-import PopupFormType from '../content/PopupFormType';
-import FormInput from '../../form/FormInput';
-import Loading from '../../Loading';
+import { authApi } from '@/libs';
+import { toastError, toastSuccess } from '@/components/ToastMessage';
+import { PopupLayout } from '@/components/popup/PopupLayout';
+import { PopupContent } from '@/components/popup/PopupContent';
+import { PopupFooter } from '@/components/popup/PopupFooter';
+import PopupFormBox from '@/components/popup/content/PopupFormBox';
+import PopupFormGroup from '@/components/popup/content/PopupFormGroup';
+import PopupFormType from '@/components/popup/content/PopupFormType';
+import FormInput from '@/components/form/FormInput';
+import Loading from '@/components/Loading';
 import { useController } from 'react-hook-form';
 
 type MyInfoFields = {

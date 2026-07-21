@@ -1,8 +1,8 @@
 import React from 'react';
 import { ICellRendererParams } from 'ag-grid-community';
-import { UserResponseSelectByLoginId } from '../../../generated';
-import { useAccountStore, useCommonStore } from '../../../stores';
-import { toastError } from '../../ToastMessage';
+import { UserResponseSelectByLoginId } from '@/generated';
+import { useAccountStore, useCommonStore } from '@/stores';
+import { toastError } from '@/components/ToastMessage';
 
 type ICellRendererType = ICellRendererParams;
 

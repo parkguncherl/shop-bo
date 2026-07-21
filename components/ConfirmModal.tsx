@@ -4,7 +4,7 @@ import { PopupFooter } from './popup';
 import styled from 'styled-components';
 import { FieldValues, Path, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { YupSchema } from '../libs';
+import { YupSchema } from '@/libs';
 import dayjs from 'dayjs';
 
 interface Props<FT extends FieldValues> {

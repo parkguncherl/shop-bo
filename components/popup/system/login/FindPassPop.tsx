@@ -1,12 +1,12 @@
 import React, { useRef, useState } from 'react';
-import { PopupLayout } from '../../index';
-import { PopupContent } from '../../PopupContent';
-import { PopupFooter } from '../../PopupFooter';
-import { toastError } from '../../../index';
-import { useAuthStore } from '../../../../stores';
+import { PopupLayout } from '@/components/popup/index';
+import { PopupContent } from '@/components/popup/PopupContent';
+import { PopupFooter } from '@/components/popup/PopupFooter';
+import { toastError } from '@/components/index';
+import { useAuthStore } from '@/stores';
 import { useMutation } from '@tanstack/react-query';
-import styles from '../../../../styles/login.module.scss';
-import { Utils } from '../../../../libs/utils';
+import styles from '@/styles/login.module.scss';
+import { Utils } from '@/libs/utils';
 
 export const FindPassPop = () => {
   const el = useRef<HTMLDivElement | null>(null);

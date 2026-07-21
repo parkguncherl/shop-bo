@@ -1,4 +1,4 @@
-import { BaseTextAreaAtom, BaseTextAreaAtomProps } from '../atom/BaseTextAreaAtom';
+import { BaseTextAreaAtom, BaseTextAreaAtomProps } from '@/components/atom/BaseTextAreaAtom';
 import { FieldError, FieldValues, useController } from 'react-hook-form';
 import { TControl } from '@/types/Control';
 import React, { useEffect, useRef, useState } from 'react';

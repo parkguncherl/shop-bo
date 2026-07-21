@@ -2,13 +2,13 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { HistoryType, useCommonStore, useMypageStore } from '../../../../stores';
-import { LOCAL_STORAGE_WMS_HISTORY } from '../../../../libs/const';
+import { HistoryType, useCommonStore, useMypageStore } from '@/stores';
+import { LOCAL_STORAGE_WMS_HISTORY } from '@/libs/const';
 import { useQuery } from '@tanstack/react-query';
-import { toastError } from '../../../ToastMessage';
+import { toastError } from '@/components/ToastMessage';
 import Link from 'next/link';
-import { ApiResponseListSelectFavorites, SelectFavorites } from '../../../../generated';
-import { authApi } from '../../../../libs';
+import { ApiResponseListSelectFavorites, SelectFavorites } from '@/generated';
+import { authApi } from '@/libs';
 
 /**
  * 즐겨찾기 영역(버튼 및 활성 시점에 출력되는 tab)

@@ -2,12 +2,12 @@
 
 import React, { useEffect } from 'react';
 import { signOut, useSession } from 'next-auth/react';
-import styles from '../../styles/layout/header.module.scss';
+import styles from '@/styles/layout/header.module.scss';
 import Link from 'next/link';
-import { useAuthStore, useCommonStore, useMypageStore } from '../../stores';
-import { authApi } from '../../libs';
-import { toastError } from '../ToastMessage';
-import { ApiResponseAuthResponseMenuAuth, ApiResponseListSelectFavorites } from '../../generated';
+import { useAuthStore, useCommonStore, useMypageStore } from '@/stores';
+import { authApi } from '@/libs';
+import { toastError } from '@/components/ToastMessage';
+import { ApiResponseAuthResponseMenuAuth, ApiResponseListSelectFavorites } from '@/generated';
 import { useQuery } from '@tanstack/react-query';
 import { TabMenu } from './TabMenu';
 import { usePathname } from 'next/navigation';

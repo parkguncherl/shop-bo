@@ -10,11 +10,11 @@ import {
   PartnerRequestUpdate,
   PageObject,
   PartnerRequestFilterForList,
-} from '../generated';
+} from '@/generated';
 type PartnerControllerApiSelectPartnerPagingRequest = any;
 type PartnerResponseSelect = any;
 import { AxiosPromise } from 'axios';
-import { authApi, authDownApi } from '../libs';
+import { authApi, authDownApi } from '@/libs';
 import { StateCreator } from 'zustand';
 
 type ModalType = 'ADD' | 'MOD';

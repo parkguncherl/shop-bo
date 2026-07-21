@@ -1,6 +1,6 @@
 import React from 'react';
-import { DropDownOption } from '../../types/DropDownOptions';
-import DropDownAtom from '../atom/DropDownAtom';
+import { DropDownOption } from '@/types/DropDownOptions';
+import DropDownAtom from '@/components/atom/DropDownAtom';
 
 interface Props {
   title?: string;

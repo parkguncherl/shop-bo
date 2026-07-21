@@ -2,20 +2,20 @@
 
 import React, { useEffect, useState } from 'react';
 import { ColDef } from 'ag-grid-community';
-import { Search, Table, TableHeader, Title } from '../../../../components';
-import { toastError, toastSuccess } from '../../../../components';
-import { useCommonStore } from '../../../../stores';
-import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
-import { useAgGridApi } from '../../../../hooks';
-import CustomNoRowsOverlay from '../../../../components/CustomNoRowsOverlay';
-import CustomGridLoading from '../../../../components/CustomGridLoading';
-import TunedGrid from '../../../../components/grid/TunedGrid';
-import { authApi } from '../../../../libs';
+import { Search, Table, TableHeader, Title } from '@/components';
+import { toastError, toastSuccess } from '@/components';
+import { useCommonStore } from '@/stores';
+import { defaultColDef, GridSetting } from '@/libs/ag-grid';
+import { useAgGridApi } from '@/hooks';
+import CustomNoRowsOverlay from '@/components/CustomNoRowsOverlay';
+import CustomGridLoading from '@/components/CustomGridLoading';
+import TunedGrid from '@/components/grid/TunedGrid';
+import { authApi } from '@/libs';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ConfirmModal } from '../../../../components/ConfirmModal';
-import NoticeMngAddPop from '../../../../components/popup/market/notice/NoticeMngAddPop';
-import NoticeMngModPop from '../../../../components/popup/market/notice/NoticeMngModPop';
-import useFilters from '../../../../hooks/useFilters';
+import { ConfirmModal } from '@/components/ConfirmModal';
+import NoticeMngAddPop from '@/components/popup/market/notice/NoticeMngAddPop';
+import NoticeMngModPop from '@/components/popup/market/notice/NoticeMngModPop';
+import useFilters from '@/hooks/useFilters';
 import { Header } from '@/components/layout/Header';
 
 export type NoticeItem = {

@@ -2,7 +2,7 @@
 
 import { ErrorBoundary } from 'react-error-boundary';
 import Error from 'next/error';
-import { ErrorMessage } from '../components';
+import { ErrorMessage } from '@/components';
 import React from 'react';
 
 const GlobalErrorBoundary = ({ children }: { children: React.ReactNode }) => {

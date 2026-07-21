@@ -1,12 +1,12 @@
 ﻿import React, { useEffect, useRef, useState } from 'react';
-import { authApi } from '../../../../libs';
-import { ApiResponseListAuthResponseEntity, Auth, Menu } from '../../../../generated';
-import { PopupContent, PopupFooter, PopupLayout } from '../../index';
-import { PopupSearchBox, PopupSearchType } from '../../content';
-import { Input, toastError, toastSuccess } from '../../../index';
-import { useMenuStore } from '../../../../stores';
+import { authApi } from '@/libs';
+import { ApiResponseListAuthResponseEntity, Auth, Menu } from '@/generated';
+import { PopupContent, PopupFooter, PopupLayout } from '@/components/popup/index';
+import { PopupSearchBox, PopupSearchType } from '@/components/popup/content';
+import { Input, toastError, toastSuccess } from '@/components/index';
+import { useMenuStore } from '@/stores';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import Loading from '../../../Loading';
+import Loading from '@/components/Loading';
 
 interface Props {
   data: Menu;

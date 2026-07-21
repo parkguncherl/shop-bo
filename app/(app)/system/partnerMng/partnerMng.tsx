@@ -5,19 +5,19 @@
  */
 
 import React, { useEffect, useMemo } from 'react';
-import { useAgGridApi } from '../../../../hooks';
-import { useCommonStore } from '../../../../stores';
-import useFilters from '../../../../hooks/useFilters';
+import { useAgGridApi } from '@/hooks';
+import { useCommonStore } from '@/stores';
+import useFilters from '@/hooks/useFilters';
 import { useQuery } from '@tanstack/react-query';
-import { authApi } from '../../../../libs';
-import { PartnerResponsePaging } from '../../../../generated';
-import { Pagination, Search, Table, TableHeader, Title, toastError } from '../../../../components';
-import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
-import { PartnerPagingFilter, usePartnerStore } from '../../../../stores/usePartnerStore';
+import { authApi } from '@/libs';
+import { PartnerResponsePaging } from '@/generated';
+import { Pagination, Search, Table, TableHeader, Title, toastError } from '@/components';
+import { defaultColDef, GridSetting } from '@/libs/ag-grid';
+import { PartnerPagingFilter, usePartnerStore } from '@/stores/usePartnerStore';
 import { CellClickedEvent, ColDef } from 'ag-grid-community';
-import PartnerAddPop from '../../../../components/popup/partner/PartnerAddPop';
-import PartnerModPop from '../../../../components/popup/partner/PartnerModPop';
-import TunedGrid from '../../../../components/grid/TunedGrid';
+import PartnerAddPop from '@/components/popup/partner/PartnerAddPop';
+import PartnerModPop from '@/components/popup/partner/PartnerModPop';
+import TunedGrid from '@/components/grid/TunedGrid';
 import dayjs from 'dayjs';
 
 const PartnerMng = () => {

@@ -1,7 +1,7 @@
 import { Slide, toast, ToastOptions } from 'react-toastify';
 import Image from 'next/image';
-import SuccessIcon from '../public/ico/ico_success.svg';
-import ErrorIcon from '../public/ico/ico_error.svg';
+import SuccessIcon from '@/public/ico/ico_success.svg';
+import ErrorIcon from '@/public/ico/ico_error.svg';
 
 /** Toast Message(정상) */
 export const toastSuccess = (message?: string, config?: ToastOptions) => {

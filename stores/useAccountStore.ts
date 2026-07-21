@@ -12,9 +12,9 @@ import {
   UserRequestUnLock,
   ApiResponseUserResponseSelectByLoginId,
   UserResponseSelectByLoginId,
-} from '../generated';
+} from '@/generated';
 import { AxiosPromise } from 'axios';
-import { authApi } from '../libs';
+import { authApi } from '@/libs';
 import { StateCreator } from 'zustand/esm';
 
 type ModalType = 'ADD' | 'MOD' | 'UNLOCK';

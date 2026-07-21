@@ -2,25 +2,25 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { CellDoubleClickedEvent, ColDef } from 'ag-grid-community';
-import { Search, Table, Title } from '../../../../components';
-import { Pagination, TableHeader } from '../../../../components';
+import { Search, Table, Title } from '@/components';
+import { Pagination, TableHeader } from '@/components';
 import { useQuery } from '@tanstack/react-query';
-import { toastError } from '../../../../components';
-import { CodePagingFilter, useCodeStore, useCommonStore } from '../../../../stores';
-import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
-import { ApiResponseListCodeDropDown, CodeResponsePaging } from '../../../../generated';
-import { CodeAddPop, CodeExcelUploadPop, CodeMngDetailPop, CodeModPop } from '../../../../components/popup/system/codeMng';
-import { useAgGridApi } from '../../../../hooks';
-import { authApi } from '../../../../libs';
-import { DropDownOption } from '../../../../types/DropDownOptions';
-import useFilters from '../../../../hooks/useFilters';
-import { Placeholder } from '../../../../libs/const';
-import { LowerCellRender } from '../../../../components/cellRenderer/code/LowerCellRender';
+import { toastError } from '@/components';
+import { CodePagingFilter, useCodeStore, useCommonStore } from '@/stores';
+import { defaultColDef, GridSetting } from '@/libs/ag-grid';
+import { ApiResponseListCodeDropDown, CodeResponsePaging } from '@/generated';
+import { CodeAddPop, CodeExcelUploadPop, CodeMngDetailPop, CodeModPop } from '@/components/popup/system/codeMng';
+import { useAgGridApi } from '@/hooks';
+import { authApi } from '@/libs';
+import { DropDownOption } from '@/types/DropDownOptions';
+import useFilters from '@/hooks/useFilters';
+import { Placeholder } from '@/libs/const';
+import { LowerCellRender } from '@/components/cellRenderer/code/LowerCellRender';
 import { AgGridReact } from 'ag-grid-react';
-import CustomNoRowsOverlay from '../../../../components/CustomNoRowsOverlay';
-import CustomGridLoading from '../../../../components/CustomGridLoading';
-import { TunedReactSelector } from '../../../../components/TunedReactSelector';
-import TunedGrid from '../../../../components/grid/TunedGrid';
+import CustomNoRowsOverlay from '@/components/CustomNoRowsOverlay';
+import CustomGridLoading from '@/components/CustomGridLoading';
+import { TunedReactSelector } from '@/components/TunedReactSelector';
+import TunedGrid from '@/components/grid/TunedGrid';
 
 /** 시스템 - 코드관리 페이지 */
 const CodeMng = () => {

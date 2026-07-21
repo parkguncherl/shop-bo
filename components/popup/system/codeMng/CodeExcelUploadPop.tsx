@@ -1,13 +1,13 @@
 ﻿import React, { useRef, useState } from 'react';
-import { useCodeStore } from '../../../../stores';
-import { PopupContent } from '../../PopupContent';
-import { PopupSearchBox, PopupSearchType } from '../../content';
-import { PopupFooter } from '../../PopupFooter';
-import { authApi } from '../../../../libs';
-import { toastError, toastSuccess } from '../../../ToastMessage';
+import { useCodeStore } from '@/stores';
+import { PopupContent } from '@/components/popup/PopupContent';
+import { PopupSearchBox, PopupSearchType } from '@/components/popup/content';
+import { PopupFooter } from '@/components/popup/PopupFooter';
+import { authApi } from '@/libs';
+import { toastError, toastSuccess } from '@/components/ToastMessage';
 import { useQueryClient } from '@tanstack/react-query';
-import { Utils } from '../../../../libs/utils';
-import { PopupLayout } from '../../PopupLayout';
+import { Utils } from '@/libs/utils';
+import { PopupLayout } from '@/components/popup/PopupLayout';
 
 export const CodeExcelUploadPop = () => {
   /** 코드관리 스토어 - State */

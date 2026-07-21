@@ -1,8 +1,8 @@
 import { useController, FieldValues } from 'react-hook-form';
-import { DropDownOption } from '../../types/DropDownOptions';
+import { DropDownOption } from '@/types/DropDownOptions';
 import React from 'react';
-import { TControl } from '../../types/Control';
-import DatePickerAtom from '../atom/DatePickerAtom';
+import { TControl } from '@/types/Control';
+import DatePickerAtom from '@/components/atom/DatePickerAtom';
 import dayjs from 'dayjs';
 
 type TProps<T extends FieldValues> = TControl<T> & {

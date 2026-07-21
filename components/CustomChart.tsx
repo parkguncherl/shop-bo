@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import ECharts from 'echarts-for-react';
-import { useDidMountEffect } from '../hooks';
+import { useDidMountEffect } from '@/hooks';
 
 export type SeriesProp = {
   name?: string;

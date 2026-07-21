@@ -1,8 +1,8 @@
 import React from 'react';
 import { ICellRendererParams } from 'ag-grid-community';
-import { Menu } from '../../../generated';
-import { useCommonStore, useMenuStore } from '../../../stores';
-import { toastError } from '../../ToastMessage';
+import { Menu } from '@/generated';
+import { useCommonStore, useMenuStore } from '@/stores';
+import { toastError } from '@/components/ToastMessage';
 
 type ICellRendererType = ICellRendererParams;
 

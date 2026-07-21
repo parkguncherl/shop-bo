@@ -2,20 +2,20 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { ColDef } from 'ag-grid-community';
-import { Search, Table, Title } from '../../../../components';
+import { Search, Table, Title } from '@/components';
 import { useQuery } from '@tanstack/react-query';
-import { toastError } from '../../../../components';
-import { useCommonStore } from '../../../../stores';
-import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
-import { useAgGridApi } from '../../../../hooks';
-import useFilters from '../../../../hooks/useFilters';
-import CustomNoRowsOverlay from '../../../../components/CustomNoRowsOverlay';
-import CustomGridLoading from '../../../../components/CustomGridLoading';
-import TunedGrid from '../../../../components/grid/TunedGrid';
-import { authApi } from '../../../../libs';
+import { toastError } from '@/components';
+import { useCommonStore } from '@/stores';
+import { defaultColDef, GridSetting } from '@/libs/ag-grid';
+import { useAgGridApi } from '@/hooks';
+import useFilters from '@/hooks/useFilters';
+import CustomNoRowsOverlay from '@/components/CustomNoRowsOverlay';
+import CustomGridLoading from '@/components/CustomGridLoading';
+import TunedGrid from '@/components/grid/TunedGrid';
+import { authApi } from '@/libs';
 import dayjs from 'dayjs';
 import ReactECharts from 'echarts-for-react';
-import { useDarkMode } from '../../../../contexts/ThemeContext';
+import { useDarkMode } from '@/contexts/ThemeContext';
 
 type CategoryViewFilter = {
   fromDate: string;

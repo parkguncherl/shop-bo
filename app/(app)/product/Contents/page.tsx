@@ -1,5 +1,5 @@
 import ProductContents from './ProductContents';
-import '../Contents/productContents.scss';
+import './productContents.scss';
 
 /**
  * (server side)Contents page

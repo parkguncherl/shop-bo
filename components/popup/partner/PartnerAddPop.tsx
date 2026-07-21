@@ -1,23 +1,23 @@
 ﻿'use client';
 
 import React, { useState } from 'react';
-import { PopupFooter } from '../PopupFooter';
-import { PopupContent } from '../PopupContent';
-import { PopupLayout } from '../PopupLayout';
-import { usePartnerStore } from '../../../stores/usePartnerStore';
-import { PopupSearchBox, PopupSearchType } from '../content';
-import FormInput from '../../form/FormInput';
-import { Placeholder } from '../../../libs/const';
+import { PopupFooter } from '@/components/popup/PopupFooter';
+import { PopupContent } from '@/components/popup/PopupContent';
+import { PopupLayout } from '@/components/popup/PopupLayout';
+import { usePartnerStore } from '@/stores/usePartnerStore';
+import { PopupSearchBox, PopupSearchType } from '@/components/popup/content';
+import FormInput from '@/components/form/FormInput';
+import { Placeholder } from '@/libs/const';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { CommonResponseFileDown, PartnerRequestCreate, PartnerResponsePaging } from '../../../generated';
+import { CommonResponseFileDown, PartnerRequestCreate, PartnerResponsePaging } from '@/generated';
 
 type PartnerRequestCreateExtended = PartnerRequestCreate & { reviewPointRate?: number; sizeInfo?: string };
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toastError, toastSuccess } from '../../ToastMessage';
-import { authApi } from '../../../libs';
-import { useCommonStore } from '../../../stores';
-import FormDropDown from '../../form/FormDropDown';
+import { toastError, toastSuccess } from '@/components/ToastMessage';
+import { authApi } from '@/libs';
+import { useCommonStore } from '@/stores';
+import FormDropDown from '@/components/form/FormDropDown';
 
 interface Props {
   data: PartnerResponsePaging;

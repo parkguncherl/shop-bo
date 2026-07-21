@@ -1,7 +1,7 @@
 import { CookieValueTypes } from 'cookies-next';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/ko';
-import { CodeDropDown } from '../generated';
+import { CodeDropDown } from '@/generated';
 import React from 'react';
 import { LOCAL_STORAGE_GUBUN } from './const';
 

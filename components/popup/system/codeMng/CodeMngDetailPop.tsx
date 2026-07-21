@@ -1,20 +1,20 @@
-import { CodeRequestCreate, CodeResponseLowerSelect, CodeResponsePaging } from '../../../../generated';
-import { useCodeStore } from '../../../../stores';
-import { PopupContent } from '../../PopupContent';
-import { PopupSearchBox, PopupSearchType, PopupTableGroup } from '../../content';
-import { Label } from '../../../Label';
-import { TableHeader } from '../../../TableHeader';
-import { PopupFooter } from '../../PopupFooter';
+import { CodeRequestCreate, CodeResponseLowerSelect, CodeResponsePaging } from '@/generated';
+import { useCodeStore } from '@/stores';
+import { PopupContent } from '@/components/popup/PopupContent';
+import { PopupSearchBox, PopupSearchType, PopupTableGroup } from '@/components/popup/content';
+import { Label } from '@/components/Label';
+import { TableHeader } from '@/components/TableHeader';
+import { PopupFooter } from '@/components/popup/PopupFooter';
 import React, { useEffect, useState } from 'react';
 import { ColDef } from 'ag-grid-community';
-import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
+import { defaultColDef, GridSetting } from '@/libs/ag-grid';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toastError, toastSuccess } from '../../../ToastMessage';
-import { useAgGridApi } from '../../../../hooks';
-import Loading from '../../../Loading';
-import { Table } from '../../../content';
-import { PopupLayout } from '../../PopupLayout';
-import TunedGrid from '../../../grid/TunedGrid';
+import { toastError, toastSuccess } from '@/components/ToastMessage';
+import { useAgGridApi } from '@/hooks';
+import Loading from '@/components/Loading';
+import { Table } from '@/components/content';
+import { PopupLayout } from '@/components/popup/PopupLayout';
+import TunedGrid from '@/components/grid/TunedGrid';
 
 interface Props {
   data: CodeResponsePaging;

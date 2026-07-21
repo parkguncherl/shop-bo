@@ -1,5 +1,5 @@
 import React from 'react';
-import '../../../styles/layout/product/srcEnumerator.scss';
+import '@/styles/layout/product/srcEnumerator.scss';
 
 /**
  * (server side)product layout

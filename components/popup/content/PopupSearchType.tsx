@@ -1,8 +1,8 @@
 import React from 'react';
-import styles from '../../../styles/popup/popup.module.scss';
-import { CustomInput } from '../../CustomInput';
-import { DropDown } from '../../DropDown';
-import SearchBar from '../../search/SearchBar';
+import styles from '@/styles/popup/popup.module.scss';
+import { CustomInput } from '@/components/CustomInput';
+import { DropDown } from '@/components/DropDown';
+import SearchBar from '@/components/search/SearchBar';
 
 
 interface Props {

@@ -1,28 +1,28 @@
 ﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { PopupFooter } from '../../PopupFooter';
-import { PopupContent } from '../../PopupContent';
-import { PopupLayout } from '../../PopupLayout';
+import { PopupFooter } from '@/components/popup/PopupFooter';
+import { PopupContent } from '@/components/popup/PopupContent';
+import { PopupLayout } from '@/components/popup/PopupLayout';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { authApi } from '../../../../libs';
-import { toastError, toastSuccess } from '../../../ToastMessage';
+import { authApi } from '@/libs';
+import { toastError, toastSuccess } from '@/components/ToastMessage';
 import {
   PartnerCodeResponseLowerSelect,
   ProductMngRequestCategoryProductInfoFilter,
   ProductMngResponseCategoryProductInfo,
   ProductMngRequestProductInfoWithExclusionFilter,
   ProductMngResponseProductInfoByExclusion,
-} from '../../../../generated';
-import TunedGrid, { TunedGridRef } from '../../../grid/TunedGrid';
-import { PopupSearchBox, PopupSearchType } from '../../content';
-import CustomGridLoading from '../../../CustomGridLoading';
-import CustomNoRowsOverlay from '../../../CustomNoRowsOverlay';
-import { GridSetting } from '../../../../libs/ag-grid';
+} from '@/generated';
+import TunedGrid, { TunedGridRef } from '@/components/grid/TunedGrid';
+import { PopupSearchBox, PopupSearchType } from '@/components/popup/content';
+import CustomGridLoading from '@/components/CustomGridLoading';
+import CustomNoRowsOverlay from '@/components/CustomNoRowsOverlay';
+import { GridSetting } from '@/libs/ag-grid';
 import { ColDef, GridReadyEvent, RowDragEndEvent } from 'ag-grid-community';
-import useFilters from '../../../../hooks/useFilters';
-import { Search } from '../../../content';
-import { PARTNER_CODE } from '../../../../libs/const';
-import { usePartnerCodeStore } from '../../../../stores/usePartnerCodeStore';
-import { useProductMngStore } from '../../../../stores/product/useProductMngStore';
+import useFilters from '@/hooks/useFilters';
+import { Search } from '@/components/content';
+import { PARTNER_CODE } from '@/libs/const';
+import { usePartnerCodeStore } from '@/stores/usePartnerCodeStore';
+import { useProductMngStore } from '@/stores/product/useProductMngStore';
 
 // interface ConfirmModalProps {
 //   type: 'ADD_TO_CATEGORY' | 'DEL_FROM_CATEGORY';

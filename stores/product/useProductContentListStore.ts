@@ -11,9 +11,9 @@ import {
   ProductContentListRequestUpdateProductContents,
   ProductContentListResponseProductContent,
   ProductContentsRequestInsertProductContents,
-} from '../../generated';
+} from '@/generated';
 import { AxiosPromise } from 'axios';
-import { authApi } from '../../libs';
+import { authApi } from '@/libs';
 
 type ModalType = 'SHOW' | 'ADD' | 'DEL_CONF' | 'ADD_PROD' | 'MOD' | 'PREVIEW';
 

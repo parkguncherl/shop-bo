@@ -1,20 +1,20 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Search, Table, Title } from '../../../../components';
-import { Pagination, TableHeader, toastError } from '../../../../components';
-import { ContactResponsePaging } from '../../../../generated';
+import { Search, Table, Title } from '@/components';
+import { Pagination, TableHeader, toastError } from '@/components';
+import { ContactResponsePaging } from '@/generated';
 import { ColDef, ColGroupDef, RowDoubleClickedEvent } from 'ag-grid-community';
 import { useQuery } from '@tanstack/react-query';
-import { useCommonStore, useContactState } from '../../../../stores';
-import { defaultColDef, GridSetting } from '../../../../libs/ag-grid';
-import { AccessLogDeatilPop } from '../../../../components/popup/system/accessLog';
-import useFilters from '../../../../hooks/useFilters';
-import { Placeholder } from '../../../../libs/const';
-import { authApi } from '../../../../libs';
-import TunedGrid, { TunedGridRef } from '../../../../components/grid/TunedGrid';
-import CustomGridLoading from '../../../../components/CustomGridLoading';
-import CustomNoRowsOverlay from '../../../../components/CustomNoRowsOverlay';
+import { useCommonStore, useContactState } from '@/stores';
+import { defaultColDef, GridSetting } from '@/libs/ag-grid';
+import { AccessLogDeatilPop } from '@/components/popup/system/accessLog';
+import useFilters from '@/hooks/useFilters';
+import { Placeholder } from '@/libs/const';
+import { authApi } from '@/libs';
+import TunedGrid, { TunedGridRef } from '@/components/grid/TunedGrid';
+import CustomGridLoading from '@/components/CustomGridLoading';
+import CustomNoRowsOverlay from '@/components/CustomNoRowsOverlay';
 
 const AccessLog = () => {
   /** Grid Api */

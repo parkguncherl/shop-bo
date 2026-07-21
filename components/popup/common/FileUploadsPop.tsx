@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { PopupContent } from '../PopupContent';
-import { Button } from '../../Button';
-import { PopupFooter } from '../PopupFooter';
-import { authApi } from '../../../libs';
-import { toastError, toastSuccess } from '../../ToastMessage';
-import { useCommonStore } from '../../../stores';
-import { CommonResponseFileDown } from '../../../generated';
-import { PopupLayout } from '../PopupLayout';
+import { PopupContent } from '@/components/popup/PopupContent';
+import { Button } from '@/components/Button';
+import { PopupFooter } from '@/components/popup/PopupFooter';
+import { authApi } from '@/libs';
+import { toastError, toastSuccess } from '@/components/ToastMessage';
+import { useCommonStore } from '@/stores';
+import { CommonResponseFileDown } from '@/generated';
+import { PopupLayout } from '@/components/popup/PopupLayout';
 
 interface FileUploadPopProps {
   ref?: React.MutableRefObject<null>;

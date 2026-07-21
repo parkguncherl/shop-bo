@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { ApiResponse, FavoritesMenuList, MenuRequestWithAuth, ModFavoritesRequest, PageObject, SelectFavorites, UserResponsePaging } from '../generated';
+import { ApiResponse, FavoritesMenuList, MenuRequestWithAuth, ModFavoritesRequest, PageObject, SelectFavorites, UserResponsePaging } from '@/generated';
 import { StateCreator } from 'zustand/esm';
 import { AxiosPromise } from 'axios';
-import { authApi } from '../libs';
+import { authApi } from '@/libs';
 
 type ModalType = 'USER_ADD' | 'USER_MOD' | 'PARTNER_INFO' | 'USER_AUTH_MOD';
 

@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { StateCreator } from 'zustand/esm';
-import { authApi } from '../../libs';
+import { authApi } from '@/libs';
 import { AxiosPromise } from 'axios';
 
 type ModalType = 'RECEIVING_ADD' | 'RECEIVING_MOD' | 'RECEIVING_DEL';

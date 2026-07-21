@@ -3,11 +3,11 @@ import { Layer, Stage, Image, Line, Text, Transformer, Arrow } from 'react-konva
 import Konva from 'konva';
 import { Html, useImage } from 'react-konva-utils';
 import { Box } from 'konva/lib/shapes/Transformer';
-import { useHistory } from '../../hooks/drawing/useHistory';
+import { useHistory } from '@/hooks/drawing/useHistory';
 import axios from 'axios';
 import path from 'path';
-import icoUndo from '../../public/images/ico_undo.svg';
-import icoRedo from '../../public/images/ico_redo.svg';
+import icoUndo from '@/public/images/ico_undo.svg';
+import icoRedo from '@/public/images/ico_redo.svg';
 
 // CanvasByKonva props interface 및 연관 interface
 interface CanvasByKonvaProps {

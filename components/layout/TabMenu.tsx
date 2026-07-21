@@ -2,13 +2,13 @@
 
 import React, { useEffect, useRef, useState, useImperativeHandle } from 'react';
 import Link from 'next/link';
-import { LOCAL_STORAGE_HISTORY, LOCAL_STORAGE_WMS_HISTORY } from '../../libs/const';
-import { useCommonStore, useMypageStore, HistoryType } from '../../stores';
+import { LOCAL_STORAGE_HISTORY, LOCAL_STORAGE_WMS_HISTORY } from '@/libs/const';
+import { useCommonStore, useMypageStore, HistoryType } from '@/stores';
 import { useSession } from 'next-auth/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { toastError, toastSuccess } from '../ToastMessage';
-import { ApiResponseListSelectFavorites, SelectFavorites } from '../../generated';
-import { authApi } from '../../libs';
+import { toastError, toastSuccess } from '@/components/ToastMessage';
+import { ApiResponseListSelectFavorites, SelectFavorites } from '@/generated';
+import { authApi } from '@/libs';
 import { ReactSortable, SortableEvent } from 'react-sortablejs';
 import { redirect, RedirectType, usePathname } from 'next/navigation';
 
