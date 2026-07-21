@@ -678,6 +678,13 @@
     color: var(--dark-text-muted) !important;
     &:hover { background-color: #383855 !important; color: var(--dark-text) !important; }
   }
+  // 토글 활성 상태(.on)는 위 !important 를 덮어 브랜드색으로 표시
+  .btnGray.btn.on {
+    background-color: var(--main-color) !important;
+    border-color: var(--main-color) !important;
+    color: #fff !important;
+    &:hover { background-color: var(--main-color) !important; color: #fff !important; filter: brightness(1.1); }
+  }
   .tblBtn {
     background-color: #2a2a40 !important;
     border-color: rgba(255, 255, 255, 0.15) !important;

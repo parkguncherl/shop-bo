@@ -7,7 +7,7 @@ import {
   ProductMngRequestProductInfoFilter,
   ProductMngResponseProductDetInfo,
   ProductMngResponseProductInfo,
-} from '../../../../generated';
+} from '@/generated';
 import { CellClickedEvent, CellStyle, ColDef, ICellEditorParams, ICellRendererParams } from 'ag-grid-community';
 import { TableHeader, toastError } from '../../../../components';
 import { useCommonStore } from '../../../../stores';
@@ -36,6 +36,9 @@ type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
 /** 목록 행 + 대표이미지 썸네일 URL (repFileId 로부터 비동기 해석) */
 type ProductInfoWithImg = ProductMngResponseProductInfo & { imgUrl?: string };
+
+/** 계절 필터 키 (선택 시 'Y' 로 전달, 복수 선택은 OR 조건) */
+type ProductInfoFilters = ProductMngRequestProductInfoFilter & { partnerId?: number };
 
 interface targetedFileSetsElementInfo extends SrcElement {
   //fileSeq?: number;
@@ -69,12 +72,25 @@ const ProductMng = () => {
   const [partnerCodeModals, partnerCodeOpenModal, partnerCodeCloseModal] = usePartnerCodeStore((s) => [s.modals, s.openModal, s.closeModal]);
 
   /** 검색 필터 */
-  const [filters, onChangeFilters] = useFilters<ProductMngRequestProductInfoFilter & { partnerId?: number }>({
+  const [filters, onChangeFilters] = useFilters<ProductInfoFilters>({
     prodNm: undefined,
     partnerId: undefined,
     domaeId: undefined,
     showYn: undefined,
   });
+
+  /** 계절 버튼 — 버튼마다 독립 boolean state (체크박스처럼 다중 선택) */
+  const [isSpring, setIsSpring] = useState(false);
+  const [isSummer, setIsSummer] = useState(false);
+  const [isAutumn, setIsAutumn] = useState(false);
+  const [isWinter, setIsWinter] = useState(false);
+
+  const seasonButtons = [
+    { label: '봄', active: isSpring, toggle: () => setIsSpring((v) => !v) },
+    { label: '여름', active: isSummer, toggle: () => setIsSummer((v) => !v) },
+    { label: '가을', active: isAutumn, toggle: () => setIsAutumn((v) => !v) },
+    { label: '겨울', active: isWinter, toggle: () => setIsWinter((v) => !v) },
+  ];
 
   const { data: partnerOptions = [] } = usePartnerList({ enabled: true });
   const [detFilters, onChangeDetFilters, onDetFiltersReset] = useFilters<ProductMngRequestProductDetInfoFilter>({
@@ -212,11 +228,29 @@ const ProductMng = () => {
     isLoading: isProductInfosLoading,
     refetch: productInfosRefetch,
   } = useQuery({
-    queryKey: ['/productMng/productInfoList', { partnerId: filters.partnerId, domaeId: filters.domaeId, showYn: filters.showYn, prodNm: filters.prodNm }],
+    queryKey: [
+      '/productMng/productInfoList',
+      {
+        partnerId: filters.partnerId,
+        domaeId: filters.domaeId,
+        showYn: filters.showYn,
+        prodNm: filters.prodNm,
+        // 계절 선택은 즉시 재조회되도록 키에 포함
+        isSpring,
+        isSummer,
+        isAutumn,
+        isWinter,
+      },
+    ],
     queryFn: () =>
       authApi.get('/productMng/productInfoList', {
         params: {
           ...filters,
+          // 선택된 계절만 'Y' 로 전달 (미선택은 undefined → 파라미터 제외)
+          isSpring: isSpring ? 'Y' : undefined,
+          isSummer: isSummer ? 'Y' : undefined,
+          isAutumn: isAutumn ? 'Y' : undefined,
+          isWinter: isWinter ? 'Y' : undefined,
         },
       }),
     refetchOnMount: 'always',
@@ -418,11 +452,7 @@ const ProductMng = () => {
         // (전역 .tblBtn 은 코드관리 등 다른 화면과 공유하므로 건드리지 않는다)
         // 선택 상태는 조상 셀렉터(.ag-row-selected) 대신 버튼에 직접 .on 을 붙여 표현한다
         cellRenderer: (p: ICellRendererParams<ProductMngResponseProductInfo>) => (
-          <button
-            type={'button'}
-            className={`tblBtn${p.node?.isSelected() ? ' on' : ''}`}
-            style={{ width: '100%', height: '32px' }}
-          >
+          <button type={'button'} className={`tblBtn${p.node?.isSelected() ? ' on' : ''}`} style={{ width: '100%', height: '32px' }}>
             {p.value ?? 0} 건
           </button>
         ),
@@ -617,6 +647,35 @@ const ProductMng = () => {
           showAll={true}
           dropDownStyle={{ width: '100px' }}
         />
+        {/* 계절 — 버튼별 boolean state 로 체크박스처럼 다중 선택. 선택된 계절 중 하나라도 포함된 상품 조회 (미선택 = 전체) */}
+        <dl>
+          <dd>
+            <div className="formBox" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              {seasonButtons.map((s) => (
+                <button
+                  key={s.label}
+                  type="button"
+                  /* 다크모드는 `.formBox button { ...!important }` 로 배경을 강제하는데,
+                     그 예외가 segBtn--active 뿐이라 활성 시 이 클래스를 부여해야 색 반전이 유지된다 */
+                  className={s.active ? 'segBtn segBtn--active' : 'segBtn'}
+                  onClick={s.toggle}
+                  style={{
+                    height: 30,
+                    padding: '0 14px',
+                    fontSize: 13,
+                    borderRadius: 3,
+                    cursor: 'pointer',
+                    border: `1px solid ${s.active ? '#5b21b6' : '#d9d9d9'}`,
+                    background: s.active ? '#5b21b6' : '#f3f4f6',
+                    color: s.active ? '#fff' : '#6b7280',
+                  }}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </dd>
+        </dl>
       </Search>
       <Table>
         <div className="tblPreview">
