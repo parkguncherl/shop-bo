@@ -1,15 +1,14 @@
 // C:\work\shop-frontend\libs\yup-schema.ts
 
 import * as yup from 'yup';
-import { AccountRequestCreateFields, AccountRequestUnLockFields, AccountRequestUpdateFields } from '../components/popup/system/accountMng';
-import { CodeRequestCreateFields, CodeRequestUpdateFields } from '../components/popup/system/codeMng';
-import { MenuFormData, MenuRequestCreateFields } from '../components/popup/system/menuMng';
-import { LoginVerificationFields } from '../app/(auth)/login/LoginClient';
-import { ProductInfoCreateFields } from '../components/popup/product/productMng/ProductInfoAddPop';
-import { ProductModFields } from '../components/popup/product/productMng/ProductModPop';
-import { ProductDetInsertFields } from '../components/popup/product/productMng/ProductDetInfoPop';
-import { UserRequestCreateUseYn } from '../generated';
-import { ProductContentFields } from '../components/popup/product/contentList/ProductContentPop';
+import { UserRequestCreate, UserRequestUpdate, UserRequestUnLock, UserRequestCreateUseYn, MenuRequestCreate, CodeRequestUpdate } from '@/generated';
+import { CodeRequestCreateFields } from '@/components/popup/system/codeMng';
+import { MenuFormData } from '@/components/popup/system/menuMng';
+import { LoginVerificationFields } from '@/app/(auth)/login/LoginClient';
+import { ProductInfoCreateFields } from '@/components/popup/product/productMng/ProductInfoAddPop';
+import { ProductModFields } from '@/components/popup/product/productMng/ProductModPop';
+import { ProductDetInsertFields } from '@/components/popup/product/productMng/ProductDetInfoPop';
+import { ProductContentFields } from '@/components/popup/product/contentList/ProductContentPop';
 
 export interface MenuRequestParams {
   menuCd?: string;
@@ -26,7 +25,7 @@ export const YupSchema = {
       //        .matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,24}$/, t('올바르지 않은 비밀번호입니다.'),
       isMobileLogin: yup.string().required('모바일 여부.'),
     }),
-  MenuRequest: (params: MenuRequestParams): yup.ObjectSchema<MenuRequestCreateFields> =>
+  MenuRequest: (params: MenuRequestParams): yup.ObjectSchema<MenuRequestCreate> =>
     yup.object({
       menuCd: yup
         .string()
@@ -43,7 +42,7 @@ export const YupSchema = {
         params.upMenuCd === 'TOP' || params.menuCd === params.upMenuCd
           ? yup.string().required('ICO를 입력하세요.').max(100, '100자 이내로 입력하세요.')
           : yup.string().required('URI를 입력하세요.').max(100, '100자 이내로 입력하세요.'),
-    }) as yup.ObjectSchema<MenuRequestCreateFields>,
+    }) as unknown as yup.ObjectSchema<MenuRequestCreate>,
   MenuRequestForUpdate: (params: MenuRequestParams): yup.ObjectSchema<MenuFormData> =>
     yup.object({
       menuCd: yup
@@ -61,8 +60,8 @@ export const YupSchema = {
         params.upMenuCd === 'TOP' || params.menuCd === params.upMenuCd
           ? yup.string().required('ICO를 입력하세요.').max(100, '100자 이내로 입력하세요.')
           : yup.string().required('URI를 입력하세요.').max(100, '100자 이내로 입력하세요.'),
-    }) as yup.ObjectSchema<MenuFormData>,
-  AccountRequest: (): yup.ObjectSchema<AccountRequestCreateFields> =>
+    }) as unknown as yup.ObjectSchema<MenuFormData>,
+  AccountRequest: (): yup.ObjectSchema<UserRequestCreate> =>
     yup.object({
       loginId: yup.string().required('ID(e-mail 또는 ID)을 입력하세요.').max(100, '100자 이내로 입력하세요.'),
       //.matches(/^[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i, '유효한 이메일 양식이 아닙니다.'),
@@ -81,8 +80,8 @@ export const YupSchema = {
       belongNm: yup.string().notRequired().max(30, '30자 이내로 입력하세요.'),
       deptNm: yup.string().notRequired().max(30, '30자 이내로 입력하세요.'),
       positionNm: yup.string().notRequired().max(30, '30자 이내로 입력하세요.'),
-    }) as yup.ObjectSchema<AccountRequestCreateFields>,
-  AccountRequestForUpdate: (): yup.ObjectSchema<AccountRequestUpdateFields> =>
+    }) as unknown as yup.ObjectSchema<UserRequestCreate>,
+  AccountRequestForUpdate: (): yup.ObjectSchema<UserRequestUpdate> =>
     yup.object({
       loginId: yup.string().required('ID(e-mail 또는 ID)을 입력하세요.').max(100, '100자 이내로 입력하세요.'),
       //.matches(/^[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i, '유효한 이메일 양식이 아닙니다.'),
@@ -98,12 +97,12 @@ export const YupSchema = {
       belongNm: yup.string().notRequired().max(30, '30자 이내로 입력하세요.'),
       deptNm: yup.string().notRequired().max(30, '30자 이내로 입력하세요.'),
       positionNm: yup.string().notRequired().max(30, '30자 이내로 입력하세요.'),
-    }) as yup.ObjectSchema<AccountRequestUpdateFields>,
+    }) as unknown as yup.ObjectSchema<UserRequestUpdate>,
 
-  AccountUnLockRequest: (): yup.ObjectSchema<AccountRequestUnLockFields> =>
+  AccountUnLockRequest: (): yup.ObjectSchema<UserRequestUnLock> =>
     yup.object({
       loginPass: yup.string().required('비밀번호를 입력하세요.'),
-    }) as yup.ObjectSchema<AccountRequestUnLockFields>,
+    }) as unknown as yup.ObjectSchema<UserRequestUnLock>,
 
   CodeRequest: (): yup.ObjectSchema<CodeRequestCreateFields> =>
     yup.object({
@@ -131,7 +130,7 @@ export const YupSchema = {
       codeEtcEngInfo: yup.string().nullable(), // 추가
     }) as yup.ObjectSchema<CodeRequestCreateFields>,
 
-  CodeRequestForUpdate: (): yup.ObjectSchema<CodeRequestUpdateFields> =>
+  CodeRequestForUpdate: (): yup.ObjectSchema<CodeRequestUpdate> =>
     yup.object({
       id: yup.number().required('아이디는 필수 key 입니다. '),
       codeUpper: yup.string().required('상위코드명을 입력하세요.').max(25, '25자 이내로 입력하세요.'),
@@ -156,7 +155,7 @@ export const YupSchema = {
       codeEngNm: yup.string().nullable(), // 추가
       codeEtcInfo: yup.string().nullable(), // 추가
       codeEtcEngInfo: yup.string().nullable(), // 추가
-    }) as yup.ObjectSchema<CodeRequestUpdateFields>,
+    }) as unknown as yup.ObjectSchema<CodeRequestUpdate>,
   MypageChangePasswordRequest: () =>
     yup.object().shape({
       rePassword: yup.string().required('현재 비밀번호를 입력하세요.'),
@@ -244,25 +243,21 @@ export const YupSchema = {
         prodTp: yup.string().required('상품유형은 필수값입니다!'),
         prodDetTp: yup.string().required('상품상세유형은 필수값입니다!'),
         composition: yup.string().notRequired(),
-        // repFileId: yup.number().notRequired(),
-        // detailFileId: yup.number().notRequired(),
-        // sizeFileId: yup.number().notRequired(),
-        // etcFileId: yup.number().notRequired(),
-        makeYmd: yup.string().required('제조일자는 필수값입니다!'),
+        makeYmd: yup.string().required('등록일자는  필수값입니다!'),
         orgAmt: yup.number().typeError('원가는 숫자만 입력 가능합니다.').notRequired(),
         sellAmt: yup.number().typeError('판매가는 숫자만 입력 가능합니다.').notRequired(),
         discountRate: yup.number().typeError('할인율은 숫자만 입력 가능합니다.').notRequired(),
         weather: yup.array().of(yup.string()).min(1, '최소 하나의 계절 유형을 선택하십시요.').required('계절 유형은 필수값입니다!'),
-        // isSpring: yup.string().notRequired(),
-        // isSummer: yup.string().notRequired(),
-        // isAutumn: yup.string().notRequired(),
-        // isWinter: yup.string().notRequired(),
         thickTp: yup.string().notRequired(),
         spanTp: yup.string().notRequired(),
         showTp: yup.string().notRequired(),
         laundryTp: yup.string().notRequired(),
         transTp: yup.string().notRequired(),
+        detInfo: yup.string().notRequired(),
+        showYn: yup.string().notRequired(),
       }),
+
+      categoryId: yup.number().notRequired(),
 
       productDet: yup
         .object({
@@ -286,7 +281,7 @@ export const YupSchema = {
       // detailFileId: yup.number().notRequired(),
       // sizeFileId: yup.number().notRequired(),
       // etcFileId: yup.number().notRequired(),
-      makeYmd: yup.string().required('제조일자는 필수값입니다!'),
+      makeYmd: yup.string().required('등록일자는 필수값입니다!'),
       orgAmt: yup.number().typeError('원가는 숫자만 입력 가능합니다.').notRequired(),
       sellAmt: yup.number().typeError('판매가는 숫자만 입력 가능합니다.').notRequired(),
       discountRate: yup.number().typeError('할인율은 숫자만 입력 가능합니다.').notRequired(),
@@ -300,6 +295,8 @@ export const YupSchema = {
       showTp: yup.string().notRequired(),
       laundryTp: yup.string().notRequired(),
       transTp: yup.string().notRequired(),
+      detInfo: yup.string().notRequired(),
+      showYn: yup.string().notRequired(),
     }) as yup.ObjectSchema<ProductModFields>,
 
   InsertProductDetRequest: (): yup.ObjectSchema<ProductDetInsertFields> =>

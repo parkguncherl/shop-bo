@@ -7,7 +7,7 @@ import PopupFormGroup from '../../content/PopupFormGroup';
 import PopupFormType from '../../content/PopupFormType';
 import FormInput from '../../../form/FormInput';
 import { SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '@/libs';
 import { toastError, toastSuccess } from '@/components';
@@ -18,6 +18,8 @@ import FormDropDown from '../../../form/FormDropDown';
 import FormDatePicker from '../../../form/FormDatePicker';
 import dayjs from 'dayjs';
 import { usePartnerCodeList } from '@/customHook/usePartnerCodeList';
+import { usePartnerCodeStore } from '@/stores/usePartnerCodeStore';
+import { PARTNER_CODE } from '@/libs/const';
 
 /** form 영역 입력 인터페이스 */
 export interface ProductCreateFields extends ProductMngRequestInsertProduct {
@@ -28,6 +30,7 @@ export interface ProductInfoCreateFields {
   id?: number;
   product?: ProductCreateFields;
   productDet: ProductMngRequestInsertProductDet;
+  categoryId?: number;
 }
 
 interface ProductContentShowPopProps {
@@ -50,6 +53,20 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
   /** 공통 스토어 - State */
   const domaeCode = usePartnerCodeList({ codeUpper: 'P0006', orderType: 'NAME' });
   const [insertProductInfo] = useProductMngStore((s) => [s.insertProductInfo]);
+  const { selectLowerPartnerCodeByCodeUpper } = usePartnerCodeStore();
+
+  /** 카테고리 목록 */
+  const { data: categoriesData } = useQuery({
+    queryKey: ['partnerCode', PARTNER_CODE.categories.code],
+    queryFn: () => selectLowerPartnerCodeByCodeUpper(PARTNER_CODE.categories.code, ''),
+    enabled: open,
+    staleTime: 60_000,
+  });
+  const categoryOptions = (categoriesData?.data?.body ?? []).map((c: any) => ({
+    key: String(c.id),
+    value: c.id,
+    label: c.codeNm,
+  }));
 
   /** 파트너 사이즈 정보(콤마 구분) → label/value 동일한 콤보 옵션 */
   const sizeOptions = (sizeInfo ?? '')
@@ -168,6 +185,10 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
         };
       }
 
+      if (data.categoryId) {
+        (insertProductInfoReqObj as any).categoryId = data.categoryId;
+      }
+
       setOpenAddConf({
         open: true,
         stored: insertProductInfoReqObj,
@@ -224,7 +245,7 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
               <PopupFormGroup title={'품목정보'}>
                 <PopupFormType className={'type2'}>
                   <FormInput<ProductInfoCreateFields> control={control} name={'product.prodNm'} label={'품목명'} placeholder={'제목'} />
-                  <FormDatePicker<ProductInfoCreateFields> control={control} name={'product.makeYmd'} title={'제조일자'} />
+                  <FormDatePicker<ProductInfoCreateFields> control={control} name={'product.makeYmd'} title={'등록일자'} />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
                   <FormDropDown<ProductInfoCreateFields>
@@ -285,6 +306,10 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
                   />
                 </PopupFormType>
                 {/* 두께/신축성/비침/세탁/안감 — 임시 숨김 */}
+                <PopupFormType className={'type2'}>
+                  <FormInput<ProductInfoCreateFields> control={control} name={'product.composition'} label={'혼용율'} />
+                  <FormDropDown<ProductInfoCreateFields> control={control} name={'categoryId'} title={'카테고리'} options={categoryOptions} placeholder={'선택'} />
+                </PopupFormType>
                 <PopupFormType className={'type_1'}>
                   <FormInput<ProductInfoCreateFields>
                     control={control}

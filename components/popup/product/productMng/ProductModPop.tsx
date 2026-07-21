@@ -214,7 +214,7 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
             <PopupFormGroup title={'품목정보'}>
               <PopupFormType className={'type2'}>
                 <FormInput<ProductModFields> control={control} name={'prodNm'} label={'품목명'} placeholder={'제목'} />
-                <FormDatePicker<ProductModFields> control={control} name={'makeYmd'} title={'제조일자'} />
+                <FormDatePicker<ProductModFields> control={control} name={'makeYmd'} title={'등록일자'} />
               </PopupFormType>
               <PopupFormType className={'type2'}>
                 <FormDropDown<ProductModFields> control={control} name={'prodTp'} title={'품목유형'} codeUpper={'90010'} />
@@ -253,6 +253,9 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
                 />
               </PopupFormType>
               {/* 두께/신축성/비침/세탁/안감 — 임시 숨김 */}
+              <PopupFormType className={'type_2'}>
+                <FormInput<ProductModFields> control={control} name={'composition'} label={'혼용율'} />
+              </PopupFormType>
               <PopupFormType className={'type_1'}>
                 <FormInput<ProductModFields> control={control} name={'detInfo'} label={'상품설명'} inputType={'textarea'} style={{ height: 120 }} />
               </PopupFormType>
