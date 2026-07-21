@@ -252,17 +252,7 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
                   placeholder={'선택'}
                 />
               </PopupFormType>
-              <PopupFormType className={'type2'}>
-                <FormDropDown<ProductModFields> control={control} name={'thickTp'} title={'두께'} codeUpper={'90030'} placeholder={'선택'} required />
-                <FormDropDown<ProductModFields> control={control} name={'spanTp'} title={'신축성'} codeUpper={'90040'} placeholder={'선택'} required />
-              </PopupFormType>
-              <PopupFormType className={'type2'}>
-                <FormDropDown<ProductModFields> control={control} name={'showTp'} title={'비침'} codeUpper={'90050'} placeholder={'선택'} required />
-                <FormDropDown<ProductModFields> control={control} name={'laundryTp'} title={'세탁'} codeUpper={'90070'} placeholder={'선택'} required />
-              </PopupFormType>
-              <PopupFormType className={'type_2'}>
-                <FormDropDown<ProductModFields> control={control} name={'transTp'} title={'안감'} codeUpper={'90060'} placeholder={'선택'} required />
-              </PopupFormType>
+              {/* 두께/신축성/비침/세탁/안감 — 임시 숨김 */}
               <PopupFormType className={'type_1'}>
                 <FormInput<ProductModFields> control={control} name={'detInfo'} label={'상품설명'} inputType={'textarea'} style={{ height: 120 }} />
               </PopupFormType>

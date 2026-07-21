@@ -528,7 +528,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                 defaultOptions={categoryOptions}
                 value={filtersForProdInfoByCategory.categoryId}
                 onChange={onChangeFiltersForProdInfoByCategoryCommonCallback}
-                dropDownStyle={{ width: '280px' }}
+                dropDownStyle={{ width: '960px' }}
               />
               <Search.Input
                 title={'상품명'}
