@@ -300,13 +300,14 @@
         content: "";
         display: flex;
         position: absolute;
-        top: 8px;
+        // 고정 오프셋(top:8px)은 rowHeight 가 커진 그리드에서 위로 치우치므로 세로 중앙 정렬한다
+        top: 50%;
         left: 50%;
         width: 12px;
         height: 9px;
         background: url(../public/images/ico_check.svg) no-repeat center;
         background-size: auto 100%;
-        transform: translateX(-50%);
+        transform: translate(-50%, -50%);
       }
     }
   }

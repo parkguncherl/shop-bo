@@ -367,13 +367,13 @@ const ProductMng = () => {
       },
       { field: 'partnerNm', headerName: '매장', minWidth: 60, maxWidth: 60, suppressHeaderMenuButton: true },
       { field: 'prodNm', headerName: '품목명', minWidth: 200, maxWidth: 200, suppressHeaderMenuButton: true },
-      { field: 'season', headerName: '계절', minWidth: 60, maxWidth: 60, suppressHeaderMenuButton: true },
-      { field: 'prodSizes', headerName: '크기', minWidth: 80, maxWidth: 80, suppressHeaderMenuButton: true },
+      { field: 'season', headerName: '계절', minWidth: 58, maxWidth: 58, suppressHeaderMenuButton: true },
+      { field: 'prodSizes', headerName: '크기', minWidth: 100, maxWidth: 100, suppressHeaderMenuButton: true, cellStyle: rcCenter },
       {
         field: 'prodColors',
         headerName: '색상',
-        minWidth: 150,
-        maxWidth: 150,
+        minWidth: 140,
+        maxWidth: 140,
         editable: true,
         cellEditor: 'agSelectCellEditor',
         cellEditorParams: (params: ICellEditorParams) => {
@@ -409,12 +409,12 @@ const ProductMng = () => {
         },
         suppressHeaderMenuButton: true,
       },
-      { field: 'makeYmd', headerName: '등록일', minWidth: 80, maxWidth: 80, suppressHeaderMenuButton: true, cellStyle: rcCenter },
+      { field: 'makeYmd', headerName: '등록일', minWidth: 70, maxWidth: 70, suppressHeaderMenuButton: true, cellStyle: rcCenter },
       {
         field: 'relCount',
         headerName: '연계',
-        minWidth: 37,
-        maxWidth: 37,
+        minWidth: 33,
+        maxWidth: 33,
         suppressHeaderMenuButton: true,
         cellStyle: (params) => ({
           ...rcCenter,
@@ -424,8 +424,8 @@ const ProductMng = () => {
       {
         field: 'orgAmt',
         headerName: '원가',
-        minWidth: 60,
-        maxWidth: 60,
+        minWidth: 56,
+        maxWidth: 56,
         suppressHeaderMenuButton: true,
         cellStyle: rcRight,
         cellRenderer: 'NUMBER_COMMA',
@@ -433,8 +433,8 @@ const ProductMng = () => {
       {
         field: 'sellAmt',
         headerName: '판매가',
-        minWidth: 60,
-        maxWidth: 60,
+        minWidth: 56,
+        maxWidth: 56,
         suppressHeaderMenuButton: true,
         cellStyle: rcRight,
         cellRenderer: 'NUMBER_COMMA',
@@ -442,8 +442,8 @@ const ProductMng = () => {
       {
         field: 'repFileIdCnt',
         headerName: '대표 IMG',
-        minWidth: 60,
-        maxWidth: 60,
+        minWidth: 58,
+        maxWidth: 58,
         suppressHeaderMenuButton: true,
         // tblBtn 은 height 20px 고정 + margin 0 !important 이므로, 셀에서 수직 중앙 정렬해야 한다
         cellStyle: GridSetting.CellStyle.FLEX_CENTER,
