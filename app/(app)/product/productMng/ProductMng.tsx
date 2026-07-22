@@ -367,8 +367,8 @@ const ProductMng = () => {
       },
       { field: 'partnerNm', headerName: '매장', minWidth: 60, maxWidth: 60, suppressHeaderMenuButton: true },
       { field: 'prodNm', headerName: '품목명', minWidth: 200, maxWidth: 200, suppressHeaderMenuButton: true },
-      { field: 'season', headerName: '계절', minWidth: 58, maxWidth: 58, suppressHeaderMenuButton: true },
-      { field: 'prodSizes', headerName: '크기', minWidth: 100, maxWidth: 100, suppressHeaderMenuButton: true, cellStyle: rcCenter },
+      { field: 'season', headerName: '계절', minWidth: 37, maxWidth: 37, suppressHeaderMenuButton: true, cellStyle: rcCenter },
+      { field: 'prodSizes', headerName: '크기', minWidth: 90, maxWidth: 90, suppressHeaderMenuButton: true, cellStyle: rcCenter },
       {
         field: 'prodColors',
         headerName: '색상',
@@ -409,7 +409,7 @@ const ProductMng = () => {
         },
         suppressHeaderMenuButton: true,
       },
-      { field: 'makeYmd', headerName: '등록일', minWidth: 70, maxWidth: 70, suppressHeaderMenuButton: true, cellStyle: rcCenter },
+      { field: 'makeYmd', headerName: '등록일', minWidth: 65, maxWidth: 65, suppressHeaderMenuButton: true, cellStyle: rcCenter },
       {
         field: 'relCount',
         headerName: '연계',
@@ -435,6 +435,15 @@ const ProductMng = () => {
         headerName: '판매가',
         minWidth: 56,
         maxWidth: 56,
+        suppressHeaderMenuButton: true,
+        cellStyle: rcRight,
+        cellRenderer: 'NUMBER_COMMA',
+      },
+      {
+        field: 'stock',
+        headerName: '재고',
+        minWidth: 40,
+        maxWidth: 40,
         suppressHeaderMenuButton: true,
         cellStyle: rcRight,
         cellRenderer: 'NUMBER_COMMA',
@@ -753,6 +762,19 @@ const ProductMng = () => {
                     등록
                   </button>
                   <button
+                    className={'btn btn_primary'}
+                    onClick={() => {
+                      // 행 더블클릭과 동일하게 수정 팝업 오픈 (선택된 행 필요)
+                      if (selectedRowsData == undefined) {
+                        toastError('수정하실 품목 ROW 를 선택하세요');
+                      } else {
+                        openModal('PROD_MOD');
+                      }
+                    }}
+                  >
+                    수정
+                  </button>
+                  <button
                     className={`btn btn_primary`}
                     onClick={() => {
                       if (selectedRowsData == undefined) {
@@ -762,7 +784,7 @@ const ProductMng = () => {
                       }
                     }}
                   >
-                    {`상세`}
+                    {`상세목록`}
                   </button>
                 </div>
               </div>
