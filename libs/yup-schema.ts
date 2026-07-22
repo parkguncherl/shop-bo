@@ -1,13 +1,20 @@
 // C:\work\shop-frontend\libs\yup-schema.ts
 
 import * as yup from 'yup';
-import { UserRequestCreate, UserRequestUpdate, UserRequestUnLock, UserRequestCreateUseYn, MenuRequestCreate, CodeRequestUpdate } from '@/generated';
+import {
+  UserRequestCreate,
+  UserRequestUpdate,
+  UserRequestUnLock,
+  UserRequestCreateUseYn,
+  MenuRequestCreate,
+  CodeRequestUpdate,
+  ProductMngRequestInsertProductDet,
+} from '@/generated';
 import { CodeRequestCreateFields } from '@/components/popup/system/codeMng';
 import { MenuFormData } from '@/components/popup/system/menuMng';
 import { LoginVerificationFields } from '@/app/(auth)/login/LoginClient';
 import { ProductInfoCreateFields } from '@/components/popup/product/productMng/ProductInfoAddPop';
 import { ProductModFields } from '@/components/popup/product/productMng/ProductModPop';
-import { ProductDetInsertFields } from '@/components/popup/product/productMng/ProductDetInfoPop';
 import { ProductContentFields } from '@/components/popup/product/contentList/ProductContentPop';
 
 export interface MenuRequestParams {
@@ -295,7 +302,7 @@ export const YupSchema = {
       showYn: yup.string().notRequired(),
     }) as yup.ObjectSchema<ProductModFields>,
 
-  InsertProductDetRequest: (): yup.ObjectSchema<ProductDetInsertFields> =>
+  InsertProductDetRequest: (): yup.ObjectSchema<ProductMngRequestInsertProductDet> =>
     yup.object({
       //productDetSeq: yup.number().required(),
       productDetSize: yup.string().required('(상품상세)사이즈는 필수값입니다!'),
@@ -304,5 +311,5 @@ export const YupSchema = {
       //fileId: yup.number().notRequired(),
       sleepYn: yup.string().required('휴면 여부는 필수값입니다!'),
       productDetCntn: yup.string(),
-    }) as yup.ObjectSchema<ProductDetInsertFields>,
+    }) as yup.ObjectSchema<ProductMngRequestInsertProductDet>,
 };

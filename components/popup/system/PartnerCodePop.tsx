@@ -126,12 +126,32 @@ export const PartnerCodePop = ({ partnerCodeUpper, activated, title, codeName, o
       suppressHeaderMenuButton: true,
     },
     {
-      headerName: '유형',
+      headerName: '정보',
+      field: 'codeDesc',
+      sortable: true,
+      minWidth: 200,
+      maxWidth: 200,
+      editable: true,
+      cellStyle: GridSetting.CellStyle.LEFT,
+      suppressHeaderMenuButton: true,
+    },
+    {
+      headerName: '기타정보',
       field: 'codeEtc',
       sortable: true,
-      width: 100,
+      width: 150,
       editable: true,
-      cellStyle: GridSetting.CellStyle.CENTER,
+      cellStyle: GridSetting.CellStyle.LEFT,
+      suppressHeaderMenuButton: true,
+    },
+    {
+      headerName: '기타정보2',
+      field: 'codeEtc1',
+      sortable: true,
+      minWidth: 150,
+      maxWidth: 150,
+      editable: true,
+      cellStyle: GridSetting.CellStyle.LEFT,
       suppressHeaderMenuButton: true,
     },
     {
@@ -155,7 +175,7 @@ export const PartnerCodePop = ({ partnerCodeUpper, activated, title, codeName, o
       headerName: '등록일자',
       field: 'updTm',
       sortable: true,
-      width: 120,
+      width: 100,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
       valueFormatter: formatDateWithDay,
@@ -175,22 +195,37 @@ export const PartnerCodePop = ({ partnerCodeUpper, activated, title, codeName, o
           partnerCodeLowerSelectList: selectedRows,
         });
       } else {
-        toastError('선택된 행이 없습니다.');
+        const focusedCell = gridApi.getFocusedCell();
+
+        if (focusedCell) {
+          const rowNode = gridApi.getDisplayedRowAtIndex(focusedCell.rowIndex);
+          const rowData = rowNode?.data;
+          if (rowData) {
+            savePartnerCodeMutate({
+              //createType: 'NO_CODECD_AUTO_INCREMENT',
+              partnerCodeLowerSelectList: [rowData],
+            });
+          }
+        } else {
+          toastError('선택된 행이 없습니다.');
+        }
       }
     }
   };
 
   /** 추가 이벤트 */
   const addRowPartnerCode = async () => {
+    const codeMaxCodeNo = Math.max(...(gridRowData?.map((item) => parseInt(item.codeCd || '0')) ?? [0])) + 1;
+    const codeMaxSeqNo = Math.max(...(gridRowData?.map((item) => item.codeOrder || 0) ?? [0])) + 1;
     const newData: PartnerCodeResponseLowerSelect = {
       codeUpper: partnerCodeUpper,
-      codeCd: '',
+      codeCd: codeMaxCodeNo ? String(codeMaxCodeNo) : '',
+      codeOrder: codeMaxSeqNo,
       codeNm: '',
     };
     if (gridRowData) {
       if (gridRowData.filter((rowData) => rowData.id == undefined).length == 0) {
         setGridRowData([...gridRowData, newData]);
-
         runWhenReady<GridApi, void>({
           id: 'gotoBottom',
           fn: (gridRefsApi) => {
@@ -203,14 +238,6 @@ export const PartnerCodePop = ({ partnerCodeUpper, activated, title, codeName, o
       } else {
         toastError('한번에 하나의 행만 추가 가능합니다.');
       }
-      // setTimeout(() => {
-      //   const api = gridRef.current?.api;
-      //   if (api) {
-      //     const lastRowIndex = gridRowData.length - 1;
-      //     api.ensureIndexVisible(lastRowIndex); // 스크롤 이동
-      //     api.setFocusedCell(lastRowIndex, 'codeCd'); // 포커스 셀 지정(필드명은 필요에 맞게)
-      //   }
-      // }, 0);
     } else {
       setGridRowData([newData]);
     }
@@ -235,7 +262,7 @@ export const PartnerCodePop = ({ partnerCodeUpper, activated, title, codeName, o
 
   return (
     <PopupLayout
-      width={800}
+      width={1100}
       isEscClose={true}
       open={activated}
       title={title}

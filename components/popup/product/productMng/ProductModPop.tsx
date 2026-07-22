@@ -48,8 +48,6 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
   const [openModConf, setOpenAddConf] = useState<{ open: boolean; stored?: ProductMngRequestUpdateProduct }>({ open: false });
   const [openDelConf, setOpenDelConf] = useState(false);
 
-  console.log('productInfo ===>', productInfo);
-
   /** 품목 내용 입력 서식 */
   const {
     handleSubmit,

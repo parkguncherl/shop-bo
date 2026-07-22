@@ -752,15 +752,6 @@ const ProductMng = () => {
                   >
                     등록
                   </button>
-                  {/*<button*/}
-                  {/*  className={`btn ${selectedRowsData != undefined && 'btn_primary'}`}*/}
-                  {/*  disabled={selectedRowsData == undefined}*/}
-                  {/*  onClick={() => {*/}
-                  {/*    openModal('PROD_DET_INFO_ADD');*/}
-                  {/*  }}*/}
-                  {/*>*/}
-                  {/*  {`${selectedRowsData == undefined ? '상세정보 추가할 품목 선택' : '상세정보'}`}*/}
-                  {/*</button>*/}
                   <button
                     className={`btn btn_primary`}
                     onClick={() => {
@@ -771,7 +762,7 @@ const ProductMng = () => {
                       }
                     }}
                   >
-                    {`품목상세`}
+                    {`상세`}
                   </button>
                 </div>
               </div>

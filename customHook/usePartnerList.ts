@@ -27,7 +27,7 @@ export const usePartnerList = ({ enabled = true, staleTime, refetchOnMount }: Us
             key: item.id,
             value: item.id as string,
             label: item.partnerNm,
-          } as PartnerResponseForSearching),
+          }) as PartnerResponseForSearching,
       );
     },
     enabled: enabled,

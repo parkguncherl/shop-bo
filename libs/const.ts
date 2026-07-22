@@ -22,6 +22,51 @@ export const Formatter = {
   },
 };
 
+// 표준색상 팔레트 (화이트/그레이/블랙 + 다양한 색상)
+export const STNDR_COLOR_PALETTE = [
+  '#FFFFFF',
+  '#F5F5F5',
+  '#E0E0E0',
+  '#BDBDBD',
+  '#9E9E9E',
+  '#757575',
+  '#424242',
+  '#000000',
+  '#F44336',
+  '#E91E63',
+  '#FF5252',
+  '#FF4081',
+  '#D50000',
+  '#C2185B',
+  '#9C27B0',
+  '#673AB7',
+  '#7C4DFF',
+  '#B388FF',
+  '#6200EA',
+  '#3F51B5',
+  '#2196F3',
+  '#03A9F4',
+  '#00BCD4',
+  '#40C4FF',
+  '#0091EA',
+  '#009688',
+  '#4CAF50',
+  '#8BC34A',
+  '#CDDC39',
+  '#69F0AE',
+  '#00C853',
+  '#FFEB3B',
+  '#FFC107',
+  '#FF9800',
+  '#FF5722',
+  '#FFD740',
+  '#FF6D00',
+  '#795548',
+  '#8D6E63',
+  '#607D8B',
+  '#90A4AE',
+];
+
 export const AlertMessage = { RequiredParams: '검색조건을 1개 이상 입력하세요.', LastDataHasBeenReached: '더 이상 데이터가 존재하지 않습니다.' };
 
 /** 인증번호 입력 대기 시간 (ms) */

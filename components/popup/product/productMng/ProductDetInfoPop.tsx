@@ -9,6 +9,7 @@ import { authApi, YupSchema } from '@/libs';
 import { toastError, toastSuccess } from '@/components/ToastMessage';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import {
+  Partner,
   ProductMngRequestDeleteProductDet,
   ProductMngRequestInsertProductDet,
   ProductMngResponseProductDetInfo,
@@ -23,15 +24,8 @@ import { GridSetting } from '@/libs/ag-grid';
 import { ColDef } from 'ag-grid-community';
 import { GlobalError, SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-
-export interface ProductDetInsertFields extends ProductMngRequestInsertProductDet {
-  // productDetSeq: number;
-  // productDetSize: string;
-  // productDetColor: string;
-  // skuDiscountRate: number;
-  // //fileId?: number;
-  // sleepYn: string;
-}
+import { STNDR_COLOR_PALETTE } from '@/libs/const';
+import { usePartnerInfo } from '@/customHook/usePartnerInfo';
 
 interface ProductContentShowPopProps {
   open: boolean;
@@ -53,51 +47,6 @@ const expandHex = (hex?: string) => {
         .join('')
     : hex;
 };
-
-// 표준색상 팔레트 (화이트/그레이/블랙 + 다양한 색상)
-const STNDR_COLOR_PALETTE = [
-  '#FFFFFF',
-  '#F5F5F5',
-  '#E0E0E0',
-  '#BDBDBD',
-  '#9E9E9E',
-  '#757575',
-  '#424242',
-  '#000000',
-  '#F44336',
-  '#E91E63',
-  '#FF5252',
-  '#FF4081',
-  '#D50000',
-  '#C2185B',
-  '#9C27B0',
-  '#673AB7',
-  '#7C4DFF',
-  '#B388FF',
-  '#6200EA',
-  '#3F51B5',
-  '#2196F3',
-  '#03A9F4',
-  '#00BCD4',
-  '#40C4FF',
-  '#0091EA',
-  '#009688',
-  '#4CAF50',
-  '#8BC34A',
-  '#CDDC39',
-  '#69F0AE',
-  '#00C853',
-  '#FFEB3B',
-  '#FFC107',
-  '#FF9800',
-  '#FF5722',
-  '#FFD740',
-  '#FF6D00',
-  '#795548',
-  '#8D6E63',
-  '#607D8B',
-  '#90A4AE',
-];
 
 const StndrColorCell = (params: any) => {
   const value: string | undefined = params.value; // '#' 없는 3자리 hex
@@ -182,10 +131,26 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
   /** 팝업 내부 local state */
   const [productDetInfoList, setProductDetInfoList] = useState<ProductMngResponseProductDetInfo[]>([]);
   const [selectedRowsData, setSelectedRowsData] = useState<ProductMngResponseProductDetInfo | undefined>(undefined);
+  const partnerInfo = usePartnerInfo();
+
+  /**
+   * 파트너 사이즈 정보.
+   * partnerInfo 응답에서 그대로 파생되는 값이라 state/useEffect 로 복제하지 않는다.
+   * (usePartnerInfo() 는 매 렌더마다 새 객체를 반환하므로 [partnerInfo] 의존 effect 는 무한 루프를 유발함)
+   */
+  const sizeInfo = useMemo(
+    () =>
+      partnerInfo.data?.sizeInfo
+        ?.split(',')
+        .map((s) => s.trim())
+        .filter(Boolean) ?? [],
+    // 원시값(문자열)에만 의존해야 매 렌더 새 배열이 생기지 않아 columnDefs 메모가 유지된다
+    [partnerInfo.data?.sizeInfo],
+  );
 
   // 컨펌 팝업
   const [openDelConf, setOpenDelConf] = useState<{ open: boolean; stored?: ProductMngRequestDeleteProductDet }>({ open: false });
-  const [openAddConf, setOpenAddConf] = useState<{ open: boolean; stored?: ProductDetInsertFields }>({ open: false });
+  const [openAddConf, setOpenAddConf] = useState<{ open: boolean; stored?: ProductMngRequestInsertProductDet }>({ open: false });
 
   const RefForGrid = useRef<TunedGridRef<ProductMngResponseProductDetInfo>>(null);
 
@@ -202,7 +167,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
     setValue,
     getValues,
     formState: { errors, isValid },
-  } = useForm<ProductDetInsertFields>({
+  } = useForm<ProductMngRequestInsertProductDet>({
     resolver: yupResolver(YupSchema.InsertProductDetRequest()),
     mode: 'onChange',
     defaultValues: {
@@ -350,6 +315,11 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
         minWidth: 80,
         maxWidth: 100,
         suppressHeaderMenuButton: true,
+        // 파트너 사이즈 정보(콤마 구분)를 콤보로 제공 (sleepYn 컬럼과 동일 방식)
+        cellEditor: 'agSelectCellEditor',
+        cellEditorParams: {
+          values: sizeInfo,
+        },
         editable: (params) => (flagAboutIsOnWritingOrNot.current ? params.data?.id == undefined : true),
         onCellValueChanged: (event) => {
           if (event.data.id) {
@@ -465,7 +435,8 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
         },
       },
     ],
-    [updateProductDetMutate, setValue, getValues, onColorChange],
+    // sizeInfo: 파트너 정보가 늦게 로드돼도 사이즈 콤보 목록이 반영되도록 포함
+    [updateProductDetMutate, setValue, getValues, onColorChange, sizeInfo],
   );
 
   /** 상품상세정보 목록 조회 */
@@ -511,7 +482,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
   };
 
   // 입력이 유효한 경우
-  const onValid: SubmitHandler<ProductDetInsertFields> = (data, event) => {
+  const onValid: SubmitHandler<ProductMngRequestInsertProductDet> = (data, event) => {
     setOpenAddConf({
       open: true,
       stored: data,
@@ -519,7 +490,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
   };
 
   // 유효하지 않은 경우
-  const onInvalid: SubmitErrorHandler<ProductDetInsertFields> = (errors, event) => {
+  const onInvalid: SubmitErrorHandler<ProductMngRequestInsertProductDet> = (errors, event) => {
     const fieldsRelatedWithErr = Object.keys(errors);
     if (fieldsRelatedWithErr.length > 0) {
       // @ts-ignore
@@ -548,7 +519,11 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
                   onClick={() => {
                     if (productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length == 0) {
                       flagAboutIsOnWritingOrNot.current = true; // 플래그 동기화
-                      setProductDetInfoList((prevState) => [...prevState, {}]); // 신규 행 추가(이후부터는 rhf 관할)
+                      const lastData =
+                        productDetInfoList.length > 0
+                          ? { ...productDetInfoList.at(productDetInfoList.length - 1), productDetColor: undefined, stndrColor: undefined }
+                          : {};
+                      setProductDetInfoList((prevState) => [...prevState, lastData ?? {}]); // 신규 행 추가(이후부터는 rhf 관할)
                     } else {
                       // 신규 작성
                       if (isValid) {
@@ -577,11 +552,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
                     }
                   }}
                 >
-                  {`${
-                    productInfo == undefined || selectedRowsData == undefined
-                      ? '삭제할 상세정보 선택'
-                      : (productInfo?.prodNm || '') + ' ' + selectedRowsData?.productDetColor + ' 을(를) 삭제'
-                  }`}
+                  삭제
                 </button>
               </div>
               <div className="right">
