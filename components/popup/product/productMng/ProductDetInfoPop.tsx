@@ -9,7 +9,6 @@ import { authApi, YupSchema } from '@/libs';
 import { toastError, toastSuccess } from '@/components/ToastMessage';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import {
-  Partner,
   ProductMngRequestDeleteProductDet,
   ProductMngRequestInsertProductDet,
   ProductMngResponseProductDetInfo,
@@ -25,7 +24,7 @@ import { ColDef } from 'ag-grid-community';
 import { GlobalError, SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { STNDR_COLOR_PALETTE } from '@/libs/const';
-import { usePartnerInfo } from '@/customHook/usePartnerInfo';
+import { useSession } from 'next-auth/react';
 
 interface ProductContentShowPopProps {
   open: boolean;
@@ -126,27 +125,12 @@ const StndrColorCell = (params: any) => {
  * */
 const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
+  const session = useSession();
   const [updateProductDet, deleteProductDet, insertProductDet] = useProductMngStore((s) => [s.updateProductDet, s.deleteProductDet, s.insertProductDet]);
 
   /** 팝업 내부 local state */
   const [productDetInfoList, setProductDetInfoList] = useState<ProductMngResponseProductDetInfo[]>([]);
   const [selectedRowsData, setSelectedRowsData] = useState<ProductMngResponseProductDetInfo | undefined>(undefined);
-  const partnerInfo = usePartnerInfo();
-
-  /**
-   * 파트너 사이즈 정보.
-   * partnerInfo 응답에서 그대로 파생되는 값이라 state/useEffect 로 복제하지 않는다.
-   * (usePartnerInfo() 는 매 렌더마다 새 객체를 반환하므로 [partnerInfo] 의존 effect 는 무한 루프를 유발함)
-   */
-  const sizeInfo = useMemo(
-    () =>
-      partnerInfo.data?.sizeInfo
-        ?.split(',')
-        .map((s) => s.trim())
-        .filter(Boolean) ?? [],
-    // 원시값(문자열)에만 의존해야 매 렌더 새 배열이 생기지 않아 columnDefs 메모가 유지된다
-    [partnerInfo.data?.sizeInfo],
-  );
 
   // 컨펌 팝업
   const [openDelConf, setOpenDelConf] = useState<{ open: boolean; stored?: ProductMngRequestDeleteProductDet }>({ open: false });
@@ -318,7 +302,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
         // 파트너 사이즈 정보(콤마 구분)를 콤보로 제공 (sleepYn 컬럼과 동일 방식)
         cellEditor: 'agSelectCellEditor',
         cellEditorParams: {
-          values: sizeInfo,
+          values: session.data?.user.partner?.sizeInfo?.split(',').map((s) => s.trim()),
         },
         editable: (params) => (flagAboutIsOnWritingOrNot.current ? params.data?.id == undefined : true),
         onCellValueChanged: (event) => {
@@ -435,8 +419,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
         },
       },
     ],
-    // sizeInfo: 파트너 정보가 늦게 로드돼도 사이즈 콤보 목록이 반영되도록 포함
-    [updateProductDetMutate, setValue, getValues, onColorChange, sizeInfo],
+    [updateProductDetMutate, setValue, getValues, onColorChange, session],
   );
 
   /** 상품상세정보 목록 조회 */
@@ -519,9 +502,18 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
                   onClick={() => {
                     if (productDetInfoList.filter((productDetInfo) => productDetInfo.id == undefined).length == 0) {
                       flagAboutIsOnWritingOrNot.current = true; // 플래그 동기화
+                      // 마지막 행의 값을 프리필하되, 서버가 부여하는 식별/자산 필드는 반드시 비운다.
+                      // 특히 id 가 남으면 editable 판정(id == undefined)에 걸려 신규/기존 행 모두 편집이 막힌다.
                       const lastData =
                         productDetInfoList.length > 0
-                          ? { ...productDetInfoList.at(productDetInfoList.length - 1), productDetColor: undefined, stndrColor: undefined }
+                          ? {
+                              ...productDetInfoList.at(productDetInfoList.length - 1),
+                              id: undefined,
+                              productDetSeq: undefined,
+                              fileId: undefined,
+                              productDetColor: undefined,
+                              stndrColor: undefined,
+                            }
                           : {};
                       setProductDetInfoList((prevState) => [...prevState, lastData ?? {}]); // 신규 행 추가(이후부터는 rhf 관할)
                     } else {
@@ -538,7 +530,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
                 </button>
                 <button
                   className={`btn ${productInfo != undefined && selectedRowsData != undefined && 'btn_primary'}`}
-                  disabled={productInfo == undefined || selectedRowsData == undefined}
+                  //disabled={productInfo == undefined || selectedRowsData == undefined}
                   onClick={() => {
                     if (selectedRowsData?.id) {
                       setOpenDelConf({
@@ -548,7 +540,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
                         },
                       });
                     } else {
-                      console.error('삭제하고자 하는 상품상세의 식별자를 찾을 수 없음');
+                      setProductDetInfoList(productDetInfoList.filter((v) => v.id));
                     }
                   }}
                 >
