@@ -526,6 +526,7 @@ const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPop
                             }
                           : {};
                       setProductDetInfoList((prevState) => [...prevState, lastData ?? {}]); // 신규 행 추가(이후부터는 rhf 관할)
+                      setValue('productDetSize', (lastData as ProductMngResponseProductDetInfo).productDetSize ?? '', { shouldValidate: true });
                     } else {
                       // 신규 작성
                       if (isValid) {
