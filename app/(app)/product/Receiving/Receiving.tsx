@@ -348,8 +348,7 @@ const Receiving = () => {
           rowSelection={{ mode: 'singleRow', enableClickSelection: true }}
           loadingOverlayComponent={CustomGridLoading}
           noRowsOverlayComponent={CustomNoRowsOverlay}
-          className="default"
-          stopEditingWhenCellsLoseFocus
+          className="default check"
           onRowClicked={(e) => setSelectedRow(e.data ?? null)}
           onCellEditingStopped={onCellEditingStopped}
         />

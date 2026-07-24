@@ -30,7 +30,7 @@ import { PartnerCodePop } from '@/components/popup/system/PartnerCodePop';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import ProductForEachCategoryPop from '@/components/popup/product/productMng/ProductForEachCategoryPop';
 import ImgEditPop, { ImgPropsOnEditPop } from '@/components/popup/common/ImgEditPop';
-import { usePartnerCodeList } from '@/customHook/usePartnerCodeList';
+import { useVendorList } from '@/customHook/useVendorList';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
@@ -64,7 +64,7 @@ const ProductMng = () => {
   const updateImageFile = useCommonStore((s) => s.updateImageFile);
   const uploadImageFiles = useCommonStore((s) => s.uploadImageFiles);
   const deleteFile = useCommonStore((s) => s.deleteFile);
-  const domaeCode = usePartnerCodeList({ codeUpper: 'P0006', orderType: 'NAME' });
+  const vendorList = useVendorList();
   /** 품목관리 스토어 - State */
   const modals = useProductMngStore((s) => s.modals);
   const openModal = useProductMngStore((s) => s.openModal);
@@ -78,7 +78,7 @@ const ProductMng = () => {
   const [filters, onChangeFilters] = useFilters<ProductInfoFilters>({
     prodNm: undefined,
     partnerId: undefined,
-    domaeId: undefined,
+    vendorId: undefined,
     showYn: undefined,
   });
 
@@ -235,7 +235,7 @@ const ProductMng = () => {
       '/productMng/productInfoList',
       {
         partnerId: filters.partnerId,
-        domaeId: filters.domaeId,
+        vendorId: filters.vendorId,
         showYn: filters.showYn,
         prodNm: filters.prodNm,
         // 계절 선택은 즉시 재조회되도록 키에 포함
@@ -639,10 +639,10 @@ const ProductMng = () => {
       <Search className="type_2">
         <Search.DropDown
           title={'협력업체'}
-          name={'domaeId'}
-          value={filters.domaeId}
-          onChange={(_name, value) => onChangeFilters('domaeId', value ? Number(value) : undefined)}
-          defaultOptions={domaeCode.data}
+          name={'vendorId'}
+          value={filters.vendorId}
+          onChange={(_name, value) => onChangeFilters('vendorId', value ? Number(value) : undefined)}
+          defaultOptions={vendorList.data}
           showAll={true}
           dropDownStyle={{ width: '120px' }}
         />

@@ -17,7 +17,7 @@ import { useProductMngStore } from '@/stores/product/useProductMngStore';
 import FormDropDown from '@/components/form/FormDropDown';
 import FormDatePicker from '@/components/form/FormDatePicker';
 import dayjs from 'dayjs';
-import { usePartnerCodeList } from '@/customHook/usePartnerCodeList';
+import { useVendorList } from '@/customHook/useVendorList';
 
 /** form 영역 입력 인터페이스 */
 export interface ProductModFields extends ProductMngRequestUpdateProduct {
@@ -41,7 +41,7 @@ interface ProductContentShowPopProps {
  * */
 const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
-  const domaeCode = usePartnerCodeList({ codeUpper: 'P0006', orderType: 'NAME' });
+  const vendorList = useVendorList();
   const updateProduct = useProductMngStore((s) => s.updateProduct);
   const deleteProduct = useProductMngStore((s) => s.deleteProduct);
 
@@ -237,7 +237,7 @@ const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContent
                 <FormInput<ProductModFields> control={control} name={'discountRate'} label={'할인율'} />
               </PopupFormType>
               <PopupFormType className={'type2'}>
-                <FormDropDown<ProductModFields> control={control} name={'domaeId'} title={'협력업체'} multiple={false} options={domaeCode.data} required />
+                <FormDropDown<ProductModFields> control={control} name={'vendorId'} title={'협력업체'} multiple={false} options={vendorList.data} required />
                 <FormDropDown<ProductModFields>
                   control={control}
                   name={'showYn'}

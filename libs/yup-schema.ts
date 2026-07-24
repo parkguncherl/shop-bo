@@ -246,7 +246,7 @@ export const YupSchema = {
       product: yup.object({
         prodNm: yup.string().required('상품명은 필수값입니다!'),
         composition: yup.string().required('혼용율은 필수값입니다!'),
-        domaeId: yup.number().typeError('협력업체는 필수값입니다!').required('협력업체는 필수값입니다!'),
+        vendorId: yup.number().typeError('협력업체는 필수값입니다!').required('협력업체는 필수값입니다!'),
         makeYmd: yup.string().required('등록일자는  필수값입니다!'),
         orgAmt: yup.number().typeError('원가는 숫자만 입력 가능합니다.').notRequired(),
         sellAmt: yup.number().typeError('판매가는 숫자만 입력 가능합니다.').notRequired(),
@@ -283,7 +283,7 @@ export const YupSchema = {
       // detailFileId: yup.number().notRequired(),
       // sizeFileId: yup.number().notRequired(),
       // etcFileId: yup.number().notRequired(),
-      domaeId: yup.number().typeError('협력업체는 필수값입니다!').required('협력업체는 필수값입니다!'),
+      vendorId: yup.number().typeError('협력업체는 필수값입니다!').required('협력업체는 필수값입니다!'),
       makeYmd: yup.string().required('등록일자는 필수값입니다!'),
       orgAmt: yup.number().typeError('원가는 숫자만 입력 가능합니다.').notRequired(),
       sellAmt: yup.number().typeError('판매가는 숫자만 입력 가능합니다.').notRequired(),

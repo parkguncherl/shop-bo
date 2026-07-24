@@ -17,7 +17,7 @@ import { useProductMngStore } from '@/stores/product/useProductMngStore';
 import FormDropDown from '@/components/form/FormDropDown';
 import FormDatePicker from '@/components/form/FormDatePicker';
 import dayjs from 'dayjs';
-import { usePartnerCodeList } from '@/customHook/usePartnerCodeList';
+import { useVendorList } from '@/customHook/useVendorList';
 import { usePartnerCodeStore } from '@/stores/usePartnerCodeStore';
 import { PARTNER_CODE } from '@/libs/const';
 
@@ -69,7 +69,7 @@ const buildDefaultValues = () => ({
 // todo 현재 상세정보 추가 영역은 그리드를 통한 상세 목록으로 마이그레이션이 진행 중, 이후 해당 form 을 통한 추가 영역이 전적으로 불필요하다 판단될 시 조건부 영역 제거, 간소화
 const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
-  const domaeCode = usePartnerCodeList({ codeUpper: 'P0006', orderType: 'NAME' });
+  const vendorList = useVendorList();
   const insertProductInfo = useProductMngStore((s) => s.insertProductInfo);
   const { selectLowerPartnerCodeByCodeUpper } = usePartnerCodeStore();
 
@@ -280,10 +280,10 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
                 <PopupFormType className={'type2'}>
                   <FormDropDown<ProductInfoCreateFields>
                     control={control}
-                    name={'product.domaeId'}
+                    name={'product.vendorId'}
                     title={'협력업체'}
                     multiple={false}
-                    options={domaeCode.data}
+                    options={vendorList.data}
                     placeholder={'선택'}
                     required
                   />

@@ -36,7 +36,8 @@ export type VendorCreateRequest = {
   etcInfo?: string | null;
 };
 
-export type VendorUpdateRequest = VendorCreateRequest & { id: number };
+// 인라인(그리드 셀 단위) 수정 지원: id 와 변경된 필드만 전송
+export type VendorUpdateRequest = Partial<VendorCreateRequest> & { id: number };
 
 // UI 상태
 interface VendorUiState {
@@ -48,10 +49,8 @@ interface VendorUiState {
   setSelectedVendor: (vendor: VendorItem | null) => void;
 
   addOpen: boolean;
-  modOpen: boolean;
   delOpen: boolean;
   setAddOpen: (open: boolean) => void;
-  setModOpen: (open: boolean) => void;
   setDelOpen: (open: boolean) => void;
 }
 
@@ -80,13 +79,9 @@ const initialStateCreator: StateCreator<VendorUiState & VendorApiState, any> = (
   },
 
   addOpen: false,
-  modOpen: false,
   delOpen: false,
   setAddOpen: (open) => {
     set(() => ({ addOpen: open }));
-  },
-  setModOpen: (open) => {
-    set(() => ({ modOpen: open }));
   },
   setDelOpen: (open) => {
     set(() => ({ delOpen: open }));

@@ -61,7 +61,7 @@ export const usePartnerCodeList = ({
 
       // 코드 항목 → 드롭다운 옵션 매핑
       // value 는 partner_code 의 PK(id) 를 사용한다.
-      //  - TB_PRODUCT.DOMAE_ID 등 FK 가 codeCd 가 아닌 id(PK)를 저장하므로,
+      //  - FK 가 codeCd 가 아닌 id(PK)를 저장하므로,
       //    선택값이 id 로 저장·매칭되어야 라벨이 정상 표시된다.
       return body.map(
         (item: any) =>
