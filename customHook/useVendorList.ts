@@ -41,7 +41,7 @@ export const useVendorList = ({ enabled = true, staleTime, refetchOnMount }: Use
           ({
             key: item.id,
             value: item.id,
-            label: item.partnerNm,
+            label: item.vendorNm,
           }) as DropDownOption,
       );
     },

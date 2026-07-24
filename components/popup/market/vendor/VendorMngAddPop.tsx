@@ -19,7 +19,7 @@ interface Props {
 }
 
 interface FormFields {
-  partnerNm: string;
+  vendorNm: string;
   location?: string;
   phoneNo?: string;
   phoneNo2?: string;
@@ -27,7 +27,7 @@ interface FormFields {
   etcInfo?: string;
 }
 
-const DEFAULTS: FormFields = { partnerNm: '', location: '', phoneNo: '', phoneNo2: '', kakaoId: '', etcInfo: '' };
+const DEFAULTS: FormFields = { vendorNm: '', location: '', phoneNo: '', phoneNo2: '', kakaoId: '', etcInfo: '' };
 
 const VendorMngAddPop = ({ open, onClose, onSuccess }: Props) => {
   const createVendor = useVendorStore((s) => s.createVendor);
@@ -41,7 +41,7 @@ const VendorMngAddPop = ({ open, onClose, onSuccess }: Props) => {
 
   const onValid: SubmitHandler<FormFields> = async (form) => {
     const { data } = await createVendor({
-      partnerNm: form.partnerNm,
+      vendorNm: form.vendorNm,
       location: form.location || null,
       phoneNo: form.phoneNo || null,
       phoneNo2: form.phoneNo2 || null,
@@ -80,7 +80,7 @@ const VendorMngAddPop = ({ open, onClose, onSuccess }: Props) => {
         <PopupFormBox>
           <PopupFormGroup title="협력업체 정보">
             <PopupFormType className="type1">
-              <FormInput<FormFields> control={control} name="partnerNm" label="명칭" placeholder="명칭을 입력하세요" required />
+              <FormInput<FormFields> control={control} name="vendorNm" label="명칭" placeholder="명칭을 입력하세요" required />
             </PopupFormType>
             <PopupFormType className="type1">
               <FormInput<FormFields> control={control} name="location" label="위치" placeholder="위치를 입력하세요" />

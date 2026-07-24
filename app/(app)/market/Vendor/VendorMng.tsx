@@ -16,7 +16,7 @@ import { ConfirmModal } from '@/components/ConfirmModal';
 import VendorMngAddPop from '@/components/popup/market/vendor/VendorMngAddPop';
 
 // 그리드에서 바로 수정 가능한 컬럼 (명칭 ~ 기타정보, 등록자 이전까지)
-const INLINE_EDITABLE = new Set(['partnerNm', 'location', 'phoneNo', 'phoneNo2', 'kakaoId', 'etcInfo']);
+const INLINE_EDITABLE = new Set(['vendorNm', 'location', 'phoneNo', 'phoneNo2', 'kakaoId', 'etcInfo']);
 
 const VendorMng = () => {
   const { onGridReady } = useAgGridApi();
@@ -45,7 +45,7 @@ const VendorMng = () => {
     data: listData,
     refetch,
   } = useQuery({
-    queryKey: ['/partnerVendorMng/list', filters.partnerNm, filters.phoneNo],
+    queryKey: ['/partnerVendorMng/list', filters.vendorNm, filters.phoneNo],
     queryFn: () => fetchVendors(filters),
   });
 
@@ -102,7 +102,7 @@ const VendorMng = () => {
       const newValue = typeof event.newValue === 'string' ? event.newValue.trim() : event.newValue;
 
       // 명칭은 필수값 - 비우면 무시
-      if (field === 'partnerNm' && (newValue == null || newValue === '')) {
+      if (field === 'vendorNm' && (newValue == null || newValue === '')) {
         toastError('명칭은 필수 항목입니다.');
         return;
       }
@@ -125,7 +125,7 @@ const VendorMng = () => {
       valueGetter: (p) => (p.node?.rowIndex != null ? p.node.rowIndex + 1 : ''),
     },
     {
-      field: 'partnerNm',
+      field: 'vendorNm',
       headerName: '명칭✎',
       minWidth: 160,
       editable: true,
@@ -200,9 +200,9 @@ const VendorMng = () => {
       <Search className="type_2">
         <Search.Input
           title="명칭"
-          name="partnerNm"
+          name="vendorNm"
           placeholder="명칭을 입력하세요"
-          value={filters.partnerNm}
+          value={filters.vendorNm}
           onChange={(name, value) => setFilters(name as keyof VendorFilter, value as string)}
           onEnter={() => refetch()}
         />

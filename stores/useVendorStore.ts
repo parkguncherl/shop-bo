@@ -8,7 +8,7 @@ import { authApi } from '@/libs';
 export type VendorItem = {
   id: number;
   partnerId?: number;
-  partnerNm: string;
+  vendorNm: string;
   location?: string;
   phoneNo?: string;
   phoneNo2?: string;
@@ -22,13 +22,13 @@ export type VendorItem = {
 
 // 협력업체 검색 필터 타입
 export type VendorFilter = {
-  partnerNm: string;
+  vendorNm: string;
   phoneNo: string;
 };
 
 // 협력업체 등록/수정 요청 타입
 export type VendorCreateRequest = {
-  partnerNm: string;
+  vendorNm: string;
   location?: string | null;
   phoneNo?: string | null;
   phoneNo2?: string | null;
@@ -62,7 +62,7 @@ interface VendorApiState {
   deleteVendor: (id: number) => AxiosPromise<any>;
 }
 
-const DEFAULT_FILTERS: VendorFilter = { partnerNm: '', phoneNo: '' };
+const DEFAULT_FILTERS: VendorFilter = { vendorNm: '', phoneNo: '' };
 
 const initialStateCreator: StateCreator<VendorUiState & VendorApiState, any> = (set) => ({
   filters: { ...DEFAULT_FILTERS },
@@ -92,7 +92,7 @@ const initialStateCreator: StateCreator<VendorUiState & VendorApiState, any> = (
       params: {
         pageRowCount: 1000,
         curPage: 1,
-        'filter.partnerNm': filters.partnerNm || undefined,
+        'filter.vendorNm': filters.vendorNm || undefined,
         'filter.phoneNo': filters.phoneNo || undefined,
       },
     }),
