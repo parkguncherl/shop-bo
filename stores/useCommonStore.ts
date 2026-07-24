@@ -41,6 +41,8 @@ interface CommonApiState {
   selectFileList: (fileId: number) => Promise<FileDet[]>;
   deleteFile: (commonRequest: any) => AxiosPromise<ApiResponse>;
   getFileUrl: (fileKey: string) => Promise<string>;
+  /** 목록 화면용: 여러 파일키의 presigned url 을 한 번의 요청으로 조회 */
+  getFileUrls: (fileKeys: string[]) => Promise<Record<string, string>>;
   getFileList: (fileId: number) => AxiosPromise<ApiResponse>;
   selectGridColumnState: (uri: string) => AxiosPromise<ApiResponse>;
   rearrangeFilesByStepsToMove: (commonRequestFileRearrangementRequest: CommonRequestFileRearrangementRequest) => AxiosPromise<ApiResponse>;
@@ -157,6 +159,13 @@ const initialStateCreator: StateCreator<CommonState & CommonApiState, any> = (se
           }
         });
       }
+    },
+    getFileUrls: async (fileKeys: string[]) => {
+      const keys = (fileKeys ?? []).filter((k) => k && k.trim() !== '');
+      if (keys.length === 0) return {};
+      return await authApi.post('/common/getFileUrls', { fileKeys: [...new Set(keys)] }).then((res) => {
+        return res.data.resultCode === 200 ? (res.data.body as Record<string, string>) ?? {} : {};
+      });
     },
     getFileList: (fileId: number) => {
       return authApi.get(`/common/file/${fileId}`);

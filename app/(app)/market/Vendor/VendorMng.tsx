@@ -5,7 +5,7 @@ import { CellEditRequestEvent, ColDef } from 'ag-grid-community';
 import { Search, Table, TableHeader, Title } from '@/components';
 import { toastError, toastSuccess } from '@/components';
 import { useCommonStore, useVendorStore } from '@/stores';
-import type { VendorItem, VendorFilter } from '@/stores';
+import type { VendorFilter } from '@/stores';
 import { defaultColDef, GridSetting } from '@/libs/ag-grid';
 import { useAgGridApi } from '@/hooks';
 import CustomNoRowsOverlay from '@/components/CustomNoRowsOverlay';
@@ -14,6 +14,7 @@ import TunedGrid from '@/components/grid/TunedGrid';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import VendorMngAddPop from '@/components/popup/market/vendor/VendorMngAddPop';
+import { VendorMngResponseVendorPagingInfo } from '@/generated';
 
 // 그리드에서 바로 수정 가능한 컬럼 (명칭 ~ 기타정보, 등록자 이전까지)
 const INLINE_EDITABLE = new Set(['vendorNm', 'location', 'phoneNo', 'phoneNo2', 'kakaoId', 'etcInfo']);
@@ -36,7 +37,7 @@ const VendorMng = () => {
   const updateVendor = useVendorStore((s) => s.updateVendor);
   const deleteVendor = useVendorStore((s) => s.deleteVendor);
 
-  const [rowData, setRowData] = useState<VendorItem[]>([]);
+  const [rowData, setRowData] = useState<VendorMngResponseVendorPagingInfo[]>([]);
   const queryClient = useQueryClient();
 
   const {
@@ -54,7 +55,7 @@ const VendorMng = () => {
     const { resultCode, body, resultMessage } = listData.data;
     if (resultCode === 200) {
       // 조회 결과 행이 읽기전용(frozen)일 수 있어 그리드 인라인 편집을 위해 mutable 복사본으로 저장
-      setRowData((body?.rows ?? []).map((r: VendorItem) => ({ ...r })));
+      setRowData((body?.rows ?? []).map((r: VendorMngResponseVendorPagingInfo) => ({ ...r })));
     } else {
       toastError(resultMessage ?? '조회 중 오류가 발생했습니다.');
     }
@@ -92,7 +93,7 @@ const VendorMng = () => {
 
   // readOnlyEdit 모드: ag-grid가 행 객체(frozen)에 직접 대입하지 않고 요청만 발생 -> 우리가 직접 갱신
   const onCellEditRequest = useCallback(
-    (event: CellEditRequestEvent<VendorItem>) => {
+    (event: CellEditRequestEvent<VendorMngResponseVendorPagingInfo>) => {
       const field = event.column.getColId();
       if (!INLINE_EDITABLE.has(field)) return;
 
@@ -115,11 +116,11 @@ const VendorMng = () => {
     [updateVendorMutate],
   );
 
-  const columnDefs: ColDef<VendorItem>[] = [
+  const columnDefs: ColDef<VendorMngResponseVendorPagingInfo>[] = [
     {
       headerName: 'No',
-      minWidth: 55,
-      maxWidth: 55,
+      minWidth: 37,
+      maxWidth: 37,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
       valueGetter: (p) => (p.node?.rowIndex != null ? p.node.rowIndex + 1 : ''),
@@ -128,20 +129,33 @@ const VendorMng = () => {
       field: 'vendorNm',
       headerName: '명칭✎',
       minWidth: 160,
+      maxWidth: 160,
       editable: true,
       suppressHeaderMenuButton: true,
     },
     {
       field: 'location',
       headerName: '위치✎',
-      minWidth: 200,
+      minWidth: 220,
+      maxWidth: 220,
       editable: true,
       suppressHeaderMenuButton: true,
     },
     {
+      field: 'prodCnt',
+      headerName: '등록',
+      minWidth: 40,
+      maxWidth: 40,
+      editable: true,
+      suppressHeaderMenuButton: true,
+      cellRenderer: 'NUMBER_COMMA',
+      cellStyle: GridSetting.CellStyle.RIGHT,
+    },
+    {
       field: 'phoneNo',
       headerName: '연락처✎',
-      minWidth: 120,
+      minWidth: 100,
+      maxWidth: 100,
       editable: true,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
@@ -149,7 +163,8 @@ const VendorMng = () => {
     {
       field: 'phoneNo2',
       headerName: '연락처2✎',
-      minWidth: 120,
+      minWidth: 100,
+      maxWidth: 100,
       editable: true,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
@@ -157,7 +172,8 @@ const VendorMng = () => {
     {
       field: 'kakaoId',
       headerName: '카톡ID✎',
-      minWidth: 120,
+      minWidth: 100,
+      maxWidth: 100,
       editable: true,
       cellStyle: GridSetting.CellStyle.CENTER,
       suppressHeaderMenuButton: true,
@@ -165,26 +181,10 @@ const VendorMng = () => {
     {
       field: 'etcInfo',
       headerName: '기타정보✎',
-      minWidth: 200,
+      minWidth: 150,
+      maxWidth: 150,
       editable: true,
       suppressHeaderMenuButton: true,
-    },
-    {
-      field: 'updUser',
-      headerName: '등록자',
-      minWidth: 100,
-      maxWidth: 120,
-      cellStyle: GridSetting.CellStyle.CENTER,
-      suppressHeaderMenuButton: true,
-    },
-    {
-      field: 'updTm',
-      headerName: '수정일',
-      minWidth: 110,
-      maxWidth: 120,
-      cellStyle: GridSetting.CellStyle.CENTER,
-      suppressHeaderMenuButton: true,
-      cellRenderer: 'DATE',
     },
   ];
 
@@ -217,7 +217,7 @@ const VendorMng = () => {
       </Search>
       <Table>
         <TableHeader count={rowData.length} search={refetch}></TableHeader>
-        <TunedGrid
+        <TunedGrid<VendorMngResponseVendorPagingInfo>
           headerHeight={35}
           onGridReady={onGridReady}
           loading={isLoading}
@@ -259,7 +259,8 @@ const VendorMng = () => {
         title="해당 협력업체를 삭제하시겠습니까?"
         warningMessage="삭제 후 복구할 수 없습니다."
         onConfirm={() => {
-          if (selectedVendor) deleteMutate(selectedVendor.id);
+          if (selectedVendor && selectedVendor.id) deleteMutate(selectedVendor.id);
+          else toastError('선택된 벤더가 없습니다.');
         }}
         onClose={(_r) => setDelOpen(false)}
       />

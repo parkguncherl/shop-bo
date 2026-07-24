@@ -3,22 +3,7 @@ import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { AxiosPromise } from 'axios';
 import { authApi } from '@/libs';
-
-// 협력업체 아이템 타입
-export type VendorItem = {
-  id: number;
-  partnerId?: number;
-  vendorNm: string;
-  location?: string;
-  phoneNo?: string;
-  phoneNo2?: string;
-  kakaoId?: string;
-  etcInfo?: string;
-  creUser?: string;
-  creTm?: string;
-  updUser?: string;
-  updTm?: string;
-};
+import { VendorMngResponseVendorPagingInfo } from '@/generated';
 
 // 협력업체 검색 필터 타입
 export type VendorFilter = {
@@ -45,8 +30,8 @@ interface VendorUiState {
   setFilters: (name: keyof VendorFilter, value: string) => void;
   resetFilters: () => void;
 
-  selectedVendor: VendorItem | null;
-  setSelectedVendor: (vendor: VendorItem | null) => void;
+  selectedVendor: VendorMngResponseVendorPagingInfo | null;
+  setSelectedVendor: (vendor: VendorMngResponseVendorPagingInfo | null) => void;
 
   addOpen: boolean;
   delOpen: boolean;

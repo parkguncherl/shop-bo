@@ -60,6 +60,7 @@ const ProductMng = () => {
   const upMenuNm = useCommonStore((s) => s.upMenuNm);
   const menuNm = useCommonStore((s) => s.menuNm);
   const getFileUrl = useCommonStore((s) => s.getFileUrl);
+  const getFileUrls = useCommonStore((s) => s.getFileUrls);
   const selectFileList = useCommonStore((s) => s.selectFileList);
   const updateImageFile = useCommonStore((s) => s.updateImageFile);
   const uploadImageFiles = useCommonStore((s) => s.uploadImageFiles);
@@ -264,20 +265,23 @@ const ProductMng = () => {
       const { resultCode, body, resultMessage } = productInfos.data;
       if (resultCode === 200) {
         const rows: ProductInfoWithImg[] = body || [];
-        // 대표이미지 썸네일 URL 해석 (repFileId → 첫 파일 → presigned url)
-        Promise.all(
-          rows.map(async (row) => {
-            if (!row.repFileId) return { ...row };
-            try {
-              const fileDetList = await selectFileList(row.repFileId);
-              const first = fileDetList?.[0];
-              const imgUrl = first?.sysFileNm ? await getFileUrl(first.sysFileNm as string) : undefined;
-              return { ...row, imgUrl };
-            } catch {
-              return { ...row };
-            }
-          }),
-        ).then(setProductInfoList);
+        // 대표이미지 썸네일 URL 해석
+        // 목록 응답에 repSysFileNm 이 포함되므로, 행별 파일조회 없이 presigned url 만 1회로 일괄 조회한다.
+        const keys = rows.map((r) => (r as any).repSysFileNm as string | undefined).filter((k): k is string => !!k);
+        if (keys.length === 0) {
+          setProductInfoList(rows);
+        } else {
+          getFileUrls(keys)
+            .then((urlMap) =>
+              setProductInfoList(
+                rows.map((row) => {
+                  const key = (row as any).repSysFileNm as string | undefined;
+                  return key ? { ...row, imgUrl: urlMap[key] } : { ...row };
+                }),
+              ),
+            )
+            .catch(() => setProductInfoList(rows));
+        }
       } else {
         toastError(resultMessage);
       }
@@ -741,14 +745,6 @@ const ProductMng = () => {
                   <button
                     className={'btn btn_primary'}
                     onClick={() => {
-                      partnerCodeOpenModal('PARTNER_CODE_P0006_OPEN');
-                    }}
-                  >
-                    협력업체관리
-                  </button>
-                  <button
-                    className={'btn btn_primary'}
-                    onClick={() => {
                       openModal('PROD_BY_CATEGORY');
                     }}
                   >
@@ -942,7 +938,6 @@ const ProductMng = () => {
         }}
         onSuccess={() => {
           closeModal(modals.type);
-
           productInfosRefetch();
           onDetFiltersReset();
         }}
@@ -964,13 +959,6 @@ const ProductMng = () => {
         activated={partnerCodeModals?.type === 'PARTNER_CODE_P0001_OPEN' && partnerCodeModals.active}
         codeName={PARTNER_CODE.categories.name}
         onCloseRequestEmerged={() => partnerCodeCloseModal('PARTNER_CODE_P0001_OPEN')}
-      />
-      <PartnerCodePop
-        partnerCodeUpper={PARTNER_CODE.domae.code}
-        title={'협력업체관리'}
-        activated={partnerCodeModals?.type === 'PARTNER_CODE_P0006_OPEN' && partnerCodeModals.active}
-        codeName={PARTNER_CODE.domae.name}
-        onCloseRequestEmerged={() => partnerCodeCloseModal('PARTNER_CODE_P0006_OPEN')}
       />
       <ProductForEachCategoryPop open={modals.type == 'PROD_BY_CATEGORY' && modals.active} onClose={() => closeModal('PROD_BY_CATEGORY')} />
       <ConfirmModal
