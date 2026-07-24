@@ -34,12 +34,18 @@ interface Props {
 /** 화주관리 수정 팝업 */
 const PartnerModPop = ({ datas }: Props) => {
   /** 공통 스토어 - State */
-  const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
+  const upMenuNm = useCommonStore((s) => s.upMenuNm);
+  const menuNm = useCommonStore((s) => s.menuNm);
   /** 스토어 */
-  const [modalType, closeModal] = usePartnerStore((s) => [s.modalType, s.closeModal]);
-  const [commonModalType, commonOpenModal, getFileUrl] = useCommonStore((s) => [s.modalType, s.openModal, s.getFileUrl]);
+  const modalType = usePartnerStore((s) => s.modalType);
+  const closeModal = usePartnerStore((s) => s.closeModal);
+  const commonModalType = useCommonStore((s) => s.modalType);
+  const commonOpenModal = useCommonStore((s) => s.openModal);
+  const getFileUrl = useCommonStore((s) => s.getFileUrl);
   /** 화주관리 스토어 - API */
-  const [updatePartner, deletePartner, openModal] = usePartnerStore((s) => [s.updatePartner, s.deletePartner, s.openModal]);
+  const updatePartner = usePartnerStore((s) => s.updatePartner);
+  const deletePartner = usePartnerStore((s) => s.deletePartner);
+  const openModal = usePartnerStore((s) => s.openModal);
   const [confirmModal, setConfirmModal] = useState<boolean>(false);
   const queryClient = useQueryClient();
   const [fileUrl, setFileUrl] = useState('');

@@ -15,13 +15,11 @@ const AuthStatusChecker = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [setHistoryList, setUpMenuNm, setMenuNm, setMenuUpdYn, setMenuExcelYn] = useCommonStore((s) => [
-    s.setHistoryList,
-    s.setUpMenuNm,
-    s.setMenuNm,
-    s.setMenuUpdYn,
-    s.setMenuExcelYn,
-  ]);
+  const setHistoryList = useCommonStore((s) => s.setHistoryList);
+  const setUpMenuNm = useCommonStore((s) => s.setUpMenuNm);
+  const setMenuNm = useCommonStore((s) => s.setMenuNm);
+  const setMenuUpdYn = useCommonStore((s) => s.setMenuUpdYn);
+  const setMenuExcelYn = useCommonStore((s) => s.setMenuExcelYn);
 
   // 메뉴 권한 체크 함수
   const authCheck = async () => {

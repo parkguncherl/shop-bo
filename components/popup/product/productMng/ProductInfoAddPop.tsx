@@ -70,7 +70,7 @@ const buildDefaultValues = () => ({
 const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
   const domaeCode = usePartnerCodeList({ codeUpper: 'P0006', orderType: 'NAME' });
-  const [insertProductInfo] = useProductMngStore((s) => [s.insertProductInfo]);
+  const insertProductInfo = useProductMngStore((s) => s.insertProductInfo);
   const { selectLowerPartnerCodeByCodeUpper } = usePartnerCodeStore();
 
   /** 카테고리 목록 */

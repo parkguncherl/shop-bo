@@ -151,7 +151,9 @@ const CustomerServiceList = () => {
   const { onGridReady } = useAgGridApi();
   const menuNm = useCommonStore((s) => s.menuNm);
   const getFileUrl = useCommonStore((s) => s.getFileUrl);
-  const [partnerCodeModals, partnerCodeOpenModal, partnerCodeCloseModal] = usePartnerCodeStore((s) => [s.modals, s.openModal, s.closeModal]);
+  const partnerCodeModals = usePartnerCodeStore((s) => s.modals);
+  const partnerCodeOpenModal = usePartnerCodeStore((s) => s.openModal);
+  const partnerCodeCloseModal = usePartnerCodeStore((s) => s.closeModal);
   const [filters, onChangeFilters, onFiltersReset] = useFilters<FilterType>({
     comuType: '',
     remarkYn: '',

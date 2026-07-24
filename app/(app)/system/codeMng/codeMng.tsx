@@ -29,23 +29,23 @@ const CodeMng = () => {
   const MainGridRef = useRef<AgGridReact>(null);
 
   /** 공통 스토어 - State */
-  const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
+  const upMenuNm = useCommonStore((s) => s.upMenuNm);
+  const menuNm = useCommonStore((s) => s.menuNm);
 
   /** 공통 스토어 - State */
-  const [menuUpdYn, menuExcelYn] = useCommonStore((s) => [s.menuUpdYn, s.menuExcelYn]);
+  const menuUpdYn = useCommonStore((s) => s.menuUpdYn);
+  const menuExcelYn = useCommonStore((s) => s.menuExcelYn);
 
   /** 코드관리 스토어 - State */
-  const [paging, setPaging, selectedCode, setSelectedCode, modalType, openModal] = useCodeStore((s) => [
-    s.paging,
-    s.setPaging,
-    s.selectedCode,
-    s.setSelectedCode,
-    s.modalType,
-    s.openModal,
-  ]);
+  const paging = useCodeStore((s) => s.paging);
+  const setPaging = useCodeStore((s) => s.setPaging);
+  const selectedCode = useCodeStore((s) => s.selectedCode);
+  const setSelectedCode = useCodeStore((s) => s.setSelectedCode);
+  const modalType = useCodeStore((s) => s.modalType);
+  const openModal = useCodeStore((s) => s.openModal);
 
   /** 코드관리 스토어 - API */
-  const [excelDown] = useCodeStore((s) => [s.excelDown]);
+  const excelDown = useCodeStore((s) => s.excelDown);
 
   const [filters, onChangeFilters, onFiltersReset, dispatch] = useFilters<CodePagingFilter>({
     codeUpper: 'TOP',

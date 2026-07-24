@@ -23,6 +23,7 @@ import { Search } from '@/components/content';
 import { PARTNER_CODE } from '@/libs/const';
 import { usePartnerCodeStore } from '@/stores/usePartnerCodeStore';
 import { useProductMngStore } from '@/stores/product/useProductMngStore';
+import { TableHeader } from '@/components';
 
 // interface ConfirmModalProps {
 //   type: 'ADD_TO_CATEGORY' | 'DEL_FROM_CATEGORY';
@@ -53,12 +54,10 @@ interface ProductContentShowPopProps {
  * */
 const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
-  const [insertCategoryProduct, updateCategoryProductSeq, deleteCategoryProduct] = useProductMngStore((s) => [
-    s.insertCategoryProduct,
-    s.updateCategoryProductSeq,
-    s.deleteCategoryProduct,
-  ]);
-  const { selectLowerPartnerCodeByCodeUpper } = usePartnerCodeStore();
+  const insertCategoryProduct = useProductMngStore((s) => s.insertCategoryProduct);
+  const updateCategoryProductSeq = useProductMngStore((s) => s.updateCategoryProductSeq);
+  const deleteCategoryProduct = useProductMngStore((s) => s.deleteCategoryProduct);
+  const selectLowerPartnerCodeByCodeUpper = usePartnerCodeStore((s) => s.selectLowerPartnerCodeByCodeUpper);
 
   /** 팝업 내부 local state */
   const [productInfoListByCategory, setProductInfoListByCategory] = useState<ProductMngResponseCategoryProductInfo[]>([]);
@@ -448,69 +447,44 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
           <PopupFooter>
             <div className="btnArea between">
               <div className="left">
-                {/*<button*/}
-                {/*  className={`btn ${selectedProductInfoByCategory != undefined && filtersForProdInfoByCategory.categoryId && 'btn_primary'}`}*/}
-                {/*  disabled={selectedProductInfoByCategory === undefined}*/}
-                {/*  onClick={() => {*/}
-                {/*    setModalsStatus({*/}
-                {/*      type: 'DEL_FROM_CATEGORY',*/}
-                {/*      active: true,*/}
-                {/*      stored_temporary: selectedProductInfoByCategory,*/}
-                {/*    });*/}
-                {/*  }}*/}
-                {/*>*/}
-                {/*  /!*{`${*!/*/}
-                {/*  /!*  selectedProductInfoByCategory != undefined && filtersForProdInfoByCategory.categoryId*!/*/}
-                {/*  /!*    ? (lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||*!/*/}
-                {/*  /!*        '알수 없는 카테고리') +*!/*/}
-                {/*  /!*      ' 에 해당하는 ' +*!/*/}
-                {/*  /!*      selectedProductInfoByCategory.prodNm?.slice(0, 7) +*!/*/}
-                {/*  /!*      ((selectedProductInfoByCategory.prodNm || '').length > 7 ? '..' : '') +*!/*/}
-                {/*  /!*      ' 을 삭제'*!/*/}
-                {/*  /!*    : filtersForProdInfoByCategory.categoryId*!/*/}
-                {/*  /!*    ? (*!/*/}
-                {/*  /!*        lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||*!/*/}
-                {/*  /!*        '알수 없음'*!/*/}
-                {/*  /!*      ).slice(0, 5) +*!/*/}
-                {/*  /!*      ((*!/*/}
-                {/*  /!*        lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||*!/*/}
-                {/*  /!*        '알수 없는 카테고리'*!/*/}
-                {/*  /!*      ).length > 5*!/*/}
-                {/*  /!*        ? '..'*!/*/}
-                {/*  /!*        : '') +*!/*/}
-                {/*  /!*      ' 내에서 삭제할 상품 선택'*!/*/}
-                {/*  /!*    : '카테고리 선택'*!/*/}
-                {/*  /!*}`}*!/*/}
-                {/*  {'카테고리에서 삭제'}*/}
-                {/*</button>*/}
-                {/*<button*/}
-                {/*  className={`btn ${selectedProductInfo != undefined && filtersForProdInfoByCategory.categoryId && 'btn_primary'}`}*/}
-                {/*  disabled={selectedProductInfo == undefined || !filtersForProdInfoByCategory.categoryId}*/}
-                {/*  onClick={() => {*/}
-                {/*    setModalsStatus({*/}
-                {/*      type: 'ADD_TO_CATEGORY',*/}
-                {/*      active: true,*/}
-                {/*      stored_temporary: {*/}
-                {/*        ...selectedProductInfo,*/}
-                {/*        categoryId: filtersForProdInfoByCategory.categoryId,*/}
-                {/*      },*/}
-                {/*    } as ConfForAddToCategory);*/}
-                {/*  }}*/}
-                {/*>*/}
-                {/*  /!*{`${*!/*/}
-                {/*  /!*  selectedProductInfo != undefined && filtersForProdInfoByCategory.categoryId*!/*/}
-                {/*  /!*    ? selectedProductInfo.prodNm?.slice(0, 7) +*!/*/}
-                {/*  /!*      ((selectedProductInfo.prodNm || '').length > 7 ? '..' : '') +*!/*/}
-                {/*  /!*      ' 을(를) ' +*!/*/}
-                {/*  /!*      (lowerPartnerCodeList.filter((lowerPartnerCode) => lowerPartnerCode.id == filtersForProdInfoByCategory.categoryId)[0]?.codeNm ||*!/*/}
-                {/*  /!*        '알수 없는 카테고리') +*!/*/}
-                {/*  /!*      ' 의 상품으로 추가 '*!/*/}
-                {/*  /!*    : '카테고리 선택 후 추가'*!/*/}
-                {/*  /!*}`}*!/*/}
-                {/*  {'카테고리에 추가'}*/}
-                {/*</button>*/}
+                <button
+                  className={`btn btn_primary`}
+                  onClick={() => {
+                    const api = RefForLeftGrid.current?.api;
+                    if (api?.getSelectedRows().length === 1) {
+                      const categoryProductId = api.getSelectedRows()[0].categoryProductId;
+
+                      deleteCategoryProductMutate({
+                        id: categoryProductId,
+                      });
+                    } else {
+                      toastError('삭제할데이터가 한건 반드시 선택되어야 합니다.');
+                    }
+                  }}
+                >
+                  삭제
+                </button>
               </div>
               <div className="right">
+                <button
+                  className={`btn btn_primary`}
+                  onClick={() => {
+                    const api = RefForRightGrid.current?.api;
+                    if (api?.getSelectedRows().length === 1) {
+                      const id = api.getSelectedRows()[0].id;
+                      if (refAsFlag.current.categoryId) {
+                        insertCategoryProductMutate({
+                          categoryId: refAsFlag.current.categoryId,
+                          productId: id,
+                        });
+                      }
+                    } else {
+                      toastError('추가할 데이터가 한건 반드시 선택되어야 합니다.');
+                    }
+                  }}
+                >
+                  추가
+                </button>
                 <button className="btn" onClick={commonOnCloseCallback}>
                   닫기
                 </button>
@@ -544,6 +518,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
           <div className="mt10">
             <div className="layoutBox">
               <div className={'layout55'}>
+                <TableHeader count={productInfoListByCategory.length} gridRef={RefForLeftGrid}></TableHeader>
                 <TunedGrid<ProductMngResponseCategoryProductInfo>
                   columnDefs={columnDefsOnLeft}
                   rowData={productInfoListByCategory}
@@ -564,6 +539,7 @@ const ProductForEachCategoryPop = ({ open, onClose }: ProductContentShowPopProps
                 />
               </div>
               <div className={'layout45'}>
+                <TableHeader count={productInfoListWithExclusion.length} gridRef={RefForRightGrid}></TableHeader>
                 <TunedGrid<ProductMngResponseProductInfoByExclusion>
                   columnDefs={columnDefsOnRight}
                   rowData={productInfoListWithExclusion}

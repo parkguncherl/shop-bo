@@ -46,13 +46,17 @@ export const CodeModPop = ({ data }: Props) => {
   });
 
   /** 코드관리 스토어 - State */
-  const [modalType, closeModal] = useCodeStore((s) => [s.modalType, s.closeModal]);
+  const modalType = useCodeStore((s) => s.modalType);
+  const closeModal = useCodeStore((s) => s.closeModal);
 
   /** 코드관리 스토어 - API */
-  const [updateCode, deleteCode, updateCodeUseNotUse] = useCodeStore((s) => [s.updateCode, s.deleteCode, s.updateCodeUseNotUse]);
+  const updateCode = useCodeStore((s) => s.updateCode);
+  const deleteCode = useCodeStore((s) => s.deleteCode);
+  const updateCodeUseNotUse = useCodeStore((s) => s.updateCodeUseNotUse);
 
   /** 공통 스토어 - State */
-  const [menuUpdYn, menuExcelYn] = useCommonStore((s) => [s.menuUpdYn, s.menuExcelYn]);
+  const menuUpdYn = useCommonStore((s) => s.menuUpdYn);
+  const menuExcelYn = useCommonStore((s) => s.menuExcelYn);
 
   const queryClient = useQueryClient();
 

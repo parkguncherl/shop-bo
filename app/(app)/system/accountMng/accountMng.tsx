@@ -41,21 +41,18 @@ const AccountMng = () => {
   const { onGridReady } = useAgGridApi();
 
   /** 공통 스토어 - State */
-  const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
+  const upMenuNm = useCommonStore((s) => s.upMenuNm);
+  const menuNm = useCommonStore((s) => s.menuNm);
 
   /** 공통 스토어 - State */
-  const [menuUpdYn] = useCommonStore((s) => [s.menuUpdYn]);
+  const menuUpdYn = useCommonStore((s) => s.menuUpdYn);
 
   /** 계정관리 스토어 - State */
-  const [paging, setPaging, modalType, openModal, closeModal] = useAccountStore((s) => [
-    s.paging,
-    s.setPaging,
-    // s.selectedUser,
-    // s.setSelectedUser,
-    s.modalType,
-    s.openModal,
-    s.closeModal,
-  ]);
+  const paging = useAccountStore((s) => s.paging);
+  const setPaging = useAccountStore((s) => s.setPaging);
+  const modalType = useAccountStore((s) => s.modalType);
+  const openModal = useAccountStore((s) => s.openModal);
+  const closeModal = useAccountStore((s) => s.closeModal);
 
   const [filters, onChangeFilters, onFiltersReset] = useFilters({
     loginId: undefined,

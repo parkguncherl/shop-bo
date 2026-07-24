@@ -16,7 +16,8 @@ interface FileUploadPopProps {
 
 export const FileUploadsPop = ({ ref, onValueChange, fileId }: FileUploadPopProps) => {
   /** 공통 스토어 - State */
-  const [modalType, closeModal] = useCommonStore((s) => [s.modalType, s.closeModal]);
+  const modalType = useCommonStore((s) => s.modalType);
+  const closeModal = useCommonStore((s) => s.closeModal);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

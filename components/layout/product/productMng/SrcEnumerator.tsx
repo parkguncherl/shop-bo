@@ -135,7 +135,7 @@ const EnumElement = ({ srcElement, isFirst, isLast, toUpperReqHandler, oneStepMo
 };
 
 const SrcEnumerator = ({ srcInfo, title, callBack, children }: SrcEnumeratorProps) => {
-  const [rearrangeFilesByStepsToMove] = useCommonStore((s) => [s.rearrangeFilesByStepsToMove]);
+  const rearrangeFilesByStepsToMove = useCommonStore((s) => s.rearrangeFilesByStepsToMove);
 
   const onToUpperReqEmerged = (event: ToUpperReqEvent) => {
     // 최상단 이동 요청 처리(fileSeq 업데이트 동작)

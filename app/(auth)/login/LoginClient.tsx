@@ -31,7 +31,10 @@ export interface LoginVerificationFields {
  * */
 const LoginClient = () => {
   /** 전역 상태 */
-  const [onVerification, modalType, onSendOtp, openModal] = useAuthStore((s) => [s.onVerification, s.modalType, s.onSendOtp, s.openModal, s.closeModal]);
+  const onVerification = useAuthStore((s) => s.onVerification);
+  const modalType = useAuthStore((s) => s.modalType);
+  const onSendOtp = useAuthStore((s) => s.onSendOtp);
+  const openModal = useAuthStore((s) => s.openModal);
 
   /** local state */
   const [otpNo, setOtpNo] = useState<string>('000000');

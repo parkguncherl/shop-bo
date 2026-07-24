@@ -24,16 +24,14 @@ const PartnerMng = () => {
   /** Grid Api */
   const { onGridReady } = useAgGridApi();
   /** 공통 스토어 - State */
-  const [menuNm] = useCommonStore((s) => [s.menuNm]);
+  const menuNm = useCommonStore((s) => s.menuNm);
   /** 스토어 */
-  const [paging, setPaging, selectedPartner, setSelectedPartner, modalType, openModal] = usePartnerStore((s) => [
-    s.paging,
-    s.setPaging,
-    s.selectedPartner,
-    s.setSelectedPartner,
-    s.modalType,
-    s.openModal,
-  ]);
+  const paging = usePartnerStore((s) => s.paging);
+  const setPaging = usePartnerStore((s) => s.setPaging);
+  const selectedPartner = usePartnerStore((s) => s.selectedPartner);
+  const setSelectedPartner = usePartnerStore((s) => s.setSelectedPartner);
+  const modalType = usePartnerStore((s) => s.modalType);
+  const openModal = usePartnerStore((s) => s.openModal);
   /** 필터 */
   const [filters, onChangeFilters] = useFilters<PartnerPagingFilter>({
     startDate: '2026-01-01',

@@ -26,8 +26,11 @@ interface Props {
 /** 화주관리 신규 추가 팝업 */
 const PartnerAddPop = ({ data }: Props) => {
   /** 스토어 */
-  const [modalType, closeModal] = usePartnerStore((s) => [s.modalType, s.closeModal]);
-  const [commonModalType, commonOpenModal, getFileUrl] = useCommonStore((s) => [s.modalType, s.openModal, s.getFileUrl]);
+  const modalType = usePartnerStore((s) => s.modalType);
+  const closeModal = usePartnerStore((s) => s.closeModal);
+  const commonModalType = useCommonStore((s) => s.modalType);
+  const commonOpenModal = useCommonStore((s) => s.openModal);
+  const getFileUrl = useCommonStore((s) => s.getFileUrl);
   const [fileUrl, setFileUrl] = useState('');
 
   /** 파일 조회하기 (by 변수) */
@@ -56,7 +59,7 @@ const PartnerAddPop = ({ data }: Props) => {
     mode: 'onSubmit',
   });
   /** 화주관리 스토어 - API */
-  const [insertPartner] = usePartnerStore((s) => [s.insertPartner]);
+  const insertPartner = usePartnerStore((s) => s.insertPartner);
 
   const queryClient = useQueryClient();
 

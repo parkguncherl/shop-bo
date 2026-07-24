@@ -33,8 +33,10 @@ export const MenuAddPop = ({ data, callback }: Props) => {
 
   const queryClient = useQueryClient();
   const [menu, setMenu] = useState<Menu>({});
-  const [modalType, closeModal, selectedMenu] = useMenuStore((s) => [s.modalType, s.closeModal, s.selectedMenu]);
-  const [insertMenu] = useMenuStore((s) => [s.insertMenu]);
+  const modalType = useMenuStore((s) => s.modalType);
+  const closeModal = useMenuStore((s) => s.closeModal);
+  const selectedMenu = useMenuStore((s) => s.selectedMenu);
+  const insertMenu = useMenuStore((s) => s.insertMenu);
 
   /** 신규 */
   const { mutate: insertMenuMutate, isPending } = useMutation({

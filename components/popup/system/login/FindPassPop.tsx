@@ -12,7 +12,9 @@ export const FindPassPop = () => {
   const el = useRef<HTMLDivElement | null>(null);
   const [loginId, setLoginId] = useState('');
   const [phoneNo, setPhoneNo] = useState('');
-  const [modalType, closeModal, onFindPassword] = useAuthStore((s) => [s.modalType, s.closeModal, s.onFindPassword]);
+  const modalType = useAuthStore((s) => s.modalType);
+  const closeModal = useAuthStore((s) => s.closeModal);
+  const onFindPassword = useAuthStore((s) => s.onFindPassword);
   const { mutate: onFindPasswordMutate, isPending: onFindPasswordIsLoading } = useMutation({
     mutationKey: ['auth/passwordInit'],
     mutationFn: onFindPassword,

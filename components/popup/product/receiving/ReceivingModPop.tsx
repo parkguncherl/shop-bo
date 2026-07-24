@@ -24,7 +24,7 @@ interface ReceivingModPopProps {
 }
 
 const ReceivingModPop = ({ open, item, onClose, onSuccess }: ReceivingModPopProps) => {
-  const [updateReceiving] = useReceivingStore((s) => [s.updateReceiving]);
+  const updateReceiving = useReceivingStore((s) => s.updateReceiving);
   const [openModConf, setOpenModConf] = useState<{ open: boolean; stored?: ReceivingRequestUpdateReceiving & { id: number } }>({ open: false });
 
   const { handleSubmit, control, setValue, reset } = useForm<ReceivingRequestUpdateReceiving>({

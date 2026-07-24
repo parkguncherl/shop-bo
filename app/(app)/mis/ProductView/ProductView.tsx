@@ -47,7 +47,8 @@ const ProductView = () => {
   const chartTextColor = isDark ? '#d0d0e0' : '#333';
   const chartAxisColor = isDark ? '#555570' : '#aaa';
   const splitLineColor = isDark ? '#2a2a3e' : '#eee';
-  const [getFileUrl, getFileList] = useCommonStore((s) => [s.getFileUrl, s.getFileList]);
+  const getFileUrl = useCommonStore((s) => s.getFileUrl);
+  const getFileList = useCommonStore((s) => s.getFileList);
 
   const [filters, onChangeFilters, onFiltersReset] = useFilters<ProductViewFilter>({
     fromDate: yearStart,

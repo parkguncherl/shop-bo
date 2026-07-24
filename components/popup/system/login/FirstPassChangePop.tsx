@@ -14,13 +14,14 @@ interface Props {
 }
 
 export const FirstPassChangePop = ({ loginId, changeType }: Props) => {
-  const [setChangePassword] = useAuthStore((s) => [s.setChangePassword]);
-  const [setStayPassword] = useAuthStore((s) => [s.setStayPassword]);
+  const setChangePassword = useAuthStore((s) => s.setChangePassword);
+  const setStayPassword = useAuthStore((s) => s.setStayPassword);
   const el = useRef<HTMLDListElement | null>(null);
   const [rePassword, setRePassword] = useState('');
   const [modPassword, setModPassword] = useState('');
   const [reModpassword, setReModPassword] = useState('');
-  const [modalType, closeModal] = useAuthStore((s) => [s.modalType, s.closeModal]);
+  const modalType = useAuthStore((s) => s.modalType);
+  const closeModal = useAuthStore((s) => s.closeModal);
   const [isRePasswordVisible, setIsRePasswordVisible] = useState(true);
   const [isModPasswordVisible, setIsModPasswordVisible] = useState(true);
   const [isReModPasswordVisible, setIsReModPasswordVisible] = useState(true);

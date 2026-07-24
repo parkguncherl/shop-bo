@@ -50,10 +50,11 @@ export const CodeAddPop = ({ data }: Props) => {
   });
 
   /** 코드관리 스토어 - State */
-  const [modalType, closeModal] = useCodeStore((s) => [s.modalType, s.closeModal]);
+  const modalType = useCodeStore((s) => s.modalType);
+  const closeModal = useCodeStore((s) => s.closeModal);
 
   /** 코드관리 스토어 - API */
-  const [insertCode] = useCodeStore((s) => [s.insertCode]);
+  const insertCode = useCodeStore((s) => s.insertCode);
 
   const queryClient = useQueryClient();
 

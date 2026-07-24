@@ -43,8 +43,9 @@ interface ProductContentShowPopProps {
  * */
 const ProductAddPop = ({ open, onClose, onSuccess, selectedContent }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
-  const [insertContentsProductList] = useProductContentListStore((s) => [s.insertContentsProductList]);
-  const [getFileUrl, getFileList] = useCommonStore((s) => [s.getFileUrl, s.getFileList]);
+  const insertContentsProductList = useProductContentListStore((s) => s.insertContentsProductList);
+  const getFileUrl = useCommonStore((s) => s.getFileUrl);
+  const getFileList = useCommonStore((s) => s.getFileList);
 
   /** 팝업 내부 local state */
   const [productInfoList, setProductInfoList] = useState<ProductContentListResponseProductInfo[]>([]);

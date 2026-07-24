@@ -73,13 +73,11 @@ const Receiving = () => {
   const { onGridReady } = useAgGridApi();
   const gridRef = useRef<TunedGridRef<ReceivingResponseReceivingItem>>(null);
   const menuNm = useCommonStore((s) => s.menuNm);
-  const [modals, openModal, closeModal, deleteReceiving, updateReceivingIfExist] = useReceivingStore((s) => [
-    s.modals,
-    s.openModal,
-    s.closeModal,
-    s.deleteReceiving,
-    s.updateReceivingIfExist,
-  ]);
+  const modals = useReceivingStore((s) => s.modals);
+  const openModal = useReceivingStore((s) => s.openModal);
+  const closeModal = useReceivingStore((s) => s.closeModal);
+  const deleteReceiving = useReceivingStore((s) => s.deleteReceiving);
+  const updateReceivingIfExist = useReceivingStore((s) => s.updateReceivingIfExist);
 
   const [filters, onChangeFilters, onFiltersReset] = useFilters<ListFilter>({
     fromDate: threeMonthsAgo,

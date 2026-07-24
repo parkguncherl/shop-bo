@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { StateCreator } from 'zustand/esm';
+import { StateCreator } from 'zustand';
 import { authApi } from '@/libs';
 import { AxiosPromise } from 'axios';
 

@@ -34,8 +34,9 @@ const HistoryBox = ({ ref }: Props) => {
   const contextMenuRef = useRef<HTMLUListElement>(null);
 
   /** 전역 상태(조건부 랜더링에 직접 사용하는 건 지양하기)*/
-  const [regFavoritesAll] = useMypageStore((s) => [s.regFavoritesAll]);
-  const [historyList, setHistoryList] = useCommonStore((s) => [s.historyList, s.setHistoryList]);
+  const regFavoritesAll = useMypageStore((s) => s.regFavoritesAll);
+  const historyList = useCommonStore((s) => s.historyList);
+  const setHistoryList = useCommonStore((s) => s.setHistoryList);
 
   /** 지역(local) states */
   // ReactSortable 내부 동작과 zustand 의 불변성 요구 모두를 충족하기 위한 완충 state, 상태 관리는 여전히 전역 관할이나 sortable 영역 상태의 동기화는 해당 state 관할

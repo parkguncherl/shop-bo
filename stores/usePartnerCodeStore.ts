@@ -18,7 +18,7 @@ import {
   PartnerCodeResponsePaging,
 } from '@/generated';
 
-type ModalType = 'PARTNER_CODE_P0001_OPEN' | 'PARTNER_CODE_P0006_OPEN';
+type ModalType = 'PARTNER_CODE_P0001_OPEN' | 'PARTNER_CODE_P0006_OPEN' | 'PARTNER_CODE_OPEN';
 
 interface ModalState {
   type: ModalType;

@@ -18,11 +18,13 @@ export interface LockCellRenderProps extends ICellRendererType {
 export const LockCellRender = ({ onClick, data }: LockCellRenderProps) => {
   //console.log('LockCellRender props:', title, onClick, data.lockYn); // 확인용 로그
   /** 공통 스토어 - State */
-  const [menuUpdYn, menuExcelYn] = useCommonStore((s) => [s.menuUpdYn, s.menuExcelYn]);
+  const menuUpdYn = useCommonStore((s) => s.menuUpdYn);
+  const menuExcelYn = useCommonStore((s) => s.menuExcelYn);
 
   /** 계정관리 스토어 - State */
-  //const [openModal, setSelectedUser] = useAccountStore((s) => [s.openModal, s.setSelectedUser]);
-  const [openModal] = useAccountStore((s) => [s.openModal]);
+  //const openModal = useAccountStore((s) => s.openModal);
+const setSelectedUser = useAccountStore((s) => s.setSelectedUser);
+  const openModal = useAccountStore((s) => s.openModal);
 
   return (
     <div

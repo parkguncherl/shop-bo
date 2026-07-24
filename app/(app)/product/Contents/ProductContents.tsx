@@ -3,13 +3,12 @@
 import React, { useState } from 'react';
 import { Title, toastError, toastSuccess } from '@/components';
 import { useCommonStore } from '@/stores';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { YupSchema } from '@/libs';
 import FormEnhancedTextArea, { ContentElement, EnhancedTextAreasMode, FileInfo } from '@/components/form/FormEnhancedTextArea';
 import FormInput from '@/components/form/FormInput';
 import { ConfirmModal } from '@/components/ConfirmModal';
-import { SubmitErrorHandler } from 'react-hook-form/dist/types/form';
 import { useProductContentsStore } from '@/stores/product/useProductContentsStore';
 import { useMutation } from '@tanstack/react-query';
 import { Formatter } from '@/libs/const';
@@ -24,8 +23,12 @@ export interface ProductContentsFields {
 /** 상품관리 - 상품컨텐츠 페이지 */
 const ProductContents = () => {
   /** 공통 스토어 - State */
-  const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
-  const [modals, openModal, closeModal, insertProductContents] = useProductContentsStore((s) => [s.modals, s.openModal, s.closeModal, (s as any).insertProductContents]);
+  const upMenuNm = useCommonStore((s) => s.upMenuNm);
+  const menuNm = useCommonStore((s) => s.menuNm);
+  const modals = useProductContentsStore((s) => s.modals);
+  const openModal = useProductContentsStore((s) => s.openModal);
+  const closeModal = useProductContentsStore((s) => s.closeModal);
+  const insertProductContents = useProductContentsStore((s) => s.insertProductContents);
 
   /** 로컬 스토어 */
   const [displayMode, setDisplayMode] = useState<EnhancedTextAreasMode>('edit');

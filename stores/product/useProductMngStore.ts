@@ -1,4 +1,4 @@
-import { StateCreator } from 'zustand/esm';
+import { StateCreator } from 'zustand';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';

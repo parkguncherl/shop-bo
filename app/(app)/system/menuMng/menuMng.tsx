@@ -21,24 +21,23 @@ const MenuMng = () => {
   const { gridApi, onGridReady } = useAgGridApi();
 
   /** 공통 스토어 - State */
-  const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
+  const upMenuNm = useCommonStore((s) => s.upMenuNm);
+  const menuNm = useCommonStore((s) => s.menuNm);
 
   /** 공통 스토어 - State */
-  const [menuUpdYn] = useCommonStore((s) => [s.menuUpdYn]);
+  const menuUpdYn = useCommonStore((s) => s.menuUpdYn);
 
   /** 코드관리 스토어 - State */
-  const [modalType, openModal, paging, filter, selectedMenu, setSelectedMenu, setPaging, setFilter, excelDown, onClear] = useMenuStore((s) => [
-    s.modalType,
-    s.openModal,
-    s.paging,
-    s.filter,
-    s.selectedMenu,
-    s.setSelectedMenu,
-    s.setPaging,
-    s.setFilter,
-    s.excelDown,
-    s.onClear,
-  ]);
+  const modalType = useMenuStore((s) => s.modalType);
+  const openModal = useMenuStore((s) => s.openModal);
+  const paging = useMenuStore((s) => s.paging);
+  const filter = useMenuStore((s) => s.filter);
+  const selectedMenu = useMenuStore((s) => s.selectedMenu);
+  const setSelectedMenu = useMenuStore((s) => s.setSelectedMenu);
+  const setPaging = useMenuStore((s) => s.setPaging);
+  const setFilter = useMenuStore((s) => s.setFilter);
+  const excelDown = useMenuStore((s) => s.excelDown);
+  const onClear = useMenuStore((s) => s.onClear);
 
   /** 메뉴관리 페이징 목록 조회 */
   const {

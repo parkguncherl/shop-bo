@@ -59,13 +59,19 @@ export const AccountModPop = ({ data, open, onClose }: AccountModPopProps) => {
   });
 
   /** 계정관리 스토어 - State */
-  //const [modalType, closeModal, selectedUser] = useAccountStore((s) => [s.modalType, s.closeModal, s.selectedUser]);
+  //const modalType = useAccountStore((s) => s.modalType);
+const closeModal = useAccountStore((s) => s.closeModal);
+const selectedUser = useAccountStore((s) => s.selectedUser);
 
   /** 계정관리 양식 관리 스토어 - API */
-  const [updateUser, deleteUser, sendMailUser, updatePasswordInit] = useAccountStore((s) => [s.updateUser, s.deleteUser, s.sendMailUser, s.updatePasswordInit]);
+  const updateUser = useAccountStore((s) => s.updateUser);
+  const deleteUser = useAccountStore((s) => s.deleteUser);
+  const sendMailUser = useAccountStore((s) => s.sendMailUser);
+  const updatePasswordInit = useAccountStore((s) => s.updatePasswordInit);
 
   /** 공통 스토어 - State */
-  const [menuUpdYn, menuExcelYn] = useCommonStore((s) => [s.menuUpdYn, s.menuExcelYn]);
+  const menuUpdYn = useCommonStore((s) => s.menuUpdYn);
+  const menuExcelYn = useCommonStore((s) => s.menuExcelYn);
 
   const [confirmModal, setConfirmModal] = useState(false);
   // const [userAuthCd, setUserAuthCd] = useState<number>(data.authCd ? Number(data.authCd) : 0);

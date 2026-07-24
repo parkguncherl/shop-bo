@@ -15,10 +15,12 @@ interface Props extends ICellRendererType {
 /** 시스템 - 코드관리 : 하위코드 수 Cell Renderer*/
 export const LowerCellRender = ({ title, styles, onClick, data }: Props) => {
   /** 공통 스토어 - State */
-  const [menuUpdYn, menuExcelYn] = useCommonStore((s) => [s.menuUpdYn, s.menuExcelYn]);
+  const menuUpdYn = useCommonStore((s) => s.menuUpdYn);
+  const menuExcelYn = useCommonStore((s) => s.menuExcelYn);
 
   /** 코드관리 스토어 - State */
-  const [openModal, setSelectedCode] = useCodeStore((s) => [s.openModal, s.setSelectedCode]);
+  const openModal = useCodeStore((s) => s.openModal);
+  const setSelectedCode = useCodeStore((s) => s.setSelectedCode);
 
   return (
     <div

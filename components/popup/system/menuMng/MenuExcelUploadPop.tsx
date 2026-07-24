@@ -17,7 +17,9 @@ export const MenuExcelUploadPop = ({ callback }: Props) => {
   const queryClient = useQueryClient();
 
   /** 메뉴접근 권한관리 스토어 - State */
-  const [modalType, closeModal, excelUpload] = useMenuStore((s) => [s.modalType, s.closeModal, s.excelUpload]);
+  const modalType = useMenuStore((s) => s.modalType);
+  const closeModal = useMenuStore((s) => s.closeModal);
+  const excelUpload = useMenuStore((s) => s.excelUpload);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | undefined>();
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

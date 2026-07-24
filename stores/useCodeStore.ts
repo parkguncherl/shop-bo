@@ -14,7 +14,7 @@ import {
 } from '@/generated';
 import { AxiosPromise } from 'axios';
 import { authApi, authDownApi } from '@/libs';
-import { StateCreator } from 'zustand/esm';
+import { StateCreator } from 'zustand';
 
 type CodeControllerApiSelectCodePagingRequest = any;
 type CodeControllerApiSelectDropdownByCodeUpperRequest = any;

@@ -41,10 +41,11 @@ export const AccountUnLockPop = ({ data }: Props) => {
   });
 
   /** 계정관리 스토어 - State */
-  const [modalType, closeModal] = useAccountStore((s) => [s.modalType, s.closeModal]);
+  const modalType = useAccountStore((s) => s.modalType);
+  const closeModal = useAccountStore((s) => s.closeModal);
 
   /** 계정관리 양식 관리 스토어 - API */
-  const [updateUserUnLock] = useAccountStore((s) => [s.updateUserUnLock]);
+  const updateUserUnLock = useAccountStore((s) => s.updateUserUnLock);
 
   const queryClient = useQueryClient();
 

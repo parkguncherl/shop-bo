@@ -21,7 +21,8 @@ const AccessLog = () => {
   const nowPage = 'wms_accessLog'; // filter 저장 2025-01-21
   const gridRef = useRef<TunedGridRef<ContactResponsePaging>>(null);
   /** 공통 스토어 - State */
-  const [upMenuNm, menuNm] = useCommonStore((s) => [s.upMenuNm, s.menuNm]);
+  const upMenuNm = useCommonStore((s) => s.upMenuNm);
+  const menuNm = useCommonStore((s) => s.menuNm);
 
   /** 스토어 */
   const [modalType, openModal, paging, setSelectContact, setPaging] = useContactState((s) => [

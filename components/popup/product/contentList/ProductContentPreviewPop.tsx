@@ -21,7 +21,8 @@ interface PreviewElement {
 }
 
 const ProductContentPreviewPop = ({ open, onClose, productContentData }: Props) => {
-  const [getFileUrl, selectFileList] = useCommonStore((s) => [s.getFileUrl, s.selectFileList]);
+  const getFileUrl = useCommonStore((s) => s.getFileUrl);
+  const selectFileList = useCommonStore((s) => s.selectFileList);
   const [elements, setElements] = useState<PreviewElement[]>([]);
   const [loading, setLoading] = useState(false);
 

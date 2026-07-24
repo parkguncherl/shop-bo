@@ -84,8 +84,10 @@ function DisplayModeManagementReducerFn(state: DisplayMode, action: DisplayModeA
  * */
 const ProductContentPop = ({ open, onClose, onSuccess, mode = 'ADD', productContentData }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
-  const [getFileUrl, selectFileList] = useCommonStore((s) => [s.getFileUrl, s.selectFileList]);
-  const [insertProductContents, updateProductContents] = useProductContentListStore((s) => [s.insertProductContents, s.updateProductContents]);
+  const getFileUrl = useCommonStore((s) => s.getFileUrl);
+  const selectFileList = useCommonStore((s) => s.selectFileList);
+  const insertProductContents = useProductContentListStore((s) => s.insertProductContents);
+  const updateProductContents = useProductContentListStore((s) => s.updateProductContents);
 
   const [displayModeStatus, dispatchDisplayModeStatus] = useReducer(DisplayModeManagementReducerFn, {
     holdByPreview: false,

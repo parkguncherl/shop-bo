@@ -16,7 +16,7 @@ type RetailResponseDetail = any;
 type RetailRequestRetailAmtFilter = any;
 import { AxiosPromise } from 'axios';
 import { authApi } from '@/libs';
-import { StateCreator } from 'zustand/esm';
+import { StateCreator } from 'zustand';
 
 type ModalType = 'CATEGORYSETTING' | 'ADD' | 'MOD' | 'CONFIRM' | 'DELETE' | 'DELETE_RECOMMAND' | 'UPDATE_SLEEP_STATUS';
 

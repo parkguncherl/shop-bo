@@ -26,10 +26,14 @@ export const CodeMngDetailPop = ({ data }: Props) => {
   const { gridApi, gridColumnApi, onGridReady } = useAgGridApi();
 
   /** 코드관리 스토어 - State */
-  const [codeUpper, setCodeUpper, modalType, closeModal] = useCodeStore((s) => [s.codeUpper, s.setCodeUpper, s.modalType, s.closeModal]);
+  const codeUpper = useCodeStore((s) => s.codeUpper);
+  const setCodeUpper = useCodeStore((s) => s.setCodeUpper);
+  const modalType = useCodeStore((s) => s.modalType);
+  const closeModal = useCodeStore((s) => s.closeModal);
 
   /** 코드관리 스토어 - API */
-  const [selectLowerCodeByCodeUpper, insertCodes] = useCodeStore((s) => [s.selectLowerCodeByCodeUpper, s.insertCodes]);
+  const selectLowerCodeByCodeUpper = useCodeStore((s) => s.selectLowerCodeByCodeUpper);
+  const insertCodes = useCodeStore((s) => s.insertCodes);
 
   const queryClient = useQueryClient();
 

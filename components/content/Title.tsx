@@ -24,7 +24,9 @@ interface Props {
 }
 
 export const Title = ({ title, search, reset, children, detail, className }: PropsWithChildren<Props>) => {
-  const [favoriteList, setFavoriteList, modFavorite] = useMypageStore((s) => [s.favoriteList, s.setFavoriteList, s.modFavorite]);
+  const favoriteList = useMypageStore((s) => s.favoriteList);
+  const setFavoriteList = useMypageStore((s) => s.setFavoriteList);
+  const modFavorite = useMypageStore((s) => s.modFavorite);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const queryClient = useQueryClient();
 

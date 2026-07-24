@@ -15,7 +15,7 @@ import {
 } from '@/generated';
 import { AxiosPromise } from 'axios';
 import { authApi } from '@/libs';
-import { StateCreator } from 'zustand/esm';
+import { StateCreator } from 'zustand';
 
 type ModalType = 'ADD' | 'MOD' | 'UNLOCK';
 

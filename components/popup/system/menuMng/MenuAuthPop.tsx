@@ -17,7 +17,9 @@ export const MenuAuthPop = ({ data, callback }: Props) => {
   const queryClient = useQueryClient();
   const el = useRef<HTMLDListElement | null>(null);
   const [authCodes, setAuthCodes] = useState<Auth[]>([]);
-  const [modalType, closeModal, updateAuth] = useMenuStore((s) => [s.modalType, s.closeModal, s.updateAuth]);
+  const modalType = useMenuStore((s) => s.modalType);
+  const closeModal = useMenuStore((s) => s.closeModal);
+  const updateAuth = useMenuStore((s) => s.updateAuth);
   /** 메뉴 권한 조회 수정 */
   const {
     data: auths,

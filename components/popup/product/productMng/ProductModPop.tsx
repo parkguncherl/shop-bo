@@ -42,7 +42,8 @@ interface ProductContentShowPopProps {
 const ProductModPop = ({ open, onClose, onSuccess, productInfo }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
   const domaeCode = usePartnerCodeList({ codeUpper: 'P0006', orderType: 'NAME' });
-  const [updateProduct, deleteProduct] = useProductMngStore((s) => [s.updateProduct, s.deleteProduct]);
+  const updateProduct = useProductMngStore((s) => s.updateProduct);
+  const deleteProduct = useProductMngStore((s) => s.deleteProduct);
 
   /** 팝업 내부 local state */
   const [openModConf, setOpenAddConf] = useState<{ open: boolean; stored?: ProductMngRequestUpdateProduct }>({ open: false });

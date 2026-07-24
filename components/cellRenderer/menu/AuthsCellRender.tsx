@@ -16,9 +16,10 @@ interface Props extends ICellRendererType {
 /** 시스템 - 메뉴접근 권한관리 : 권한 Cell Renderer*/
 export const AuthsCellRenderer = ({ title, styles, onClick, data }: Props) => {
   /** 공통 스토어 - State */
-  const [menuUpdYn, menuExcelYn] = useCommonStore((s) => [s.menuUpdYn, s.menuExcelYn]);
+  const menuUpdYn = useCommonStore((s) => s.menuUpdYn);
+  const menuExcelYn = useCommonStore((s) => s.menuExcelYn);
 
-  const [openModal] = useMenuStore((s) => [s.openModal]);
+  const openModal = useMenuStore((s) => s.openModal);
 
   return (
     <div

@@ -22,8 +22,11 @@ export const Header = ({ closed }: Props) => {
   const session = useSession();
   const { logout } = useAuthStore();
   /** 공통 스토어 - State */
-  const [setUpMenuNm, setMenuNm, setMenuUpdYn, setMenuExcelYn] = useCommonStore((s) => [s.setUpMenuNm, s.setMenuNm, s.setMenuUpdYn, s.setMenuExcelYn]);
-  const [setFavoriteList] = useMypageStore((s) => [s.setFavoriteList]);
+  const setUpMenuNm = useCommonStore((s) => s.setUpMenuNm);
+  const setMenuNm = useCommonStore((s) => s.setMenuNm);
+  const setMenuUpdYn = useCommonStore((s) => s.setMenuUpdYn);
+  const setMenuExcelYn = useCommonStore((s) => s.setMenuExcelYn);
+  const setFavoriteList = useMypageStore((s) => s.setFavoriteList);
 
   /**
    * 각 페이지(메뉴) 에 관한 사용자의 권한 확인, 권한 부재 시 역시 리다이렉트 및 로그아웃 처리

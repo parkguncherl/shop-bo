@@ -29,7 +29,7 @@ interface ReceivingAddPopProps {
 
 const ReceivingAddPop = ({ open, onClose, onSuccess }: ReceivingAddPopProps) => {
   const { onGridReady } = useAgGridApi();
-  const [insertReceiving] = useReceivingStore((s) => [s.insertReceiving]);
+  const insertReceiving = useReceivingStore((s) => s.insertReceiving);
 
   const [searchKeyword, setSearchKeyword] = useState('');
   const [searchQuery, setSearchQuery] = useState('');

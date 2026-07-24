@@ -50,10 +50,12 @@ export const AccountAddPop = ({ open, onClose }: AccountAddPopProps) => {
   });
 
   /** 계정관리 스토어 - State */
-  //const [modalType, closeModal] = useAccountStore((s) => [s.modalType, s.closeModal]);
+  //const modalType = useAccountStore((s) => s.modalType);
+const closeModal = useAccountStore((s) => s.closeModal);
 
   /** 계정관리 양식 관리 스토어 - API */
-  const [insertUser, sendMailUser] = useAccountStore((s) => [s.insertUser, s.sendMailUser]);
+  const insertUser = useAccountStore((s) => s.insertUser);
+  const sendMailUser = useAccountStore((s) => s.sendMailUser);
   const queryClient = useQueryClient();
 
   const [partnerList, setPartnerList] = useState([]);

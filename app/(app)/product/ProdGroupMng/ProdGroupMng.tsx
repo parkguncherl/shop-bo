@@ -36,18 +36,19 @@ const ProdGroupMng = () => {
   const { onGridReady } = useAgGridApi();
 
   /** 공통 스토어 - State */
-  const [upMenuNm, menuNm, getFileUrl, getFileList] = useCommonStore((s) => [s.upMenuNm, s.menuNm, s.getFileUrl, s.getFileList]);
+  const upMenuNm = useCommonStore((s) => s.upMenuNm);
+  const menuNm = useCommonStore((s) => s.menuNm);
+  const getFileUrl = useCommonStore((s) => s.getFileUrl);
+  const getFileList = useCommonStore((s) => s.getFileList);
 
   /** 코드관리 스토어 - State */
-  const [paging, setPaging, modals, openModal, closeModal, deleteProductContents, updateContentsProductSeq] = useProductContentListStore((s) => [
-    s.paging,
-    s.setPaging,
-    s.modals,
-    s.openModal,
-    s.closeModal,
-    s.deleteProductContents,
-    s.updateContentsProductSeq,
-  ]);
+  const paging = useProductContentListStore((s) => s.paging);
+  const setPaging = useProductContentListStore((s) => s.setPaging);
+  const modals = useProductContentListStore((s) => s.modals);
+  const openModal = useProductContentListStore((s) => s.openModal);
+  const closeModal = useProductContentListStore((s) => s.closeModal);
+  const deleteProductContents = useProductContentListStore((s) => s.deleteProductContents);
+  const updateContentsProductSeq = useProductContentListStore((s) => s.updateContentsProductSeq);
 
   const gridRef = useRef<TunedGridRef<ProductContentListResponseProductContent>>(null);
   const rightGridRef = useRef<TunedGridRef<ProductContentListResponseProductContent>>(null);

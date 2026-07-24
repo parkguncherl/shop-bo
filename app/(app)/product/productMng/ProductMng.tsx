@@ -57,19 +57,22 @@ const ProductMng = () => {
   const { onGridReady } = useAgGridApi();
 
   /** 공통 스토어 - State */
-  const [upMenuNm, menuNm, getFileUrl, selectFileList, updateImageFile, uploadImageFiles, deleteFile] = useCommonStore((s) => [
-    s.upMenuNm,
-    s.menuNm,
-    s.getFileUrl,
-    s.selectFileList,
-    s.updateImageFile,
-    s.uploadImageFiles,
-    s.deleteFile,
-  ]);
+  const upMenuNm = useCommonStore((s) => s.upMenuNm);
+  const menuNm = useCommonStore((s) => s.menuNm);
+  const getFileUrl = useCommonStore((s) => s.getFileUrl);
+  const selectFileList = useCommonStore((s) => s.selectFileList);
+  const updateImageFile = useCommonStore((s) => s.updateImageFile);
+  const uploadImageFiles = useCommonStore((s) => s.uploadImageFiles);
+  const deleteFile = useCommonStore((s) => s.deleteFile);
   const domaeCode = usePartnerCodeList({ codeUpper: 'P0006', orderType: 'NAME' });
   /** 품목관리 스토어 - State */
-  const [modals, openModal, closeModal, deleteProduct] = useProductMngStore((s) => [s.modals, s.openModal, s.closeModal, s.deleteProduct]);
-  const [partnerCodeModals, partnerCodeOpenModal, partnerCodeCloseModal] = usePartnerCodeStore((s) => [s.modals, s.openModal, s.closeModal]);
+  const modals = useProductMngStore((s) => s.modals);
+  const openModal = useProductMngStore((s) => s.openModal);
+  const closeModal = useProductMngStore((s) => s.closeModal);
+  const deleteProduct = useProductMngStore((s) => s.deleteProduct);
+  const partnerCodeModals = usePartnerCodeStore((s) => s.modals);
+  const partnerCodeOpenModal = usePartnerCodeStore((s) => s.openModal);
+  const partnerCodeCloseModal = usePartnerCodeStore((s) => s.closeModal);
 
   /** 검색 필터 */
   const [filters, onChangeFilters] = useFilters<ProductInfoFilters>({

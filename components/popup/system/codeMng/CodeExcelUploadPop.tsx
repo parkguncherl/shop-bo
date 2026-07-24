@@ -11,10 +11,11 @@ import { PopupLayout } from '@/components/popup/PopupLayout';
 
 export const CodeExcelUploadPop = () => {
   /** 코드관리 스토어 - State */
-  const [modalType, closeModal] = useCodeStore((s) => [s.modalType, s.closeModal]);
+  const modalType = useCodeStore((s) => s.modalType);
+  const closeModal = useCodeStore((s) => s.closeModal);
 
   /** 코드관리 스토어 - API */
-  const [excelTemplate] = useCodeStore((s) => [s.excelTemplate]);
+  const excelTemplate = useCodeStore((s) => s.excelTemplate);
   const queryClient = useQueryClient();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | undefined>();

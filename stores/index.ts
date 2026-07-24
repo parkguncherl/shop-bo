@@ -8,3 +8,4 @@ export * from './useMenuStore';
 export * from './useAttributeStore';
 export * from './useMypageStore';
 export * from './usePrintStore';
+export * from './useVendorStore';

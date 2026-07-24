@@ -45,9 +45,12 @@ export const MenuModPop = ({ data, callback }: Props) => {
   });
 
   const queryClient = useQueryClient();
-  const [modalType, closeModal] = useMenuStore((s) => [s.modalType, s.closeModal]);
-  const [updateMenu, deleteMenu] = useMenuStore((s) => [s.updateMenu, s.deleteMenu]);
-  const [menuUpdYn, menuExcelYn] = useCommonStore((s) => [s.menuUpdYn, s.menuExcelYn]);
+  const modalType = useMenuStore((s) => s.modalType);
+  const closeModal = useMenuStore((s) => s.closeModal);
+  const updateMenu = useMenuStore((s) => s.updateMenu);
+  const deleteMenu = useMenuStore((s) => s.deleteMenu);
+  const menuUpdYn = useCommonStore((s) => s.menuUpdYn);
+  const menuExcelYn = useCommonStore((s) => s.menuExcelYn);
   const [confirmModal, setConfirmModal] = useState(false);
 
   /** 변경  */

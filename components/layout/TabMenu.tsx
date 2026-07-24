@@ -37,7 +37,8 @@ export const TabMenu = ({ ref }: Props) => {
 
   /** 지역(local) states */
   const [favoriteBtn, setFavoriteBtn] = useState(false); // 즐겨찾기 onoff
-  const [historyList, setHistoryList] = useCommonStore((s) => [s.historyList, s.setHistoryList]);
+  const historyList = useCommonStore((s) => s.historyList);
+  const setHistoryList = useCommonStore((s) => s.setHistoryList);
   const [activeIndex, setActiveIndex] = useState<number | null>(0); // 활성화 탭
   const [translateXValue, setTranslateXValue] = useState<number>(0); // 왼쪽 오른쪽 이동
   const listRef = useRef<HTMLDivElement>(null); // list Ref 생성
@@ -46,7 +47,9 @@ export const TabMenu = ({ ref }: Props) => {
   const [divWidth, setDivWidth] = useState<number>(0); // 최대 이동 범위
   const containerRef = useRef<HTMLDivElement>(null); // 즐겨찾기 div 영역
   const [isButtonVisible, setIsButtonVisible] = useState<any>(true); // 즐겨찾기영역 이동 버튼
-  const [favoriteList, setFavoriteList, regFavoritesAll] = useMypageStore((s) => [s.favoriteList, s.setFavoriteList, s.regFavoritesAll]);
+  const favoriteList = useMypageStore((s) => s.favoriteList);
+  const setFavoriteList = useMypageStore((s) => s.setFavoriteList);
+  const regFavoritesAll = useMypageStore((s) => s.regFavoritesAll);
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 });
   const [authGroupCd] = useState<string>(session.data?.user?.authCd ? session.data?.user.authCd?.substring(0, 1) : '');
   const [hoverIndex, setHoverIndex] = useState<number | null>(null); // Hover 상태 관리

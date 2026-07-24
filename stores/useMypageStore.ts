@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { ApiResponse, FavoritesMenuList, MenuRequestWithAuth, ModFavoritesRequest, PageObject, SelectFavorites, UserResponsePaging } from '@/generated';
-import { StateCreator } from 'zustand/esm';
+import { StateCreator } from 'zustand';
 import { AxiosPromise } from 'axios';
 import { authApi } from '@/libs';
 

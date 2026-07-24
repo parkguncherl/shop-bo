@@ -126,7 +126,9 @@ const StndrColorCell = (params: any) => {
 const ProductDetInfoPop = ({ open, onClose, productInfo }: ProductContentShowPopProps) => {
   /** 공통 스토어 - State */
   const session = useSession();
-  const [updateProductDet, deleteProductDet, insertProductDet] = useProductMngStore((s) => [s.updateProductDet, s.deleteProductDet, s.insertProductDet]);
+  const updateProductDet = useProductMngStore((s) => s.updateProductDet);
+  const deleteProductDet = useProductMngStore((s) => s.deleteProductDet);
+  const insertProductDet = useProductMngStore((s) => s.insertProductDet);
 
   /** 팝업 내부 local state */
   const [productDetInfoList, setProductDetInfoList] = useState<ProductMngResponseProductDetInfo[]>([]);
