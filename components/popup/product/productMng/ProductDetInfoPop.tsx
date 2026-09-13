@@ -1,6 +1,6 @@
 ﻿import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { CirclePicker, ColorResult } from 'react-color';
+import { SketchPicker, ColorResult } from 'react-color';
 import { PopupFooter } from '@/components/popup/PopupFooter';
 import { PopupContent } from '@/components/popup/PopupContent';
 import { PopupLayout } from '@/components/popup/PopupLayout';
@@ -60,11 +60,9 @@ const StndrColorCell = (params: any) => {
   };
 
   const onComplete = (c: ColorResult) => {
+    // 6자리 hex(#제외) 그대로 저장 (stndr_color varchar(6))
     const hex6 = c.hex.replace('#', '').toLowerCase();
-    // 각 채널(0~255)을 가장 가까운 3자리 표현값(0~15)으로 반올림해 축약 (예: ff00aa → f0a)
-    const toNibble = (pair: string) => Math.round(parseInt(pair, 16) / 17).toString(16);
-    const hex3 = toNibble(hex6.slice(0, 2)) + toNibble(hex6.slice(2, 4)) + toNibble(hex6.slice(4, 6));
-    params.onColorChange?.(params, hex3);
+    params.onColorChange?.(params, hex6);
   };
 
   return (
@@ -101,12 +99,11 @@ const StndrColorCell = (params: any) => {
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              <CirclePicker
+              <SketchPicker
                 color={value ? `#${expandHex(value)}` : '#ffffff'}
-                colors={STNDR_COLOR_PALETTE}
-                circleSize={22}
-                circleSpacing={10}
-                width="352px"
+                presetColors={STNDR_COLOR_PALETTE}
+                disableAlpha
+                width="460px"
                 onChangeComplete={onComplete}
               />
             </div>

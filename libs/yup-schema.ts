@@ -274,7 +274,10 @@ export const YupSchema = {
       productDet: yup
         .object({
           //productDetSeq: yup.number().required(),
-          productDetSize: yup.string().required('(상품상세)사이즈는 필수값입니다!'),
+          // 사이즈는 멀티선택(배열) → 최소 1개 필수
+          productDetSize: yup
+            .mixed()
+            .test('required', '(상품상세)사이즈는 필수값입니다!', (v) => (Array.isArray(v) ? v.length > 0 : !!v)),
           productDetColor: yup.string().required('(상품상세)컬러는 필수값입니다!'),
           skuDiscountRate: yup.number().typeError('스큐 단위 할인율은 숫자만 입력 가능합니다.').required('스큐 단위 할인율은 필수값입니다!'),
           //fileId: yup.number().notRequired(),

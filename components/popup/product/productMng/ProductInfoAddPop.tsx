@@ -194,16 +194,19 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
         stored: insertProductInfoReqObj,
       });
     } else {
-      if (data.productDet?.productDetColor?.includes(',')) {
-        toastError('컬러정보에는 대표컬러만 넣으세요 [콤마 삭제]');
-        return;
-      }
+      // 사이즈 멀티선택(배열) → 콤마 문자열로 변환. 컬러는 콤마 입력 허용(백엔드에서 사이즈 x 컬러 조합 생성)
+      const productDetForReq = {
+        ...data.productDet,
+        productDetSize: Array.isArray((data.productDet as any)?.productDetSize)
+          ? ((data.productDet as any).productDetSize as string[]).join(',')
+          : (data.productDet as any)?.productDetSize,
+      };
 
       // id 부재 --> 품목정보 또한 추가
       let insertProductInfoReqObj: ProductMngRequestInsertProduct = {
         ...data.product,
         makeYmd: dayjs(data.product?.makeYmd).format('YYYY-MM-DD'), // localDate 형식에 적합하도록 변환
-        productDet: data.productDet,
+        productDet: productDetForReq,
       };
 
       if ((data.product as ProductCreateFields).weather.includes('spring')) {
@@ -410,19 +413,26 @@ const ProductInfoAddPop = ({ open, onClose, onSuccess, productInfo, sizeInfo }: 
             )}
             <PopupFormGroup title={'상세'}>
               <PopupFormType className={'type2'}>
-                <FormDropDown<ProductInfoCreateFields>
+                <Controller
                   control={control}
                   name={'productDet.productDetSize'}
-                  title={'품목 사이즈'}
-                  options={sizeOptions}
-                  placeholder={'선택'}
+                  render={({ field }) => (
+                    <TunedReactSelector
+                      title={'품목 사이즈'}
+                      isMulti
+                      placeholder={'선택 (복수 가능)'}
+                      options={sizeOptions}
+                      multiValues={Array.isArray(field.value) ? (field.value as (string | number)[]) : field.value ? [field.value as string] : []}
+                      onChangeMulti={(vals) => field.onChange(vals.map((v) => String(v)))}
+                    />
+                  )}
                 />
                 <FormInput<ProductInfoCreateFields>
                   control={control}
                   name={'productDet.productDetColor'}
-                  label={'대표품목컬러'}
+                  label={'품목컬러'}
                   inputType={'label'}
-                  placeholder={'컬러'}
+                  placeholder={'예: 노랑,파랑 (콤마로 구분)'}
                 />
               </PopupFormType>
               <PopupFormType className={'type2'}>

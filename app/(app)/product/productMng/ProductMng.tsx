@@ -392,12 +392,22 @@ const ProductMng = () => {
       { field: 'vendorNm', headerName: '협력업체', minWidth: 80, maxWidth: 80, suppressHeaderMenuButton: true },
       { field: 'prodNm', headerName: '품목명', minWidth: 200, maxWidth: 200, suppressHeaderMenuButton: true },
       { field: 'season', headerName: '계절', minWidth: 37, maxWidth: 37, suppressHeaderMenuButton: true, cellStyle: rcCenter },
-      { field: 'prodSizes', headerName: '크기', minWidth: 90, maxWidth: 90, suppressHeaderMenuButton: true, cellStyle: rcCenter },
+      {
+        field: 'prodSizes',
+        headerName: '크기',
+        minWidth: 90,
+        maxWidth: 90,
+        suppressHeaderMenuButton: true,
+        wrapText: true,
+        cellStyle: { ...rcCenter, whiteSpace: 'normal', lineHeight: '1.25' } as CellStyle,
+      },
       {
         field: 'prodColors',
         headerName: '색상',
         minWidth: 145,
         maxWidth: 145,
+        wrapText: true,
+        cellStyle: { ...rcCenter, whiteSpace: 'normal', lineHeight: '1.25' } as CellStyle,
         editable: true,
         cellEditor: 'agSelectCellEditor',
         cellEditorParams: (params: ICellEditorParams) => {
