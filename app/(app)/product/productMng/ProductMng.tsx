@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Search, Table, Title, toastSuccess } from '@/components';
 import {
+  FileDet,
   ProductMngRequestProductDetInfoFilter,
   ProductMngRequestProductInfoFilter,
   ProductMngResponseProductDetInfo,
@@ -60,7 +61,6 @@ const ProductMng = () => {
   /** 공통 스토어 - State */
   const upMenuNm = useCommonStore((s) => s.upMenuNm);
   const menuNm = useCommonStore((s) => s.menuNm);
-  const getFileUrl = useCommonStore((s) => s.getFileUrl);
   const getFileUrls = useCommonStore((s) => s.getFileUrls);
   /** 이미지 확대보기 팝업 */
   const [zoomImg, setZoomImg] = useState<{ url: string; title?: string } | null>(null);
@@ -69,6 +69,23 @@ const ProductMng = () => {
   const uploadImageFiles = useCommonStore((s) => s.uploadImageFiles);
   const deleteFile = useCommonStore((s) => s.deleteFile);
   const vendorList = useVendorList();
+
+  /**
+   * 파일 상세 목록 → presigned URL 을 1회 일괄(getFileUrls) 조회하여 SrcEnumerator 용 fileInfos 로 변환.
+   * (기존에는 항목마다 getFileUrl 을 개별 호출했으나, bulk 로 묶어 요청 수를 1회로 줄인다.)
+   */
+  const buildFileInfos = useCallback(
+    async (fileDetList: FileDet[]): Promise<targetedFileSetsElementInfo[]> => {
+      const keys = (fileDetList ?? []).map((f) => f.sysFileNm).filter((k): k is string => !!k);
+      const urlMap = keys.length > 0 ? await getFileUrls(keys) : {};
+      return (fileDetList ?? []).map((f) => ({
+        fileNm: f.fileNm,
+        fileSeq: f.fileSeq,
+        fileSrc: f.sysFileNm ? urlMap[f.sysFileNm] : undefined,
+      }));
+    },
+    [getFileUrls],
+  );
   /** 품목관리 스토어 - State */
   const modals = useProductMngStore((s) => s.modals);
   const openModal = useProductMngStore((s) => s.openModal);
@@ -144,17 +161,7 @@ const ProductMng = () => {
           if (targetedFileSetInfo?.fileId) {
             setTargetedFileSetInfo({
               ...targetedFileSetInfo,
-              fileInfos: await selectFileList(targetedFileSetInfo?.fileId).then(async (fileDetList) => {
-                const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
-                for (let index = 0; index < fileDetList.length; index++) {
-                  fileSetsElementInfos.push({
-                    fileNm: fileDetList[index].fileNm,
-                    fileSeq: fileDetList[index].fileSeq,
-                    fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
-                  });
-                }
-                return fileSetsElementInfos;
-              }),
+              fileInfos: await selectFileList(targetedFileSetInfo?.fileId).then(buildFileInfos),
             });
           }
         } else {
@@ -176,17 +183,7 @@ const ProductMng = () => {
           if (targetedFileSetInfo?.fileId) {
             setTargetedFileSetInfo({
               ...targetedFileSetInfo,
-              fileInfos: await selectFileList(targetedFileSetInfo?.fileId).then(async (fileDetList) => {
-                const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
-                for (let index = 0; index < fileDetList.length; index++) {
-                  fileSetsElementInfos.push({
-                    fileNm: fileDetList[index].fileNm,
-                    fileSeq: fileDetList[index].fileSeq,
-                    fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
-                  });
-                }
-                return fileSetsElementInfos;
-              }),
+              fileInfos: await selectFileList(targetedFileSetInfo?.fileId).then(buildFileInfos),
             });
           }
         } else {
@@ -210,17 +207,7 @@ const ProductMng = () => {
           if (targetedFileSetInfo?.fileId) {
             setTargetedFileSetInfo({
               ...targetedFileSetInfo,
-              fileInfos: await selectFileList(targetedFileSetInfo?.fileId).then(async (fileDetList) => {
-                const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
-                for (let index = 0; index < fileDetList.length; index++) {
-                  fileSetsElementInfos.push({
-                    fileNm: fileDetList[index].fileNm,
-                    fileSeq: fileDetList[index].fileSeq,
-                    fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
-                  });
-                }
-                return fileSetsElementInfos;
-              }),
+              fileInfos: await selectFileList(targetedFileSetInfo?.fileId).then(buildFileInfos),
             });
           }
           productInfosRefetch();
@@ -336,17 +323,7 @@ const ProductMng = () => {
         type: undefined, // 색상이므로
         rowData: productInfoList.filter((productInfo) => productInfo.id == productDetInfo.productId)[0],
         fileId: productDetInfo.fileId as number,
-        fileInfos: await selectFileList(productDetInfo.fileId as number).then(async (fileDetList) => {
-          console.log('fileDetList: ', fileDetList);
-          const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
-          for (let index = 0; index < fileDetList.length; index++) {
-            fileSetsElementInfos.push({
-              fileSeq: fileDetList[index].fileSeq,
-              fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
-            });
-          }
-          return fileSetsElementInfos;
-        }),
+        fileInfos: await selectFileList(productDetInfo.fileId as number).then(buildFileInfos),
       };
     };
     targetedFileSetInfoRefreshFn(productDetInfo).then((updatedFileSetInfo) => {
@@ -570,17 +547,7 @@ const ProductMng = () => {
           type: 'rep',
           rowData: event.data,
           fileId: event.data.repFileId,
-          fileInfos: await selectFileList(event.data.repFileId).then(async (fileDetList) => {
-            const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
-            for (let index = 0; index < fileDetList.length; index++) {
-              fileSetsElementInfos.push({
-                fileNm: fileDetList[index].fileNm,
-                fileSeq: fileDetList[index].fileSeq,
-                fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
-              });
-            }
-            return fileSetsElementInfos;
-          }),
+          fileInfos: await selectFileList(event.data.repFileId).then(buildFileInfos),
         });
       } else if (cellsColField == 'detailFileIdCnt') {
         if (targetedFileSetInfo?.fileId == event.data?.detailFileId) {
@@ -597,16 +564,7 @@ const ProductMng = () => {
           type: 'detail',
           rowData: event.data,
           fileId: event.data?.detailFileId,
-          fileInfos: await selectFileList(event.data.detailFileId).then(async (fileDetList) => {
-            const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
-            for (let index = 0; index < fileDetList.length; index++) {
-              fileSetsElementInfos.push({
-                fileSeq: fileDetList[index].fileSeq,
-                fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
-              });
-            }
-            return fileSetsElementInfos;
-          }),
+          fileInfos: await selectFileList(event.data.detailFileId).then(buildFileInfos),
         });
       } else if (cellsColField == 'sizeFileIdCnt') {
         if (targetedFileSetInfo?.fileId == event.data?.sizeFileId) {
@@ -623,16 +581,7 @@ const ProductMng = () => {
           type: 'size',
           rowData: event.data,
           fileId: event.data?.sizeFileId,
-          fileInfos: await selectFileList(event.data.sizeFileId).then(async (fileDetList) => {
-            const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
-            for (let index = 0; index < fileDetList.length; index++) {
-              fileSetsElementInfos.push({
-                fileSeq: fileDetList[index].fileSeq,
-                fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
-              });
-            }
-            return fileSetsElementInfos;
-          }),
+          fileInfos: await selectFileList(event.data.sizeFileId).then(buildFileInfos),
         });
       } else if (cellsColField == 'etcFileIdCnt') {
         if (targetedFileSetInfo?.fileId == event.data?.etcFileId) {
@@ -649,16 +598,7 @@ const ProductMng = () => {
           type: 'etc',
           rowData: event.data,
           fileId: event.data?.etcFileId,
-          fileInfos: await selectFileList(event.data.etcFileId).then(async (fileDetList) => {
-            const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
-            for (let index = 0; index < fileDetList.length; index++) {
-              fileSetsElementInfos.push({
-                fileSeq: fileDetList[index].fileSeq,
-                fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
-              });
-            }
-            return fileSetsElementInfos;
-          }),
+          fileInfos: await selectFileList(event.data.etcFileId).then(buildFileInfos),
         });
       }
     }
@@ -852,16 +792,7 @@ const ProductMng = () => {
                         ...prevState,
                         fileInfos: !prevState?.fileId
                           ? undefined
-                          : await selectFileList(prevState.fileId).then(async (fileDetList) => {
-                              const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
-                              for (let index = 0; index < fileDetList.length; index++) {
-                                fileSetsElementInfos.push({
-                                  fileSeq: fileDetList[index].fileSeq,
-                                  fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
-                                });
-                              }
-                              return fileSetsElementInfos;
-                            }),
+                          : await selectFileList(prevState.fileId).then(buildFileInfos),
                       } as targetedFileSetInfo;
                     };
 
@@ -928,16 +859,7 @@ const ProductMng = () => {
               ...prevState,
               fileInfos: !prevState?.fileId
                 ? undefined
-                : await selectFileList(prevState.fileId).then(async (fileDetList) => {
-                    const fileSetsElementInfos: targetedFileSetsElementInfo[] = [];
-                    for (let index = 0; index < fileDetList.length; index++) {
-                      fileSetsElementInfos.push({
-                        fileSeq: fileDetList[index].fileSeq,
-                        fileSrc: fileDetList[index].sysFileNm ? await getFileUrl(fileDetList[index].sysFileNm as string) : undefined,
-                      });
-                    }
-                    return fileSetsElementInfos;
-                  }),
+                : await selectFileList(prevState.fileId).then(buildFileInfos),
             } as targetedFileSetInfo;
           };
 
