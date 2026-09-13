@@ -790,9 +790,7 @@ const ProductMng = () => {
                     const targetedFileSetInfoRefreshFn = async (prevState: targetedFileSetInfo | undefined) => {
                       return {
                         ...prevState,
-                        fileInfos: !prevState?.fileId
-                          ? undefined
-                          : await selectFileList(prevState.fileId).then(buildFileInfos),
+                        fileInfos: !prevState?.fileId ? undefined : await selectFileList(prevState.fileId).then(buildFileInfos),
                       } as targetedFileSetInfo;
                     };
 
@@ -857,9 +855,7 @@ const ProductMng = () => {
           const targetedFileSetInfoRefreshFn = async (prevState: targetedFileSetInfo | undefined) => {
             return {
               ...prevState,
-              fileInfos: !prevState?.fileId
-                ? undefined
-                : await selectFileList(prevState.fileId).then(buildFileInfos),
+              fileInfos: !prevState?.fileId ? undefined : await selectFileList(prevState.fileId).then(buildFileInfos),
             } as targetedFileSetInfo;
           };
 
