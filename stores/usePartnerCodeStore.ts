@@ -93,25 +93,25 @@ const initialStateCreator: StateCreator<PartnerCodeState & PartnerCodeApiState, 
       }));
     },
     selectDropdownByPartnerCodeUpper: () => {
-      return authApi.get('/partnerCode/dropdown', {
+      return authApi.get('/userCode/dropdown', {
         params: {
           ...get().partnerCodeDropDown,
         },
       });
     },
     savePartnerCode: (codeRequest) => {
-      return authApi.post('/partnerCode', codeRequest);
+      return authApi.post('/userCode', codeRequest);
     },
     deletePartnerCode: (codeRequest) => {
-      return authApi.delete('/partnerCode', {
+      return authApi.delete('/userCode', {
         data: codeRequest,
       });
     },
     updatePartnerCodeToDeletedStatus: (codeRequests: PartnerCodeRequestSoftDelete) => {
-      return authApi.put('/partnerCode/update-status', codeRequests);
+      return authApi.put('/userCode/update-status', codeRequests);
     },
     selectLowerPartnerCodeByCodeUpper: (codeUpper: string, searchKeyWord: string) => {
-      return authApi.get('/partnerCode/lowerCodeList', {
+      return authApi.get('/userCode/lowerCodeList', {
         params: {
           codeUpper: codeUpper,
           searchKeyword: searchKeyWord,
@@ -119,7 +119,7 @@ const initialStateCreator: StateCreator<PartnerCodeState & PartnerCodeApiState, 
       });
     },
     selectPartnerCodeDropdown: (codeUpper: string, searchKeyWord?: string) => {
-      return authApi.get('/partnerCode/dropdown', {
+      return authApi.get('/userCode/dropdown', {
         params: { codeUpper: codeUpper, searchKeyWord: searchKeyWord },
       });
     },

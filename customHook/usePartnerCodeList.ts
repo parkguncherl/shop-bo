@@ -42,10 +42,10 @@ export const usePartnerCodeList = ({
 }: UsePartnerCodeListParams) => {
   return useQuery({
     // 캐시 키: 상위코드 + 선택적 식별자 조합으로 구분
-    queryKey: ['/partnerCode/lowerCodeList/', codeUpper, queryKey],
+    queryKey: ['/userCode/lowerCodeList/', codeUpper, queryKey],
     // 실제 서버 호출 (공통 응답 래퍼 형태로 반환됨)
     queryFn: () =>
-      authApi.get('/partnerCode/lowerCodeList', {
+      authApi.get('/userCode/lowerCodeList', {
         params: { codeUpper, searchKeyword, orderType },
       }),
     // select: 서버 원본 응답 → 화면에서 바로 쓰는 DropDownOption[] 로 변환.
