@@ -1,9 +1,9 @@
-// hooks/usePartnerCodeList.ts
+// hooks/useUserCodeList.ts
 import { useQuery } from '@tanstack/react-query';
 import { authApi } from '@/libs';
 import { toastError } from '@/components';
 import { DropDownOption } from '@/types/DropDownOptions';
-/** usePartnerCodeList 훅 파라미터 */
+/** useUserCodeList 훅 파라미터 */
 interface UsePartnerCodeListParams {
   /** 상위 코드 (예: 'P0006' → 해당 상위코드의 하위 코드 목록 조회) */
   codeUpper: string;
@@ -26,12 +26,12 @@ interface UsePartnerCodeListParams {
  *
  * 반환값은 배열이 아니라 react-query 의 결과 객체(UseQueryResult)입니다.
  * 가공된 옵션 배열은 그 안의 `.data` 에 담깁니다.
- *   const codeList = usePartnerCodeList({ codeUpper: 'P0006' });
+ *   const codeList = useUserCodeList({ codeUpper: 'P0006' });
  *   codeList.data      // → DropDownOption[] (로딩 전엔 undefined)
  *   codeList.isLoading // 로딩 상태
  * 따라서 <FormDropDown options={...} /> 에는 `codeList.data ?? []` 를 넘겨야 합니다.
  */
-export const usePartnerCodeList = ({
+export const useUserCodeList = ({
   codeUpper,
   searchKeyword = '',
   orderType = 'NAME',

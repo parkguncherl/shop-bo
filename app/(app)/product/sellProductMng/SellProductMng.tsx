@@ -26,7 +26,7 @@ import ProductModPop from '@/components/popup/product/productMng/ProductModPop';
 import ProductDetInfoPop from '@/components/popup/product/productMng/ProductDetInfoPop';
 import { usePartnerCodeStore } from '@/stores/usePartnerCodeStore';
 import { usePartnerList } from '@/customHook/usePartnerList';
-import { usePartnerCodeList } from '@/customHook/usePartnerCodeList';
+import { useUserCodeList } from '@/customHook/useUserCodeList';
 import { PartnerCodePop } from '@/components/popup/system/PartnerCodePop';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import ImageZoomPop from '@/components/popup/common/ImageZoomPop';
@@ -88,7 +88,7 @@ const SellProductMng = () => {
   });
 
   /** 카테고리(P0001) 검색용 드롭다운 옵션 (+ 코드에 없는 '미등록' 항목을 화면에서 추가) */
-  const { data: categoryCodeOptions = [] } = usePartnerCodeList({ codeUpper: PARTNER_CODE.categories.code });
+  const { data: categoryCodeOptions = [] } = useUserCodeList({ codeUpper: PARTNER_CODE.categories.code });
   // categoryId = -1 은 '어떤 카테고리에도 등록되지 않은 상품' 을 의미하는 sentinel 값
   const categoryOptions = useMemo(() => [...categoryCodeOptions, { key: '-1', value: -1, label: '미등록' }], [categoryCodeOptions]);
 
