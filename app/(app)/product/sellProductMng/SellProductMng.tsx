@@ -242,7 +242,7 @@ const SellProductMng = () => {
     refetch: productInfosRefetch,
   } = useQuery({
     queryKey: [
-      '/productMng/productInfoList',
+      '/productMng/sellProductInfoList',
       {
         partnerId: filters.partnerId,
         vendorId: filters.vendorId,
@@ -257,7 +257,7 @@ const SellProductMng = () => {
       },
     ],
     queryFn: () =>
-      authApi.get('/productMng/productInfoList', {
+      authApi.get('/productMng/sellProductInfoList', {
         params: {
           ...filters,
           // 선택된 계절만 'Y' 로 전달 (미선택은 undefined → 파라미터 제외)

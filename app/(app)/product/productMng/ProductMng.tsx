@@ -19,7 +19,7 @@ import { authApi } from '@/libs';
 import TunedGrid, { TunedGridRef } from '@/components/grid/TunedGrid';
 import useFilters from '@/hooks/useFilters';
 import { useProductMngStore } from '@/stores/product/useProductMngStore';
-import { PARTNER_CODE, Placeholder } from '@/libs/const';
+import { Placeholder } from '@/libs/const';
 import SrcEnumerator, { SrcElement, SrcEnumeratorProps } from '@/components/layout/product/productMng/SrcEnumerator';
 import { FileUploadPop } from '@/components/popup/common';
 import ProductInfoAddPop from '@/components/popup/product/productMng/ProductInfoAddPop';
@@ -27,12 +27,9 @@ import ProductModPop from '@/components/popup/product/productMng/ProductModPop';
 import ProductDetInfoPop from '@/components/popup/product/productMng/ProductDetInfoPop';
 import { usePartnerCodeStore } from '@/stores/usePartnerCodeStore';
 import { usePartnerList } from '@/customHook/usePartnerList';
-import { useUserCodeList } from '@/customHook/useUserCodeList';
-import { PartnerCodePop } from '@/components/popup/system/PartnerCodePop';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import ImageZoomPop from '@/components/popup/common/ImageZoomPop';
 import ImgEditPop, { ImgPropsOnEditPop } from '@/components/popup/common/ImgEditPop';
-import { useVendorList } from '@/customHook/useVendorList';
 
 type targetedFileTypes = 'rep' | 'detail' | 'size' | 'etc';
 
@@ -68,7 +65,6 @@ const ProductMng = () => {
   const updateImageFile = useCommonStore((s) => s.updateImageFile);
   const uploadImageFiles = useCommonStore((s) => s.uploadImageFiles);
   const deleteFile = useCommonStore((s) => s.deleteFile);
-  const vendorList = useVendorList();
 
   /**
    * 파일 상세 목록 → presigned URL 을 1회 일괄(getFileUrls) 조회하여 SrcEnumerator 용 fileInfos 로 변환.
@@ -99,15 +95,9 @@ const ProductMng = () => {
   const [filters, onChangeFilters] = useFilters<ProductInfoFilters>({
     prodNm: undefined,
     partnerId: undefined,
-    vendorId: undefined,
     categoryId: undefined,
     showYn: 'Y', // 기본값: 전시
   });
-
-  /** 카테고리(P0001) 검색용 드롭다운 옵션 (+ 코드에 없는 '미등록' 항목을 화면에서 추가) */
-  const { data: categoryCodeOptions = [] } = useUserCodeList({ codeUpper: PARTNER_CODE.categories.code });
-  // categoryId = -1 은 '어떤 카테고리에도 등록되지 않은 상품' 을 의미하는 sentinel 값
-  const categoryOptions = useMemo(() => [...categoryCodeOptions, { key: '-1', value: -1, label: '미등록' }], [categoryCodeOptions]);
 
   /** 계절 버튼 — 버튼마다 독립 boolean state (체크박스처럼 다중 선택) */
   const [isSpring, setIsSpring] = useState(false);
@@ -232,7 +222,6 @@ const ProductMng = () => {
       '/productMng/productInfoList',
       {
         partnerId: filters.partnerId,
-        vendorId: filters.vendorId,
         categoryId: filters.categoryId,
         showYn: filters.showYn,
         prodNm: filters.prodNm,
@@ -608,24 +597,6 @@ const ProductMng = () => {
     <div>
       <Title title={upMenuNm && menuNm ? `${menuNm}` : ''} />
       <Search className="type_2">
-        <Search.DropDown
-          title={'카테고리'}
-          name={'categoryId'}
-          value={filters.categoryId}
-          onChange={(_name, value) => onChangeFilters('categoryId', value ? Number(value) : undefined)}
-          defaultOptions={categoryOptions}
-          showAll={true}
-          dropDownStyle={{ width: '120px' }}
-        />
-        <Search.DropDown
-          title={'협력업체'}
-          name={'vendorId'}
-          value={filters.vendorId}
-          onChange={(_name, value) => onChangeFilters('vendorId', value ? Number(value) : undefined)}
-          defaultOptions={vendorList.data}
-          showAll={true}
-          dropDownStyle={{ width: '120px' }}
-        />
         <Search.Input title={'품목명'} name={'prodNm'} placeholder={Placeholder.Input} value={filters.prodNm} onChange={onChangeFilters} onEnter={onSearch} />
         <Search.DropDown
           title={'전시여부'}
@@ -711,16 +682,6 @@ const ProductMng = () => {
                 className={'default check'}
               />
               <div className="btnArea between">
-                <div className="left">
-                  <button
-                    className={'btn btn_primary'}
-                    onClick={() => {
-                      partnerCodeOpenModal('PARTNER_CODE_P0001_OPEN');
-                    }}
-                  >
-                    카테고리
-                  </button>
-                </div>
                 <div className="right">
                   <button
                     className={'btn btn_primary'}
@@ -901,13 +862,6 @@ const ProductMng = () => {
           }
         }}
         productInfo={selectedRowsData}
-      />
-      <PartnerCodePop
-        partnerCodeUpper={PARTNER_CODE.categories.code}
-        title={'품목카테고리관리'}
-        activated={partnerCodeModals?.type === 'PARTNER_CODE_P0001_OPEN' && partnerCodeModals.active}
-        codeName={PARTNER_CODE.categories.name}
-        onCloseRequestEmerged={() => partnerCodeCloseModal('PARTNER_CODE_P0001_OPEN')}
       />
       <ConfirmModal
         open={modals.active && modals.type == 'PROD_DEL'}
