@@ -59,8 +59,8 @@ export const AccountModPop = ({ data, open, onClose }: AccountModPopProps) => {
 
   /** 계정관리 스토어 - State */
   //const modalType = useAccountStore((s) => s.modalType);
-const closeModal = useAccountStore((s) => s.closeModal);
-const selectedUser = useAccountStore((s) => s.selectedUser);
+  const closeModal = useAccountStore((s) => s.closeModal);
+  //const selectedUser = useAccountStore((s) => s.selectedUser);
 
   /** 계정관리 양식 관리 스토어 - API */
   const updateUser = useAccountStore((s) => s.updateUser);
@@ -256,13 +256,7 @@ const selectedUser = useAccountStore((s) => s.selectedUser);
               <PopupFormGroup>
                 <PopupFormType className={'type1'}>
                   <FormInput label={'ID(e-mail)'} name={'loginId'} control={control} disable={true} />
-                  <FormInput<UserRequestUpdate>
-                    control={control}
-                    name={'userNm'}
-                    label={'이름'}
-                    placeholder={Placeholder.Input || ''}
-                    required={true}
-                  />
+                  <FormInput<UserRequestUpdate> control={control} name={'userNm'} label={'이름'} placeholder={Placeholder.Input || ''} required={true} />
                 </PopupFormType>
                 <PopupFormType className={'type1'}>
                   <FormInput<UserRequestUpdate>
@@ -288,13 +282,7 @@ const selectedUser = useAccountStore((s) => s.selectedUser);
                   <FormDropDown<UserRequestUpdate> control={control} title={'상태'} name={'useYn'} codeUpper={'10030'} required={true} />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>
-                  <FormInput<UserRequestUpdate>
-                    control={control}
-                    name={'belongNm'}
-                    label={'소속'}
-                    placeholder={Placeholder.Input || ''}
-                    required={true}
-                  />
+                  <FormInput<UserRequestUpdate> control={control} name={'belongNm'} label={'소속'} placeholder={Placeholder.Input || ''} required={true} />
                   <FormInput<UserRequestUpdate> control={control} name={'deptNm'} label={'부서'} placeholder={Placeholder.Input || ''} />
                 </PopupFormType>
                 <PopupFormType className={'type2'}>

@@ -154,7 +154,9 @@ const AccountMng = () => {
         },
         suppressHeaderMenuButton: true,
       },
+      /*
       { field: 'workLogisNm', headerName: '연결창고', minWidth: 100, maxWidth: 100, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
+*/
       { field: 'useYn', headerName: '사용여부', minWidth: 90, maxWidth: 100, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
       { field: 'lastLoginDateTime', headerName: '최근접속기록', minWidth: 150, cellStyle: GridSetting.CellStyle.CENTER, suppressHeaderMenuButton: true },
       {
